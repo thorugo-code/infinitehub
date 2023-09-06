@@ -1,0 +1,367 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Project {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="header bg-primary" style="padding-bottom: 14rem">
+      <div class="container-fluid">
+        <div class="header-body">
+          <div class="row align-items-center py-4">
+            <div class="col-lg-6 col-7">
+              <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                  <li class="breadcrumb-item"><a href="home.html"><i class="fas fa-home"></i></a></li>
+                  <li class="breadcrumb-item"><a href="projects.html">Projects</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="project.html">Project</a></li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page Title -->
+    <div class="pb-7" style="margin-top: -14rem">
+      <div class="container-fluid">
+        <div class="header-body">
+          <div class="row" style="justify-content: center">
+            <a href="#" class="avatar rounded-circle" style="z-index: 1; min-width: 100px; min-height: 100px">
+              <img alt="Image placeholder" src="static/assets/img/icons/custom/1x/hyundai.png">
+            </a>
+            <div class="col-md-7 pl-5">
+              <h1 class="text-white pt-2" style="font-size: 2.5rem">
+                <a target="_blank" class="text-white" style="line-height: 1rem"
+                   href="project.html">Modelagem BIM
+                </a>
+              </h1>
+              <p class="text-lead text-light mt--3">
+                <a target="_blank" class="text-white" href="projects.html">Hyundai</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page Widgets -->
+    <div class="mt--5 pb-4">
+      <div class="container-fluid">
+        <div class="header-body">
+          <!-- Card stats -->
+<!--          <div class="row" style="justify-content: center">
+            <div class="col-xl-3 col-lg-6" style="max-width: 51%">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Files</h5>
+                      <span class="h2 font-weight-bold mb-0">0</span>
+                    </div>
+                    <div class="col-auto">
+                      <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                        <i class="fas fa-archive"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="mt-3 mb-0 text-muted text-sm">
+                    <span class="text-warning mr-2"><i class="fa fa-arrow-up"></i> 0</span>
+                    <span class="text-nowrap">Since last month</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-6" style="max-width: 51%">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Bugdet</h5>
+                      <span class="h2 font-weight-bold mb-0">0,00 USD</span>
+                    </div>
+                    <div class="col-auto">
+                      <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                        <i class="fas fa-chart-bar"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="mt-3 mb-0 text-muted text-sm">
+                    <span class="text-warning mr-2"><i class="fas fa-arrow-up"></i> 0,00 USD</span>
+                    <span class="text-nowrap">Since last month</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-6" style="max-width: 51%">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Performance</h5>
+                      <span class="h2 font-weight-bold mb-0">59,65%</span>
+                    </div>
+                    <div class="col-auto">
+                      <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+                        <i class="fas fa-percent"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="mt-3 mb-0 text-muted text-sm">
+                    <span class="badge badge-dot mr-2">
+                      <i class="bg-info" style="margin-right: 0.6rem"></i>
+                      <span class="text-nowrap">On schedule</span>
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>-->
+    <div class="container-fluid">
+      <div class="row pb-4">
+        <div class="col-xl-7">
+          <div class="card shadow">
+            <div class="pb-1">
+              <div class="card-header">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <h3 class="mb-0">Info</h3>
+                  </div>
+<!--                  <div class="col text-right">
+                    <a href="#!" class="btn btn-sm btn-secondary">
+                      <img alt="Edit icon" src="static/assets/img/icons/custom/1x/edit-black.png" style="width: 1rem;
+                      height: 1rem; margin-bottom: 3px">
+                      Edit</a>
+		  </div>-->
+              </div>
+            </div>
+              <!-- Card body (ADD CONTENT) -->
+            <div class="card-body" style="padding: 2rem">
+              <form>
+                <div class="px-3">
+                  <div class="row">
+                    <div class="col-lg-5">
+                      <div class="form-group">
+                        <label class="form-control-label" for="input-client-name">Client</label>
+                        <input type="text" id="input-username" class="form-control" placeholder="Client's name" value="" disabled>
+                      </div>
+                    </div>
+                    <div class="col-lg-5">
+                      <div class="form-group">
+                        <label class="form-control-label" for="input-client-area">Area of activity</label>
+                        <input type="email" id="input-email" class="form-control" placeholder="Client's area of activity" value="" disabled>
+                      </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <label class="form-control-label" for="input-client-area">Country</label>
+                        <div class="form-group">
+                          <img src="static/assets/img/icons/custom/1x/br.png" alt="br" style="height: 25px; margin-top: 0.5rem">
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Address -->
+                <div class="px-3">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label class="form-control-label" for="input-address">Start:</label>
+                        <input type="date" id="input-date" class="form-control" placeholder="Home Address" value="" disabled>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label class="form-control-label" for="input-address">Deadline:</label>
+                        <input type="date" id="input-date" class="form-control" placeholder="Home Address" value="" disabled>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Description -->
+                <div class="px-3">
+                  <div class="form-group">
+                    <label class="form-control-label">About</label>
+                    <textarea rows="4" class="form-control" placeholder="A few words about the project ..." disabled></textarea>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+          <div class="card shadow">
+            <div class="pb-1">
+              <div class="card-header">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <h3 class="mb-0">Tasks</h3>
+                  </div>
+<!--                  <div class="col text-right">
+                    <a href="#!" class="btn btn-sm btn-primary">New</a>
+		  </div>-->
+              </div>
+            </div>
+              <div class="table-responsive pb-3">
+                <table class="table align-items-center table-flush" style="display: block; max-height: 297px; overflow: auto">
+                  <thead class="thead-light" style="line-height: 0.5rem">
+                    <tr>
+                      <th scope="col" style="width: 0; padding-right: 0"></th>
+                      <th scope="col" style="width: 100%">Task</th>
+                      <th scope="col" style="width: 0">Priority</th>
+                      <th scope="col" style="width: 130px">Deadline</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+<!--                    <tr>
+                      <th scope="row" style="padding-right: 0">
+                        <form style="display: inline">
+                          <input type="checkbox">
+                        </form></th>
+                      <th scope="row">Task 1</th>
+                      <td class="text-red">High</td>
+                      <th scope="row">01/01/2020</th>
+                    </tr>
+                    <tr>
+                      <th scope="row" style="padding-right: 0">
+                        <form style="display: inline">
+                          <input type="checkbox">
+                        </form></th>
+                      <th scope="row">Task 2</th>
+                      <td class="text-yellow">Medium</td>
+                      <th scope="row">01/01/2020</th>
+                    </tr>
+                    <tr>
+                      <th scope="row" style="padding-right: 0">
+                        <form style="display: inline">
+                          <input type="checkbox">
+                        </form>
+                      </th>
+                      <th scope="row">Task 3</th>
+                      <td class="text-green">Low</td>
+                      <th scope="row">01/01/2020</th>
+                    </tr>-->
+                  </tbody>
+                </table>
+              </div>
+          </div>
+        </div>
+        </div>
+        <div class="col-xl-5" style="max-height: 824px">
+          <div class="card shadow">
+            <div>
+              <div class="card-header">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <h3 class="mb-0">Files</h3>
+                  </div>
+<!--                  <div class="col text-right">
+                    <a href="#!" class="btn btn-sm btn-secondary">Filter</a>
+		  </div>-->
+                </div>
+              <div class="file-widget">
+                  <div class="new-file" style="height: 200px">
+                    <img src="static/assets/img/icons/extensions/1x/new.png" alt="New File" style="height: 105px">
+                  </div>
+                  <div class="file-list" >
+<!--                    <div class="file-item" style="height: 105px">
+                      <a href="#!">
+                        <img src="static/assets/img/icons/extensions/1x/rvt.png" alt="File 1" style="height: 105px">
+                      </a>
+                      <div style="width: 94.27px">
+                          <div id="truncateLongTexts">
+                            <a href="#!">archive.rvt</a>
+                          </div>
+		      </div>
+                    </div>-->
+                    <!-- Add more file items here -->
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+          <div class="card shadow">
+            <div class="card-header">
+              <h3 class="mb-0">Updates</h3>
+<!--              <p class="text-sm">
+                <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
+                <span class="font-weight-bold">3</span> this month
+	      </p>-->
+            </div>
+            <div class="card-body p-3 mb-3" style="max-height: 400px; overflow: auto">
+              <div class="timeline timeline-one-side mr-2 ml-2">
+<!--                <div class="timeline-block mb-3">
+                  <span class="timeline-step">
+                    <i class="ni ni-bell-55 text-success text-gradient"></i>
+                  </span>
+                  <div class="timeline-content">
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">$2400, Design changes</h6>
+                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p>
+                  </div>
+                </div>
+                <div class="timeline-block mb-3">
+                  <span class="timeline-step">
+                    <i class="ni ni-html5 text-danger text-gradient"></i>
+                  </span>
+                  <div class="timeline-content">
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">New order #1832412</h6>
+                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 11 PM</p>
+                  </div>
+                </div>
+                <div class="timeline-block mb-3">
+                  <span class="timeline-step">
+                    <i class="ni ni-cart text-info text-gradient"></i>
+                  </span>
+                  <div class="timeline-content">
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">Server payments for April</h6>
+                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 9:34 PM</p>
+                  </div>
+                </div>
+                <div class="timeline-block mb-3">
+                  <span class="timeline-step">
+                    <i class="ni ni-credit-card text-warning text-gradient"></i>
+                  </span>
+                  <div class="timeline-content">
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">New card added for order #4395133</h6>
+                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">20 DEC 2:20 AM</p>
+                  </div>
+                </div>
+                <div class="timeline-block mb-3">
+                  <span class="timeline-step">
+                    <i class="ni ni-key-25 text-primary text-gradient"></i>
+                  </span>
+                  <div class="timeline-content">
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">Unlock packages for development</h6>
+                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">18 DEC 4:54 AM</p>
+                  </div>
+                </div>
+                <div class="timeline-block">
+                  <span class="timeline-step">
+                    <i class="ni ni-money-coins text-dark text-gradient"></i>
+                  </span>
+                  <div class="timeline-content">
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">New order #9583120</h6>
+                    <p class="text-dark font-weight-bold text-xs mt-1 mb-0">17 DEC</p>
+                  </div>
+		</div>-->
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+      {% include "includes/footer.html" %}
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+<script src="/static/assets/vendor/clipboard/dist/clipboard.min.js"></script>
+
+{% endblock javascripts %}

@@ -1,0 +1,387 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Projects {% endblock title %}
+
+{% block content %}
+
+  <div class="header bg-primary pb-6">
+    <div class="container-fluid">
+      <div class="header-body">
+        <div class="row align-items-center py-4">
+          <div class="col-lg-6 col-7">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+              <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                <li class="breadcrumb-item"><a href="#">Projects</a></li>
+                <li class="breadcrumb-item active" aria-current="page"></li>
+              </ol>
+            </nav>
+          </div>
+          <div class="col-lg-6 col-5 text-right">
+            <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal" data-target="#newPageModal">New</a>
+{#            <a href="#" class="btn btn-sm btn-neutral">Filters</a>#}
+          </div>
+          <!-- New Page Modal -->
+          <div class="modal fade" id="newPageModal" tabindex="-1" role="dialog" aria-labelledby="newPageModalLabel" aria-hidden="true">
+            <div class="modal-dialog my-6" role="document">
+              <div class="modal-content">
+                <div class="modal-header mt-2">
+                  <h5 class="modal-title" style="margin-left: auto">
+                    <i class="ni ni-bulb-61 text-blue" style="font-size: 2rem"></i>
+                  </h5>
+                  <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem" id="newPageModalLabel">New Project</span>
+                  <button type="button" class="close mt--4" style="margin-left: -30px" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                  <form id="newPageForm" method="post" action{% url 'project' %}>
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                      <label for="title">Title</label>
+                      <input type="text" class="form-control" id="project" name="project">
+                    </div>
+                    <div class="row">
+                      <div class="col form-group mb-3">
+                        <label for="title">Client</label>
+                        <input type="text" class="form-control" id="client" name="client">
+                      </div>
+                      <div class="col form-group mb-3" style="max-width: 30%">
+                        <label for="country">Country</label>
+                        <select class="form-control">
+                          <option value="br">Brazil</option>
+                          <option value="pt">Portugal</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group mb-3">
+                      <label for="title">Client's Area</label>
+                      <input type="text" class="form-control" name="client_area">
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <div class="form-group">
+                          <label for="title">Start</label>
+                          <input type="date" id="input-date" class="form-control" name="start_date" placeholder="Home Address">
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="form-group">
+                          <label for="title">Deadline</label>
+                          <input type="date" id="input-date" class="form-control" name="deadline" placeholder="Home Address">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="title">About</label>
+                      <textarea rows="4" class="form-control" placeholder="A few words about the project ..."></textarea>
+                    </div>
+                    <!-- Other form fields here -->
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-primary" form="newPageForm">Create</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page content -->
+  <div class="container-fluid mt--6">
+    <div class="row" style="min-height: 670px">
+      <div class="col">
+        <div class="card">
+          <!-- Card header -->
+          <div class="card-header border-0">
+            <h3 class="mb-0">Projects</h3>
+          </div>
+          <!-- Light table -->
+          <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col" class="sort" data-sort="name">Project</th>
+                  <th scope="col" class="sort" data-sort="client">Client</th>
+                  <th scope="col" class="sort" data-sort="budget">Budget</th>
+                  <th scope="col" class="sort" data-sort="status">Status</th>
+                  <th scope="col" class="sort" data-sort="completion">Performance</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody class="list">
+                <tr>
+                  <th scope="row">
+                    <a href="project.html" class="media align-items-center">
+                      <div class="avatar rounded-circle mr-3">
+                        <img alt="Image placeholder" src="/static/assets/img/icons/custom/1x/hyundai.png">
+                      </div>
+                      <div class="media-body">
+                        <span class="name mb-0 text-sm" style="font-weight: 400; color: #525f7f">Modelagem BIM</span>
+                      </div>
+                    </a>
+                  </th>
+                  <td>
+                    Hyundai
+		          </td>
+                  <td class="budget">
+                    $0 USD
+                  </td>
+                  <td>
+                    <span class="badge badge-dot mr-4">
+                      <i class="bg-info"></i>
+                      <span class="status">on schedule</span>
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="completion mr-2">60%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+<!--                  <td class="text-right">
+                    <div class="dropdown">
+                      <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                      </a>
+		      <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+		      </div>
+                    </div>
+		  </td>-->
+                </tr>
+<!--                <tr>
+                  <th scope="row">
+                    <div class="media align-items-center">
+                      <a href="#" class="avatar rounded-circle mr-3">
+                        <img alt="Image placeholder" src="/static/assets/img/samples/bp.jpg">
+                      </a>
+                      <div class="media-body">
+                        <span class="name mb-0 text-sm">Modelagem BIM</span>
+                      </div>
+                    </div>
+                  </th>
+                  <td>
+                    Beneficência Portuguesa
+                  </td>
+                  <td class="budget">
+                    $1800 USD
+                  </td>
+                  <td>
+                    <span class="badge badge-dot mr-4">
+                      <i class="bg-success"></i>
+                      <span class="status">completed</span>
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="completion mr-2">100%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <div class="dropdown">
+                      <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <div class="media align-items-center">
+                      <a href="#" class="avatar rounded-circle mr-3">
+                        <img alt="Image placeholder" src="/static/assets/img/samples/continental.jpg">
+                      </a>
+                      <div class="media-body">
+                        <span class="name mb-0 text-sm">Modelagem Estrutural</span>
+                      </div>
+                    </div>
+                  </th>
+                  <td>
+                    Continental
+                  </td>
+                  <td class="budget">
+                    $3150 USD
+                  </td>
+                  <td>
+                    <span class="badge badge-dot mr-4">
+                      <i class="bg-danger"></i>
+                      <span class="status">delayed</span>
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="completion mr-2">72%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" style="width: 72%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <div class="dropdown">
+                      <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <div class="media align-items-center">
+                      <a href="#" class="avatar rounded-circle mr-3">
+                        <img alt="Image placeholder" src="/static/assets/img/samples/renault.jpg">
+                      </a>
+                      <div class="media-body">
+                        <span class="name mb-0 text-sm">Modelagem BIM</span>
+                      </div>
+                    </div>
+                  </th>
+                  <td>
+                    Renault
+                  </td>
+                  <td class="budget">
+                    $4400 USD
+                  </td>
+                  <td>
+                    <span class="badge badge-dot mr-4">
+                      <i class="bg-warning"></i>
+                      <span class="status">pending</span>
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="completion mr-2">90%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <div class="dropdown">
+                      <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <div class="media align-items-center">
+                      <a href="#" class="avatar rounded-circle mr-3">
+                        <img alt="Image placeholder" src="/static/assets/img/samples/einstein.png">
+                      </a>
+                      <div class="media-body">
+                        <span class="name mb-0 text-sm">Modelagem BIM</span>
+                      </div>
+                    </div>
+                  </th>
+                  <td>
+                    Albert Einstein
+                  </td>
+                  <td class="budget">
+                    $2200 USD
+                  </td>
+                  <td>
+                    <span class="badge badge-dot mr-4">
+                      <i class="bg-success"></i>
+                      <span class="status">completed</span>
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="completion mr-2">100%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <div class="dropdown">
+                      <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                      </div>
+                    </div>
+                  </td>
+		</tr>-->
+              </tbody>
+            </table>
+          </div>
+          <!-- Card footer -->
+          <div class="card-footer py-4">
+            <nav aria-label="...">
+              <ul class="pagination justify-content-end mb-0">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1">
+                    <i class="fas fa-angle-left"></i>
+                    <span class="sr-only">Previous</span>
+                  </a>
+                </li>
+                <li class="page-item active">
+                  <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                  <a class="page-link" href="#">
+                    <i class="fas fa-angle-right"></i>
+                    <span class="sr-only">Next</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include "includes/footer.html" %}
+
+  </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}{% endblock javascripts %}

@@ -1,0 +1,123 @@
+{% extends 'layouts/base-fullscreen.html' %}
+
+{% block title %} Register {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- Page content -->
+    <div class="container mt--8 pb-5">
+      <!-- Table -->
+      <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+        
+          <div class="auth-card bg-secondary shadow border-0">
+            <div class="card-body px-lg-5">
+              <div class="text-center text-muted mb-4">
+
+                {% if msg %}
+                  <p>{{ msg | safe }}</p>
+                {% else %}
+                    <p>Add your credentials</p>
+                {% endif %}  
+              
+              </div>
+
+              {% if not success %}
+
+                <form method="POST">
+
+                  {% csrf_token %}
+
+                  <div class="row mb-2">
+                    <div class="col pr-2">
+                      <div class="form-group mb-3">
+                        <div class="input-group input-group-alternative">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="ni ni-badge"></i></span>
+                          </div>
+                          {{ form.first_name }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col pl-2">
+                      <div class="form-group mb-3">
+                        <div class="input-group input-group-alternative">
+                          {{ form.last_name }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="input-group input-group-alternative mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                      </div>
+                      {{ form.username }}
+                    </div>
+                  </div>
+                  <span class="text-error">{{ form.username.errors }}</span>
+
+                  <div class="form-group">
+                    <div class="input-group input-group-alternative">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                      </div>
+                      {{ form.password1 }}
+                    </div>
+                  </div>
+                  <span class="text-error">{{ form.password1.errors }}</span>
+
+                  <div class="form-group">
+                    <div class="input-group input-group-alternative">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                      </div>
+                      {{ form.password2 }}
+                    </div>
+                  </div>
+                  <span class="text-error">{{ form.password2.errors }}</span>
+
+{#                  <div class="row my-4">#}
+{#                    <div class="col-12">#}
+{#                      <div class="custom-control custom-control-alternative custom-checkbox">#}
+{#                        <input class="custom-control-input" id="customCheckRegister" type="checkbox">#}
+{#                        <label class="custom-control-label" for="customCheckRegister">#}
+{#                          <span class="text-muted">I agree with the <a href="#!">Privacy Policy</a></span>#}
+{#                        </label>#}
+{#                      </div>#}
+{#                    </div>#}
+{#                  </div>#}
+                  <div class="text-center">
+                    <button type="submit" class="btn btn-primary mt-3">Create account</button>
+                  </div>
+                </form>
+
+              {% endif %}  
+  
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-3"></div>
+        <div class="col-3">
+          <a href="{% url 'login' %}" class="text-light"><small>Login</small></a>
+        </div>
+        <div class="col-3 text-right">
+          <a href="https://https://infinitefoundry.com/frequently-asked-questions/" class="text-light"><small>Get Support</small></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}{% endblock javascripts %}
