@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -57,8 +58,12 @@ def get_paginated_projects(request):
     return paginator, projects
 
 
-def get_paginated_files(request):
-    files_list = UploadedFile.objects.all()
+def get_paginated_files(request, category=None):
+    if category is None:
+        files_list = UploadedFile.objects.all()
+    else:
+        files_list = UploadedFile.objects.filter(category=category)
+
     paginator = Paginator(files_list, 6)  # Show 6 files per page
     page = request.GET.get('page')
     files = paginator.get_page(page)
@@ -70,8 +75,8 @@ def project_list(request):
     return render(request, "home/projectsList.html", {'projects_list': projects})
 
 
-def assets_list(request, category):
-    paginator, files = get_paginated_files(request)
+def assets_list(request, category=None):
+    paginator, files = get_paginated_files(request, category)
     if category == '3d-models':
         title = '3D Models'
     elif category == 'scripts':
@@ -85,7 +90,16 @@ def assets_list(request, category):
 
 
 def assets_hub(request):
-    return render(request, "home/assetsPage.html")
+
+    models_3d = len(UploadedFile.objects.filter(category='3d-models'))
+    scripts = len(UploadedFile.objects.filter(category='scripts'))
+    unity = len(UploadedFile.objects.filter(category='unity'))
+    others = len(UploadedFile.objects.filter(category='others'))
+
+    return render(request, "home/assetsPage.html", {'3d_models_files': models_3d,
+                                                    'scripts_files': scripts,
+                                                    'unity_files': unity,
+                                                    'others_files': others})
 
 
 def project(request):
@@ -190,6 +204,8 @@ def upload_file(request, id):
     if request.method == 'POST':
         file = request.FILES['file']
         uploaded_file = UploadedFile.objects.create(project=project, file=file)
+        uploaded_file.category = uploaded_file.fileCategory()
+        uploaded_file.save()
 
         return redirect('project_details', id=project.id)
 
