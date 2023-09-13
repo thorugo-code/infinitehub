@@ -13,4 +13,4 @@ class Command(BaseCommand):
             file.category = category
             file.save()
 
-        self.stdout.write(self.style.SUCCESS('File categories updated successfully.'))
+            self.stdout.write(self.style.SUCCESS(f'File {file} category updated successfully.'))

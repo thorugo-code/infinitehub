@@ -87,3 +87,21 @@ def file_name_only(value):
 @stringfilter
 def file_name_only_with_extension(value):
     return value.split('/')[-1]
+
+
+@register.filter(name='refformatted_category')
+@stringfilter
+def reformatted_category(value):
+    if value == '3d-models':
+        return '3D Models'
+    elif value == '2d-drawings':
+        return '2D Drawings'
+    elif value == 'scripts':
+        return 'Scripts'
+    elif value == 'unity':
+        return 'Unity'
+    elif value == 'others':
+        return 'Others'
+    else:
+        return value.capitalize()
+

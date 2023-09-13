@@ -2,6 +2,8 @@
 from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
+from djmoney.models.fields import MoneyField
+from djmoney.money import Money
 
 
 class Project(models.Model):
@@ -13,6 +15,7 @@ class Project(models.Model):
     start_date = models.DateField()
     deadline = models.DateField()
     about = models.TextField()
+    budget = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
     img = models.ImageField(upload_to=f'apps/static/assets/uploads/', default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
 
 
@@ -28,7 +31,10 @@ class UploadedFile(models.Model):
     project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.CASCADE)
     file = models.FileField(upload_to=custom_upload_path)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.CASCADE, default=1)
     category = models.CharField(max_length=100, default='others')
+    description = models.TextField(default='')
+    value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
 
     def __str__(self):
         return self.file.name
@@ -48,8 +54,7 @@ class UploadedFile(models.Model):
 
         folders = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'iso', 'dmg', 'pkg', 'deb', 'rpm']
 
-        unity = ['unitypackage', 'assets', 'prefab', 'mat', 'fbx', 'unity', 'unity3d', 'unitypackage', 'asset', 'meta',
-                 'ress']
+        unity = ['unitypackage', 'assets', 'prefab', 'mat', 'unity', 'unity3d', 'unitypackage', 'asset', 'meta', 'ress']
 
         database = ['db', 'sql', 'sqlite', 'sqlite3', 'db3', 'sqlite2', 'sqlite3-shm', 'sqlite3-wal']
 
@@ -72,6 +77,15 @@ class UploadedFile(models.Model):
             return 'others'
 
     def save(self, *args, **kwargs):
-        # Set the 'category' field based on the file extension before saving
+
         self.category = self.fileCategory()
-        super(UploadedFile, self).save(*args, **kwargs)
+        super().save()
+
+        project = self.project
+        total_budget = project.uploaded_files.aggregate(models.Sum('value'))['value__sum'] or Money(0, 'USD')
+
+        project.budget = total_budget
+        project.save()
+
+
+

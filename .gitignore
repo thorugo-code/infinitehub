@@ -10,7 +10,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+.dist/
 downloads/
 eggs/
 .eggs/
@@ -162,4 +162,4 @@ cython_debug/
 # Custom project paths
 # Add paths that you wish to ignore here, relative to the root of the repository
 uploads/
-db.sqlite3
+./db.sqlite3

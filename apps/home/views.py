@@ -5,6 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 
 from django import template
+from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -96,10 +97,19 @@ def assets_hub(request):
     unity = len(UploadedFile.objects.filter(category='unity'))
     others = len(UploadedFile.objects.filter(category='others'))
 
+    values_3d = UploadedFile.objects.filter(category='3d-models').aggregate(Sum('value'))['value__sum']
+    values_scripts = UploadedFile.objects.filter(category='scripts').aggregate(Sum('value'))['value__sum']
+    values_unity = UploadedFile.objects.filter(category='unity').aggregate(Sum('value'))['value__sum']
+    values_others = UploadedFile.objects.filter(category='others').aggregate(Sum('value'))['value__sum']
+
     return render(request, "home/assetsPage.html", {'3d_models_files': models_3d,
                                                     'scripts_files': scripts,
                                                     'unity_files': unity,
-                                                    'others_files': others})
+                                                    'others_files': others,
+                                                    '3d_models_value': values_3d if values_3d is not None else 0,
+                                                    'scripts_value': values_scripts if values_scripts is not None else 0,
+                                                    'unity_value': values_unity if values_unity is not None else 0,
+                                                    'others_value': values_others if values_others is not None else 0})
 
 
 def project(request):
@@ -203,8 +213,26 @@ def upload_file(request, id):
 
     if request.method == 'POST':
         file = request.FILES['file']
+
         uploaded_file = UploadedFile.objects.create(project=project, file=file)
-        uploaded_file.category = uploaded_file.fileCategory()
+        uploaded_file.description = request.POST.get('file_description', 'DEFAULT')
+
+        masked_value = request.POST.get('file_value', 'USD 0.00')
+        masked_value = masked_value.replace('USD ', '')
+        masked_value = masked_value.replace(',', '')
+
+        uploaded_file.value = masked_value if masked_value != '' else 0
+
+        # input_category = request.POST.get('file_type', 'none')
+
+        # if input_category != 'none':
+        #     uploaded_file.category = input_category
+        # else:
+        #     uploaded_file.category = uploaded_file.fileCategory()
+
+        uploaded_by = request.user
+        uploaded_file.uploaded_by = uploaded_by
+
         uploaded_file.save()
 
         return redirect('project_details', id=project.id)
