@@ -334,6 +334,7 @@ def profile(request):
     user = request.user
     user_profile = Profile.objects.get(user=user)
     user_files = UploadedFile.objects.filter(uploaded_by=user)
+    user_files_count = user_files.count()
 
     if request.method == 'POST':
         user.first_name = request.POST.get('first_name', user.first_name)
@@ -354,4 +355,6 @@ def profile(request):
 
         redirect('profile')
 
-    return render(request, 'home/profile.html', {'user_profile': user_profile, 'user_files': user_files})
+    return render(request, 'home/profile.html', {'user_profile': user_profile, 
+                                                 'user_files': user_files, 
+                                                 'user_files_number': user_files_count})
