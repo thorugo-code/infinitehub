@@ -1,13 +1,8 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
 
-# Create your views here.
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from django.utils.text import slugify
 from .forms import LoginForm, SignUpForm
+from apps.home.models import Profile
 
 
 def login_view(request):
@@ -23,7 +18,13 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect("/")
+                profile = Profile.objects.get(user=user)
+                if profile.first_login:
+                    profile.first_login = False
+                    profile.save()
+                    return redirect("profile")
+                else:
+                    return redirect("home")
             else:
                 msg = 'Invalid credentials'
         else:
@@ -48,6 +49,10 @@ def register_user(request):
 
             msg = 'User created - please <a href="/login">login</a>.'
             success = True
+
+            # Create user profile
+            profile = Profile.objects.create(user=user)
+            profile.save()
 
             return redirect("/login/", {"msg": msg, "success": success})
 

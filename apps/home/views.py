@@ -5,21 +5,22 @@ Copyright (c) 2019 - present AppSeed.us
 
 
 from django import template
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import loader
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-from .models import Project, UploadedFile
+from .models import Project, UploadedFile, Profile
 from django.core.paginator import Paginator
 import os
 
 
 @login_required(login_url="/login/")
 def index(request):
-    context = {'segment': 'index'}
+    context = {'segment': 'index',
+               'user_profile': Profile.objects.get(user=request.user)}
 
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
@@ -30,6 +31,12 @@ def pages(request):
     context = {}
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
+    try:
+        user_profile = Profile.objects.get(user=request.user)
+        context['user_profile'] = user_profile
+    except Profile.DoesNotExist:
+        pass
+
     try:
 
         load_template = request.path.split('/')[-1]
@@ -62,8 +69,10 @@ def get_paginated_projects(request):
 def get_paginated_files(request, category=None):
     if category is None:
         files_list = UploadedFile.objects.all()
-    else:
+    elif type(category) == str:
         files_list = UploadedFile.objects.filter(category=category)
+    else:
+        files_list = UploadedFile.objects.filter(category)
 
     paginator = Paginator(files_list, 6)  # Show 6 files per page
     page = request.GET.get('page')
@@ -72,35 +81,56 @@ def get_paginated_files(request, category=None):
 
 
 def project_list(request):
+    user_profile = Profile.objects.get(user=request.user)
     paginator, projects = get_paginated_projects(request)
-    return render(request, "home/projectsList.html", {'projects_list': projects})
+    return render(request, "home/projectsList.html", {'projects_list': projects, 'user_profile': user_profile})
 
 
 def assets_list(request, category=None):
-    paginator, files = get_paginated_files(request, category)
+
+    user_profile = Profile.objects.get(user=request.user)
+
     if category == '3d-models':
         title = '3D Models'
+        paginator, files = get_paginated_files(request, category)
     elif category == 'scripts':
         title = 'Scripts'
+        paginator, files = get_paginated_files(request, category)
     elif category == 'unity':
         title = 'Unity'
+        paginator, files = get_paginated_files(request, category)
     else:
         title = 'Others'
+        category_filter = Q(category__in=['clouds', 'executable', 'folders', 'database',
+                                          'office', 'images', 'video', 'others'])
+        paginator, files = get_paginated_files(request, category_filter)
 
-    return render(request, "home/assetsList.html", {'files_list': files, 'title': title})
+    return render(request, "home/assetsList.html", {'files_list': files,
+                                                    'category': category,
+                                                    'title': title,
+                                                    'user_profile': user_profile})
 
 
 def assets_hub(request):
 
-    models_3d = len(UploadedFile.objects.filter(category='3d-models'))
-    scripts = len(UploadedFile.objects.filter(category='scripts'))
-    unity = len(UploadedFile.objects.filter(category='unity'))
-    others = len(UploadedFile.objects.filter(category='others'))
+    user_profile = Profile.objects.get(user=request.user)
+
+    # other_categories = ['3d-models', 'clouds', 'scripts', 'executable', 'folders',
+    #               'unity', 'database', 'office', 'images', 'video', 'others']
+
+    other_categories = ['clouds', 'executable', 'folders', 'database', 'office', 'images', 'video', 'others']
+
+    category_filter = Q(category__in=other_categories)
+
+    models_3d = UploadedFile.objects.filter(category='3d-models').count()
+    scripts = UploadedFile.objects.filter(category='scripts').count()
+    unity = UploadedFile.objects.filter(category='unity').count()
+    others = UploadedFile.objects.filter(category_filter).count()
 
     values_3d = UploadedFile.objects.filter(category='3d-models').aggregate(Sum('value'))['value__sum']
     values_scripts = UploadedFile.objects.filter(category='scripts').aggregate(Sum('value'))['value__sum']
     values_unity = UploadedFile.objects.filter(category='unity').aggregate(Sum('value'))['value__sum']
-    values_others = UploadedFile.objects.filter(category='others').aggregate(Sum('value'))['value__sum']
+    values_others = UploadedFile.objects.filter(category_filter).aggregate(Sum('value'))['value__sum']
 
     return render(request, "home/assetsPage.html", {'3d_models_files': models_3d,
                                                     'scripts_files': scripts,
@@ -109,7 +139,8 @@ def assets_hub(request):
                                                     '3d_models_value': values_3d if values_3d is not None else 0,
                                                     'scripts_value': values_scripts if values_scripts is not None else 0,
                                                     'unity_value': values_unity if values_unity is not None else 0,
-                                                    'others_value': values_others if values_others is not None else 0})
+                                                    'others_value': values_others if values_others is not None else 0,
+                                                    'user_profile': user_profile})
 
 
 def project(request):
@@ -144,10 +175,13 @@ def project(request):
     elif request.method == 'GET':
         
         project_id = request.GET.get('id')
+
+        user_profile = Profile.objects.get(user=request.user)
         
         request_project = Project.objects.get(id=project_id)
         
-        return render(request, 'home/project.html', {'project': request_project})
+        return render(request, 'home/project.html', {'project': request_project,
+                                                     'user_profile': user_profile})
 
     # Handle GET request or invalid form submission
     return render(request, 'home/page-404.html')
@@ -158,6 +192,8 @@ def project_details(request, id):
     project = Project.objects.get(id=id)
 
     edit_mode = request.GET.get('edit')
+
+    user_profile = Profile.objects.get(user=request.user)
 
     if edit_mode is not None:
         edit_mode = True
@@ -176,7 +212,9 @@ def project_details(request, id):
 
         return redirect('project_details', id=project.id)
     
-    return render(request, 'home/project.html', {'project': project, 'edit_mode': edit_mode})
+    return render(request, 'home/project.html', {'project': project,
+                                                 'edit_mode': edit_mode,
+                                                 'user_profile': user_profile})
 
 
 def delete_project(request, id):
@@ -208,6 +246,19 @@ def change_picture(request, id):
     return redirect('project_details', id=project.id)
 
 
+def change_profile_picture(request):
+    user_profile = Profile.objects.get(user=request.user)
+
+    if request.method == 'POST':
+        file = request.FILES['profilePicture']
+        user_profile.avatar = file
+        user_profile.save()
+
+        return redirect('profile')
+
+    return redirect('profile')
+
+
 def upload_file(request, id):
     project = Project.objects.get(id=id)
 
@@ -223,12 +274,12 @@ def upload_file(request, id):
 
         uploaded_file.value = masked_value if masked_value != '' else 0
 
-        # input_category = request.POST.get('file_type', 'none')
+        input_category = request.POST.get('file_type')
 
-        # if input_category != 'none':
-        #     uploaded_file.category = input_category
-        # else:
-        #     uploaded_file.category = uploaded_file.fileCategory()
+        if input_category != 'none':
+            uploaded_file.category = input_category
+        else:
+            uploaded_file.category = uploaded_file.fileCategory()
 
         uploaded_by = request.user
         uploaded_file.uploaded_by = uploaded_by
@@ -246,9 +297,28 @@ def delete_file(request, project_id, file_id):
     file_path = uploaded_file.file.path
     if os.path.exists(file_path):
         os.remove(file_path)
+
+    uploaded_file.value = 0
+    uploaded_file.save()
+
     uploaded_file.delete()
 
     return redirect('project_details', id=project_id)
+
+
+@require_POST
+def delete_file_from_storage(request, category, file_id):
+    uploaded_file = get_object_or_404(UploadedFile, pk=file_id)
+    file_path = uploaded_file.file.path
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    uploaded_file.value = 0
+    uploaded_file.save()
+
+    uploaded_file.delete()
+
+    return redirect('assets_list', category=category)
 
 
 def download_file(request, file_id):
@@ -262,19 +332,26 @@ def download_file(request, file_id):
 
 def profile(request):
     user = request.user
-    edit_mode = request.GET.get('edit')
-    if edit_mode is not None:
-        edit_mode = True
-    else:
-        edit_mode = False
+    user_profile = Profile.objects.get(user=user)
+    user_files = UploadedFile.objects.filter(uploaded_by=user)
 
     if request.method == 'POST':
-        user.first_name = request.POST.get('input-first-name', user.first_name)
-        user.last_name = request.POST.get('input-last-name', user.last_name)
-        user.email = request.POST.get('input-email', user.email)
-
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
         user.save()
 
-        return redirect('profile')
+        # user_profile.phone = request.POST.get('phone', user_profile.phone)
 
-    return render(request, 'home/profile.html', {'edit_mode': edit_mode})
+        user_profile.address = request.POST.get('address', user_profile.address)
+        user_profile.city = request.POST.get('city', user_profile.city)
+        user_profile.state = request.POST.get('state', user_profile.state)
+        user_profile.country = request.POST.get('country', user_profile.country)
+        user_profile.postal_code = request.POST.get('postal-code', user_profile.postal_code)
+
+        user_profile.about = request.POST.get('about-user', user_profile.about)
+
+        user_profile.save()
+
+        redirect('profile')
+
+    return render(request, 'home/profile.html', {'user_profile': user_profile, 'user_files': user_files})

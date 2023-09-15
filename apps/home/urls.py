@@ -37,9 +37,12 @@ urlpatterns = [
 
     path('storage/<str:category>/', views.assets_list, name='assets_list'),
 
+    path('storage/<str:category>/delete=<int:file_id>', views.delete_file_from_storage, name='delete_file_from_storage'),
+
     # USER URLS
 
     path('profile/', views.profile, name='profile'),
+    path('profile/change-picture', views.change_profile_picture, name='change_profile_picture'),
 
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),

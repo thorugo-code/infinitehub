@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
@@ -7,7 +6,6 @@ from djmoney.money import Money
 
 
 class Project(models.Model):
-
     title = models.CharField(max_length=100)
     client = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
@@ -16,7 +14,8 @@ class Project(models.Model):
     deadline = models.DateField()
     about = models.TextField()
     budget = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
-    img = models.ImageField(upload_to=f'apps/static/assets/uploads/', default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+    img = models.ImageField(upload_to=f'apps/static/assets/uploads/',
+                            default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
 
 
 def custom_upload_path(instance, filename):
@@ -73,12 +72,25 @@ class UploadedFile(models.Model):
             return 'scripts'
         elif self.fileExtension() in unity:
             return 'unity'
+        elif self.fileExtension() in clouds:
+            return 'clouds'
+        elif self.fileExtension() in executable:
+            return 'executable'
+        elif self.fileExtension() in folders:
+            return 'folders'
+        elif self.fileExtension() in database:
+            return 'database'
+        elif self.fileExtension() in office:
+            return 'office'
+        elif self.fileExtension() in images:
+            return 'images'
+        elif self.fileExtension() in video:
+            return 'video'
         else:
             return 'others'
 
     def save(self, *args, **kwargs):
 
-        self.category = self.fileCategory()
         super().save()
 
         project = self.project
@@ -88,4 +100,30 @@ class UploadedFile(models.Model):
         project.save()
 
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_login = models.BooleanField(default=True)
 
+    avatar = models.ImageField(upload_to='apps/static/assets/uploads/profile_pics',
+                               default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+
+    # birth_date = models.DateField(null=True, blank=True)
+
+    about = models.TextField(default='')
+
+    address = models.CharField(max_length=150, default='')
+
+    city = models.CharField(max_length=100, default='')
+    state = models.CharField(max_length=100, default='')
+    country = models.CharField(max_length=100, default='')
+    postal_code = models.CharField(max_length=20, default='')
+
+    # phone = models.CharField(max_length=20, default='')
+
+    def __str__(self):
+        return f'{self.user.username} Profile'
+
+    def save(self, *args, **kwargs):
+        super().save()
+        user = self.user
+        user.save()

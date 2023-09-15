@@ -75,7 +75,7 @@
                                                         src="{{ project.img.url|slice:"5:" }}">
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group form-control-label">
                                             <label for="fileInput">Select file</label>
                                             <input type="file" class="form-control-file" id="fileInput"
                                                    name="projectPicture"
@@ -148,8 +148,8 @@
                             <div class="card-body" style="padding: 2rem">
                                 {% if edit_mode %}
                                     <div class="px-3">
-                                        <div class="form-group">
-                                            <label class="form-control-label" for="about">Title</label>
+                                        <div class="form-group form-control-label">
+                                            <label class="form-control-label" for="title">Title</label>
                                             <input type="text" id="title" name="title" class="form-control"
                                                    placeholder="Client's name" value="{{ project.title }}">
                                         </div>
@@ -158,7 +158,7 @@
                                 <div class="px-3">
                                     <div class="row">
                                         <div class="col-lg-5">
-                                            <div class="form-group">
+                                            <div class="form-group form-control-label">
                                                 <label class="form-control-label">Client</label>
                                                 {% if edit_mode %}
                                                     <input type="text" id="client" name="client" class="form-control"
@@ -171,7 +171,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-5">
-                                            <div class="form-group">
+                                            <div class="form-group form-control-label">
                                                 <label class="form-control-label" for="input-client-area">Area of
                                                     activity</label>
                                                 {% if edit_mode %}
@@ -185,8 +185,8 @@
                                                 {% endif %}
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
-                                            <label class="form-control-label" for="input-client-area">Country</label>
+                                        <div class="col-lg-2 form-control-label">
+                                            <label for="input-client-area">Country</label>
                                             <div class="form-group">
                                                 {% if edit_mode %}
                                                     <select class="form-control" , id="country" , name="country">
@@ -209,8 +209,8 @@
                                 <div class="px-3">
                                     <div class="row">
                                         <div class="col-lg-6">
-                                            <div class="form-group">
-                                                <label class="form-control-label" for="input-date">Start:</label>
+                                            <div class="form-group form-control-label">
+                                                <label for="input-date">Start:</label>
                                                 {% if edit_mode %}
                                                     <input type="date" id="input-date" class="form-control"
                                                            name="start_date"
@@ -223,8 +223,8 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
-                                            <div class="form-group">
-                                                <label class="form-control-label" for="input-address">Deadline:</label>
+                                            <div class="form-group form-control-label">
+                                                <label for="input-address">Deadline:</label>
                                                 {% if edit_mode %}
                                                     <input type="date" id="input-date" class="form-control"
                                                            name="deadline" value="{{ project.deadline|date:'Y-m-d' }}">
@@ -238,8 +238,8 @@
                                     </div>
                                 </div>
                                 <div class="px-3">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="about">About</label>
+                                    <div class="form-group form-control-label">
+                                        <label for="about">About</label>
                                         {% if edit_mode %}
                                             <textarea rows="4" class="form-control" id="about" name="about"
                                                       placeholder="A few words about the project ...">{{ project.about }}</textarea>
@@ -254,65 +254,6 @@
                         </div>
                     </div>
                 </form>
-
-
-                {#            <div class="card shadow">#}
-                {#              <div class="pb-1">#}
-                {#                <div class="card-header">#}
-                {#                  <div class="row align-items-center">#}
-                {#                    <div class="col">#}
-                {#                      <h3 class="mb-0">Tasks</h3>#}
-                {#                    </div>#}
-                {#                  </div>#}
-                {#                </div>#}
-                {#                <div class="table-responsive pb-3">#}
-                {#                  <table#}
-                {#                    class="table align-items-center table-flush"#}
-                {#                    style="display: block; max-height: 297px; overflow: auto">#}
-                {#                    <thead class="thead-light" style="line-height: 0.5rem">#}
-                {#                      <tr>#}
-                {#                        <th scope="col" style="width: 0; padding-right: 0"></th>#}
-                {#                        <th scope="col" style="width: 100%">Task</th>#}
-                {#                        <th scope="col">Priority</th>#}
-                {#                        <th scope="col">Deadline</th>#}
-                {#                      </tr>#}
-                {#                    </thead>#}
-                {#                    <tbody>#}
-                {#                    <tr>#}
-                {#                      <th scope="row" style="padding-right: 0">#}
-                {#                        <form style="display: inline">#}
-                {#                          <input type="checkbox">#}
-                {#                        </form></th>#}
-                {#                      <th scope="row">Task 1</th>#}
-                {#                      <td class="text-red">High</td>#}
-                {#                      <th scope="row">01/01/2020</th>#}
-                {#                    </tr>#}
-                {#                    <tr>#}
-                {#                      <th scope="row" style="padding-right: 0">#}
-                {#                        <form style="display: inline">#}
-                {#                          <input type="checkbox">#}
-                {#                        </form></th>#}
-                {#                      <th scope="row">Task 2</th>#}
-                {#                      <td class="text-yellow">Medium</td>#}
-                {#                      <th scope="row">01/01/2020</th>#}
-                {#                    </tr>#}
-                {#                    <tr>#}
-                {#                      <th scope="row" style="padding-right: 0">#}
-                {#                        <form style="display: inline">#}
-                {#                          <input type="checkbox">#}
-                {#                        </form>#}
-                {#                      </th>#}
-                {#                      <th scope="row">Task 3</th>#}
-                {#                      <td class="text-green">Low</td>#}
-                {#                      <th scope="row">01/01/2020</th>#}
-                {#                    </tr>#}
-                {#                    </tbody>#}
-                {#                  </table>#}
-                {#                </div>#}
-                {#              </div>#}
-                {#            </div>#}
-
-
             </div>
             <div class="col-xl-5" style="max-height: 824px">
                 <div class="card shadow">
@@ -362,33 +303,42 @@
                                                                     alt="New File"
                                                                     style="height: 130px"/>
                                                         </div>
-                                                        <div class="form-group">
+                                                        <div class="form-group form-control-label">
                                                             <label for="fileInput">Select file</label>
                                                             <input type="file" name="file" class="form-control-file"
                                                                    id="fileInput"
-                                                                   onchange="previewExtension(event); enableButtonsFile()">
+                                                                   onchange="previewExtension(event); enableButtonsFile(); updateCategory(event)">
                                                         </div>
-
-{#                                                        <div class="form-group">#}
-{#                                                            <label for="fileType">Category</label>#}
-{#                                                            <input type="text" class="form-control" id="fileType"#}
-{#                                                                   name="file_type">#}
-{#                                                        </div>#}
-
-                                                        <div class="form-group">
+                                                        <div class="form-group form-control-label">
+                                                            <label for="fileType">Category</label>
+                                                            <select class="form-control" id="fileType" name="file_type">
+                                                                <option value="none">--Select--</option>
+                                                                <option value="3d-models">3D Model</option>
+                                                                <option value="scripts">Script</option>
+                                                                <option value="unity">Unity</option>
+                                                                <option value="clouds">Cloud</option>
+                                                                <option value="executable">Executable</option>
+                                                                <option value="folders">Folder</option>
+                                                                <option value="database">Database</option>
+                                                                <option value="office">Office</option>
+                                                                <option value="images">Image</option>
+                                                                <option value="video">Video</option>
+                                                                <option value="other">Other</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group form-control-label">
                                                             <label for="fileValue">Value</label>
                                                             <input inputmode="decimal" class="form-control"
                                                                    id="fileValue"
                                                                    name="file_value" placeholder="">
                                                         </div>
-
-                                                        <div class="form-group mb-2">
+                                                        <div class="form-group mb-2 form-control-label">
                                                             <label for="fileDescription">Description</label>
                                                             <textarea class="form-control"
                                                                       id="fileDescription"
-                                                                      name="file_description"></textarea>
+                                                                      name="file_description">
+                                                            </textarea>
                                                         </div>
-
                                                     </form>
                                                 </div>
                                                 <div class="modal-footer">
@@ -458,23 +408,26 @@
                                                                             alt="New File"
                                                                             style="height: 130px"/>
                                                                 </div>
-                                                                <div class="form-group">
-                                                                    <label for="fileType">Name</label>
+                                                                <div class="form-group form-control-label">
+                                                                    <label for="fileType"
+                                                                           style="font-size:0.8125rem; font-weight:600">Name</label>
                                                                     <input type="text" class="form-control"
                                                                            id="fileType"
                                                                            value="{{ uploaded_file.file.name|file_name_only_with_extension }}"
                                                                            disabled>
                                                                 </div>
                                                                 <div class="row">
-                                                                    <div class="form-group col-lg-6">
-                                                                        <label for="fileType">Category</label>
+                                                                    <div class="form-group form-control-label col-lg-6">
+                                                                        <label for="fileType"
+                                                                               style="font-size:0.8125rem; font-weight:600">Category</label>
                                                                         <input type="text" class="form-control"
                                                                                id="fileType"
                                                                                value="{{ uploaded_file.category|refformatted_category }}"
                                                                                disabled>
                                                                     </div>
-                                                                    <div class="form-group col-lg-6">
-                                                                        <label for="fileValue">Value</label>
+                                                                    <div class="form-group form-control-label col-lg-6">
+                                                                        <label for="fileValue"
+                                                                               style="font-size:0.8125rem; font-weight:600">Value</label>
                                                                         <input inputmode="decimal" class="form-control"
                                                                                id="fileValue"
                                                                                value="{{ uploaded_file.value }}"
@@ -483,23 +436,27 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="row">
-                                                                    <div class="form-group col-lg-6">
-                                                                        <label for="fileUploadUser">Uploaded By</label>
+                                                                    <div class="form-group form-control-label col-lg-6">
+                                                                        <label for="fileUploadUser"
+                                                                               style="font-size:0.8125rem; font-weight:600">Uploaded
+                                                                            By</label>
                                                                         <input type="text" class="form-control"
                                                                                id="fileUploadUser"
                                                                                value="{{ uploaded_file.uploaded_by.first_name }} {{ uploaded_file.uploaded_by.last_name }}"
                                                                                disabled>
                                                                     </div>
-                                                                    <div class="form-group col-lg-6">
-                                                                        <label for="fileUploadDate">Date</label>
+                                                                    <div class="form-group form-control-label col-lg-6">
+                                                                        <label for="fileUploadDate"
+                                                                               style="font-size:0.8125rem; font-weight:600">Date</label>
                                                                         <input type="date" class="form-control"
                                                                                id="fileUploadDate"
                                                                                value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
                                                                                disabled>
                                                                     </div>
                                                                 </div>
-                                                                <div class="form-group">
-                                                                    <label for="fileDescription">Description</label>
+                                                                <div class="form-group form-control-label">
+                                                                    <label for="fileDescription"
+                                                                           style="font-size:0.8125rem; font-weight:600">Description</label>
                                                                     <textarea class="form-control"
                                                                               id="fileDescription"
                                                                               disabled>{{ uploaded_file.description }}</textarea>
@@ -557,8 +514,9 @@
                                                                             alt="New File"
                                                                             style="height: 130px"/>
                                                                 </div>
-                                                                <div class="form-group">
-                                                                    <label for="fileName">Name</label>
+                                                                <div class="form-group form-control-label">
+                                                                    <label for="fileName"
+                                                                           style="font-size:0.8125rem; font-weight:600">Name</label>
                                                                     <input type="text" class="form-control"
                                                                            id="fileUploadDate"
                                                                            value="{{ uploaded_file.file|file_name_only_with_extension }}"
@@ -590,17 +548,97 @@
                         </div>
                     </div>
                 </div>
-                {#            <div class="card shadow">#}
-                {#              <div class="card-header">#}
-                {#                <h3 class="mb-0">Updates </h3>#}
-                {#              </div>#}
-                {#              <div#}
-                {#                class="card-body p-3 mb-3"#}
-                {#                style="max-height: 400px; overflow: auto"#}
-                {#              >#}
-                {#                <div class="timeline timeline-one-side mr-2 ml-2"></div>#}
-                {#              </div>#}
-                {#            </div>#}
+
+
+{#                <div class="card">#}
+{##}
+{#                    <div class="card-header">#}
+{##}
+{#                        <h5 class="h3 mb-0">Tasks</h5>#}
+{#                    </div>#}
+{##}
+{#                    <div class="card-body p-0">#}
+{##}
+{#                        <ul class="list-group list-group-flush" data-toggle="checklist">#}
+{#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
+{#                                <div class="checklist-item checklist-item-success">#}
+{#                                    <div class="checklist-info">#}
+{#                                        <h5 class="checklist-title mb-0">Task 1 with low priority</h5>#}
+{#                                        <small class="text-success">Low</small>#}
+{#                                        <small class="text-nowrap">- 01/01/2020</small>#}
+{#                                    </div>#}
+{#                                    <div>#}
+{#                                        <div class="custom-control custom-checkbox custom-checkbox-success">#}
+{#                                            <input class="custom-control-input" id="chk-todo-task-1" type="checkbox">#}
+{#                                            <label class="custom-control-label" for="chk-todo-task-1"></label>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
+{#                                <div class="checklist-item checklist-item-medium">#}
+{#                                    <div class="checklist-info">#}
+{#                                        <h5 class="checklist-title mb-0">Task 2 with medium priority</h5>#}
+{#                                        <small class="text-medium">Medium</small>#}
+{#                                        <small class="text-nowrap">- 01/01/2020</small>#}
+{#                                    </div>#}
+{#                                    <div>#}
+{#                                        <div class="custom-control custom-checkbox custom-checkbox-medium">#}
+{#                                            <input class="custom-control-input" id="chk-todo-task-2" type="checkbox">#}
+{#                                            <label class="custom-control-label" for="chk-todo-task-2"></label>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
+{#                                <div class="checklist-item checklist-item-info">#}
+{#                                    <div class="checklist-info">#}
+{#                                        <h5 class="checklist-title mb-0">Task 3 with no priority</h5>#}
+{#                                        <small class="text-info">None</small>#}
+{#                                        <small class="text-nowrap">- 01/01/2020</small>#}
+{#                                    </div>#}
+{#                                    <div>#}
+{#                                        <div class="custom-control custom-checkbox custom-checkbox-info">#}
+{#                                            <input class="custom-control-input" id="chk-todo-task-3" type="checkbox">#}
+{#                                            <label class="custom-control-label" for="chk-todo-task-3"></label>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
+{#                                <div class="checklist-item checklist-item-danger">#}
+{#                                    <div class="checklist-info">#}
+{#                                        <h5 class="checklist-title mb-0">Task 4 with high priority</h5>#}
+{#                                        <small class="text-danger">High</small>#}
+{#                                        <small class="text-nowrap">- 01/01/2020</small>#}
+{#                                    </div>#}
+{#                                    <div>#}
+{#                                        <div class="custom-control custom-checkbox custom-checkbox-danger">#}
+{#                                            <input class="custom-control-input" id="chk-todo-task-4" type="checkbox">#}
+{#                                            <label class="custom-control-label" for="chk-todo-task-4"></label>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
+{#                                <div class="checklist-item checklist-item-success checklist-item-checked">#}
+{#                                    <div class="checklist-info">#}
+{#                                        <h5 class="checklist-title mb-0">Task 5 with low priority</h5>#}
+{#                                        <small class="text-success">Low</small><small class="text-nowrap"> - 01/01/2020</small>#}
+{#                                    </div>#}
+{#                                    <div>#}
+{#                                        <div class="custom-control custom-checkbox custom-checkbox-success">#}
+{#                                            <input class="custom-control-input" id="chk-todo-task-5" type="checkbox">#}
+{#                                            <label class="custom-control-label" for="chk-todo-task-5"></label>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                        </ul>#}
+{#                    </div>#}
+{#                </div>#}
+
+
             </div>
         </div>
 
@@ -747,6 +785,93 @@
 
             cancelButton.setAttribute("disabled", "disabled");
             uploadButton.setAttribute("disabled", "disabled");
+        }
+
+        function updateCategory(event) {
+            const fileInput = event.target;
+            const fileTypeSelect = document.getElementById('fileType');
+
+            // Get the selected file
+            const selectedFile = fileInput.files[0];
+
+            if (selectedFile) {
+                // Get the file name and split it to extract the extension
+                const fileName = selectedFile.name;
+                const fileExtension = fileName.split('.').pop().toLowerCase();
+
+                // Map file extensions to categories (customize this as needed)
+                const extensionToCategory = {
+                    'rvt': '3d-models',
+                    'stp': '3d-models',
+                    'igs': '3d-models',
+                    'ifc': '3d-models',
+                    'sat': '3d-models',
+                    'dxf': '3d-models',
+                    'dwg': '3d-models',
+                    'prt': '3d-models',
+                    'catpart': '3d-models',
+                    'catproduct': '3d-models',
+                    'cgr': '3d-models',
+                    'obj': '3d-models',
+                    'stl': '3d-models',
+                    'jt': '3d-models',
+                    'dgn': '3d-models',
+                    'fbx': '3d-models',
+                    'sldprt': '3d-models',
+                    'sldasm': '3d-models',
+                    'rcp': 'clouds',
+                    'rcs': 'clouds',
+                    'pod': 'clouds',
+                    'fls': 'clouds',
+                    'las': 'clouds',
+                    'e57': 'clouds',
+                    'py': 'scripts',
+                    'html': 'scripts',
+                    'css': 'scripts',
+                    'js': 'scripts',
+                    'cs': 'scripts',
+                    'c': 'scripts',
+                    'cpp': 'scripts',
+                    'json': 'scripts',
+                    'xml': 'scripts',
+                    'kt': 'scripts',
+                    'kts': 'scripts',
+                    'exe': 'executable',
+                    'zip': 'folders',
+                    'rar': 'folders',
+                    'assets': 'unity',
+                    'asset': 'unity',
+                    'ress': 'unity',
+                    'sqlite3': 'database',
+                    'xlsx': 'office',
+                    'docx': 'office',
+                    'pptx': 'office',
+                    'pdf': 'office',
+                    'ai': 'images',
+                    'jpg': 'images',
+                    'jpeg': 'images',
+                    'png': 'images',
+                    'gif': 'images',
+                    'webp': 'images',
+                    'ico': 'images',
+                    'mp4': 'video',
+                    'avi': 'video',
+                    'mkv': 'video',
+                    'wmv': 'video',
+                    'txt': 'office',
+                    'x_t': '3d-models',
+                    'x_b': '3d-models',
+                    'apk': 'executable',
+                    // Add more mappings here
+                };
+
+                // Update the select field based on the file extension
+                if (extensionToCategory[fileExtension]) {
+                    fileTypeSelect.value = extensionToCategory[fileExtension];
+                } else {
+                    fileTypeSelect.value = 'other'; // Default to "Other" if no mapping found
+                }
+            }
         }
 
     </script>
