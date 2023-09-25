@@ -13,7 +13,7 @@ urlpatterns = [
 
     path('', views.index, name='home'),
 
-    # PROJECT URLS
+    # PROJECTS LIST URLS
     
     path('create_project/', views.project, name='create_project'),
     
@@ -23,6 +23,8 @@ urlpatterns = [
 
     path('projects/id=<int:id>/delete', views.delete_project, name='delete_project'),
 
+    # PROJECT PAGE URLS
+
     path('projects/id=<int:id>/upload', views.upload_file, name='upload_file'),
 
     path('projects/id=<int:project_id>/delete=<int:file_id>', views.delete_file, name='delete_file'),
@@ -31,13 +33,13 @@ urlpatterns = [
     
     path('projects/id=<int:id>/change-picture', views.change_picture, name='change_picture'),
 
-    # STORAGE URLS
+    # ASSETS URLS
 
-    path('storage/', views.assets_hub, name='assets_hub'),
+    path('assets/', views.assets_hub, name='assets_hub'),
 
-    path('storage/<str:category>/', views.assets_list, name='assets_list'),
+    path('assets/<str:category>/', views.assets_list, name='assets_list'),
 
-    path('storage/<str:category>/delete=<int:file_id>', views.delete_file_from_storage, name='delete_file_from_storage'),
+    path('assets/<str:category>/delete=<int:file_id>', views.delete_file_from_storage, name='delete_file_from_storage'),
 
     # USER URLS
 
