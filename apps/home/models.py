@@ -1,5 +1,8 @@
+import os
+import qrcode
 from datetime import datetime
 from django.db import models
+from django.core.files import File
 from django.contrib.auth.models import User
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
@@ -127,3 +130,56 @@ class Profile(models.Model):
         super().save()
         user = self.user
         user.save()
+
+
+class Equipments(models.Model):
+    acquisition_date = models.DateField(default=datetime.now)
+    name = models.CharField(max_length=100, default='"Untitled"')
+    series = models.CharField(max_length=100, default='N/A')
+    supplier = models.CharField(max_length=100, default='')
+    price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+    description = models.TextField(default='')
+    qrcode = models.TextField(default='')
+
+    def __str__(self):
+        return self.name
+
+    def generate_qrcode(self):
+        info = f'Equipment: {self.name}\nSeries: {self.series}\nAcquisition Date: {self.acquisition_date.strftime("%d/%m/%Y")}'
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(info)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        img_name = f'{self.name}_{self.id}.png'
+
+        # Specify the directory where you want to save the image
+        image_dir = f'apps/static/assets/uploads/qrcodes/equipments/{self.acquisition_date.strftime("%Y")}/' \
+                    f'{self.acquisition_date.strftime("%m")}/{self.name}/'
+
+        # Create the directory if it doesn't exist
+        os.makedirs(image_dir, exist_ok=True)
+
+        # Specify the full path to save the image
+        image_path = os.path.join(image_dir, img_name)
+
+        # Save the QR code image to the specified path
+        img.save(image_path)
+
+        return image_path
+
+    def save(self, *args, **kwargs):
+
+        if self.series == '':
+            self.series = 'N/A'
+
+        self.qrcode = self.generate_qrcode()
+
+        super().save()

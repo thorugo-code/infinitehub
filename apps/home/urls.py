@@ -15,7 +15,7 @@ urlpatterns = [
 
     # PROJECTS LIST URLS
     
-    path('create_project/', views.project, name='create_project'),
+    path('projects/create', views.project, name='create_project'),
     
     path('projects/id=<int:id>', views.project_details, name='project_details'),
     
@@ -41,9 +41,22 @@ urlpatterns = [
 
     path('assets/<str:category>/delete=<int:file_id>', views.delete_file_from_storage, name='delete_file_from_storage'),
 
+    # INVENTORY URLS
+
+    path('inventory/', views.inventory_list, name='inventory_list'),
+
+    path('inventory/new', views.inventory_list, name='new_equipment'),
+
+    path('inventory/delete=<int:id>', views.delete_equipment, name='delete_equipment'),
+
+    path('inventory/id=<int:id>', views.inventory_list, name='equipment_details'),
+
+    path('inventory/download/qrcode=<int:equipment_id>', views.download_qrcode_inventory, name='download_file_from_inventory'),
+
     # USER URLS
 
     path('profile/', views.profile, name='profile'),
+
     path('profile/change-picture', views.change_profile_picture, name='change_profile_picture'),
 
     # Matches any html file

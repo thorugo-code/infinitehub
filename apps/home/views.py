@@ -1,9 +1,4 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
-
+import datetime
 from django import template
 from django.db.models import Sum, Q
 from django.contrib.auth.decorators import login_required
@@ -12,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import loader
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-from .models import Project, UploadedFile, Profile
+from .models import Project, UploadedFile, Profile, Equipments
 from django.core.paginator import Paginator
 import os
 
@@ -66,6 +61,14 @@ def get_paginated_projects(request):
     return paginator, projects
 
 
+def get_paginated_equipments(request):
+    equipments_list = Equipments.objects.all()
+    paginator = Paginator(equipments_list, 6)  # Show 6 projects per page
+    page = request.GET.get('page')
+    equipments = paginator.get_page(page)
+    return paginator, equipments
+
+
 def get_paginated_files(request, category=None):
     if category is None:
         files_list = UploadedFile.objects.all()
@@ -87,7 +90,6 @@ def project_list(request):
 
 
 def assets_list(request, category=None):
-
     user_profile = Profile.objects.get(user=request.user)
 
     if category == '3d-models':
@@ -112,7 +114,6 @@ def assets_list(request, category=None):
 
 
 def assets_hub(request):
-
     user_profile = Profile.objects.get(user=request.user)
 
     # other_categories = ['3d-models', 'clouds', 'scripts', 'executable', 'folders',
@@ -144,7 +145,6 @@ def assets_hub(request):
 
 
 def project(request):
-
     if request.method == 'POST':
 
         # Retrieve form data
@@ -173,13 +173,13 @@ def project(request):
         return redirect('project_details', id=project.id)
 
     elif request.method == 'GET':
-        
+
         project_id = request.GET.get('id')
 
         user_profile = Profile.objects.get(user=request.user)
-        
+
         request_project = Project.objects.get(id=project_id)
-        
+
         return render(request, 'home/project.html', {'project': request_project,
                                                      'user_profile': user_profile})
 
@@ -211,7 +211,7 @@ def project_details(request, id):
         project.save()
 
         return redirect('project_details', id=project.id)
-    
+
     return render(request, 'home/project.html', {'project': project,
                                                  'edit_mode': edit_mode,
                                                  'user_profile': user_profile})
@@ -355,6 +355,51 @@ def profile(request):
 
         redirect('profile')
 
-    return render(request, 'home/profile.html', {'user_profile': user_profile, 
-                                                 'user_files': user_files, 
+    return render(request, 'home/profile.html', {'user_profile': user_profile,
+                                                 'user_files': user_files,
                                                  'user_files_number': user_files_count})
+
+
+def inventory_list(request):
+    if request.method == 'POST':
+        name = request.POST.get('name', 'Untitled')
+        series = request.POST.get('series', 'N/A')
+        supplier = request.POST.get('supplier', 'Untitled')
+        acquisition_date = request.POST.get('acquisition_date', datetime.datetime.now)
+        price = request.POST.get('equipment_value', 'USD 0.00')
+        price = price.replace('USD ', '')
+        price = price.replace(',', '')
+        description = request.POST.get('description', '')
+
+        equipment = Equipments(name=name,
+                               series=series,
+                               supplier=supplier,
+                               acquisition_date=acquisition_date,
+                               price=price if price != '' else 0,
+                               description=description)
+
+        equipment.save()
+
+        return redirect('inventory_list')
+
+    paginator, equipments = get_paginated_equipments(request)
+    user_profile = Profile.objects.get(user=request.user)
+
+    return render(request, 'home/inventory.html', {'user_profile': user_profile,
+                                                   'equipment_list': equipments})
+
+
+def download_qrcode_inventory(request, equipment_id):
+    equipment = get_object_or_404(Equipments, pk=equipment_id)
+    qrcode_path = equipment.qrcode
+    with open(qrcode_path, 'rb') as file:
+        response = HttpResponse(file.read(), content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{equipment.qrcode.split("/")[-1]}"'
+        return response
+
+
+def delete_equipment(request, id):
+    equipment = get_object_or_404(Equipments, pk=id)
+    equipment.delete()
+
+    return redirect('inventory_list')
