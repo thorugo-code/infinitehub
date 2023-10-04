@@ -105,3 +105,9 @@ def reformatted_category(value):
     else:
         return value.capitalize()
 
+
+@register.filter(name='url_name')
+@stringfilter
+def url_name(value):
+    return value.replace(' ', '-').lower()
+

@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import loader
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-from .models import Project, UploadedFile, Profile, Equipments
+from apps.home.models import Project, UploadedFile, Profile, Equipments
 from django.core.paginator import Paginator
 import os
 
@@ -366,18 +366,18 @@ def inventory_list(request):
         series = request.POST.get('series', 'N/A')
         supplier = request.POST.get('supplier', 'Untitled')
         acquisition_date = request.POST.get('acquisition_date', datetime.datetime.now)
-        price = request.POST.get('equipment_value', 'USD 0.00')
-        price = price.replace('USD ', '')
-        price = price.replace(',', '')
+        price_str = request.POST.get('equipment_value', 'USD 0.00').replace('USD ', '').replace(',', '')
+        price = float(price_str) if price_str else 0
         description = request.POST.get('description', '')
 
-        equipment = Equipments(name=name,
-                               series=series,
-                               supplier=supplier,
-                               acquisition_date=acquisition_date,
-                               price=price if price != '' else 0,
-                               description=description)
-
+        equipment = Equipments(
+            name=name,
+            series=series,
+            supplier=supplier,
+            acquisition_date=acquisition_date,
+            price=price,
+            description=description
+        )
         equipment.save()
 
         return redirect('inventory_list')
@@ -385,8 +385,7 @@ def inventory_list(request):
     paginator, equipments = get_paginated_equipments(request)
     user_profile = Profile.objects.get(user=request.user)
 
-    return render(request, 'home/inventory.html', {'user_profile': user_profile,
-                                                   'equipment_list': equipments})
+    return render(request, 'home/inventory.html', {'user_profile': user_profile, 'equipment_list': equipments})
 
 
 def download_qrcode_inventory(request, equipment_id):

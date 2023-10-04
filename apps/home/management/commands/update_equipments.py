@@ -11,5 +11,5 @@ class Command(BaseCommand):
         for equipment in equipments:
             equipment.save()
 
-        self.stdout.write(self.style.SUCCESS('Successfully created QRCode for all equipments'))
+        self.stdout.write(self.style.SUCCESS('Successfully updated all equipments'))
 

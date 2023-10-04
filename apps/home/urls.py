@@ -6,8 +6,8 @@ Copyright (c) 2019 - present AppSeed.us
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, re_path
-from apps.home import views
-from .views import *
+from apps.home.views import views
+from apps.home.views import collaborators
 
 urlpatterns = [
 
@@ -19,7 +19,7 @@ urlpatterns = [
     
     path('projects/id=<int:id>', views.project_details, name='project_details'),
     
-    path("projects/", project_list, name="project_list"),
+    path("projects/", views.project_list, name="project_list"),
 
     path('projects/id=<int:id>/delete', views.delete_project, name='delete_project'),
 
@@ -41,6 +41,12 @@ urlpatterns = [
 
     path('assets/<str:category>/delete=<int:file_id>', views.delete_file_from_storage, name='delete_file_from_storage'),
 
+    # COLABORATORS URLS
+
+    path('collaborators/', collaborators.page_list, name='collaborators_list'),
+
+    path('collaborators/<str:name>', collaborators.details, name='collaborator_details'),
+
     # INVENTORY URLS
 
     path('inventory/', views.inventory_list, name='inventory_list'),
@@ -51,7 +57,8 @@ urlpatterns = [
 
     path('inventory/id=<int:id>', views.inventory_list, name='equipment_details'),
 
-    path('inventory/download/qrcode=<int:equipment_id>', views.download_qrcode_inventory, name='download_file_from_inventory'),
+    path('inventory/download/qrcode=<int:equipment_id>', views.download_qrcode_inventory,
+         name='download_file_from_inventory'),
 
     # USER URLS
 

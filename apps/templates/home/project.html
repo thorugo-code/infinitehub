@@ -11,8 +11,9 @@
                         <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-                                <li class="breadcrumb-item"><a href="/projects/">Projects</a> </li>
-                                <li class="breadcrumb-item active" aria-current="page"><a href="">{{ project.title }}</a></li>
+                                <li class="breadcrumb-item"><a href="/projects/">Projects</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><a
+                                        href="">{{ project.title }}</a></li>
                             </ol>
                         </nav>
                     </div>
@@ -211,316 +212,319 @@
                 </div>
                 <div class="col-xl-5" style="max-height: 824px">
                     <div class="card shadow">
-                        <div>
-                            <div class="card-header">
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <h3 class="mb-0">Files </h3>
-                                    </div>
-                                    <div class="col text-right">
-                                        <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                           data-target="#sortModal">
-                                            <i class="fas fa-sort"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                           data-target="#filterModal">
-                                            <i class="fas fa-filter"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                           data-target="#newFileModal">
-                                            <i class="fas fa-plus"></i>
-                                        </a>
-                                    </div>
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">Files </h3>
                                 </div>
-                            </div>
-                            <!-- Card body (ADD CONTENT) -->
-                            <div class="card-body px-4 pb-4 pt-0">
-                                <div class="file-list" style="height: 200px">
-
-                                    {% load filters %}
-
-                                    {% for uploaded_file in project.uploaded_files.all %}
-                                        <div class="file-item mr-3" style="height: 105px">
-                                            <a href="#"
-                                               data-toggle="modal"
-                                               data-target="#watchFileModal{{ uploaded_file.pk }}">
-                                                <img src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
-                                                     alt="{{ uploaded_file.file.name }}" style="height: 105px">
-                                            </a>
-                                            <div style="width: 94.27px">
-                                                <div style="display: flex; justify-content: center">
-                                                    <a
-                                                            href="#"
-                                                            data-toggle="modal"
-                                                            data-target="#watchFileModal">{{ uploaded_file.file|file_name_only_with_extension|truncatechars:10 }}
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Watch File Modal -->
-                                        <div class="modal fade" id="watchFileModal{{ uploaded_file.pk }}"
-                                             tabindex="-1" role="dialog"
-                                             aria-labelledby="watchFileModalLabel{{ uploaded_file.pk }}"
-                                             aria-hidden="true">
-                                            <div class="modal-dialog my-6" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header mt-2 mb--1">
-                                                        <h5 class="modal-title my-1"
-                                                            style="margin-left: auto">
-                                                            <i></i>
-                                                        </h5>
-                                                        <span class="ml-3 my-1"
-                                                              style="margin-right: auto; font-size: 1.2rem"
-                                                              id="newPageModalLabel"></span>
-                                                        <button type="button" class="close mt--4"
-                                                                style="margin-left: -30px"
-                                                                data-dismiss="modal"
-                                                                aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body py-0"
-                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                        <form method="post"
-                                                              id="downloadFile{{ uploaded_file.pk }}"
-                                                              action="{% url 'delete_file' project.id uploaded_file.pk %}">
-                                                            {% csrf_token %}
-                                                            <div class="form-group mt--1"
-                                                                 style="display: flex; justify-content: center">
-                                                                <img
-                                                                        id="filePreviewModal"
-                                                                        src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
-                                                                        alt="New File"
-                                                                        style="height: 130px"/>
-                                                            </div>
-                                                            <div class="form-group form-control-label">
-                                                                <label for="fileType"
-                                                                       style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                                <input type="text" class="form-control"
-                                                                       id="fileType"
-                                                                       value="{{ uploaded_file.file.name|file_name_only_with_extension }}"
-                                                                       disabled>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="form-group form-control-label col-lg-6">
-                                                                    <label for="fileType"
-                                                                           style="font-size:0.8125rem; font-weight:600">Category</label>
-                                                                    <input type="text" class="form-control"
-                                                                           id="fileType"
-                                                                           value="{{ uploaded_file.category|refformatted_category }}"
-                                                                           disabled>
-                                                                </div>
-                                                                <div class="form-group form-control-label col-lg-6">
-                                                                    <label for="fileValue"
-                                                                           style="font-size:0.8125rem; font-weight:600">Value</label>
-                                                                    <input inputmode="decimal"
-                                                                           class="form-control"
-                                                                           id="fileValue"
-                                                                           value="{{ uploaded_file.value }}"
-                                                                           placeholder="$ 0.00"
-                                                                           disabled>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="form-group form-control-label col-lg-6">
-                                                                    <label for="fileUploadUser"
-                                                                           style="font-size:0.8125rem; font-weight:600">Uploaded
-                                                                        By</label>
-                                                                    <input type="text" class="form-control"
-                                                                           id="fileUploadUser"
-                                                                           value="{{ uploaded_file.uploaded_by.first_name }} {{ uploaded_file.uploaded_by.last_name }}"
-                                                                           disabled>
-                                                                </div>
-                                                                <div class="form-group form-control-label col-lg-6">
-                                                                    <label for="fileUploadDate"
-                                                                           style="font-size:0.8125rem; font-weight:600">Date</label>
-                                                                    <input type="date" class="form-control"
-                                                                           id="fileUploadDate"
-                                                                           value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
-                                                                           disabled>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group form-control-label">
-                                                                <label for="fileDescription"
-                                                                       style="font-size:0.8125rem; font-weight:600">Description</label>
-                                                                <textarea class="form-control"
-                                                                          id="fileDescription"
-                                                                          disabled>{{ uploaded_file.description }}</textarea>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Cancel
-                                                        </button>
-                                                        <button class="btn btn-danger text-white"
-                                                                data-dismiss="modal" data-toggle="modal"
-                                                                data-target="#deleteConfirm{{ uploaded_file.pk }}">
-                                                            Delete
-                                                        </button>
-                                                        <a href="{% url 'download_file' uploaded_file.pk %}"
-                                                           class="btn btn-success">Download</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Delete Confirm Modal -->
-                                        <div class="modal fade" id="deleteConfirm{{ uploaded_file.pk }}"
-                                             tabindex="-1" role="dialog"
-                                             aria-labelledby="deleteConfirmLabel{{ uploaded_file.pk }}"
-                                             aria-hidden="true">
-                                            <div class="modal-dialog my-6" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header mt-2">
-                                                        <h5 class="modal-title my-1"
-                                                            style="margin-left: auto">
-                                                            <i class="ni ni-fat-delete text-blue"
-                                                               style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                        </h5>
-                                                        <span class="ml-3 my-1"
-                                                              style="margin-right: auto; font-size: 1.2rem"
-                                                              id="deleteConfirmModalLabel">Are you sure?</span>
-                                                        <button type="button" class="close mt--4"
-                                                                style="margin-left: -30px"
-                                                                data-dismiss="modal"
-                                                                aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body py-0"
-                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                        <form method="post"
-                                                              id="deleteConfirmForm{{ uploaded_file.pk }}"
-                                                              action="{% url 'delete_file' project.id uploaded_file.pk %}">
-                                                            {% csrf_token %}
-                                                            <div class="form-group mt-4"
-                                                                 style="display: flex; justify-content: center">
-                                                                <img
-                                                                        id="filePreviewModal"
-                                                                        src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
-                                                                        alt="New File"
-                                                                        style="height: 130px"/>
-                                                            </div>
-                                                            <div class="form-group form-control-label">
-                                                                <label for="fileName"
-                                                                       style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                                <input type="text" class="form-control"
-                                                                       id="fileUploadDate"
-                                                                       value="{{ uploaded_file.file|file_name_only_with_extension }}"
-                                                                       disabled>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Cancel
-                                                        </button>
-
-                                                        <button type="submit" class="btn btn-danger"
-                                                                form="deleteConfirmForm{{ uploaded_file.pk }}">
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
+                                <div class="col text-right">
+                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                       data-target="#sortModal">
+                                        <i class="fas fa-sort"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                       data-target="#filterModal">
+                                        <i class="fas fa-filter"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                       data-target="#newFileModal">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
+                        <!-- Card body (ADD CONTENT) -->
+                        <div class="card-body px-4 pb-4 pt-0">
+                            <div class="file-list" style="height: 200px">
+
+                                {% load filters %}
+
+                                {% for uploaded_file in project.uploaded_files.all %}
+                                    <div class="file-item mr-3" style="height: 105px">
+                                        <a href="#"
+                                           data-toggle="modal"
+                                           data-target="#watchFileModal{{ uploaded_file.pk }}">
+                                            <img src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
+                                                 alt="{{ uploaded_file.file.name }}" style="height: 105px">
+                                        </a>
+                                        <div style="width: 94.27px">
+                                            <div style="display: flex; justify-content: center">
+                                                <a
+                                                        href="#"
+                                                        data-toggle="modal"
+                                                        data-target="#watchFileModal">{{ uploaded_file.file|file_name_only_with_extension|truncatechars:10 }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Watch File Modal -->
+                                    <div class="modal fade" id="watchFileModal{{ uploaded_file.pk }}"
+                                         tabindex="-1" role="dialog"
+                                         aria-labelledby="watchFileModalLabel{{ uploaded_file.pk }}"
+                                         aria-hidden="true">
+                                        <div class="modal-dialog my-6" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header mt-2 mb--1">
+                                                    <h5 class="modal-title my-1"
+                                                        style="margin-left: auto">
+                                                        <i></i>
+                                                    </h5>
+                                                    <span class="ml-3 my-1"
+                                                          style="margin-right: auto; font-size: 1.2rem"
+                                                          id="newPageModalLabel"></span>
+                                                    <button type="button" class="close mt--4"
+                                                            style="margin-left: -30px"
+                                                            data-dismiss="modal"
+                                                            aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body py-0"
+                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    <form method="post"
+                                                          id="downloadFile{{ uploaded_file.pk }}"
+                                                          action="{% url 'delete_file' project.id uploaded_file.pk %}">
+                                                        {% csrf_token %}
+                                                        <div class="form-group mt--1"
+                                                             style="display: flex; justify-content: center">
+                                                            <img
+                                                                    id="filePreviewModal"
+                                                                    src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
+                                                                    alt="New File"
+                                                                    style="height: 130px"/>
+                                                        </div>
+                                                        <div class="form-group form-control-label">
+                                                            <label for="fileType"
+                                                                   style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="fileType"
+                                                                   value="{{ uploaded_file.file.name|file_name_only_with_extension }}"
+                                                                   disabled>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group form-control-label col-lg-6">
+                                                                <label for="fileType"
+                                                                       style="font-size:0.8125rem; font-weight:600">Category</label>
+                                                                <input type="text" class="form-control"
+                                                                       id="fileType"
+                                                                       value="{{ uploaded_file.category|refformatted_category }}"
+                                                                       disabled>
+                                                            </div>
+                                                            <div class="form-group form-control-label col-lg-6">
+                                                                <label for="fileValue"
+                                                                       style="font-size:0.8125rem; font-weight:600">Value</label>
+                                                                <input inputmode="decimal"
+                                                                       class="form-control"
+                                                                       id="fileValue"
+                                                                       value="{{ uploaded_file.value }}"
+                                                                       placeholder="$ 0.00"
+                                                                       disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group form-control-label col-lg-6">
+                                                                <label for="fileUploadUser"
+                                                                       style="font-size:0.8125rem; font-weight:600">Uploaded
+                                                                    By</label>
+                                                                <input type="text" class="form-control"
+                                                                       id="fileUploadUser"
+                                                                       value="{{ uploaded_file.uploaded_by.first_name }} {{ uploaded_file.uploaded_by.last_name }}"
+                                                                       disabled>
+                                                            </div>
+                                                            <div class="form-group form-control-label col-lg-6">
+                                                                <label for="fileUploadDate"
+                                                                       style="font-size:0.8125rem; font-weight:600">Date</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="fileUploadDate"
+                                                                       value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
+                                                                       disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-control-label">
+                                                            <label for="fileDescription"
+                                                                   style="font-size:0.8125rem; font-weight:600">Description</label>
+                                                            <textarea class="form-control"
+                                                                      id="fileDescription"
+                                                                      disabled>{{ uploaded_file.description }}</textarea>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">Cancel
+                                                    </button>
+                                                    <button class="btn btn-danger text-white"
+                                                            data-dismiss="modal" data-toggle="modal"
+                                                            data-target="#deleteConfirm{{ uploaded_file.pk }}">
+                                                        Delete
+                                                    </button>
+                                                    <a href="{% url 'download_file' uploaded_file.pk %}"
+                                                       class="btn btn-success">Download</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Delete Confirm Modal -->
+                                    <div class="modal fade" id="deleteConfirm{{ uploaded_file.pk }}"
+                                         tabindex="-1" role="dialog"
+                                         aria-labelledby="deleteConfirmLabel{{ uploaded_file.pk }}"
+                                         aria-hidden="true">
+                                        <div class="modal-dialog my-6" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header mt-2">
+                                                    <h5 class="modal-title my-1"
+                                                        style="margin-left: auto">
+                                                        <i class="ni ni-fat-delete text-blue"
+                                                           style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                    </h5>
+                                                    <span class="ml-3 my-1"
+                                                          style="margin-right: auto; font-size: 1.2rem"
+                                                          id="deleteConfirmModalLabel">Are you sure?</span>
+                                                    <button type="button" class="close mt--4"
+                                                            style="margin-left: -30px"
+                                                            data-dismiss="modal"
+                                                            aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body py-0"
+                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    <form method="post"
+                                                          id="deleteConfirmForm{{ uploaded_file.pk }}"
+                                                          action="{% url 'delete_file' project.id uploaded_file.pk %}">
+                                                        {% csrf_token %}
+                                                        <div class="form-group mt-4"
+                                                             style="display: flex; justify-content: center">
+                                                            <img
+                                                                    id="filePreviewModal"
+                                                                    src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
+                                                                    alt="New File"
+                                                                    style="height: 130px"/>
+                                                        </div>
+                                                        <div class="form-group form-control-label">
+                                                            <label for="fileName"
+                                                                   style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="fileUploadDate"
+                                                                   value="{{ uploaded_file.file|file_name_only_with_extension }}"
+                                                                   disabled>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">Cancel
+                                                    </button>
+
+                                                    <button type="submit" class="btn btn-danger"
+                                                            form="deleteConfirmForm{{ uploaded_file.pk }}">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow">
+
+                        <div class="card-header">
+
+                            <h5 class="h3 mb-0">Tasks</h5>
+                        </div>
+
+                        <div class="card-body p-0">
+
+                            <ul class="list-group list-group-flush" data-toggle="checklist">
+                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                    <div class="checklist-item checklist-item-success">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Task 1 with low priority</h5>
+                                            <small class="text-success">Low</small>
+                                            <small class="text-nowrap">- 01/01/2020</small>
+                                        </div>
+                                        <div>
+                                            <div class="custom-control custom-checkbox custom-checkbox-success">
+                                                <input class="custom-control-input" id="chk-todo-task-1"
+                                                       type="checkbox">
+                                                <label class="custom-control-label" for="chk-todo-task-1"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                    <div class="checklist-item checklist-item-medium">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Task 2 with medium priority</h5>
+                                            <small class="text-medium">Medium</small>
+                                            <small class="text-nowrap">- 01/01/2020</small>
+                                        </div>
+                                        <div>
+                                            <div class="custom-control custom-checkbox custom-checkbox-medium">
+                                                <input class="custom-control-input" id="chk-todo-task-2"
+                                                       type="checkbox">
+                                                <label class="custom-control-label" for="chk-todo-task-2"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                    <div class="checklist-item checklist-item-info">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Task 3 with no priority</h5>
+                                            <small class="text-info">None</small>
+                                            <small class="text-nowrap">- 01/01/2020</small>
+                                        </div>
+                                        <div>
+                                            <div class="custom-control custom-checkbox custom-checkbox-info">
+                                                <input class="custom-control-input" id="chk-todo-task-3"
+                                                       type="checkbox">
+                                                <label class="custom-control-label" for="chk-todo-task-3"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                    <div class="checklist-item checklist-item-danger">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Task 4 with high priority</h5>
+                                            <small class="text-danger">High</small>
+                                            <small class="text-nowrap">- 01/01/2020</small>
+                                        </div>
+                                        <div>
+                                            <div class="custom-control custom-checkbox custom-checkbox-danger">
+                                                <input class="custom-control-input" id="chk-todo-task-4"
+                                                       type="checkbox">
+                                                <label class="custom-control-label" for="chk-todo-task-4"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                    <div class="checklist-item checklist-item-success checklist-item-checked">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Task 5 with low priority</h5>
+                                            <small class="text-success">Low</small><small class="text-nowrap"> -
+                                            01/01/2020</small>
+                                        </div>
+                                        <div>
+                                            <div class="custom-control custom-checkbox custom-checkbox-success">
+                                                <input class="custom-control-input" id="chk-todo-task-5"
+                                                       type="checkbox">
+                                                <label class="custom-control-label" for="chk-todo-task-5"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-
-
-                {#                <div class="card">#}
-                {##}
-                {#                    <div class="card-header">#}
-                {##}
-                {#                        <h5 class="h3 mb-0">Tasks</h5>#}
-                {#                    </div>#}
-                {##}
-                {#                    <div class="card-body p-0">#}
-                {##}
-                {#                        <ul class="list-group list-group-flush" data-toggle="checklist">#}
-                {#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-                {#                                <div class="checklist-item checklist-item-success">#}
-                {#                                    <div class="checklist-info">#}
-                {#                                        <h5 class="checklist-title mb-0">Task 1 with low priority</h5>#}
-                {#                                        <small class="text-success">Low</small>#}
-                {#                                        <small class="text-nowrap">- 01/01/2020</small>#}
-                {#                                    </div>#}
-                {#                                    <div>#}
-                {#                                        <div class="custom-control custom-checkbox custom-checkbox-success">#}
-                {#                                            <input class="custom-control-input" id="chk-todo-task-1" type="checkbox">#}
-                {#                                            <label class="custom-control-label" for="chk-todo-task-1"></label>#}
-                {#                                        </div>#}
-                {#                                    </div>#}
-                {#                                </div>#}
-                {#                            </li>#}
-                {#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-                {#                                <div class="checklist-item checklist-item-medium">#}
-                {#                                    <div class="checklist-info">#}
-                {#                                        <h5 class="checklist-title mb-0">Task 2 with medium priority</h5>#}
-                {#                                        <small class="text-medium">Medium</small>#}
-                {#                                        <small class="text-nowrap">- 01/01/2020</small>#}
-                {#                                    </div>#}
-                {#                                    <div>#}
-                {#                                        <div class="custom-control custom-checkbox custom-checkbox-medium">#}
-                {#                                            <input class="custom-control-input" id="chk-todo-task-2" type="checkbox">#}
-                {#                                            <label class="custom-control-label" for="chk-todo-task-2"></label>#}
-                {#                                        </div>#}
-                {#                                    </div>#}
-                {#                                </div>#}
-                {#                            </li>#}
-                {#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-                {#                                <div class="checklist-item checklist-item-info">#}
-                {#                                    <div class="checklist-info">#}
-                {#                                        <h5 class="checklist-title mb-0">Task 3 with no priority</h5>#}
-                {#                                        <small class="text-info">None</small>#}
-                {#                                        <small class="text-nowrap">- 01/01/2020</small>#}
-                {#                                    </div>#}
-                {#                                    <div>#}
-                {#                                        <div class="custom-control custom-checkbox custom-checkbox-info">#}
-                {#                                            <input class="custom-control-input" id="chk-todo-task-3" type="checkbox">#}
-                {#                                            <label class="custom-control-label" for="chk-todo-task-3"></label>#}
-                {#                                        </div>#}
-                {#                                    </div>#}
-                {#                                </div>#}
-                {#                            </li>#}
-                {#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-                {#                                <div class="checklist-item checklist-item-danger">#}
-                {#                                    <div class="checklist-info">#}
-                {#                                        <h5 class="checklist-title mb-0">Task 4 with high priority</h5>#}
-                {#                                        <small class="text-danger">High</small>#}
-                {#                                        <small class="text-nowrap">- 01/01/2020</small>#}
-                {#                                    </div>#}
-                {#                                    <div>#}
-                {#                                        <div class="custom-control custom-checkbox custom-checkbox-danger">#}
-                {#                                            <input class="custom-control-input" id="chk-todo-task-4" type="checkbox">#}
-                {#                                            <label class="custom-control-label" for="chk-todo-task-4"></label>#}
-                {#                                        </div>#}
-                {#                                    </div>#}
-                {#                                </div>#}
-                {#                            </li>#}
-                {#                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-                {#                                <div class="checklist-item checklist-item-success checklist-item-checked">#}
-                {#                                    <div class="checklist-info">#}
-                {#                                        <h5 class="checklist-title mb-0">Task 5 with low priority</h5>#}
-                {#                                        <small class="text-success">Low</small><small class="text-nowrap"> - 01/01/2020</small>#}
-                {#                                    </div>#}
-                {#                                    <div>#}
-                {#                                        <div class="custom-control custom-checkbox custom-checkbox-success">#}
-                {#                                            <input class="custom-control-input" id="chk-todo-task-5" type="checkbox">#}
-                {#                                            <label class="custom-control-label" for="chk-todo-task-5"></label>#}
-                {#                                        </div>#}
-                {#                                    </div>#}
-                {#                                </div>#}
-                {#                            </li>#}
-                {#                        </ul>#}
-                {#                    </div>#}
-                {#                </div>#}
 
 
             </div>

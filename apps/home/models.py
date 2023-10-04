@@ -134,18 +134,21 @@ class Profile(models.Model):
 
 class Equipments(models.Model):
     acquisition_date = models.DateField(default=datetime.now)
-    name = models.CharField(max_length=100, default='"Untitled"')
+    name = models.CharField(max_length=100, default='Untitled')
     series = models.CharField(max_length=100, default='N/A')
     supplier = models.CharField(max_length=100, default='')
     price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
     description = models.TextField(default='')
     qrcode = models.TextField(default='')
+    custom_id = models.CharField(max_length=100, default='')
 
     def __str__(self):
         return self.name
 
     def generate_qrcode(self):
-        info = f'Equipment: {self.name}\nSeries: {self.series}\nAcquisition Date: {self.acquisition_date.strftime("%d/%m/%Y")}'
+        info = (f'Equipment: {self.name}\n'
+                f'Series: {self.series}\n'
+                f'Acquisition Date: {self.acquisition_date.strftime("%d/%m/%Y")}')
 
         qr = qrcode.QRCode(
             version=1,
@@ -153,6 +156,7 @@ class Equipments(models.Model):
             box_size=10,
             border=4,
         )
+
         qr.add_data(info)
         qr.make(fit=True)
 
@@ -175,11 +179,18 @@ class Equipments(models.Model):
 
         return image_path
 
+    def generate_custom_id(self):
+        return f'{self.acquisition_date.strftime("%Y%m")}{self.id:03d}'
+
     def save(self, *args, **kwargs):
 
         if self.series == '':
             self.series = 'N/A'
 
-        self.qrcode = self.generate_qrcode()
+        if self.qrcode == '' or self.qrcode is None:
+            self.qrcode = self.generate_qrcode()
+
+        if self.custom_id == '' or self.custom_id is None:
+            self.custom_id = self.generate_custom_id()
 
         super().save()
