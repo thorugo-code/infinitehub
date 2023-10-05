@@ -2,13 +2,85 @@ import os
 import qrcode
 from datetime import datetime
 from django.db import models
-from django.core.files import File
 from django.contrib.auth.models import User
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 
 
+def custom_upload_path(instance, filename):
+    client = instance.project.client.replace(" ", "_")
+    project_name = instance.project.title.replace(" ", "_")
+    year = datetime.now().strftime('%Y')
+    month = datetime.now().strftime('%m')
+    return f'uploads/projects/{client}/{project_name}/{year}/{month}/{filename}'
+
+
+class Equipments(models.Model):
+    acquisition_date = models.DateField(default=datetime.now)
+    name = models.CharField(max_length=100, default='Untitled')
+    series = models.CharField(max_length=100, default='N/A')
+    supplier = models.CharField(max_length=100, default='')
+    price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+    description = models.TextField(default='')
+    qrcode = models.TextField(default='')
+    custom_id = models.CharField(max_length=100, default='')
+
+    def __str__(self):
+        return self.name
+
+    def generate_qrcode(self):
+        info = (f'Equipment: {self.name}\n'
+                f'Series: {self.series}\n'
+                f'Acquisition Date: {self.acquisition_date.strftime("%d/%m/%Y")}')
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+
+        qr.add_data(info)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        img_name = f'{self.name}_{self.id}.png'
+
+        # Specify the directory where you want to save the image
+        image_dir = f'apps/static/assets/uploads/qrcodes/equipments/{self.acquisition_date.strftime("%Y")}/' \
+                    f'{self.acquisition_date.strftime("%m")}/{self.name}/'
+
+        # Create the directory if it doesn't exist
+        os.makedirs(image_dir, exist_ok=True)
+
+        # Specify the full path to save the image
+        image_path = os.path.join(image_dir, img_name)
+
+        # Save the QR code image to the specified path
+        img.save(image_path)
+
+        return image_path
+
+    def generate_custom_id(self):
+        return f'{self.acquisition_date.strftime("%Y%m")}{self.id:03d}'
+
+    def save(self, *args, **kwargs):
+
+        if self.series == '':
+            self.series = 'N/A'
+
+        if self.qrcode == '' or self.qrcode is None:
+            self.qrcode = self.generate_qrcode()
+
+        if self.custom_id == '' or self.custom_id is None:
+            self.custom_id = self.generate_custom_id()
+
+        super().save()
+
+
 class Project(models.Model):
+    working = models.BooleanField(default=True)
     title = models.CharField(max_length=100)
     client = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
@@ -21,15 +93,37 @@ class Project(models.Model):
                             default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
 
 
-def custom_upload_path(instance, filename):
-    client = instance.project.client.replace(" ", "_")
-    project_name = instance.project.title.replace(" ", "_")
-    year = datetime.now().strftime('%Y')
-    month = datetime.now().strftime('%m')
-    return f'uploads/projects/{client}/{project_name}/{year}/{month}/{filename}'
+class Profile(models.Model):
+    first_login = models.BooleanField(default=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    avatar = models.ImageField(upload_to='apps/static/assets/uploads/profile_pics',
+                               default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+
+    # birthday = models.DateField(null=True, blank=True)
+
+    about = models.TextField(default='')
+
+    address = models.CharField(max_length=150, default='')
+
+    city = models.CharField(max_length=100, default='')
+    state = models.CharField(max_length=100, default='')
+    country = models.CharField(max_length=100, default='')
+    postal_code = models.CharField(max_length=20, default='')
+
+    # phone = models.CharField(max_length=20, default='')
+
+    def __str__(self):
+        return f'{self.user.username} Profile'
+
+    def save(self, *args, **kwargs):
+        super().save()
+        user = self.user
+        user.save()
 
 
 class UploadedFile(models.Model):
+
     project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.CASCADE)
     file = models.FileField(upload_to=custom_upload_path)
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -101,96 +195,3 @@ class UploadedFile(models.Model):
 
         project.budget = total_budget
         project.save()
-
-
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_login = models.BooleanField(default=True)
-
-    avatar = models.ImageField(upload_to='apps/static/assets/uploads/profile_pics',
-                               default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
-
-    # birth_date = models.DateField(null=True, blank=True)
-
-    about = models.TextField(default='')
-
-    address = models.CharField(max_length=150, default='')
-
-    city = models.CharField(max_length=100, default='')
-    state = models.CharField(max_length=100, default='')
-    country = models.CharField(max_length=100, default='')
-    postal_code = models.CharField(max_length=20, default='')
-
-    # phone = models.CharField(max_length=20, default='')
-
-    def __str__(self):
-        return f'{self.user.username} Profile'
-
-    def save(self, *args, **kwargs):
-        super().save()
-        user = self.user
-        user.save()
-
-
-class Equipments(models.Model):
-    acquisition_date = models.DateField(default=datetime.now)
-    name = models.CharField(max_length=100, default='Untitled')
-    series = models.CharField(max_length=100, default='N/A')
-    supplier = models.CharField(max_length=100, default='')
-    price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
-    description = models.TextField(default='')
-    qrcode = models.TextField(default='')
-    custom_id = models.CharField(max_length=100, default='')
-
-    def __str__(self):
-        return self.name
-
-    def generate_qrcode(self):
-        info = (f'Equipment: {self.name}\n'
-                f'Series: {self.series}\n'
-                f'Acquisition Date: {self.acquisition_date.strftime("%d/%m/%Y")}')
-
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-
-        qr.add_data(info)
-        qr.make(fit=True)
-
-        img = qr.make_image(fill_color="black", back_color="white")
-
-        img_name = f'{self.name}_{self.id}.png'
-
-        # Specify the directory where you want to save the image
-        image_dir = f'apps/static/assets/uploads/qrcodes/equipments/{self.acquisition_date.strftime("%Y")}/' \
-                    f'{self.acquisition_date.strftime("%m")}/{self.name}/'
-
-        # Create the directory if it doesn't exist
-        os.makedirs(image_dir, exist_ok=True)
-
-        # Specify the full path to save the image
-        image_path = os.path.join(image_dir, img_name)
-
-        # Save the QR code image to the specified path
-        img.save(image_path)
-
-        return image_path
-
-    def generate_custom_id(self):
-        return f'{self.acquisition_date.strftime("%Y%m")}{self.id:03d}'
-
-    def save(self, *args, **kwargs):
-
-        if self.series == '':
-            self.series = 'N/A'
-
-        if self.qrcode == '' or self.qrcode is None:
-            self.qrcode = self.generate_qrcode()
-
-        if self.custom_id == '' or self.custom_id is None:
-            self.custom_id = self.generate_custom_id()
-
-        super().save()

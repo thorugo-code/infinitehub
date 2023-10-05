@@ -27,12 +27,12 @@
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
                                     <a class="nav-link"
-                                       href="{% url 'project_list' %}">
+                                       href="{% url 'project_list' 'working' %}">
                                         <span class="nav-link-text"> Working </span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{% url 'project_list' %}"
+                                    <a href="{% url 'project_list' 'archive' %}"
                                        class="nav-link">
                                         <span class="sidenav-normal"> Archive </span>
                                     </a>
@@ -93,18 +93,18 @@
                         </a>
                         <div class="collapse" id="navbar-financial" style="">
                             <ul class="nav nav-sm flex-column">
-                                <li class="nav-item">
-                                    <a href=""
-                                       class="nav-link">
-                                        <span class="sidenav-normal"> Bills to receive </span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link"
-                                       href="">
-                                        <span class="nav-link-text"> Clients </span>
-                                    </a>
-                                </li>
+{#                                <li class="nav-item">#}
+{#                                    <a href=""#}
+{#                                       class="nav-link">#}
+{#                                        <span class="sidenav-normal"> Bills to receive </span>#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                                <li class="nav-item">#}
+{#                                    <a class="nav-link"#}
+{#                                       href="">#}
+{#                                        <span class="nav-link-text"> Clients </span>#}
+{#                                    </a>#}
+{#                                </li>#}
                                 <li class="nav-item">
                                     <a class="nav-link"
                                        href="{% url 'inventory_list' %}">

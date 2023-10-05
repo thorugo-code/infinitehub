@@ -41,12 +41,9 @@ def details(request, name):
     full_name_from_post = name.replace('-', ' ').title()
 
     for user in Profile.objects.all():
-        print(user.user.get_full_name(), full_name_from_post)
         if user.user.get_full_name() == full_name_from_post:
             user_id = user.user.id
             break
-        else:
-            user_id = 1
 
     context = {
         'collaborator': Profile.objects.get(user__id=user_id),

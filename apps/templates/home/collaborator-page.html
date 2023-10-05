@@ -13,7 +13,8 @@
                         <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-                                <li class="breadcrumb-item"><a href="{% url 'collaborators_list' %}">Collaborators</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'collaborators_list' %}">Collaborators</a>
+                                </li>
                                 <li class="breadcrumb-item"><a href="">{{ collaborator.user.get_full_name }}</a></li>
                                 <li class="breadcrumb-item" aria-current="page"></li>
                             </ol>
@@ -28,103 +29,241 @@
         <div class="row mb--4">
 
             <!-- Profile Picture Card -->
-            <div class="col-xl-3 order-xl-2 mb-5">
-                <div class="card card-profile">
-                    <img src="/static/assets/img/theme/img-2-1200x600.webp" alt="Image placeholder"
-                         class="card-img-top">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-3 order-lg-2">
-                            <div class="card-profile-image"
-                                 style="background-color: #adb5bd00">
-                                <a href="#" data-toggle="modal" data-target="#profilePictureModal">
-                                    <img class="rounded-circle"
-                                         style="width: 145px; height: 145px; object-fit: cover;"
-                                         src="{{ collaborator.avatar.url|slice:"5:" }}">
+            <div class="col-xl-4 order-xl-2 mb-5">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Documents</h3>
+                            </div>
+                            <div class="col text-right">
+                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                   data-target="#sortDocumentsModal">
+                                    <i class="fas fa-sort"></i>
+                                </a>
+                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                   data-target="#filterDocumentsModal">
+                                    <i class="fas fa-filter"></i>
+                                </a>
+                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                   data-target="#newDocumentModal">
+                                    <i class="fas fa-plus"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body pt-0">
-                        <div class="row">
+                    <div class="table-responsive">
+
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                            <tr>
+                                <th scope="col" style="width: 50%">Name</th>
+                                <th scope="col" style="width: 50%">Updated</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row"></th>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
                             <div class="col">
-                                <div class="card-profile-stats d-flex justify-content-center pt-6 pb-0 pb-md-4">
-                                    <div>
-                                        <span class="heading">NºF</span>
-                                        <span class="description">Files</span>
-                                    </div>
-                                    <div>
-                                        <span class="heading">NºP</span>
-                                        <span class="description">Projects</span>
-                                    </div>
-                                </div>
+                                <h3 class="mb-0">Files</h3>
+                            </div>
+                            <div class="col text-right">
+                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                   data-target="#sortModal">
+                                    <i class="fas fa-sort"></i>
+                                </a>
+                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                   data-target="#filterModal">
+                                    <i class="fas fa-filter"></i>
+                                </a>
                             </div>
                         </div>
-                        <div class="text-center">
-                            <h5 class="h3">
-                                <span>{{ collaborator.user.first_name }} {{ collaborator.user.last_name }}</span>
-                                {#                                <span class="font-weight-300">, "{{ user_profile.birth_date }} AGE"</span>#}
-                            </h5>
-                            <div class="h5 font-weight-300 mt--1">
-                                {% if collaborator.state != '' and collaborator.country != '' %}
-                                    {{ collaborator.state }}, {{ collaborator.country }}
-                                {% elif collaborator.state != '' %}
-                                    {{ collaborator.state }}, "Country"
-                                {% elif collaborator.country != '' %}
-                                    "State", {{ collaborator.country }}
-                                {% else %}
-                                    "State", "Country"
-                                {% endif %}
-                            </div>
-                            <div class="h5 mt-4">
-                                {{ collaborator.user.username }}
-                            </div>
-                            {#                            <div class="h5 font-weight-300 mt--2">#}
-                            {#                                {{ user_profile.phone }}"(00) 00000-0000"#}
-                            {#                            </div>#}
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-0">
+                        <div class="file-list" style="height: 200px">
+
+                            {% load filters %}
+
+                            {% for uploaded_file in project.uploaded_files.all %}
+                                <div class="file-item mr-3" style="height: 105px">
+                                    <a href="#"
+                                       data-toggle="modal"
+                                       data-target="#watchFileModal{{ uploaded_file.pk }}">
+                                        <img src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
+                                             alt="{{ uploaded_file.file.name }}" style="height: 105px">
+                                    </a>
+                                    <div style="width: 94.27px">
+                                        <div style="display: flex; justify-content: center">
+                                            <a
+                                                    href="#"
+                                                    data-toggle="modal"
+                                                    data-target="#watchFileModal">{{ uploaded_file.file|file_name_only_with_extension|truncatechars:10 }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Watch File Modal -->
+                                <div class="modal fade" id="watchFileModal{{ uploaded_file.pk }}"
+                                     tabindex="-1" role="dialog"
+                                     aria-labelledby="watchFileModalLabel{{ uploaded_file.pk }}"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog my-6" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2 mb--1">
+                                                <h5 class="modal-title my-1"
+                                                    style="margin-left: auto">
+                                                    <i></i>
+                                                </h5>
+                                                <span class="ml-3 my-1"
+                                                      style="margin-right: auto; font-size: 1.2rem"
+                                                      id="newPageModalLabel"></span>
+                                                <button type="button" class="close mt--4"
+                                                        style="margin-left: -30px"
+                                                        data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body py-0"
+                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <form method="post"
+                                                      id="downloadFile{{ uploaded_file.pk }}"
+                                                      action="{% url 'delete_file' project.id uploaded_file.pk %}">
+                                                    {% csrf_token %}
+                                                    <div class="form-group mt--1"
+                                                         style="display: flex; justify-content: center">
+                                                        <img
+                                                                id="filePreviewModal"
+                                                                src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
+                                                                alt="New File"
+                                                                style="height: 130px"/>
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileType"
+                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                        <input type="text" class="form-control"
+                                                               id="fileType"
+                                                               value="{{ uploaded_file.file.name|file_name_only_with_extension }}"
+                                                               disabled>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="form-group form-control-label col-lg-6">
+                                                            <label for="fileType"
+                                                                   style="font-size:0.8125rem; font-weight:600">Category</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="fileType"
+                                                                   value="{{ uploaded_file.category|refformatted_category }}"
+                                                                   disabled>
+                                                        </div>
+                                                        <div class="form-group form-control-label col-lg-6">
+                                                            <label for="fileValue"
+                                                                   style="font-size:0.8125rem; font-weight:600">Value</label>
+                                                            <input inputmode="decimal"
+                                                                   class="form-control"
+                                                                   id="fileValue"
+                                                                   value="{{ uploaded_file.value }}"
+                                                                   placeholder="$ 0.00"
+                                                                   disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="form-group form-control-label col-lg-6">
+                                                            <label for="fileUploadUser"
+                                                                   style="font-size:0.8125rem; font-weight:600">Uploaded
+                                                                By</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="fileUploadUser"
+                                                                   value="{{ uploaded_file.uploaded_by.first_name }} {{ uploaded_file.uploaded_by.last_name }}"
+                                                                   disabled>
+                                                        </div>
+                                                        <div class="form-group form-control-label col-lg-6">
+                                                            <label for="fileUploadDate"
+                                                                   style="font-size:0.8125rem; font-weight:600">Date</label>
+                                                            <input type="date" class="form-control"
+                                                                   id="fileUploadDate"
+                                                                   value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
+                                                                   disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileDescription"
+                                                               style="font-size:0.8125rem; font-weight:600">Description</label>
+                                                        <textarea class="form-control"
+                                                                  id="fileDescription"
+                                                                  disabled>{{ uploaded_file.description }}</textarea>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Cancel
+                                                </button>
+                                                <a href="{% url 'download_file' uploaded_file.pk %}"
+                                                   class="btn btn-success">Download</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Profile Information Card -->
-            <div class="col-xl-9 order-xl-1 mb-5">
+            <div class="col-xl-8 order-xl-1 mb-5">
                 <div class="card">
                     <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col-8">
-                                <h3 class="mb-0">Profile</h3>
+                                <h3 class="mb-0">Informations</h3>
                             </div>
                         </div>
                     </div>
                     <div class="card-body" style="padding-bottom: 1rem">
-                        <h6 class="heading-small text-muted mb-4">User information</h6>
-                        <div class="pl-lg-4 mt-4">
+                        <div class="px-lg-4">
                             <div class="row">
                                 <div class="col-lg-3">
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-first-name">First name</label>
                                         <input type="text" id="input-first-name" class="form-control"
-                                               placeholder="First name" value="{{ collaborator.user.first_name }}" disabled>
+                                               placeholder="First name" value="{{ collaborator.user.first_name }}"
+                                               disabled>
                                     </div>
                                 </div>
                                 <div class="col-lg-3">
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-last-name">Last name</label>
                                         <input type="text" id="input-last-name" class="form-control"
-                                               placeholder="Last name" value="{{ collaborator.user.last_name }}" disabled>
+                                               placeholder="Last name" value="{{ collaborator.user.last_name }}"
+                                               disabled>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-email">Email address</label>
                                         <input type="email" id="input-email" class="form-control"
-                                               placeholder="Email address" value="{{ collaborator.user.username }}" disabled>
+                                               placeholder="Email address" value="{{ collaborator.user.username }}"
+                                               disabled>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="pl-lg-4 mb-5">
+                        <div class="px-lg-4 mb-5">
                             <div class="form-group">
                                 <label class="form-control-label" for="about-user">About</label>
                                 <textarea rows="4" class="form-control" id="about-user"
@@ -133,10 +272,7 @@
                             </div>
                         </div>
 
-                        <!--Divider -->
-                        <hr class="my-4" style="border-top: 1"/>
-                        <h6 class="heading-small text-muted mb-4 pb-3 mt-5">Contact information</h6>
-                        <div class="pl-lg-4">
+                        <div class="px-lg-4">
                             <div class="row">
                                 <div class="form-group col-lg-8">
                                     <label class="form-control-label" for="input-address">Address</label>
@@ -175,6 +311,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <hr class="my-4" style="border-top: 0"/>
                     </div>
                 </div>

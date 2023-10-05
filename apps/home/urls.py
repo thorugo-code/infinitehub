@@ -1,72 +1,78 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, re_path
 from apps.home.views import views
 from apps.home.views import collaborators
+from apps.home.views import profile
+from apps.home.views import projects
+from apps.home.views import inventory
 
 urlpatterns = [
+                  path('', views.index, name='home'),
 
-    path('', views.index, name='home'),
+                  # PROJECTS LIST URLS
 
-    # PROJECTS LIST URLS
-    
-    path('projects/create', views.project, name='create_project'),
-    
-    path('projects/id=<int:id>', views.project_details, name='project_details'),
-    
-    path("projects/", views.project_list, name="project_list"),
+                  path('projects/create', projects.create_project, name='create_project'),
 
-    path('projects/id=<int:id>/delete', views.delete_project, name='delete_project'),
+                  path('projects/id=<int:id>/', projects.details, name='project_details'),
 
-    # PROJECT PAGE URLS
+                  path("projects/", projects.page_list, name="project_list"),
 
-    path('projects/id=<int:id>/upload', views.upload_file, name='upload_file'),
+                  path("projects/<str:situation>/", projects.page_list, name="project_list"),
 
-    path('projects/id=<int:project_id>/delete=<int:file_id>', views.delete_file, name='delete_file'),
+                  path('projects/id=<int:id>/delete', projects.delete, name='delete_project'),
 
-    path('download_file/<int:file_id>/', views.download_file, name='download_file'),
-    
-    path('projects/id=<int:id>/change-picture', views.change_picture, name='change_picture'),
+                  path('projects/working/archive=<int:id>/redirect-to=<str:situation_page>', projects.archive,
+                       name='archive_project'),
 
-    # ASSETS URLS
+                  path('projects/archive/unarchive=<int:id>/redirect-to=<str:situation_page>', projects.unarchive,
+                       name='unarchive_project'),
 
-    path('assets/', views.assets_hub, name='assets_hub'),
+                  # PROJECT PAGE URLS
 
-    path('assets/<str:category>/', views.assets_list, name='assets_list'),
+                  path('projects/id=<int:id>/upload', projects.upload_file, name='upload_file'),
 
-    path('assets/<str:category>/delete=<int:file_id>', views.delete_file_from_storage, name='delete_file_from_storage'),
+                  path('projects/id=<int:project_id>/delete=<int:file_id>', projects.delete_file, name='delete_file'),
 
-    # COLABORATORS URLS
+                  path('download_file/<int:file_id>/', projects.download_file, name='download_file'),
 
-    path('collaborators/', collaborators.page_list, name='collaborators_list'),
+                  path('projects/id=<int:id>/change-picture', projects.change_picture, name='change_picture'),
 
-    path('collaborators/<str:name>', collaborators.details, name='collaborator_details'),
+                  # ASSETS URLS
 
-    # INVENTORY URLS
+                  path('assets/', views.assets_hub, name='assets_hub'),
 
-    path('inventory/', views.inventory_list, name='inventory_list'),
+                  path('assets/<str:category>/', views.assets_list, name='assets_list'),
 
-    path('inventory/new', views.inventory_list, name='new_equipment'),
+                  path('assets/<str:category>/delete=<int:file_id>', views.delete_file_from_storage,
+                       name='delete_file_from_storage'),
 
-    path('inventory/delete=<int:id>', views.delete_equipment, name='delete_equipment'),
+                  # COLABORATORS URLS
 
-    path('inventory/id=<int:id>', views.inventory_list, name='equipment_details'),
+                  path('collaborators/', collaborators.page_list, name='collaborators_list'),
 
-    path('inventory/download/qrcode=<int:equipment_id>', views.download_qrcode_inventory,
-         name='download_file_from_inventory'),
+                  path('collaborators/<str:name>', collaborators.details, name='collaborator_details'),
 
-    # USER URLS
+                  # INVENTORY URLS
 
-    path('profile/', views.profile, name='profile'),
+                  path('inventory/', inventory.inventory_list, name='inventory_list'),
 
-    path('profile/change-picture', views.change_profile_picture, name='change_profile_picture'),
+                  path('inventory/new', inventory.inventory_list, name='new_equipment'),
 
-    # Matches any html file
-    re_path(r'^.*\.*', views.pages, name='pages'),
+                  path('inventory/id=<int:id>', inventory.inventory_list, name='equipment_details'),
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  path('inventory/delete=<int:id>', inventory.delete_equipment, name='delete_equipment'),
+
+                  path('inventory/download/qrcode=<int:equipment_id>', inventory.download_qrcode_inventory,
+                       name='download_file_from_inventory'),
+
+                  # USER URLS
+
+                  path('profile/', profile.details, name='profile'),
+
+                  path('profile/change-picture', profile.change_picture, name='change_profile_picture'),
+
+                  # Matches any html file
+                  re_path(r'^.*\.*', views.pages, name='pages'),
+
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
