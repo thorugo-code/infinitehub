@@ -93,9 +93,6 @@ def assets_list(request, category=None):
 def assets_hub(request):
     user_profile = Profile.objects.get(user=request.user)
 
-    # other_categories = ['3d-models', 'clouds', 'scripts', 'executable', 'folders',
-    #               'unity', 'database', 'office', 'images', 'video', 'others']
-
     other_categories = ['clouds', 'executable', 'folders', 'database', 'office', 'images', 'video', 'others']
 
     category_filter = Q(category__in=other_categories)

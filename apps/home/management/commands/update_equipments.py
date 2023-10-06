@@ -9,6 +9,7 @@ class Command(BaseCommand):
         equipments = Equipments.objects.all()
 
         for equipment in equipments:
+            print(f'Updating {equipment.name}...')
             equipment.save()
 
         self.stdout.write(self.style.SUCCESS('Successfully updated all equipments'))

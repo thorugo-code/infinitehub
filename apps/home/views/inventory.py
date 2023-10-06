@@ -14,14 +14,19 @@ def get_paginated_equipments(request):
 
 
 def inventory_list(request):
+
     if request.method == 'POST':
         name = request.POST.get('name', 'Untitled')
         series = request.POST.get('series', 'N/A')
         supplier = request.POST.get('supplier', 'Untitled')
-        acquisition_date = request.POST.get('acquisition-date', datetime.datetime.now)
+
+        acquisition_date_str = request.POST.get('acquisition-date', datetime.datetime.now)
+        acquisition_date = datetime.datetime.strptime(acquisition_date_str, '%Y-%m-%d').date()
+
         price_str = request.POST.get('equipment_value', 'USD 0.00').replace('USD ', '').replace(',', '')
         price = float(price_str) if price_str else 0
-        description = request.POST.get('description', '')
+
+        description = request.POST.get('about', '')
 
         equipment = Equipments(
             name=name,
@@ -39,7 +44,7 @@ def inventory_list(request):
     user_profile = Profile.objects.get(user=request.user)
 
     context = {
-        'equipments_list': equipments,
+        'equipment_list': equipments,
         'user_profile': user_profile,
     }
 
@@ -56,7 +61,7 @@ def download_qrcode_inventory(request, equipment_id):
 
 
 def delete_equipment(request, id):
-    equipment = get_object_or_404(Equipments, pk=id)
+    equipment = Equipments.objects.get(id=id)
     equipment.delete()
 
     return redirect('inventory_list')

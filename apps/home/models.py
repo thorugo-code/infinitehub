@@ -16,6 +16,7 @@ def custom_upload_path(instance, filename):
 
 
 class Equipments(models.Model):
+
     acquisition_date = models.DateField(default=datetime.now)
     name = models.CharField(max_length=100, default='Untitled')
     series = models.CharField(max_length=100, default='N/A')
@@ -29,9 +30,10 @@ class Equipments(models.Model):
         return self.name
 
     def generate_qrcode(self):
-        info = (f'Equipment: {self.name}\n'
+        info = (f'Name: {self.name}\n'
                 f'Series: {self.series}\n'
-                f'Acquisition Date: {self.acquisition_date.strftime("%d/%m/%Y")}')
+                f'ID: {self.custom_id}\n'
+                f'Acquisition: {self.acquisition_date.strftime("%d/%m/%Y")}')
 
         qr = qrcode.QRCode(
             version=1,
@@ -66,17 +68,19 @@ class Equipments(models.Model):
         return f'{self.acquisition_date.strftime("%Y%m")}{self.id:03d}'
 
     def save(self, *args, **kwargs):
+        
+        super().save()
 
         if self.series == '':
             self.series = 'N/A'
 
-        if self.qrcode == '' or self.qrcode is None:
+        if not self.qrcode or self.qrcode == '':
             self.qrcode = self.generate_qrcode()
 
-        if self.custom_id == '' or self.custom_id is None:
+        if not self.custom_id or self.custom_id == '':
             self.custom_id = self.generate_custom_id()
 
-        super().save()
+        super(Equipments, self).save(*args, **kwargs)
 
 
 class Project(models.Model):
