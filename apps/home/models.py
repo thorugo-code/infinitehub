@@ -95,6 +95,11 @@ class Project(models.Model):
     budget = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
     img = models.ImageField(upload_to=f'apps/static/assets/uploads/',
                             default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+    completition = models.IntegerField(default=0)
+    finished = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
 
 
 class Profile(models.Model):
@@ -198,4 +203,33 @@ class UploadedFile(models.Model):
         total_budget = project.uploaded_files.aggregate(models.Sum('value'))['value__sum'] or Money(0, 'USD')
 
         project.budget = total_budget
+        project.save()
+
+
+class Task(models.Model):
+    project = models.ForeignKey(Project, related_name='tasks', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    deadline = models.DateField()
+    priority = models.IntegerField(default=0)
+
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateField(null=True, blank=True)
+    completed_by = models.ForeignKey(User, related_name='completed_tasks', on_delete=models.CASCADE, null=True,
+                                     blank=True)
+
+    created_at = models.DateField(auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name='created_tasks', on_delete=models.CASCADE, default=1)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *arg, **kwargs):
+        super().save()
+
+        project = self.project
+        total_tasks = project.tasks.count()
+        completed_tasks = project.tasks.filter(completed=True).count()
+
+        project.completition = int((completed_tasks / total_tasks) * 100)
         project.save()

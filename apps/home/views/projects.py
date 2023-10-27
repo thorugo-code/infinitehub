@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
-from apps.home.models import Project, UploadedFile, Profile
+from apps.home.models import Project, UploadedFile, Profile, Task
 from django.core.paginator import Paginator
 import os
+from datetime import datetime
 
 
 def archive(request, id, situation_page=None):
@@ -101,17 +102,7 @@ def create_project(request):
 
 
 def details(request, id):
-    # Retrieve the project using the 'id' argument
     project = Project.objects.get(id=id)
-
-    edit_mode = request.GET.get('edit')
-
-    user_profile = Profile.objects.get(user=request.user)
-
-    if edit_mode is not None:
-        edit_mode = True
-    else:
-        edit_mode = False
 
     if request.method == 'POST':
         project.title = request.POST.get('title', project.title)
@@ -125,9 +116,24 @@ def details(request, id):
 
         return redirect('project_details', id=project.id)
 
-    return render(request, 'home/project.html', {'project': project,
-                                                 'edit_mode': edit_mode,
-                                                 'user_profile': user_profile})
+    user_profile = Profile.objects.get(user=request.user)
+    tasks = Task.objects.filter(project=project)
+
+    edit_mode = request.GET.get('edit')
+
+    if edit_mode is not None:
+        edit_mode = True
+    else:
+        edit_mode = False
+
+    context = {
+        'project': project,
+        'user_profile': user_profile,
+        'tasks': tasks,
+        'edit_mode': edit_mode
+    }
+
+    return render(request, 'home/project.html', context)
 
 
 def delete(request, id):
@@ -157,6 +163,22 @@ def change_picture(request, id):
         return redirect('project_details', id=project.id)
 
     return redirect('project_details', id=project.id)
+
+
+def change_project_status(request, project_id, situation_page=None):
+    project = Project.objects.get(id=project_id)
+
+    if project.finished:
+        project.finished = False
+    else:
+        project.finished = True
+
+    project.save()
+
+    if situation_page is None or situation_page == 'None':
+        return redirect('project_list')
+    else:
+        return redirect('project_list', situation=situation_page)
 
 
 def upload_file(request, id):
@@ -214,3 +236,67 @@ def download_file(request, file_id):
         response['Content-Disposition'] = f'attachment; filename="{uploaded_file.file.name.split("/")[-1]}"'
         return response
 
+
+def submit_task(request, project_id):
+    project = Project.objects.get(id=project_id)
+
+    if request.method == 'POST':
+        task = Task(
+            project=project,
+            title=request.POST.get('taskTitle'),
+            description=request.POST.get('taskDescription'),
+            deadline=request.POST.get('taskDeadline'),
+            priority=int(request.POST.get('taskPriority')),
+            created_by=request.user
+        )
+
+        task.save()
+
+        return redirect('project_details', id=project.id)
+
+    return redirect('project_details', id=project.id)
+
+
+def delete_task(request, project_id, task_id):
+    project = Project.objects.get(id=project_id)
+    task = Task.objects.get(id=task_id, project=project)
+    task.delete()
+
+    return redirect('project_details', id=project_id)
+
+
+def edit_task(request, project_id, task_id):
+    task = Task.objects.get(id=task_id)
+    project = Project.objects.get(id=project_id)
+
+    if request.method == 'POST':
+        task.title = request.POST.get('taskTitleEdit', task.title)
+        task.description = request.POST.get('taskDescriptionEdit', task.description)
+        task.deadline = request.POST.get('taskDeadlineEdit', task.deadline)
+        task.priority = int(request.POST.get('taskPriorityEdit', task.priority))
+        task.save()
+
+        return redirect('project_details', id=project.id)
+
+    return redirect('project_details', id=project.id)
+
+
+def change_task_status(request, project_id, task_id):
+    task = Task.objects.get(id=task_id)
+    project = Project.objects.get(id=project_id)
+
+    if request.method == 'POST':
+        if task.completed:
+            task.completed = False
+            task.completed_by = None
+            task.completed_at = None
+        else:
+            task.completed = True
+            task.completed_by = request.user
+            task.completed_at = datetime.now()
+
+        task.save()
+
+        return redirect('project_details', id=project.id)
+
+    return redirect('project_details', id=project.id)

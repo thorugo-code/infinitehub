@@ -431,99 +431,275 @@
                         </div>
                     </div>
 
-{#                    <div class="card shadow">#}
-{##}
-{#                        <div class="card-header">#}
-{##}
-{#                            <h5 class="h3 mb-0">Tasks</h5>#}
-{#                        </div>#}
-{##}
-{#                        <div class="card-body p-0">#}
-{##}
-{#                            <ul class="list-group list-group-flush" data-toggle="checklist">#}
-{#                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-{#                                    <div class="checklist-item checklist-item-success">#}
-{#                                        <div class="checklist-info">#}
-{#                                            <h5 class="checklist-title mb-0">Task 1 with low priority</h5>#}
-{#                                            <small class="text-success">Low</small>#}
-{#                                            <small class="text-nowrap">- 01/01/2020</small>#}
-{#                                        </div>#}
-{#                                        <div>#}
-{#                                            <div class="custom-control custom-checkbox custom-checkbox-success">#}
-{#                                                <input class="custom-control-input" id="chk-todo-task-1"#}
-{#                                                       type="checkbox">#}
-{#                                                <label class="custom-control-label" for="chk-todo-task-1"></label>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </li>#}
-{#                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-{#                                    <div class="checklist-item checklist-item-medium">#}
-{#                                        <div class="checklist-info">#}
-{#                                            <h5 class="checklist-title mb-0">Task 2 with medium priority</h5>#}
-{#                                            <small class="text-medium">Medium</small>#}
-{#                                            <small class="text-nowrap">- 01/01/2020</small>#}
-{#                                        </div>#}
-{#                                        <div>#}
-{#                                            <div class="custom-control custom-checkbox custom-checkbox-medium">#}
-{#                                                <input class="custom-control-input" id="chk-todo-task-2"#}
-{#                                                       type="checkbox">#}
-{#                                                <label class="custom-control-label" for="chk-todo-task-2"></label>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </li>#}
-{#                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-{#                                    <div class="checklist-item checklist-item-info">#}
-{#                                        <div class="checklist-info">#}
-{#                                            <h5 class="checklist-title mb-0">Task 3 with no priority</h5>#}
-{#                                            <small class="text-info">None</small>#}
-{#                                            <small class="text-nowrap">- 01/01/2020</small>#}
-{#                                        </div>#}
-{#                                        <div>#}
-{#                                            <div class="custom-control custom-checkbox custom-checkbox-info">#}
-{#                                                <input class="custom-control-input" id="chk-todo-task-3"#}
-{#                                                       type="checkbox">#}
-{#                                                <label class="custom-control-label" for="chk-todo-task-3"></label>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </li>#}
-{#                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-{#                                    <div class="checklist-item checklist-item-danger">#}
-{#                                        <div class="checklist-info">#}
-{#                                            <h5 class="checklist-title mb-0">Task 4 with high priority</h5>#}
-{#                                            <small class="text-danger">High</small>#}
-{#                                            <small class="text-nowrap">- 01/01/2020</small>#}
-{#                                        </div>#}
-{#                                        <div>#}
-{#                                            <div class="custom-control custom-checkbox custom-checkbox-danger">#}
-{#                                                <input class="custom-control-input" id="chk-todo-task-4"#}
-{#                                                       type="checkbox">#}
-{#                                                <label class="custom-control-label" for="chk-todo-task-4"></label>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </li>#}
-{#                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">#}
-{#                                    <div class="checklist-item checklist-item-success checklist-item-checked">#}
-{#                                        <div class="checklist-info">#}
-{#                                            <h5 class="checklist-title mb-0">Task 5 with low priority</h5>#}
-{#                                            <small class="text-success">Low</small><small class="text-nowrap"> -#}
-{#                                            01/01/2020</small>#}
-{#                                        </div>#}
-{#                                        <div>#}
-{#                                            <div class="custom-control custom-checkbox custom-checkbox-success">#}
-{#                                                <input class="custom-control-input" id="chk-todo-task-5"#}
-{#                                                       type="checkbox">#}
-{#                                                <label class="custom-control-label" for="chk-todo-task-5"></label>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </li>#}
-{#                            </ul>#}
-{#                        </div>#}
-{#                    </div>#}
+                    <div class="card shadow">
+
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">Tasks</h3>
+                                </div>
+                                <div class="col text-right">
+                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                       data-target="#sortTasksModal">
+                                        <i class="fas fa-sort"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                       data-target="#filterTasksModal">
+                                        <i class="fas fa-filter"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                       data-target="#newTaskModal">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-0" style="min-height: 85px; max-height: 19rem; overflow-y: auto;">
+
+                            <ul class="list-group list-group-flush" data-toggle="checklist">
+
+                                {% for task in tasks %}
+
+                                    <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+
+                                        {% if task.priority == 1 %}
+
+                                            <div class="checklist-item checklist-item-success {% if task.completed %}checklist-item-checked{% endif %}">
+                                                <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
+                                                    <div class="checklist-info">
+                                                        <h5 class="checklist-title mb-0">{{ task.title }}</h5>
+                                                        <small class="text-success">Low</small><small class="text-nowrap text-default"> - {{ task.deadline|date:'d/m/Y' }}</small>
+                                                    </div>
+                                                </a>
+                                                <div>
+                                                    <div class="custom-control custom-checkbox custom-checkbox-success">
+
+                                                        <form method="post" id="changeStatusTask{{ task.id }}"
+                                                              action="{% url 'change_task_status' project.id task.id %}">
+                                                            {% csrf_token %}
+                                                            <label class="custom-control custom-checkbox">
+                                                                <input class="custom-control-input"
+                                                                       id="chk-todo-task-{{ task.id }}"
+                                                                       type="checkbox"
+                                                                       {% if task.completed %}checked{% endif %}
+                                                                       onchange="submitCheckboxForm({{ task.id }})">
+                                                                <label class="custom-control-label"
+                                                                       for="chk-todo-task-{{ task.id }}"></label>
+                                                            </label>
+                                                        </form>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        {% elif task.priority == 2 %}
+
+                                            <div class="checklist-item checklist-item-medium {% if task.completed %}checklist-item-checked{% endif %}">
+                                                <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
+                                                    <div class="checklist-info">
+                                                        <h5 class="checklist-title mb-0">{{ task.title }}</h5>
+                                                        <small class="text-medium">Medium</small><small class="text-nowrap text-default"> - {{ task.deadline|date:'d/m/Y' }}</small>
+                                                    </div>
+                                                </a>
+                                                <div>
+                                                    <div class="custom-control custom-checkbox custom-checkbox-medium">
+
+                                                        <form method="post" id="changeStatusTask{{ task.id }}"
+                                                              action="{% url 'change_task_status' project.id task.id %}">
+                                                            {% csrf_token %}
+                                                            <label class="custom-control custom-checkbox">
+                                                                <input class="custom-control-input"
+                                                                       id="chk-todo-task-{{ task.id }}"
+                                                                       type="checkbox"
+                                                                       {% if task.completed %}checked{% endif %}
+                                                                       onchange="submitCheckboxForm({{ task.id }})">
+                                                                <label class="custom-control-label"
+                                                                       for="chk-todo-task-{{ task.id }}"></label>
+                                                            </label>
+                                                        </form>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        {% elif task.priority == 3 %}
+
+                                            <div class="checklist-item checklist-item-danger {% if task.completed %}checklist-item-checked{% endif %}">
+                                                <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
+                                                    <div class="checklist-info">
+                                                        <h5 class="checklist-title mb-0">{{ task.title }}</h5>
+                                                        <small class="text-danger">High</small><small class="text-nowrap text-default"> - {{ task.deadline|date:'d/m/Y' }}</small>
+                                                    </div>
+                                                </a>
+                                                <div>
+                                                    <div class="custom-control custom-checkbox custom-checkbox-danger">
+
+                                                        <form method="post" id="changeStatusTask{{ task.id }}"
+                                                              action="{% url 'change_task_status' project.id task.id %}">
+                                                            {% csrf_token %}
+                                                            <label class="custom-control custom-checkbox">
+                                                                <input class="custom-control-input"
+                                                                       id="chk-todo-task-{{ task.id }}"
+                                                                       type="checkbox"
+                                                                       {% if task.completed %}checked{% endif %}
+                                                                       onchange="submitCheckboxForm({{ task.id }})">
+                                                                <label class="custom-control-label"
+                                                                       for="chk-todo-task-{{ task.id }}"></label>
+                                                            </label>
+                                                        </form>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        {% else %}
+
+                                            <div class="checklist-item checklist-item-info {% if task.completed %}checklist-item-checked{% endif %}">
+                                                <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
+                                                    <div class="checklist-info">
+                                                        <h5 class="checklist-title mb-0">{{ task.title }}</h5>
+                                                        <small class="text-info">None</small><small
+                                                            class="text-nowrap text-default">
+                                                        - {{ task.deadline|date:'d/m/Y' }}</small>
+                                                    </div>
+                                                </a>
+                                                <div>
+                                                    <div class="custom-control custom-checkbox custom-checkbox-info">
+
+                                                        <form method="post" id="changeStatusTask{{ task.id }}"
+                                                              action="{% url 'change_task_status' project.id task.id %}">
+                                                            {% csrf_token %}
+                                                            <label class="custom-control custom-checkbox">
+                                                                <input class="custom-control-input"
+                                                                       id="chk-todo-task-{{ task.id }}"
+                                                                       type="checkbox"
+                                                                       {% if task.completed %}checked{% endif %}
+                                                                       onchange="submitCheckboxForm({{ task.id }})">
+                                                                <label class="custom-control-label"
+                                                                       for="chk-todo-task-{{ task.id }}"></label>
+                                                            </label>
+                                                        </form>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        {% endif %}
+                                    </li>
+
+                                    <!-- Task Details Modal -->
+                                    <div class="modal fade" id="taskDetails{{ task.id }}" tabindex="-1" role="dialog"
+                                         aria-labelledby="taskDetails{{ task.id }}Label" aria-hidden="true">
+                                        <div class="modal-dialog my-6" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header mt-2 align-items-center">
+                                                    <h5 class="modal-title my-1" style="margin-left: auto">
+                                                        {% if task.priority == 0 %}
+                                                            <i class="fas fa-circle text-info"
+                                                               style="font-size: 0.9rem"></i>
+                                                        {% elif task.priority == 1 %}
+                                                            <i class="fas fa-circle text-success"
+                                                               style="font-size: 0.9rem"></i>
+                                                        {% elif task.priority == 2 %}
+                                                            <i class="fas fa-circle text-medium"
+                                                               style="font-size: 0.9rem"></i>
+                                                        {% elif task.priority == 3 %}
+                                                            <i class="fas fa-circle text-danger"
+                                                               style="font-size: 0.9rem"></i>
+                                                        {% endif %}
+                                                    </h5>
+                                                    <span class="ml-3 my-1"
+                                                          style="margin-right: auto; font-size: 1.2rem"
+                                                          id="newFileModalLabel">{{ task.title|truncatechars:'25' }}</span>
+                                                    <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                            data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body py-0"
+                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    <form method="post" id="editTask{{ task.id }}"
+                                                          action="{% url 'edit_task' project.id task.id %}"
+                                                          onsubmit="disableSubmitTaskButton()">
+                                                        {% csrf_token %}
+                                                        <div class="form-group form-control-label">
+                                                            <label for="taskTitleEdit">Title</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="taskTitleEdit"
+                                                                   name="taskTitleEdit" placeholder=""
+                                                                   value="{{ task.title }}">
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group form-control-label col">
+                                                                <label for="taskDeadlineEdit">Deadline</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="taskDeadlineEdit"
+                                                                       name="taskDeadlineEdit" placeholder=""
+                                                                       onchange="enableSubmitTaskButton()"
+                                                                       onemptied="disableSubmitTaskButton()"
+                                                                       value="{{ task.deadline|date:"Y-m-d" }}">
+                                                            </div>
+                                                            <div class="form-group form-control-label col">
+                                                                <label for="taskPriorityInputEdit">Priority</label>
+                                                                <select class="form-control" id="taskPriorityInputEdit"
+                                                                        name="taskPriorityEdit">
+                                                                    <option value="0">--Select--</option>
+                                                                    <option value="3"
+                                                                            {% if task.priority == 3 %}selected{% endif %}>
+                                                                        High
+                                                                    </option>
+                                                                    <option value="2"
+                                                                            {% if task.priority == 2 %}selected{% endif %}>
+                                                                        Medium
+                                                                    </option>
+                                                                    <option value="1"
+                                                                            {% if task.priority == 1 %}selected{% endif %}>
+                                                                        Low
+                                                                    </option>
+                                                                    <option value="0"
+                                                                            {% if task.priority == 0 %}selected{% endif %}>
+                                                                        None
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group mb-2 form-control-label">
+                                                            <label for="taskDescriptionEdit">Description</label>
+                                                            <textarea class="form-control"
+                                                                      id="taskDescriptionEdit"
+                                                                      name="taskDescriptionEdit"
+                                                                      rows="3">{{ task.description }}</textarea>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                                            form="editTask{{ task.id }}" id="cancelEditTaskButton">
+                                                        Cancel
+                                                    </button>
+                                                    <button type="submit" class="btn btn-danger"
+                                                            form="editTask{{ task.id }}"
+                                                            id="deleteTaskButton">
+                                                        Delete
+                                                    </button>
+                                                    <button type="submit" class="btn btn-success"
+                                                            form="editTask{{ task.id }}"
+                                                            id="editTaskButton">
+                                                        Save
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+
+                        <div class="card-footer py-2" style="border-top: 0 !important"></div>
+                    </div>
 
                 </div>
             </div>
@@ -581,6 +757,78 @@
                     </button>
                     <button type="submit" class="btn btn-primary" form="profilePictureForm"
                             id="uploadButton" disabled>Upload
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Task Modal -->
+    <div class="modal fade" id="newTaskModal" tabindex="-1" role="dialog"
+         aria-labelledby="newTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog my-6" role="document">
+            <div class="modal-content">
+                <div class="modal-header mt-2 align-items-center">
+                    <h5 class="modal-title my-1" style="margin-left: auto">
+                        <i class="fas fa-tasks text-blue"
+                           style="font-size: 1.2rem"></i>
+                    </h5>
+                    <span class="ml-3 my-1"
+                          style="margin-right: auto; font-size: 1.2rem"
+                          id="newFileModalLabel">New task</span>
+                    <button type="button" class="close mt--4" style="margin-left: -30px"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body py-0"
+                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                    <form method="post" id="submitTask"
+                          action="{% url 'submit_task' project.id %}"
+                          onsubmit="disableSubmitTaskButton()">
+                        {% csrf_token %}
+                        <div class="form-group form-control-label">
+                            <label for="taskTitle">Title</label>
+                            <input type="text" class="form-control"
+                                   id="taskTitle"
+                                   name="taskTitle" placeholder="">
+                        </div>
+                        <div class="row">
+                            <div class="form-group form-control-label col">
+                                <label for="taskDeadline">Deadline</label>
+                                <input type="date" class="form-control"
+                                       id="taskDeadline"
+                                       name="taskDeadline" placeholder=""
+                                       onchange="enableSubmitTaskButton()"
+                                       onemptied="disableSubmitTaskButton()">
+                            </div>
+                            <div class="form-group form-control-label col">
+                                <label for="taskPriorityInput">Priority</label>
+                                <select class="form-control" id="taskPriorityInput" name="taskPriority">
+                                    <option value="0">--Select--</option>
+                                    <option value="3">High</option>
+                                    <option value="2">Medium</option>
+                                    <option value="1">Low</option>
+                                    <option value="0">None</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group mb-2 form-control-label">
+                            <label for="taskDescription">Description</label>
+                            <textarea class="form-control"
+                                      id="taskDescription"
+                                      name="taskDescription" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            form="submitTask" id="cancelTaskButton">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" form="submitTask"
+                            id="submitTaskButton" disabled>
+                        Submit
                     </button>
                 </div>
             </div>
@@ -853,6 +1101,14 @@
             uploadButton.removeAttribute("disabled");
         }
 
+        function enableSubmitTaskButton() {
+            const cancelButton = document.getElementById("cancelTaskButton");
+            const uploadButton = document.getElementById("submitTaskButton");
+
+            cancelButton.removeAttribute("disabled");
+            uploadButton.removeAttribute("disabled");
+        }
+
         function disableButtons() {
             const cancelButton = document.getElementById("cancelButton");
             const uploadButton = document.getElementById("uploadButton");
@@ -864,6 +1120,14 @@
         function disableButtonsFile() {
             const cancelButton = document.getElementById("cancelButtonFile");
             const uploadButton = document.getElementById("uploadButtonFile");
+
+            cancelButton.setAttribute("disabled", "disabled");
+            uploadButton.setAttribute("disabled", "disabled");
+        }
+
+        function disableSubmitTaskButton() {
+            const cancelButton = document.getElementById("cancelTaskButton");
+            const uploadButton = document.getElementById("submitTaskButton");
 
             cancelButton.setAttribute("disabled", "disabled");
             uploadButton.setAttribute("disabled", "disabled");
@@ -954,6 +1218,11 @@
                     fileTypeSelect.value = 'other'; // Default to "Other" if no mapping found
                 }
             }
+        }
+
+        function submitCheckboxForm(taskId) {
+            const formId = 'changeStatusTask' + taskId;
+            document.getElementById(formId).submit();
         }
 
     </script>
