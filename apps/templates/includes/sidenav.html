@@ -26,9 +26,9 @@
                         <div class="collapse" id="navbar-projects" style="">
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
-                                    <a class="nav-link"
-                                       href="{% url 'project_list' 'working' %}">
-                                        <span class="nav-link-text"> Working </span>
+                                    <a href="{% url 'project_list' %}"
+                                       class="nav-link">
+                                        <span class="sidenav-normal"> All </span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -38,9 +38,15 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{% url 'project_list' %}"
-                                       class="nav-link">
-                                        <span class="sidenav-normal"> All </span>
+                                    <a class="nav-link"
+                                       href="{% url 'project_list' 'finished' %}">
+                                        <span class="nav-link-text"> Finished </span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link"
+                                       href="{% url 'project_list' 'working' %}">
+                                        <span class="nav-link-text"> Working </span>
                                     </a>
                                 </li>
                             </ul>
@@ -59,7 +65,7 @@
                                 <li class="nav-item">
                                     <a href="{% url 'assets_hub' %}"
                                        class="nav-link">
-                                        <span class="sidenav-normal"> View categories </span>
+                                        <span class="sidenav-normal"> All </span>
                                     </a>
                                 </li>
                                 <li class="nav-item">

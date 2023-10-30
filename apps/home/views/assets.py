@@ -1,55 +1,9 @@
-from django import template
 from django.db.models import Sum, Q
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.template import loader
-from django.urls import reverse
 from django.views.decorators.http import require_POST
-from apps.home.models import Project, UploadedFile, Profile, Equipments
+from apps.home.models import UploadedFile, Profile
 from django.core.paginator import Paginator
 import os
-
-
-@login_required(login_url="/login/")
-def index(request):
-    context = {'segment': 'index',
-               'user_profile': Profile.objects.get(user=request.user)}
-
-    html_template = loader.get_template('home/index.html')
-    return HttpResponse(html_template.render(context, request))
-
-
-@login_required(login_url="/login/")
-def pages(request):
-    context = {}
-    # All resource paths end in .html.
-    # Pick out the html file name from the url. And load that template.
-    try:
-        user_profile = Profile.objects.get(user=request.user)
-        context['user_profile'] = user_profile
-    except Profile.DoesNotExist:
-        pass
-
-    try:
-
-        load_template = request.path.split('/')[-1]
-
-        if load_template == 'admin':
-            return HttpResponseRedirect(reverse('admin:index'))
-        context['segment'] = load_template
-
-        html_template = loader.get_template('home/' + load_template)
-        return HttpResponse(html_template.render(context, request))
-
-    except template.TemplateDoesNotExist:
-
-        html_template = loader.get_template('home/page-404.html')
-        return HttpResponse(html_template.render(context, request))
-
-    except:
-        html_template = loader.get_template('home/page-500.html')
-        return HttpResponse(html_template.render(context, request))
 
 
 def get_paginated_files(request, category=None):
@@ -107,19 +61,41 @@ def assets_hub(request):
     values_unity = UploadedFile.objects.filter(category='unity').aggregate(Sum('value'))['value__sum']
     values_others = UploadedFile.objects.filter(category_filter).aggregate(Sum('value'))['value__sum']
 
-    return render(request, "home/assetsPage.html", {'3d_models_files': models_3d,
-                                                    'scripts_files': scripts,
-                                                    'unity_files': unity,
-                                                    'others_files': others,
-                                                    '3d_models_value': values_3d if values_3d is not None else 0,
-                                                    'scripts_value': values_scripts if values_scripts is not None else 0,
-                                                    'unity_value': values_unity if values_unity is not None else 0,
-                                                    'others_value': values_others if values_others is not None else 0,
-                                                    'user_profile': user_profile})
+    paginator, all_files = get_paginated_files(request)
+
+    context = {
+        'files_list': all_files,
+        '3d_models_files': models_3d,
+        'scripts_files': scripts,
+        'unity_files': unity,
+        'others_files': others,
+        '3d_models_value': values_3d if values_3d is not None else 0,
+        'scripts_value': values_scripts if values_scripts is not None else 0,
+        'unity_value': values_unity if values_unity is not None else 0,
+        'others_value': values_others if values_others is not None else 0,
+        'user_profile': user_profile
+    }
+
+    return render(request, "home/assetsPage.html", context)
 
 
 @require_POST
-def delete_file_from_storage(request, category, file_id):
+def delete_file_from_storage(request, file_id):
+    uploaded_file = get_object_or_404(UploadedFile, pk=file_id)
+    file_path = uploaded_file.file.path
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    uploaded_file.value = 0
+    uploaded_file.save()
+
+    uploaded_file.delete()
+
+    return redirect('assets_hub')
+
+
+@require_POST
+def delete_file_from_storage_with_category(request, category, file_id):
     uploaded_file = get_object_or_404(UploadedFile, pk=file_id)
     file_path = uploaded_file.file.path
     if os.path.exists(file_path):

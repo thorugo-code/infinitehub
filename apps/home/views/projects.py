@@ -5,6 +5,7 @@ from apps.home.models import Project, UploadedFile, Profile, Task
 from django.core.paginator import Paginator
 import os
 from datetime import datetime
+from django.db.models import Q
 
 
 def archive(request, id, situation_page=None):
@@ -31,9 +32,12 @@ def unarchive(request, id, situation_page=None):
 
 def get_paginated_projects(request, situation=None):
     if situation == 'working':
-        projects_list = Project.objects.filter(working=True)
+        query = Q(working=True, finished=False)
+        projects_list = Project.objects.filter(query)
     elif situation == 'archive':
         projects_list = Project.objects.filter(working=False)
+    elif situation == 'finished':
+        projects_list = Project.objects.filter(finished=True)
     else:
         projects_list = Project.objects.all()
 
@@ -261,6 +265,7 @@ def delete_task(request, project_id, task_id):
     project = Project.objects.get(id=project_id)
     task = Task.objects.get(id=task_id, project=project)
     task.delete()
+    project.save(update_tasks=True)
 
     return redirect('project_details', id=project_id)
 

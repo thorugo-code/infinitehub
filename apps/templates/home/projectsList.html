@@ -20,6 +20,9 @@
                                 {% elif situation == "archive" %}
                                     <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
                                     <li class="breadcrumb-item"><a href="">Archive</a></li>
+                                {% elif situation == "finished" %}
+                                    <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
+                                    <li class="breadcrumb-item"><a href="">Finished</a></li>
                                 {% else %}
                                     <li class="breadcrumb-item"><a href="">Projects</a></li>
                                 {% endif %}

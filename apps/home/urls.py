@@ -1,15 +1,11 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, re_path
-from apps.home.views import views
-from apps.home.views import collaborators
-from apps.home.views import profile
-from apps.home.views import projects
-from apps.home.views import inventory
+from apps.home.views import assets, collaborators, inventory, login, profile, projects
 
 urlpatterns = [
 
-    path('', views.index, name='home'),
+    path('', login.index, name='home'),
 
     # PROJECTS LIST URLS
 
@@ -29,7 +25,8 @@ urlpatterns = [
     path('projects/archive/unarchive=<int:id>/redirect-to=<str:situation_page>', projects.unarchive,
          name='unarchive_project'),
 
-    path('projects/change-status=<int:project_id>/redirect-to=<str:situation_page>', projects.change_project_status, name='change_project_status'),
+    path('projects/change-status=<int:project_id>/redirect-to=<str:situation_page>', projects.change_project_status,
+         name='change_project_status'),
 
     # PROJECT PAGE URLS
 
@@ -43,7 +40,8 @@ urlpatterns = [
 
     path('projects/id=<int:project_id>/submit-task', projects.submit_task, name='submit_task'),
 
-    path('projects/id=<int:project_id>/task=<int:task_id>/change-status', projects.change_task_status, name='change_task_status'),
+    path('projects/id=<int:project_id>/task=<int:task_id>/change-status', projects.change_task_status,
+         name='change_task_status'),
 
     path('projects/id=<int:project_id>/edit=<int:task_id>/', projects.edit_task, name='edit_task'),
 
@@ -51,11 +49,14 @@ urlpatterns = [
 
     # ASSETS URLS
 
-    path('assets/', views.assets_hub, name='assets_hub'),
+    path('assets/', assets.assets_hub, name='assets_hub'),
 
-    path('assets/<str:category>/', views.assets_list, name='assets_list'),
+    path('assets/<str:category>/', assets.assets_list, name='assets_list'),
 
-    path('assets/<str:category>/delete=<int:file_id>', views.delete_file_from_storage,
+    path('assets/<str:category>/delete=<int:file_id>', assets.delete_file_from_storage_with_category,
+         name='delete_file_from_storage_with_category'),
+
+    path('assets/delete=<int:file_id>', assets.delete_file_from_storage,
          name='delete_file_from_storage'),
 
     # COLABORATORS URLS
@@ -84,6 +85,6 @@ urlpatterns = [
     path('profile/change-picture', profile.change_picture, name='change_profile_picture'),
 
     # Matches any html file
-    re_path(r'^.*\.*', views.pages, name='pages'),
+    re_path(r'^.*\.*', login.pages, name='pages'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

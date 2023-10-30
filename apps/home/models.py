@@ -68,7 +68,7 @@ class Equipments(models.Model):
         return f'{self.acquisition_date.strftime("%Y%m")}{self.id:03d}'
 
     def save(self, *args, **kwargs):
-        
+
         super().save()
 
         if self.series == '':
@@ -100,6 +100,15 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if kwargs.get('update_tasks'):
+            total_tasks = self.tasks.count()
+            completed_tasks = self.tasks.filter(completed=True).count()
+
+            self.completition = int((completed_tasks / total_tasks) * 100)
+
+        super().save()
 
 
 class Profile(models.Model):

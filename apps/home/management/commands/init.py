@@ -4,7 +4,7 @@ from apps.home.models import Profile
 
 
 class Command(BaseCommand):
-    help = 'Create Profile objects for existing users'
+    help = 'Init database with custom commands'
 
     def handle(self, *args, **options):
         # Get all existing users
@@ -14,6 +14,4 @@ class Command(BaseCommand):
         for user in users:
             profile, created = Profile.objects.get_or_create(user=user)
             if created:
-                self.stdout.write(self.style.SUCCESS(f'Profile created for user: {user.username}'))
-            else:
-                self.stdout.write(self.style.SUCCESS(f'Profile already exists for user: {user.username}'))
+                self.stdout.write(f'Profile created for user: {self.style.SUCCESS(user.username)}')

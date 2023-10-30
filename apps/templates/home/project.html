@@ -218,14 +218,14 @@
                                     <h3 class="mb-0">Files </h3>
                                 </div>
                                 <div class="col text-right">
-                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                       data-target="#sortModal">
-                                        <i class="fas fa-sort"></i>
-                                    </a>
-                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                       data-target="#filterModal">
-                                        <i class="fas fa-filter"></i>
-                                    </a>
+{#                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+{#                                       data-target="#sortModal">#}
+{#                                        <i class="fas fa-sort"></i>#}
+{#                                    </a>#}
+{#                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+{#                                       data-target="#filterModal">#}
+{#                                        <i class="fas fa-filter"></i>#}
+{#                                    </a>#}
                                     <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
                                        data-target="#newFileModal">
                                         <i class="fas fa-plus"></i>
@@ -432,21 +432,20 @@
                     </div>
 
                     <div class="card shadow">
-
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col">
                                     <h3 class="mb-0">Tasks</h3>
                                 </div>
                                 <div class="col text-right">
-                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                       data-target="#sortTasksModal">
-                                        <i class="fas fa-sort"></i>
-                                    </a>
-                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                       data-target="#filterTasksModal">
-                                        <i class="fas fa-filter"></i>
-                                    </a>
+{#                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+{#                                       data-target="#sortTasksModal">#}
+{#                                        <i class="fas fa-sort"></i>#}
+{#                                    </a>#}
+{#                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+{#                                       data-target="#filterTasksModal">#}
+{#                                        <i class="fas fa-filter"></i>#}
+{#                                    </a>#}
                                     <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
                                        data-target="#newTaskModal">
                                         <i class="fas fa-plus"></i>
@@ -678,11 +677,10 @@
                                                             form="editTask{{ task.id }}" id="cancelEditTaskButton">
                                                         Cancel
                                                     </button>
-                                                    <button type="submit" class="btn btn-danger"
-                                                            form="editTask{{ task.id }}"
-                                                            id="deleteTaskButton">
+                                                    <a class="btn btn-danger"
+                                                       href="{% url 'delete_task' project.id task.id %}">
                                                         Delete
-                                                    </button>
+                                                    </a>
                                                     <button type="submit" class="btn btn-success"
                                                             form="editTask{{ task.id }}"
                                                             id="editTaskButton">
