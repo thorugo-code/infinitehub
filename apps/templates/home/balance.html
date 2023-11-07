@@ -1,0 +1,572 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Balance {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <style>
+        .tabcontent {
+            animation: fadeEffect 1s;
+        }
+
+        @keyframes fadeEffect {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+    <!-- Header -->
+    <div class="header bg-primary" style="padding-bottom: 6rem"> <!--xmlns="http://www.w3.org/1999/html"-->
+        <div class="container-fluid">
+            <div class="header-body">
+                <div class="row align-items-center py-4">
+                    <div class="col-lg-6 col-7">
+                        <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                                <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="">Financial</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'balance_page' %}">Balance</a></li>
+                                <li class="breadcrumb-item active"></li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid" style="margin-top: -6rem">
+        <div class="header-body">
+            <!-- Card stats -->
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card bg-gradient-success border-0 mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Inputs</h5>
+                                    <span class="h2 font-weight-bold mb-0 text-white">0</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span class="text-white mr-1"><i class="fa fa-arrow-up mr-2"></i>0</span>
+                                <span class="text-nowrap text-white">This month</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card bg-gradient-danger border-0 mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Outputs</h5>
+                                    <span class="h2 font-weight-bold mb-0 text-white">0</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
+                                        <i class="fas fa-donate"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span class="text-white mr-1"><i class="fa fa-arrow-down mr-2"></i>0</span>
+                                <span class="text-nowrap text-white">This month</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card bg-gradient-info border-0 mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Balance</h5>
+                                    <span class="h2 font-weight-bold mb-0 text-white">0</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
+                                        <i class="fas fa-wallet"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span class="text-white mr-1"><i class="fa fa-chart-bar mr-2"></i>0</span>
+                                <span class="text-nowrap text-white">This month</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-2">
+    <div class="row" style="min-height: 670px;">
+
+        <!-- Bills Card -->
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="mb-0">Bills</h4>
+                        </div>
+                        <div class="col-lg-4 text-right btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-primary tablinksBills"
+                                    onclick="openBills(event, 'receive')" id="defaultOpenBills">
+                                Receive
+                            </button>
+                            <button type="button" class="btn btn-sm btn-neutral tablinksBills"
+                                    onclick="openBills(event, 'pay')">
+                                Pay
+                            </button>
+                        </div>
+                        <div class="text-right mr-2">
+                            <button type="button" class="btn btn-sm btn-neutral">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-neutral">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0" style="min-height: 19rem; max-height: 19rem; overflow-y: auto;">
+
+                    <div id="receive" class="tabcontent">
+                        <ul class="list-group list-group-flush" data-toggle="checklist">
+                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                <div class="checklist-item checklist-item-medium ">
+                                    <a href="#" data-toggle="modal" data-target="#taskDetails1">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Desativar modo DEBUG</h5>
+                                            <small class="text-medium">Medium</small><small
+                                                class="text-nowrap text-default"> - 24/11/2023</small>
+                                        </div>
+                                    </a>
+                                    <div>
+
+                                        <div class="text-right">
+                                            <div class="dropdown">
+                                                <a class="btn btn-sm btn-icon-only text-light" href="#"
+                                                   role="button"
+                                                   data-toggle="dropdown" aria-haspopup="true"
+                                                   aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                    <a class="dropdown-item" href="">Action</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="">Bad action</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="pay" class="tabcontent">
+                        <ul class="list-group list-group-flush" data-toggle="checklist">
+                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                <div class="checklist-item checklist-item-medium ">
+                                    <a href="#" data-toggle="modal" data-target="#taskDetails1">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Desativar modo DEBUG</h5>
+                                            <small class="text-medium">Medium</small><small
+                                                class="text-nowrap text-default"> - 24/11/2023</small>
+                                        </div>
+                                    </a>
+                                    <div>
+
+                                        <div class="text-right">
+                                            <div class="dropdown">
+                                                <a class="btn btn-sm btn-icon-only text-light" href="#"
+                                                   role="button"
+                                                   data-toggle="dropdown" aria-haspopup="true"
+                                                   aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                    <a class="dropdown-item" href="">Action</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="">Bad action</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                <div class="checklist-item checklist-item-medium ">
+                                    <a href="#" data-toggle="modal" data-target="#taskDetails1">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Desativar modo DEBUG</h5>
+                                            <small class="text-medium">Medium</small><small
+                                                class="text-nowrap text-default"> - 24/11/2023</small>
+                                        </div>
+                                    </a>
+                                    <div>
+
+                                        <div class="text-right">
+                                            <div class="dropdown">
+                                                <a class="btn btn-sm btn-icon-only text-light" href="#"
+                                                   role="button"
+                                                   data-toggle="dropdown" aria-haspopup="true"
+                                                   aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                    <a class="dropdown-item" href="">Action</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="">Bad action</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                <div class="checklist-item checklist-item-medium ">
+                                    <a href="#" data-toggle="modal" data-target="#taskDetails1">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Desativar modo DEBUG</h5>
+                                            <small class="text-medium">Medium</small><small
+                                                class="text-nowrap text-default"> - 24/11/2023</small>
+                                        </div>
+                                    </a>
+                                    <div>
+
+                                        <div class="text-right">
+                                            <div class="dropdown">
+                                                <a class="btn btn-sm btn-icon-only text-light" href="#"
+                                                   role="button"
+                                                   data-toggle="dropdown" aria-haspopup="true"
+                                                   aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                    <a class="dropdown-item" href="">Action</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="">Bad action</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="card-footer py-2"></div>
+            </div>
+        </div>
+
+        <!-- Reports Card -->
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="mb-0">Reports</h4>
+                        </div>
+                        <div class="col-lg-4 text-right btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-primary tablinksReports"
+                                    onclick="openReports(event, 'monthly')" id="defaultOpenReports">
+                                Month
+                            </button>
+                            <button type="button" class="btn btn-sm btn-neutral tablinksReports"
+                                    onclick="openReports(event, 'yearly')">
+                                Year
+                            </button>
+                        </div>
+                        <div class="text-right mr-2">
+                            <button type="button" class="btn btn-sm btn-neutral">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-neutral">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0" style="min-height: 22rem; max-height: 22rem; overflow-y: auto;">
+
+                    <div id="monthly" class="tabcontent">
+                        <ul class="list-group list-group-flush" data-toggle="checklist">
+                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                <div class="checklist-item checklist-item-medium ">
+                                    <a href="#" data-toggle="modal" data-target="#taskDetails1">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Desativar modo DEBUG</h5>
+                                            <small class="text-medium">Medium</small><small
+                                                class="text-nowrap text-default"> - 24/11/2023</small>
+                                        </div>
+                                    </a>
+                                    <div>
+
+                                        <div class="text-right">
+                                            <div class="dropdown">
+                                                <a class="btn btn-sm btn-icon-only text-light" href="#"
+                                                   role="button"
+                                                   data-toggle="dropdown" aria-haspopup="true"
+                                                   aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                    <a class="dropdown-item" href="">Action</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="">Bad action</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="yearly" class="tabcontent">
+                        <ul class="list-group list-group-flush" data-toggle="checklist">
+                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                <div class="checklist-item checklist-item-medium ">
+                                    <a href="#" data-toggle="modal" data-target="#taskDetails1">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Desativar modo DEBUG</h5>
+                                            <small class="text-medium">Medium</small><small
+                                                class="text-nowrap text-default"> - 24/11/2023</small>
+                                        </div>
+                                    </a>
+                                    <div>
+                                        <div class="text-right">
+                                            <div class="dropdown">
+                                                <a class="btn btn-sm btn-icon-only text-light" href="#"
+                                                   role="button"
+                                                   data-toggle="dropdown" aria-haspopup="true"
+                                                   aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                    <a class="dropdown-item" href="">Action</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="">Bad action</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                <div class="checklist-item checklist-item-medium ">
+                                    <a href="#" data-toggle="modal" data-target="#taskDetails1">
+                                        <div class="checklist-info">
+                                            <h5 class="checklist-title mb-0">Desativar modo DEBUG</h5>
+                                            <small class="text-medium">Medium</small><small
+                                                class="text-nowrap text-default"> - 24/11/2023</small>
+                                        </div>
+                                    </a>
+                                    <div>
+                                        <div class="text-right">
+                                            <div class="dropdown">
+                                                <a class="btn btn-sm btn-icon-only text-light" href="#"
+                                                   role="button"
+                                                   data-toggle="dropdown" aria-haspopup="true"
+                                                   aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                    <a class="dropdown-item" href="">Action</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="">Bad action</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="card-footer py-2"></div>
+            </div>
+        </div>
+
+        <!-- Highlights Card -->
+        <div class="col-lg-4">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="h3 mb-0">Featured customers</h5>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <ul class="list-group list-group-flush list my--3">
+                        <li class="list-group-item px-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h5 class="mb-0">Argon Design System</h5>
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <div class="progress progress-xs my-0">
+                                                <div class="progress-bar bg-orange" role="progressbar"
+                                                     aria-valuenow="60"
+                                                     aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-auto">
+                                            <span style="font-size: 0.8125rem">60%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h5 class="mb-0">Angular Now UI Kit PRO</h5>
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <div class="progress progress-xs my-0">
+                                                <div class="progress-bar bg-green" role="progressbar"
+                                                     aria-valuenow="100"
+                                                     aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-auto">
+                                            <span style="font-size: 0.8125rem">100%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h5>Black Dashboard</h5>
+                                    <div class="progress progress-xs mb-0">
+                                        <div class="progress-bar bg-red" role="progressbar" aria-valuenow="72"
+                                             aria-valuemin="0" aria-valuemax="100" style="width: 72%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h5>React Material Dashboard</h5>
+                                    <div class="progress progress-xs mb-0">
+                                        <div class="progress-bar bg-teal" role="progressbar" aria-valuenow="90"
+                                             aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h5>Vue Paper UI Kit PRO</h5>
+                                    <div class="progress progress-xs mb-0">
+                                        <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100"
+                                             aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="container-fluid mt-4">
+        {% include "includes/footer.html" %}
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+    <script src="/static/assets/vendor/clipboard/dist/clipboard.min.js"></script>
+
+    <script>
+        function openReports(evt, period) {
+            // Declare all variables
+            let i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                if (tabcontent[i].id === "monthly" || tabcontent[i].id === "yearly") {
+                    tabcontent[i].style.display = "none";
+                }
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tablinksReports");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace("btn-primary", "btn-neutral");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(period).style.display = "block";
+            evt.currentTarget.className = evt.currentTarget.className.replace("btn-neutral", "btn-primary");
+        }
+
+        function openBills(evt, mode) {
+            // Declare all variables
+            let i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                if (tabcontent[i].id === "pay" || tabcontent[i].id === "receive") {
+                    tabcontent[i].style.display = "none";
+                }
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tablinksBills");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace("btn-primary", "btn-neutral");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(mode).style.display = "block";
+            evt.currentTarget.className = evt.currentTarget.className.replace("btn-neutral", "btn-primary");
+        }
+
+        document.getElementById("defaultOpenReports").click();
+
+        document.getElementById("defaultOpenBills").click();
+
+    </script>
+
+{% endblock javascripts %}

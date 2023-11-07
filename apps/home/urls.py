@@ -1,13 +1,9 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, re_path
-from apps.home.views import assets, collaborators, inventory, login, profile, projects
+from apps.home.views import assets, collaborators, inventory, login, profile, projects, balance
 
-urlpatterns = [
-
-    path('', login.index, name='home'),
-
-    # PROJECTS LIST URLS
+projects_list_urls = [
 
     path('projects/create', projects.create_project, name='create_project'),
 
@@ -27,8 +23,9 @@ urlpatterns = [
 
     path('projects/change-status=<int:project_id>/redirect-to=<str:situation_page>', projects.change_project_status,
          name='change_project_status'),
+]
 
-    # PROJECT PAGE URLS
+projects_page_urls = [
 
     path('projects/id=<int:id>/upload', projects.upload_file, name='upload_file'),
 
@@ -46,8 +43,9 @@ urlpatterns = [
     path('projects/id=<int:project_id>/edit=<int:task_id>/', projects.edit_task, name='edit_task'),
 
     path('projects/id=<int:project_id>/delete-task=<int:task_id>', projects.delete_task, name='delete_task'),
+]
 
-    # ASSETS URLS
+assets_urls = [
 
     path('assets/', assets.assets_hub, name='assets_hub'),
 
@@ -58,14 +56,21 @@ urlpatterns = [
 
     path('assets/delete=<int:file_id>', assets.delete_file_from_storage,
          name='delete_file_from_storage'),
+]
 
-    # COLABORATORS URLS
+balance_urls = [
+
+    path('balance/', balance.page, name='balance_page'),
+]
+
+collaborators_urls = [
 
     path('collaborators/', collaborators.page_list, name='collaborators_list'),
 
     path('collaborators/<str:name>', collaborators.details, name='collaborator_details'),
+]
 
-    # INVENTORY URLS
+inventory_urls = [
 
     path('inventory/', inventory.inventory_list, name='inventory_list'),
 
@@ -77,14 +82,26 @@ urlpatterns = [
 
     path('inventory/download/qrcode=<int:equipment_id>', inventory.download_qrcode_inventory,
          name='download_file_from_inventory'),
+]
 
-    # USER URLS
+profile_urls = [
 
     path('profile/', profile.details, name='profile'),
 
     path('profile/change-picture', profile.change_picture, name='change_profile_picture'),
+]
+
+base_urls = [
+
+    path('', login.index, name='home'),
 
     # Matches any html file
     re_path(r'^.*\.*', login.pages, name='pages'),
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+urlpatterns = projects_list_urls + projects_page_urls + assets_urls + collaborators_urls + inventory_urls + profile_urls
+urlpatterns += balance_urls + base_urls
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

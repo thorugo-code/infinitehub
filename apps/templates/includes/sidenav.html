@@ -99,12 +99,12 @@
                         </a>
                         <div class="collapse" id="navbar-financial" style="">
                             <ul class="nav nav-sm flex-column">
-{#                                <li class="nav-item">#}
-{#                                    <a href=""#}
-{#                                       class="nav-link">#}
-{#                                        <span class="sidenav-normal"> Bills to receive </span>#}
-{#                                    </a>#}
-{#                                </li>#}
+                                <li class="nav-item">
+                                    <a href="{% url 'balance_page' %}"
+                                       class="nav-link">
+                                        <span class="sidenav-normal"> Balance </span>
+                                    </a>
+                                </li>
 {#                                <li class="nav-item">#}
 {#                                    <a class="nav-link"#}
 {#                                       href="">#}
@@ -132,12 +132,12 @@
 
                 <!-- Navigation -->
                 <ul class="navbar-nav navbar-item-fixed-bottom" id="bottomNavList" style="background: #fff">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/profile/">
-                            <i class="ni ni-circle-08 text-default"></i>
-                            <span class="nav-link-text">Profile</span>
-                        </a>
-                    </li>
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" href="/profile/">#}
+{#                            <i class="ni ni-circle-08 text-default"></i>#}
+{#                            <span class="nav-link-text">Profile</span>#}
+{#                        </a>#}
+{#                    </li>#}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">
                             <i class="ni ni-button-power text-red"></i>
