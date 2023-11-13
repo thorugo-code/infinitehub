@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
             name='UploadedFile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(upload_to=apps.home.models.custom_upload_path)),
+                ('file', models.FileField(upload_to=apps.home.models.custom_upload_path_projects)),
                 ('uploaded_at', models.DateTimeField(auto_now_add=True)),
                 ('category', models.CharField(default='others', max_length=100)),
                 ('description', models.TextField(default='')),

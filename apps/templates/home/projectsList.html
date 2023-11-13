@@ -16,17 +16,16 @@
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
                                 {% if situation == "working" %}
                                     <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
-                                    <li class="breadcrumb-item"><a href="">Working</a></li>
+                                    <li class="breadcrumb-item active">Working</li>
                                 {% elif situation == "archive" %}
                                     <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
-                                    <li class="breadcrumb-item"><a href="">Archive</a></li>
+                                    <li class="breadcrumb-item active">Archive</li>
                                 {% elif situation == "finished" %}
                                     <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
-                                    <li class="breadcrumb-item"><a href="">Finished</a></li>
+                                    <li class="breadcrumb-item active">Finished</li>
                                 {% else %}
-                                    <li class="breadcrumb-item"><a href="">Projects</a></li>
+                                    <li class="breadcrumb-item active">Projects</li>
                                 {% endif %}
-                                <li class="breadcrumb-item active" aria-current="page"></li>
                             </ol>
                         </nav>
                     </div>
@@ -213,6 +212,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>

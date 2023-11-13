@@ -91,13 +91,13 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link collapsed" id="collapse-financial"
-                           href="#navbar-financial" data-toggle="collapse" role="button" aria-expanded="false"
-                           aria-controls="navbar-financial">
-                            <i class="fas fa-database text-green"></i>
-                            <span class="nav-link-text">Financial</span>
+                        <a class="nav-link collapsed" id="collapse-clients"
+                           href="#navbar-administrative" data-toggle="collapse" role="button" aria-expanded="false"
+                           aria-controls="navbar-administrative">
+                            <i class="ni ni-briefcase-24 text-green"></i>
+                            <span class="nav-link-text">Administrative</span>
                         </a>
-                        <div class="collapse" id="navbar-financial" style="">
+                        <div class="collapse" id="navbar-administrative" style="">
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
                                     <a href="{% url 'balance_page' %}"
@@ -107,16 +107,41 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link"
-                                       href="">
-                                        <span class="nav-link-text mr-1"> Clients </span><i class="fas fa-cog" style="font-size: 0.8125rem;"></i>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link"
                                        href="{% url 'inventory_list' %}">
                                         <span class="nav-link-text"> Inventory </span>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link"
+                                       href="{% url 'units_home' %}">
+                                        <span class="nav-link-text"> Units </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" id="collapse-financial"
+                           href="#navbar-financial" data-toggle="collapse" role="button" aria-expanded="false"
+                           aria-controls="navbar-financial">
+                            <i class="fas fa-users text-orange"></i>
+                            <span class="nav-link-text">Clients</span>
+                        </a>
+                        <div class="collapse" id="navbar-financial" style="">
+                            <ul class="nav nav-sm flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link"
+                                       href="{% url 'clients_home' %}">
+                                        <span class="nav-link-text mr-1"> All </span>
+                                    </a>
+                                </li>
+{#                                <li class="nav-item">#}
+{#                                    <a class="nav-link"#}
+{#                                       href="{% url 'inventory_list' %}">#}
+{#                                        <span class="nav-link-text"> Inventory </span>#}
+{#                                    </a>#}
+{#                                </li>#}
                             </ul>
                         </div>
                     </li>

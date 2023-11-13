@@ -7,12 +7,19 @@ from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 
 
-def custom_upload_path(instance, filename):
+def custom_upload_path_projects(instance, filename):
     client = instance.project.client.replace(" ", "_")
     project_name = instance.project.title.replace(" ", "_")
     year = datetime.now().strftime('%Y')
     month = datetime.now().strftime('%m')
     return f'uploads/projects/{client}/{project_name}/{year}/{month}/{filename}'
+
+
+def custom_upload_path_bills(instance, filename):
+    unit = instance.unit.replace(" ", "_")
+    year = datetime.now().strftime('%Y')
+    month = datetime.now().strftime('%m')
+    return f'uploads/proofs/bills/{unit}/{year}/{month}/{filename}'
 
 
 class Equipments(models.Model):
@@ -131,6 +138,8 @@ class Profile(models.Model):
 
     # phone = models.CharField(max_length=20, default='')
 
+    unit = models.ForeignKey('Unit', related_name='members', on_delete=models.CASCADE, null=True, blank=True)
+
     def __str__(self):
         return f'{self.user.username} Profile'
 
@@ -143,7 +152,7 @@ class Profile(models.Model):
 class UploadedFile(models.Model):
 
     project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.CASCADE)
-    file = models.FileField(upload_to=custom_upload_path)
+    file = models.FileField(upload_to=custom_upload_path_projects)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.CASCADE, default=1)
     category = models.CharField(max_length=100, default='others')
@@ -242,3 +251,58 @@ class Task(models.Model):
 
         project.completition = int((completed_tasks / total_tasks) * 100)
         project.save()
+
+
+class Unit(models.Model):
+    avatar = models.ImageField(upload_to='uploads/units/avatar',
+                               default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+    name = models.CharField(max_length=100)
+    cnpj = models.CharField(max_length=100)
+    area = models.CharField(max_length=100, default='none')
+    location = models.CharField(max_length=100)
+
+
+class Client(models.Model):
+    avatar = models.ImageField(upload_to='uploads/clients/avatar',
+                               default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+    name = models.CharField(max_length=100)
+    cnpj = models.CharField(max_length=100)
+    area = models.CharField(max_length=100, default='none')
+    location = models.CharField(max_length=100)
+    description = models.TextField()
+
+
+class Bill(models.Model):
+    project = models.ForeignKey(Project, related_name='bills', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    unit = models.ForeignKey(Unit, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)
+
+    category = models.CharField(max_length=100, default='others')
+    sub_category = models.CharField(max_length=100, default='others')
+
+    value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+    fees = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+    discount = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+    total = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+
+    number_of_installments = models.IntegerField(default=1)
+    value_of_installments = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+
+    method = models.CharField(max_length=100, default='others')
+    due_date = models.DateField(blank=True, null=True)
+
+    description = models.TextField()
+
+    paid = models.BooleanField(default=False)
+    status = models.CharField(max_length=100, default='pending')
+
+    created_at = models.DateField(auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name='created_bills', on_delete=models.CASCADE, default=1)
+
+    proof = models.FileField(upload_to=custom_upload_path_bills, null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *arg, **kwargs):
+        super().save()

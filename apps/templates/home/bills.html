@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %} Balance {% endblock title %}
+{% block title %} Reports {% endblock title %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}
@@ -31,7 +31,8 @@
                             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
                                 <li class="breadcrumb-item"><a href="">Administrative</a></li>
-                                <li class="breadcrumb-item active">Balance</li>
+                                <li class="breadcrumb-item"><a href="{% url 'balance_page' %}">Balance</a></li>
+                                <li class="breadcrumb-item active">Bills</li>
                             </ol>
                         </nav>
                     </div>
@@ -42,6 +43,7 @@
 
     <div class="container-fluid" style="margin-top: -6rem">
         <div class="header-body">
+
             <!-- Card stats -->
             <div class="row">
                 <div class="col-lg-3">
@@ -129,6 +131,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -136,29 +139,28 @@
         <div class="row" style="flex-wrap: wrap-reverse">
 
             <!-- Bills Card -->
-            <div class="col-lg-8">
+            <div class="col">
                 <div class="card shadow">
                     <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h4 class="my-1">Nearby bills</h4>
+                                <h4 class="my-1">Bills</h4>
                             </div>
-                            <div class="text-right btn-group mr-1" role="group">
-                                <button type="button" class="btn btn-sm btn-neutral tablinksBills"
-                                        onclick="openBills(event, 'receive')" id="defaultOpenBills">
-                                    Receive
+                            <div class="text-right mr-3">
+                                <button type="button" class="btn btn-sm btn-neutral">
+                                    <i class="fas fa-sort"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-neutral tablinksBills"
-                                        onclick="openBills(event, 'pay')">
-                                    Pay
+                                <button type="button" class="btn btn-sm btn-neutral">
+                                    <i class="fas fa-filter"></i>
                                 </button>
-                            </div>
-                            <div class="text-right mx-2">
-                                <a href="{% url 'balance_bills' %}" class="btn btn-sm btn-primary">See all</a>
+                                <button type="button" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                        data-target="#newBillModal">
+                                    <i class="fas fa-plus"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body p-0" style="height: 32rem; overflow: auto">
+                    <div class="card-body p-0" style="height: 45rem; overflow: auto">
 
                         <div class="table-responsive">
                             <table class="table align-items-center table-flush">
@@ -170,68 +172,10 @@
                                     <th scope="col" style="width:15%">Value</th>
                                     <th scope="col" style="width:15%">Date</th>
                                     <th scope="col" style="width:10%">Status</th>
-                                    <th scope="col" style="width: 0"></th>
                                 </tr>
                                 </thead>
 
-                                <tbody class="tabcontent border-0" id="receive">
-                                {% for item in user_profile.user.last_name %}
-                                    <tr>
-                                        <th scope="row">
-                                            <i class="fas fa-arrow-up text-success mr-2"></i> Infinite Foundry Brasil
-                                        </th>
-                                        <td>
-                                            Embraer
-                                        </td>
-                                        <td>
-                                            Pix
-                                        </td>
-                                        <td>
-                                            3.513,00
-                                        </td>
-                                        <td>
-                                            01/01/2024
-                                        </td>
-                                        <td>
-                                        <span class="badge badge-dot mr-4">
-                                            <i class="bg-warning"></i>
-                                            <span class="status">pending</span>
-                                        </span>
-                                        </td>
-                                        <td class="text-right">
-                                            <div class="dropdown">
-                                                <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
-                                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                    <a class="dropdown-item"
-                                                       href="">
-                                                        Open
-                                                    </a>
-                                                    <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item text-warning"
-                                                       href="">
-                                                        Set as working
-                                                    </a>
-                                                    <a class="dropdown-item text-success"
-                                                       href="">
-                                                        Finish
-                                                    </a>
-                                                    <a class="dropdown-item text-danger" href="" data-dismiss="modal"
-                                                       data-toggle="modal"
-                                                       data-target="">
-                                                        Delete
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-
-                                <tbody class="tabcontent border-0" id="pay">
-                                {% for item in user_profile.user.last_name %}
+                                <tbody>
                                     <tr>
                                         <th scope="row">
                                             <i class="fas fa-arrow-down text-danger mr-2"></i> Infinite Foundry Brasil
@@ -255,7 +199,29 @@
                                         </span>
                                         </td>
                                     </tr>
-                                {% endfor %}
+                                    <tr>
+                                        <th scope="row">
+                                            <i class="fas fa-arrow-up text-success mr-2"></i> Infinite Foundry Brasil
+                                        </th>
+                                        <td>
+                                            Embraer
+                                        </td>
+                                        <td>
+                                            Pix
+                                        </td>
+                                        <td>
+                                            4.234,00
+                                        </td>
+                                        <td>
+                                            01/01/2024
+                                        </td>
+                                        <td>
+                                        <span class="badge badge-dot mr-4">
+                                            <i class="bg-warning"></i>
+                                            <span class="status">pending</span>
+                                        </span>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -265,154 +231,8 @@
                 </div>
             </div>
 
-            <!-- Percentage Chart Card -->
-            <div class="col-lg-4">
-                <div class="card shadow">
-                    <div class="card-header bg-transparent">
-                        <div class="row align-items-center">
-                            <div class="col mt-1">
-                                <h4 class="mt-1 mb-0">Percentage</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body" style="height: 32rem">
-                        <div class="chart">
-
-                        </div>
-                    </div>
-                    <div class="card-footer border-top-0 py-2"></div>
-                </div>
-            </div>
-
         </div>
-    </div>
 
-    <div class="container-fluid">
-        <div class="row">
-
-            <!-- Last Reports Chart Card -->
-            <div class="col-lg-4">
-                <div class="card shadow">
-                    <div class="card-header bg-transparent">
-                        <div class="row align-items-center">
-                            <div class="col mt-1">
-                                <h4 class="mt-1 mb-0">Monthly balances</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body" style="height: 26rem;">
-                        <div class="chart">
-
-                        </div>
-                    </div>
-                    <div class="card-footer border-top-0 py-2"></div>
-                </div>
-            </div>
-
-            <!-- Reports Card -->
-            <div class="col-lg-8">
-                <div class="card shadow">
-                    <div class="card-header border-0">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h4 class="my-1">Last reports</h4>
-                            </div>
-                            <div class="text-right btn-group mr-1" role="group">
-                                <button type="button" class="btn btn-sm btn-neutral tablinksReports"
-                                        onclick="openReports(event, 'month')" id="defaultOpenReports">
-                                    Month
-                                </button>
-                                <button type="button" class="btn btn-sm btn-neutral tablinksReports"
-                                        onclick="openReports(event, 'year')">
-                                    Year
-                                </button>
-                                <button type="button" class="btn btn-sm btn-neutral tablinksReports"
-                                        onclick="openReports(event, 'custom')">
-                                    Custom
-                                </button>
-                            </div>
-                            <div class="text-right mx-2">
-                                <a href="" class="btn btn-sm btn-primary">See all</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body p-0" style="height: 26rem; overflow: auto">
-                        <div class="table-responsive">
-                            <table class="table align-items-center table-flush">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th scope="col">Period</th>
-                                    <th scope="col" style="width: 20%">Received</th>
-                                    <th scope="col" style="width: 20%">Paid</th>
-                                    <th scope="col" style="width: 15%">Balance</th>
-                                </tr>
-                                </thead>
-
-                                <tbody class="tabcontent border-0" id="month">
-                                {% for item in user_profile.user.last_name %}
-                                    <tr>
-                                        <th scope="row">
-                                            December, 2023
-                                        </th>
-                                        <td>
-                                            3.513,00
-                                        </td>
-                                        <td>
-                                            294,00
-                                        </td>
-                                        <td>
-                                            <i class="fas fa-arrow-up text-success mr-3"></i> 3.219,00
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-
-                                <tbody class="tabcontent border-0" id="year">
-                                {% for item in user_profile.user.last_name %}
-                                    <tr>
-                                        <th scope="row">
-                                            2023
-                                        </th>
-                                        <td>
-                                            4,269
-                                        </td>
-                                        <td>
-                                            4,569
-                                        </td>
-                                        <td>
-                                            <i class="fas fa-arrow-down text-danger mr-3"></i> 300,00
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-
-                                <tbody class="tabcontent border-0" id="custom">
-                                {% for item in user_profile.user.last_name %}
-                                    <tr>
-                                        <th scope="row">
-                                            January, 2023 - June, 2023
-                                        </th>
-                                        <td>
-                                            4,269
-                                        </td>
-                                        <td>
-                                            4,569
-                                        </td>
-                                        <td>
-                                            <i class="fas fa-arrow-down text-danger mr-3"></i> 300,00
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card-footer border-top-0 py-2"></div>
-                </div>
-            </div>
-
-        </div>
     </div>
 
     <div class="container-fluid">
@@ -458,8 +278,12 @@
                             <div class="form-group form-control-label mb-3">
                                 <label for="beneficiary">Beneficiary</label>
                                 <select class="form-control" id="beneficiary" name="bill_beneficiary">
-                                    <option value="if-br">Infinite Foundry Brasil</option>
-                                    <option value="if-pt">Infinite Foundry Portugal</option>
+                                    <option value=""></option>
+                                    {% for unit in units %}
+                                    <option value="{{ unit.id }}">{{ unit.name }}</option>
+                                    {% endfor %}
+{#                                    <option value="if-br">Infinite Foundry Brasil</option>#}
+{#                                    <option value="if-pt">Infinite Foundry Portugal</option>#}
                                 </select>
                             </div>
                             <div class="row">
@@ -659,65 +483,101 @@
         </div>
     </div>
 
+    <!-- Filter Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" role="dialog"
+         aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog my-6" role="document">
+            <div class="modal-content">
+                <div class="modal-header mt-2 align-items-center">
+                    <h5 class="modal-title" style="margin-left: auto">
+                        <i class="ni ni-ui-04 text-blue" style="font-size: 1.5rem"></i>
+                    </h5>
+                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
+                          id="filterModalLabel">Filter</span>
+                    <button type="button" class="close mt--4" style="margin-left: -30px"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="filterButton"
+                            disabled>Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sort Modal -->
+    <div class="modal fade" id="sortModal" tabindex="-1" role="dialog"
+         aria-labelledby="sortModalLabel" aria-hidden="true">
+        <div class="modal-dialog my-6" role="document">
+            <div class="modal-content">
+                <div class="modal-header mt-2 align-items-center">
+                    <h5 class="modal-title" style="margin-left: auto">
+                        <i class="ni ni-bullet-list-67 text-blue" style="font-size: 1.4rem"></i>
+                    </h5>
+                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
+                          id="sortModalLabel">Sort</span>
+                    <button type="button" class="close mt--4" style="margin-left: -30px"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="sortButton"
+                            disabled>Sort
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock content %}
 
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
 
     <script src="/static/assets/vendor/clipboard/dist/clipboard.min.js"></script>
-    {#    <script src="https://appsrv1-147a1.kxcdn.com/argon-dashboard/vendor/chart.js/dist/Chart.min.js"></script>#}
-    {#    <script src="https://appsrv1-147a1.kxcdn.com/argon-dashboard/vendor/chart.js/dist/Chart.extension.js"></script>#}
+    <script src="https://appsrv1-147a1.kxcdn.com/argon-dashboard/vendor/chart.js/dist/Chart.min.js"></script>
+    <script src="https://appsrv1-147a1.kxcdn.com/argon-dashboard/vendor/chart.js/dist/Chart.extension.js"></script>
 
     <script>
 
-        function openBills(evt, mode) {
+        function openBillsModal(evt, mode) {
             // Declare all variables
             let i, tabcontent, tablinks;
 
             // Get all elements with class="tabcontent" and hide them
             tabcontent = document.getElementsByClassName("tabcontent");
             for (i = 0; i < tabcontent.length; i++) {
-                if (tabcontent[i].id === "pay" || tabcontent[i].id === "receive") {
+                if (tabcontent[i].id === "bills-to-pay" || tabcontent[i].id === "bills-to-receive") {
                     tabcontent[i].style.display = "none";
                 }
             }
 
             // Get all elements with class="tablinks" and remove the class "active"
-            tablinks = document.getElementsByClassName("tablinksBills");
+            tablinks = document.getElementsByClassName("tablinksBillsModal");
             for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace("btn-primary", "btn-neutral");
+                tablinks[i].className = tablinks[i].className.replace("btn-success text-white", "btn-neutral text-green");
+                tablinks[i].className = tablinks[i].className.replace("btn-danger text-white", "btn-neutral text-red");
             }
 
             // Show the current tab, and add an "active" class to the button that opened the tab
-            document.getElementById(mode).style.display = "table-row-group";
-            evt.currentTarget.className = evt.currentTarget.className.replace("btn-neutral", "btn-primary");
+            document.getElementById(mode).style.display = "block";
+            evt.currentTarget.className = evt.currentTarget.className.replace("btn-neutral text-green", "btn-success text-white");
+            evt.currentTarget.className = evt.currentTarget.className.replace("btn-neutral text-red", "btn-danger text-white");
         }
 
-        function openReports(evt, mode) {
-            // Declare all variables
-            let i, tabcontent, tablinks;
-
-            // Get all elements with class="tabcontent" and hide them
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                if (tabcontent[i].id === "month" || tabcontent[i].id === "year" || tabcontent[i].id === "custom") {
-                    tabcontent[i].style.display = "none";
-                }
-            }
-
-            // Get all elements with class="tablinks" and remove the class "active"
-            tablinks = document.getElementsByClassName("tablinksReports");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace("btn-primary", "btn-neutral");
-            }
-
-            // Show the current tab, and add an "active" class to the button that opened the tab
-            document.getElementById(mode).style.display = "table-row-group";
-            evt.currentTarget.className = evt.currentTarget.className.replace("btn-neutral", "btn-primary");
-        }
-
-        document.getElementById("defaultOpenReports").click();
-        document.getElementById("defaultOpenBills").click();
+        document.getElementById("defaultOpenBillsModal").click();
 
     </script>
 

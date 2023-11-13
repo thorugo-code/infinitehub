@@ -15,8 +15,7 @@
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
                                 <li class="breadcrumb-item"><a href="{% url 'collaborators_list' %}">Collaborators</a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="">{{ collaborator.user.get_full_name }}</a></li>
-                                <li class="breadcrumb-item" aria-current="page"></li>
+                                <li class="breadcrumb-item active">{{ collaborator.user.get_full_name }}</li>
                             </ol>
                         </nav>
                     </div>

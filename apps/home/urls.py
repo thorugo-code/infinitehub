@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, re_path
-from apps.home.views import assets, collaborators, inventory, login, profile, projects, balance
+from apps.home.views import assets, collaborators, inventory, login, profile, projects, balance, clients, units
 
 projects_list_urls = [
 
@@ -60,7 +60,16 @@ assets_urls = [
 
 balance_urls = [
 
-    path('balance/', balance.page, name='balance_page'),
+    path('balance/', balance.home, name='balance_page'),
+    path('balance/bills/', balance.bills, name='balance_bills'),
+
+    path('balance/bills/<str:type>/new', balance.new_bill, name='new_bill'),
+]
+
+clients_urls = [
+
+    path('clients/', clients.home, name='clients_home'),
+    path('clients/new', clients.create, name='create_client'),
 ]
 
 collaborators_urls = [
@@ -91,6 +100,12 @@ profile_urls = [
     path('profile/change-picture', profile.change_picture, name='change_profile_picture'),
 ]
 
+units_urls = [
+
+    path('units/', units.home, name='units_home'),
+    path('units/new', units.create, name='units_create'),
+]
+
 base_urls = [
 
     path('', login.index, name='home'),
@@ -101,7 +116,7 @@ base_urls = [
 ]
 
 urlpatterns = projects_list_urls + projects_page_urls + assets_urls + collaborators_urls + inventory_urls + profile_urls
-urlpatterns += balance_urls + base_urls
+urlpatterns += balance_urls + clients_urls + units_urls + base_urls
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
