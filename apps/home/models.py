@@ -7,6 +7,27 @@ from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 
 
+def unmask_money(value, currency):
+    if value == "":
+        return 0.0
+    elif currency == 'BRL':
+        value = value.replace('R$ ', '')
+        value = value.replace('BRL ', '')
+        value = value.replace('.', '')
+        value = value.replace(',', '.')
+    elif currency == 'USD':
+        value = value.replace('$ ', '')
+        value = value.replace('USD ', '')
+        value = value.replace(',', '')
+    else:
+        value = value.replace('€ ', '')
+        value = value.replace('EUR ', '')
+        value = value.replace('.', '')
+        value = value.replace(',', '.')
+
+    return float(value)
+
+
 def custom_upload_path_projects(instance, filename):
     client = instance.project.client.replace(" ", "_")
     project_name = instance.project.title.replace(" ", "_")
@@ -16,14 +37,13 @@ def custom_upload_path_projects(instance, filename):
 
 
 def custom_upload_path_bills(instance, filename):
-    unit = instance.unit.replace(" ", "_")
+    unit = instance.unit.name.replace(" ", "_")
     year = datetime.now().strftime('%Y')
     month = datetime.now().strftime('%m')
     return f'uploads/proofs/bills/{unit}/{year}/{month}/{filename}'
 
 
 class Equipments(models.Model):
-
     acquisition_date = models.DateField(default=datetime.now)
     name = models.CharField(max_length=100, default='Untitled')
     series = models.CharField(max_length=100, default='N/A')
@@ -150,7 +170,6 @@ class Profile(models.Model):
 
 
 class UploadedFile(models.Model):
-
     project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.CASCADE)
     file = models.FileField(upload_to=custom_upload_path_projects)
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -272,10 +291,11 @@ class Client(models.Model):
     description = models.TextField()
 
 
-class Bill(models.Model):
-    project = models.ForeignKey(Project, related_name='bills', on_delete=models.CASCADE)
+class BillToReceive(models.Model):
+    project = models.ForeignKey(Project, related_name='bills_to_receive', on_delete=models.CASCADE, null=True,
+                                blank=True)
     title = models.CharField(max_length=100)
-    unit = models.ForeignKey(Unit, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)
+    unit = models.ForeignKey(Unit, related_name='bills_to_receive', on_delete=models.CASCADE, null=True, blank=True)
 
     category = models.CharField(max_length=100, default='others')
     sub_category = models.CharField(max_length=100, default='others')
@@ -285,7 +305,7 @@ class Bill(models.Model):
     discount = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
     total = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
 
-    number_of_installments = models.IntegerField(default=1)
+    number_of_installments = models.IntegerField(default=0)
     value_of_installments = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
 
     method = models.CharField(max_length=100, default='others')
@@ -297,7 +317,36 @@ class Bill(models.Model):
     status = models.CharField(max_length=100, default='pending')
 
     created_at = models.DateField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='created_bills', on_delete=models.CASCADE, default=1)
+    created_by = models.ForeignKey(User, related_name='created_bills_to_receive', on_delete=models.CASCADE, default=1)
+
+    proof = models.FileField(upload_to=custom_upload_path_bills, null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *arg, **kwargs):
+        super().save()
+
+
+class BillToPay(models.Model):
+    project = models.ForeignKey(Project, related_name='bills_to_pay', on_delete=models.CASCADE,
+                                null=True, blank=True)
+    title = models.CharField(max_length=100)
+    unit = models.ForeignKey(Unit, related_name='bills_to_pay', on_delete=models.CASCADE, null=True, blank=True)
+
+    category = models.CharField(max_length=100, default='others')
+    sub_category = models.CharField(max_length=100, default='others')
+
+    value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+    due_date = models.DateField(blank=True, null=True)
+
+    description = models.TextField()
+
+    paid = models.BooleanField(default=False)
+    status = models.CharField(max_length=100, default='pending')
+
+    created_at = models.DateField(auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name='created_bills_to_pay', on_delete=models.CASCADE, default=1)
 
     proof = models.FileField(upload_to=custom_upload_path_bills, null=True, blank=True)
 

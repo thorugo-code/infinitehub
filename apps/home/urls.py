@@ -63,7 +63,7 @@ balance_urls = [
     path('balance/', balance.home, name='balance_page'),
     path('balance/bills/', balance.bills, name='balance_bills'),
 
-    path('balance/bills/<str:type>/new', balance.new_bill, name='new_bill'),
+    path('balance/bills/new-<str:bill_type>/redirect=<str:redirect_to>', balance.new_bill, name='new_bill'),
 ]
 
 clients_urls = [

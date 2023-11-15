@@ -1227,34 +1227,26 @@
     <script>
 
         $(document).ready(function () {
-            // Select the value input field by its ID
             const valueInput = $("#fileValueInput");
 
-            // Format the input value before submission
             valueInput.on("blur", function () {
-                // Get the current input value
                 let inputValue = valueInput.val();
 
-                // Remove currency symbols, commas, and spaces
                 inputValue = inputValue.replace(/[$, ]/g, '');
-
-                // Replace any comma (,) with a period (.) as the decimal separator
                 inputValue = inputValue.replace(/,/g, '.');
 
-                // Update the input value
                 valueInput.val(inputValue);
             });
 
-            // Apply the currency mask using inputmask
             valueInput.inputmask({
                 alias: "numeric",
-                radixPoint: ".", // Use dot as the decimal separator
+                radixPoint: ".",
                 groupSeparator: ",",
                 autoGroup: true,
                 rightAlign: false,
-                autoUnmask: true, // Ensure the value is submitted without formatting
-                numericInput: true, // Start from the cents decimals
-                prefix: "USD ", // Add your desired currency symbol here
+                autoUnmask: true,
+                numericInput: true,
+                prefix: "USD ",
             });
         });
 
