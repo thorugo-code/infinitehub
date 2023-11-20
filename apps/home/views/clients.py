@@ -45,3 +45,10 @@ def create(request):
 
     return redirect('clients_home')
 
+
+def delete(request, client_id):
+    client = Client.objects.get(id=client_id)
+    client.delete()
+
+    return redirect('clients_home')
+

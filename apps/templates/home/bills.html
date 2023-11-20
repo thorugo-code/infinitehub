@@ -43,7 +43,6 @@
 
     <div class="container-fluid" style="margin-top: -6rem">
         <div class="header-body">
-
             <!-- Card stats -->
             <div class="row">
                 <div class="col-lg-3">
@@ -51,18 +50,20 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Inputs</h5>
-                                    <span class="h2 font-weight-bold mb-0 text-white">0</span>
+                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Received</h5>
+                                    <span class="h2 font-weight-bold mb-0 text-white">
+                                        {% if received_value == 0 %}{{ currency_symbol }}0{% else %}
+                                            {{ received_value }}{% endif %}
+                                    </span>
                                 </div>
                                 <div class="col-auto">
                                     <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
-                                        <i class="fas fa-chart-line"></i>
+                                        <i class="fas fa-arrow-alt-circle-up"></i>
                                     </div>
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-white mr-1"><i class="fa fa-arrow-up mr-2"></i>0</span>
-                                <span class="text-nowrap text-white">This month</span>
+                                <span class="text-white">Total bills: {{ received }}</span>
                             </p>
                         </div>
                     </div>
@@ -72,18 +73,20 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Outputs</h5>
-                                    <span class="h2 font-weight-bold mb-0 text-white">0</span>
+                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Paid</h5>
+                                    <span class="h2 font-weight-bold mb-0 text-white">
+                                        {% if paid_value == 0 %}{{ currency_symbol }}0{% else %}
+                                            {{ paid_value }}{% endif %}
+                                    </span>
                                 </div>
                                 <div class="col-auto">
                                     <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
-                                        <i class="fas fa-donate"></i>
+                                        <i class="fas fa-arrow-alt-circle-down"></i>
                                     </div>
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-white mr-1"><i class="fa fa-arrow-down mr-2"></i>0</span>
-                                <span class="text-nowrap text-white">This month</span>
+                                <span class="text-white">Total bills: {{ paid }}</span>
                             </p>
                         </div>
                     </div>
@@ -93,18 +96,20 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Balance</h5>
-                                    <span class="h2 font-weight-bold mb-0 text-white">0</span>
+                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Pending</h5>
+                                    <span class="h2 font-weight-bold mb-0 text-white">
+                                        {% if pending_value == 0 %}{{ currency_symbol }}0{% else %}
+                                            {{ pending_value }}{% endif %}
+                                    </span>
                                 </div>
                                 <div class="col-auto">
                                     <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
-                                        <i class="fas fa-wallet"></i>
+                                        <i class="fas fa-hourglass-half"></i>
                                     </div>
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-white mr-1"><i class="fa fa-chart-bar mr-2"></i>0</span>
-                                <span class="text-nowrap text-white">This month</span>
+                                <span class="text-white">Total bills: {{ pending }}</span>
                             </p>
                         </div>
                     </div>
@@ -114,30 +119,30 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Clients</h5>
-                                    <span class="h2 font-weight-bold mb-0 text-white">0</span>
+                                    <h5 class="card-title text-uppercase text-muted mb-0 text-white">Late</h5>
+                                    <span class="h2 font-weight-bold mb-0 text-white">
+                                        {% if late_value == 0 %}{{ currency_symbol }}0{% else %}
+                                            {{ late_value }}{% endif %}
+                                    </span>
                                 </div>
                                 <div class="col-auto">
                                     <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
-                                        <i class="fas fa-users"></i>
+                                        <i class="fas fa-exclamation-circle"></i>
                                     </div>
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-white mr-1"><i class="fa fa-arrow-up mr-2"></i>0</span>
-                                <span class="text-nowrap text-white">This month</span>
+                                <span class="text-white">Total bills: {{ late }}</span>
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <div class="container-fluid mt-2">
-        <div class="row" style="flex-wrap: wrap-reverse">
-
+        <div class="row">
             <!-- Bills Card -->
             <div class="col">
                 <div class="card shadow">
@@ -161,85 +166,484 @@
                         </div>
                     </div>
                     <div class="card-body p-0" style="height: 45rem; overflow: auto">
-
-                        <div class="table-responsive">
-                            <table class="table align-items-center table-flush">
-                                <thead class="thead-light">
+                        <table class="table-responsive table align-items-center table-flush"
+                               style="min-height: 45rem">
+                            <thead class="thead-light">
+                            <tr>
+                                <th scope="col" style="width:15%">Name</th>
+                                <th scope="col" style="width:15%">Local</th>
+                                <th scope="col" style="width:15%">Project</th>
+                                <th scope="col" style="width:15%">Method</th>
+                                <th scope="col" style="width:15%">Value</th>
+                                <th scope="col" style="width:15%">Date</th>
+                                <th scope="col" style="width:10%">Status</th>
+                                <th scope="col" style="width: 0"></th>
+                            </tr>
+                            </thead>
+                            <tbody class="list">
+                            {% for bill in bills %}
                                 <tr>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Local</th>
-                                    <th scope="col">Project</th>
-                                    <th scope="col">Method</th>
-                                    <th scope="col" style="width:15%">Value</th>
-                                    <th scope="col" style="width:15%">Date</th>
-                                    <th scope="col" style="width:10%">Status</th>
-                                </tr>
-                                </thead>
-
-                                <tbody>
-
-                                {% for bill in bills %}
-
-                                    <tr>
-                                        <th scope="row">
-                                            {% if bill in bills_to_pay %}
-                                                <i class="fas fa-arrow-down text-danger mr-2"></i>{{ bill.title }}
-                                            {% else %}
-                                                <i class="fas fa-arrow-up text-success mr-2"></i>{{ bill.title }}
-                                            {% endif %}
-                                        </th>
-                                        <td>
-                                            {{ bill.unit.name }}
-                                        </td>
-                                        <td>
-                                            {% if bill.project is None %}
+                                    <th scope="row">
+                                        {% if bill in bills_to_pay %}
+                                            <i class="fas fa-arrow-down text-danger mr-2"></i>{{ bill.title }}
+                                        {% else %}
+                                            <i class="fas fa-arrow-up text-success mr-2"></i>{{ bill.title }}
+                                        {% endif %}
+                                    </th>
+                                    <td>
+                                        {{ bill.unit.name }}
+                                    </td>
+                                    <td>
+                                        {% if bill.project is None %}
                                             N/A
-                                            {% else %}
+                                        {% else %}
                                             {{ bill.project }}
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if bill in bills_to_pay %}
-                                                N/A
-                                            {% else %}
-                                                {{ bill.method }}
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if bill in bills_to_pay %}
-                                                {{ bill.value }}
-                                            {% else %}
-                                                {{ bill.total }}
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {{ bill.due_date }}
-                                        </td>
-                                        <td>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ bill.method }}
+                                    </td>
+                                    <td>
+                                        {% if bill in bills_to_pay %}
+                                            {{ bill.value }}
+                                        {% else %}
+                                            {{ bill.total }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ bill.due_date }}
+                                    </td>
+                                    <td>
                                         <span class="badge badge-dot mr-4">
                                             {% if bill.paid %}
                                                 <i class="bg-success"></i>
                                                 <span class="status">paid</span>
-                                            {% else %}
-                                                <i class="bg-warning"></i>
+                                            {% elif not bill.paid and bill.due_date >= date_now %}
+                                                <i class="bg-info"></i>
                                                 <span class="status">pending</span>
+                                            {% else %}
+                                                <i class="bg-danger"></i>
+                                                <span class="status">late</span>
                                             {% endif %}
-                                        </span>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
 
+                                        </span>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="dropdown">
+                                            <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
+                                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                <a class="dropdown-item"
+                                                   href="">
+                                                    Open
+                                                </a>
+                                                <div class="dropdown-divider"></div>
+                                                {% if bill.paid %}
+                                                    <a class="dropdown-item text-warning" href="" data-dismiss="modal"
+                                                       data-toggle="modal"
+                                                       data-target="#paidConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}">
+                                                        Set as pending
+                                                    </a>
+                                                {% else %}
+                                                    <a class="dropdown-item text-success" href="" data-dismiss="modal"
+                                                       data-toggle="modal"
+                                                       data-target="#paidConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}">
+                                                        Set as paid
+                                                    </a>
+                                                {% endif %}
+                                                <a class="dropdown-item text-danger" href="" data-dismiss="modal"
+                                                   data-toggle="modal"
+                                                   data-target="#deleteConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}">
+                                                    Delete
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <div class="modal fade"
+                                     id="deleteConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}"
+                                     tabindex="-1"
+                                     role="dialog" aria-labelledby="deleteConfirmLabel{{ bill.id }}"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog my-6" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2">
+                                                <h5 class="modal-title my-1" style="margin-left: auto">
+                                                    <i class="ni ni-fat-delete text-blue"
+                                                       style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                </h5>
+                                                <span class="ml-3 my-1"
+                                                      style="margin-right: auto; font-size: 1.2rem"
+                                                      id="deleteConfirmModalLabel{{ bill.id }}">Are you sure?</span>
+                                                <button type="button" class="close mt--4"
+                                                        style="margin-left: -30px" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body py-0"
+                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <p class="text-center">Are you sure you want to delete this
+                                                    bill?
+                                                    <br>
+                                                    This action cannot be undone.
+                                                    {% if bill in bills_to_receive %}
+                                                        <form method="post"
+                                                              id="deleteConfirmFormIncome{{ bill.id }}"
+                                                              action="{% url 'delete_bill' 'income' bill.id 'balance_bills' %}">
+                                                            {% csrf_token %}
+                                                        </form>
+                                                        <div class="form-group form-control-label mb-3">
+                                                            <label for="name">Name</label>
+                                                            <input class="form-control" id="name"
+                                                                   name="bill_name"
+                                                                   value="{{ bill.title }}" disabled>
+                                                        </div>
+                                                        <div class="form-group form-control-label mb-3">
+                                                            <label for="beneficiary">Local</label>
+                                                            <input class="form-control" id="beneficiary"
+                                                                   name="bill_beneficiary"
+                                                                   value="{{ bill.unit.name }}" disabled>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="category">Category</label>
+                                                                <input class="form-control" id="category"
+                                                                       name="bill_category"
+                                                                       value="{{ bill.category }}" disabled>
+                                                            </div>
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="client">Client</label>
+                                                                <input class="form-control" id="client"
+                                                                       name="bill_receive_client"
+                                                                       value="{{ bill.client.name }}"
+                                                                       disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billTotalInfo">Total</label>
+                                                                <input inputmode="decimal"
+                                                                       class="form-control"
+                                                                       id="billTotalInfo"
+                                                                       name="bill_total" placeholder=""
+                                                                       value="{{ bill.total }}" disabled>
+                                                            </div>
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billMethodInput">Method</label>
+                                                                <input class="form-control"
+                                                                       id="billMethodInput"
+                                                                       name="bill_method"
+                                                                       value="{{ bill.method }}" disabled>
+                                                            </div>
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billDueDateInput">Due
+                                                                    date</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="billDueDateInput"
+                                                                       name="bill_due_date" placeholder=""
+                                                                       value="{{ bill.due_date|date:'Y-m-d' }}"
+                                                                       disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-control-label">
+                                                            <label for="about">Description</label>
+                                                            <textarea rows="4" class="form-control"
+                                                                      id="about"
+                                                                      name="bill_description"
+                                                                      disabled>{{ bill.description }}</textarea>
+                                                        </div>
+                                                    {% else %}
+                                                        <form method="post"
+                                                              id="deleteConfirmFormExpense{{ bill.id }}"
+                                                              action="{% url 'delete_bill' 'expense' bill.id 'balance_bills' %}">
+                                                            {% csrf_token %}
+                                                        </form>
+                                                        <div class="form-group form-control-label mb-3">
+                                                            <label for="name">Name</label>
+                                                            <input class="form-control" id="name"
+                                                                   name="bill_name"
+                                                                   value="{{ bill.title }}" disabled>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="beneficiary">Local</label>
+                                                                <input class="form-control" id="beneficiary"
+                                                                       name="bill_beneficiary"
+                                                                       value="{{ bill.unit.name }}" disabled>
+                                                            </div>
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="category">Category</label>
+                                                                <input class="form-control" id="category"
+                                                                       name="bill_category"
+                                                                       value="{{ bill.subcategory }}" disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billTotalInput">Value</label>
+                                                                <input inputmode="decimal"
+                                                                       class="form-control"
+                                                                       id="billTotalInput"
+                                                                       name="bill_total" placeholder=""
+                                                                       value="{{ bill.value }}" disabled>
+                                                            </div>
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billMethodInput">Method</label>
+                                                                <input class="form-control"
+                                                                       id="billMethodInput"
+                                                                       name="bill_method"
+                                                                       value="{{ bill.method }}" disabled>
+                                                            </div>
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billDueDateInput">Due
+                                                                    date</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="billDueDateInput"
+                                                                       name="bill_due_date" placeholder=""
+                                                                       value="{{ bill.due_date|date:'Y-m-d' }}"
+                                                                       disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-control-label">
+                                                            <label for="about">Description</label>
+                                                            <textarea rows="4" class="form-control"
+                                                                      id="about"
+                                                                      name="bill_description"
+                                                                      disabled>{{ bill.description }}</textarea>
+                                                        </div>
+                                                    {% endif %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Cancel
+                                                </button>
+                                                {% if bill in bills_to_receive %}
+                                                    <button type="submit" class="btn btn-danger"
+                                                            form="deleteConfirmFormIncome{{ bill.id }}">
+                                                        Delete
+                                                    </button>
+                                                {% else %}
+                                                    <button type="submit" class="btn btn-danger"
+                                                            form="deleteConfirmFormExpense{{ bill.id }}">
+                                                        Delete
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade"
+                                     id="paidConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}"
+                                     tabindex="-1"
+                                     role="dialog" aria-labelledby="paidConfirmLabel{{ bill.id }}"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog my-6" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2">
+                                                <h5 class="modal-title my-1" style="margin-left: auto">
+                                                    <i class="ni ni-fat-delete text-blue"
+                                                       style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                </h5>
+                                                <span class="ml-3 my-1"
+                                                      style="margin-right: auto; font-size: 1.2rem"
+                                                      id="paidConfirmModalLabel{{ bill.id }}">Are you sure?</span>
+                                                <button type="button" class="close mt--4"
+                                                        style="margin-left: -30px" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body py-0"
+                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <p class="text-center">Are you sure you want to change status of this
+                                                    bill?
+                                                    <br>
+                                                    This action can be undone on bills page.
+                                                    {% if bill in bills_to_receive %}
+                                                        <form method="post"
+                                                              id="paidConfirmFormIncome{{ bill.id }}"
+                                                              action="{% url 'change_bill_status' 'income' bill.id 'balance_bills' %}">
+                                                            {% csrf_token %}
+                                                        </form>
+                                                        <div class="form-group form-control-label mb-3">
+                                                            <label for="name">Name</label>
+                                                            <input class="form-control" id="name"
+                                                                   name="bill_name"
+                                                                   value="{{ bill.title }}" disabled>
+                                                        </div>
+                                                        <div class="form-group form-control-label mb-3">
+                                                            <label for="beneficiary">Local</label>
+                                                            <input class="form-control" id="beneficiary"
+                                                                   name="bill_beneficiary"
+                                                                   value="{{ bill.unit.name }}" disabled>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billTotalInfo">Total</label>
+                                                                <input inputmode="decimal"
+                                                                       class="form-control"
+                                                                       id="billTotalInfo"
+                                                                       name="bill_total" placeholder=""
+                                                                       value="{{ bill.total }}" disabled>
+                                                            </div>
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billDueDateInput">Due
+                                                                    date</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="billDueDateInput"
+                                                                       name="bill_due_date" placeholder=""
+                                                                       value="{{ bill.due_date|date:'Y-m-d' }}"
+                                                                       disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-control-label">
+                                                            <label for="about">Description</label>
+                                                            <textarea rows="4" class="form-control"
+                                                                      id="about"
+                                                                      name="bill_description"
+                                                                      disabled>{{ bill.description }}</textarea>
+                                                        </div>
+                                                    {% else %}
+                                                        <form method="post"
+                                                              id="paidConfirmFormExpense{{ bill.id }}"
+                                                              action="{% url 'change_bill_status' 'expense' bill.id 'balance_bills' %}">
+                                                            {% csrf_token %}
+                                                        </form>
+                                                        <div class="form-group form-control-label mb-3">
+                                                            <label for="name">Name</label>
+                                                            <input class="form-control" id="name"
+                                                                   name="bill_name"
+                                                                   value="{{ bill.title }}" disabled>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="beneficiary">Local</label>
+                                                                <input class="form-control" id="beneficiary"
+                                                                       name="bill_beneficiary"
+                                                                       value="{{ bill.unit.name }}" disabled>
+                                                            </div>
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="category">Category</label>
+                                                                <input class="form-control" id="category"
+                                                                       name="bill_category"
+                                                                       value="{{ bill.subcategory }}" disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billTotalInput">Value</label>
+                                                                <input inputmode="decimal"
+                                                                       class="form-control"
+                                                                       id="billTotalInput"
+                                                                       name="bill_total" placeholder=""
+                                                                       value="{{ bill.value }}" disabled>
+                                                            </div>
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billDueDateInput">Due
+                                                                    date</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="billDueDateInput"
+                                                                       name="bill_due_date" placeholder=""
+                                                                       value="{{ bill.due_date|date:'Y-m-d' }}"
+                                                                       disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-control-label">
+                                                            <label for="about">Description</label>
+                                                            <textarea rows="4" class="form-control"
+                                                                      id="about"
+                                                                      name="bill_description"
+                                                                      disabled>{{ bill.description }}</textarea>
+                                                        </div>
+                                                    {% endif %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Cancel
+                                                </button>
+                                                {% if bill in bills_to_receive %}
+                                                    {% if bill.paid %}
+                                                        <button type="submit" class="btn btn-warning"
+                                                                form="paidConfirmFormIncome{{ bill.id }}">
+                                                            Set as pending
+                                                        </button>
+                                                    {% else %}
+                                                        <button type="submit" class="btn btn-success"
+                                                                form="paidConfirmFormIncome{{ bill.id }}">
+                                                            Set as paid
+                                                        </button>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% if bill.paid %}
+                                                        <button type="submit" class="btn btn-warning"
+                                                                form="paidConfirmFormExpense{{ bill.id }}">
+                                                            Set as pending
+                                                        </button>
+                                                    {% else %}
+                                                        <button type="submit" class="btn btn-success"
+                                                                form="paidConfirmFormExpense{{ bill.id }}">
+                                                            Set as paid
+                                                        </button>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                     <div class="card-footer border-top-0 py-2"></div>
                 </div>
             </div>
-
         </div>
-
     </div>
+
+    {#    <div class="container-fluid mt-2">#}
+    {#        <div class="row">#}
+    {#            <div class="col">#}
+    {#                <div class="accordion">#}
+    {#                    <div class="card shadow my-0">#}
+    {#                        <div class="card-header" id="heading1" role="button" data-toggle="collapse"#}
+    {#                             data-target="#collapse1" aria-expanded="true" aria-controls="collapse1">#}
+    {#                            <h5 class="mb-0">#}
+    {#                                <span class="heading">Accordion Item 1</span>#}
+    {#                            </h5>#}
+    {#                        </div>#}
+    {##}
+    {#                        <div id="collapse1" class="collapse show" aria-labelledby="heading1" data-parent=".accordion">#}
+    {#                            <div class="card-body">#}
+    {#                                Content for Accordion Item 1#}
+    {#                            </div>#}
+    {#                        </div>#}
+    {#                    </div>#}
+    {##}
+    {#                    <div class="card my-0 border-top" style="box-shadow: 0 0 0 0">#}
+    {#                        <div class="card-header" id="heading2" role="button" data-toggle="collapse"#}
+    {#                             data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">#}
+    {#                            <h5 class="mb-0">#}
+    {#                                <span class="heading">Accordion Item 2</span>#}
+    {#                            </h5>#}
+    {#                        </div>#}
+    {##}
+    {#                        <div id="collapse2" class="collapse" aria-labelledby="heading2" data-parent=".accordion">#}
+    {#                            <div class="card-body">#}
+    {#                                Content for Accordion Item 2#}
+    {#                            </div>#}
+    {#                        </div>#}
+    {#                    </div>#}
+    {##}
+    {#                    <!-- Add more accordion items as needed -->#}
+    {##}
+    {#                </div>#}
+    {##}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
 
     <div class="container-fluid">
         {% include "includes/footer.html" %}
@@ -262,7 +666,6 @@
                     </button>
                 </div>
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-
                     <div class="row mb-3">
                         <div class="col-6 btn-group" style="margin: auto" role="group">
                             <button type="button" class="btn btn-sm btn-neutral text-green tablinksBillsModal"
@@ -284,13 +687,12 @@
                               enctype="multipart/form-data"
                               onsubmit=blockSubmit(event,'submitReceiveButton')>
                             {% csrf_token %}
-
                             <div class="form-group form-control-label mb-3">
                                 <label for="name">Name</label>
                                 <input class="form-control" id="name" name="bill_name">
                             </div>
                             <div class="form-group form-control-label mb-3">
-                                <label for="beneficiary">Beneficiary</label>
+                                <label for="beneficiary">Local</label>
                                 <select class="form-control" id="beneficiary" name="bill_beneficiary">
                                     {% for unit in units %}
                                         <option value="{{ unit.id }}">{{ unit.name }}</option>
@@ -309,13 +711,11 @@
                                     </select>
                                 </div>
                                 <div class="col form-group form-control-label mb-3">
-                                    <label for="sub-category">Sub category</label>
-                                    <select class="form-control" id="sub-category" name="bill_sub_category">
-                                        <script>
-                                            for (i = 1; i <= 24; i++) {
-                                                document.write(`<option value="${i}">Option ${i}</option>`);
-                                            }
-                                        </script>
+                                    <label for="client">Client</label>
+                                    <select class="form-control" id="client" name="bill_receive_client">
+                                        {% for client in clients %}
+                                            <option value="{{ client.id }}">{{ client.name }}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
@@ -341,9 +741,9 @@
                             </div>
                             <div class="row">
                                 <div class="col form-group form-control-label">
-                                    <label for="billTotalInput">Total</label>
+                                    <label for="billReceiveTotalInput">Total</label>
                                     <input inputmode="decimal" class="form-control"
-                                           id="billTotalInput"
+                                           id="billReceiveTotalInput"
                                            name="bill_total" placeholder="">
                                 </div>
                                 <div class="col form-group form-control-label">
@@ -425,7 +825,7 @@
                               enctype="multipart/form-data" onsubmit=blockSubmit(event,'submitBillPayButton')>
                             {% csrf_token %}
                             <div class="form-group form-control-label mb-3">
-                                <label for="title">Title</label>
+                                <label for="title">Name</label>
                                 <input type="text" class="form-control" id="title" name="bill_name">
                             </div>
                             <div class="form-group form-control-label mb-3">
@@ -439,26 +839,70 @@
                             <div class="row">
                                 <div class="col form-group form-control-label mb-3">
                                     <label for="category">Category</label>
-                                    <select class="form-control" id="category" name="bill_pay_sub_category">
-                                        <option value="others"></option>
-                                        <option value="bank-exp">Bank</option>
-                                        <option value="maintenance-exp">Maintenance</option>
-                                        <option value="financial-exp">Financial</option>
-                                        <option value="taxes-exp">Taxes</option>
-                                        <option value="staff-exp">Staff</option>
-                                    </select>
-                                </div>
-                                <div class="col form-group form-control-label mb-3">
-                                    <label for="category">Sub category</label>
                                     <select class="form-control" id="category" name="bill_pay_category">
-                                        <option value="others"></option>
-                                        <option value="bank-exp">Bank</option>
-                                        <option value="maintenance-exp">Maintenance</option>
-                                        <option value="financial-exp">Financial</option>
-                                        <option value="taxes-exp">Taxes</option>
-                                        <option value="staff-exp">Staff</option>
+
+                                        <optgroup label="Bank">
+                                            <option value="bank-fees">Bank fees</option>
+                                        </optgroup>
+
+                                        <optgroup label="Financial">
+                                            <option value="loan-interest">Loan interest</option>
+                                            <option value="fines-for-late-payment">Fines for late payment</option>
+                                            <option value="IOF/IR-on-applications">IOF/IR on applications</option>
+                                        </optgroup>
+
+                                        <optgroup label="Maintenance">
+                                            <option value="equipments">Equipments</option>
+                                            <option value="cleaning-and-hygiene">Cleaning and hygiene</option>
+                                            <option value="repairs-and-work">Repairs and work</option>
+                                            <option value="utensils">Utensils</option>
+                                        </optgroup>
+
+                                        <optgroup label="Public fees">
+                                            <option value="IPTU">IPTU</option>
+                                            <option value="state-tax">State tax</option>
+                                            <option value="municipal-tax">Municipal tax</option>
+                                            <option value="city-hall-fees">City hall fees</option>
+                                            <option value="employers'-union">Employers' union</option>
+                                            <option value="business-license">Business license</option>
+                                        </optgroup>
+
+                                        <optgroup label="Staff">
+                                            <option value="food">Food</option>
+                                            <option value="INSS">INSS</option>
+                                            <option value="occupational-medicine">Occupational medicine</option>
+                                            <option value="training">Training</option>
+                                            <option value="EPI">Individual protection equipment</option>
+                                            <option value="uniforms">Uniforms</option>
+                                            <option value="transportation">Transportation</option>
+                                            <option value="bonus">Bonus</option>
+                                            <option value="confraternization">Confraternization</option>
+                                            <option value="FGTS">FGTS</option>
+                                            <option value="union-contribution">Union contribution</option>
+                                            <option value="salary">Salary</option>
+                                        </optgroup>
+
+                                        <optgroup label="Taxes">
+                                            <option value="CSLL">CSLL</option>
+                                            <option value="cofins">COFINS</option>
+                                            <option value="simples-nacional">Simples Nacional</option>
+                                        </optgroup>
+
                                     </select>
                                 </div>
+
+
+                                <div class="col form-group form-control-label">
+                                    <label for="billMethodInput">Method</label>
+                                    <select class="form-control" id="billMethodInput" name="bill_pay_method">
+                                        <option value="bank-slip">Bank slip</option>
+                                        <option value="pix">Pix</option>
+                                        <option value="transfer">Transfer</option>
+                                        <option value="credit-card">Credit card</option>
+                                    </select>
+                                </div>
+
+
                             </div>
                             <div class="row">
                                 <div class="col form-group form-control-label">
@@ -646,11 +1090,10 @@
             setupInput($("#billValueInput"));
             setupInput($("#billFeesInput"));
             setupInput($("#billDiscountInput"));
-            setupInput($("#billTotalInput"));
+            setupInput($("#billReceiveTotalInput"));
             setupInput($("#billInstallmentsValueInput"));
             setupInput($("#billPayValueInput"));
         });
     </script>
-
 
 {% endblock javascripts %}

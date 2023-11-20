@@ -298,7 +298,7 @@ class BillToReceive(models.Model):
     unit = models.ForeignKey(Unit, related_name='bills_to_receive', on_delete=models.CASCADE, null=True, blank=True)
 
     category = models.CharField(max_length=100, default='others')
-    sub_category = models.CharField(max_length=100, default='others')
+    client = models.ForeignKey(Client, related_name='bills_to_receive', on_delete=models.CASCADE, null=True, blank=True)
 
     value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
     fees = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
@@ -314,7 +314,6 @@ class BillToReceive(models.Model):
     description = models.TextField()
 
     paid = models.BooleanField(default=False)
-    status = models.CharField(max_length=100, default='pending')
 
     created_at = models.DateField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='created_bills_to_receive', on_delete=models.CASCADE, default=1)
@@ -335,7 +334,8 @@ class BillToPay(models.Model):
     unit = models.ForeignKey(Unit, related_name='bills_to_pay', on_delete=models.CASCADE, null=True, blank=True)
 
     category = models.CharField(max_length=100, default='others')
-    sub_category = models.CharField(max_length=100, default='others')
+    subcategory = models.CharField(max_length=100, default='others')
+    method = models.CharField(max_length=100, default='others')
 
     value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
     due_date = models.DateField(blank=True, null=True)
@@ -343,7 +343,6 @@ class BillToPay(models.Model):
     description = models.TextField()
 
     paid = models.BooleanField(default=False)
-    status = models.CharField(max_length=100, default='pending')
 
     created_at = models.DateField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='created_bills_to_pay', on_delete=models.CASCADE, default=1)
@@ -353,5 +352,29 @@ class BillToPay(models.Model):
     def __str__(self):
         return self.title
 
+    def category_choose(self):
+
+        bank = ['Bank fees']
+        financial = ['Loan interest', 'Fines for late payment', 'IOF/IR on applications']
+        maintenance = ['Equipments', 'Cleaning and hygiene', 'Repairs and work', 'Utensils']
+        public_fees = ['IPTU', 'State tax', 'Municipal tax', 'City hall fees', "Employers' union", 'Business license']
+        staff = ['Salary', 'Union contribution', 'Confraternization', 'Bonus', 'Salary', 'FGTS', 'INSS', 'Uniforms',
+                 'Transportation voucher', 'Individual protection equipment', 'Training', 'Occupational medicine',
+                 'Food']
+
+        if self.subcategory in bank:
+            return 'Bank'
+        elif self.subcategory in financial:
+            return 'Financial'
+        elif self.subcategory in maintenance:
+            return 'Maintenance'
+        elif self.subcategory in public_fees:
+            return 'Public fees'
+        elif self.subcategory in staff:
+            return 'Staff'
+        else:
+            return 'Others'
+
     def save(self, *arg, **kwargs):
+        self.category = self.category_choose()
         super().save()

@@ -64,12 +64,17 @@ balance_urls = [
     path('balance/bills/', balance.bills, name='balance_bills'),
 
     path('balance/bills/new-<str:bill_type>/redirect=<str:redirect_to>', balance.new_bill, name='new_bill'),
+    path('balance/bills/delete-<str:bill_type>-<int:bill_id>/redirect=<str:redirect_to>', balance.delete_bill,
+         name='delete_bill'),
+    path('balance/bills/change-status-<str:bill_type>-<int:bill_id>/redirect=<str:redirect_to>', balance.change_status,
+         name='change_bill_status'),
 ]
 
 clients_urls = [
 
     path('clients/', clients.home, name='clients_home'),
     path('clients/new', clients.create, name='create_client'),
+    path('clients/delete=<int:client_id>', clients.delete, name='delete_client'),
 ]
 
 collaborators_urls = [
@@ -104,6 +109,7 @@ units_urls = [
 
     path('units/', units.home, name='units_home'),
     path('units/new', units.create, name='units_create'),
+    path('units/delete=<int:unit_id>', units.delete, name='units_delete'),
 ]
 
 base_urls = [

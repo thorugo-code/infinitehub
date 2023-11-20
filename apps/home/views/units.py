@@ -44,3 +44,9 @@ def create(request):
 
     return redirect('clients_home')
 
+
+def delete(request, unit_id):
+    unit = Unit.objects.get(id=unit_id)
+    unit.delete()
+
+    return redirect('clients_home')
