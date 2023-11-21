@@ -68,6 +68,8 @@ balance_urls = [
          name='delete_bill'),
     path('balance/bills/change-status-<str:bill_type>-<int:bill_id>/redirect=<str:redirect_to>', balance.change_status,
          name='change_bill_status'),
+    path('balance/bills/sort', balance.bills, name='sort_bills'),
+    path('balance/bills/sort=<str:sort_by>-<str:sort_type>', balance.bills, name='sorted_bills'),
 ]
 
 clients_urls = [

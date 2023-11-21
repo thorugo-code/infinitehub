@@ -36,13 +36,13 @@ def home(request):
     return render(request, 'home/balance.html', context)
 
 
-def bills(request):
+def bills(request, sorted_by=None, sort_type=None):
     currency = request.POST.get('currency', 'USD')
 
-    all_bills = sorted(
+    all_bills = reversed(sorted(
         chain(BillToReceive.objects.all(), BillToPay.objects.all()),
         key=lambda bill: bill.due_date
-    )
+    ))
     bills_to_receive = BillToReceive.objects.all()
     bills_received = BillToReceive.objects.filter(paid=True)
     bills_to_pay = BillToPay.objects.all()
@@ -89,6 +89,8 @@ def bills(request):
         'currency': currency,
         'date_now': datetime.now().date(),
         'currency_symbol': '$' if currency == 'USD' else 'R$',
+        'sorted_by': sorted_by,
+        'sort_type': sort_type,
     }
 
     return render(request, 'home/bills.html', context)
@@ -177,3 +179,4 @@ def change_status(request, bill_type, bill_id, redirect_to='balance_page'):
         bill.save()
 
     return redirect(redirect_to)
+
