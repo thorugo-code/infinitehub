@@ -335,6 +335,9 @@ class BillToPay(models.Model):
 
     category = models.CharField(max_length=100, default='others')
     subcategory = models.CharField(max_length=100, default='others')
+    client = models.ForeignKey(Client, related_name='bills_to_pay', on_delete=models.CASCADE,
+                               null=True, blank=True)
+
     method = models.CharField(max_length=100, default='others')
 
     value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)

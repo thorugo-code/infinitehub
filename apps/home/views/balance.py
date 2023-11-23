@@ -39,10 +39,6 @@ def home(request):
 def bills(request, sorted_by=None, sort_type=None):
     currency = request.POST.get('currency', 'USD')
 
-    all_bills = reversed(sorted(
-        chain(BillToReceive.objects.all(), BillToPay.objects.all()),
-        key=lambda bill: bill.due_date
-    ))
     bills_to_receive = BillToReceive.objects.all()
     bills_received = BillToReceive.objects.filter(paid=True)
     bills_to_pay = BillToPay.objects.all()
@@ -73,7 +69,6 @@ def bills(request, sorted_by=None, sort_type=None):
         'clients': Client.objects.all(),
         'bills_to_receive': bills_to_receive,
         'bills_to_pay': bills_to_pay,
-        'bills': all_bills,
         'received': bills_received_count,
         'received_value': bills_received_total,
         'paid': bills_paid_count,
@@ -92,6 +87,42 @@ def bills(request, sorted_by=None, sort_type=None):
         'sorted_by': sorted_by,
         'sort_type': sort_type,
     }
+
+    if sorted_by is None and sort_type is None:
+        all_bills = reversed(
+            sorted(
+                chain(BillToReceive.objects.all(), BillToPay.objects.all()),
+                key=lambda bill: bill.created_at)
+        )
+
+    elif sorted_by == 'value':
+        all_bills = sorted(
+            chain(BillToReceive.objects.all(), BillToPay.objects.all()),
+            key=lambda bill: getattr(bill, sorted_by if bill in bills_to_pay else 'total')
+        )
+
+    elif sorted_by == 'category':
+        all_bills = sorted(
+            chain(BillToReceive.objects.all(), BillToPay.objects.all()),
+            key=lambda bill: getattr(bill, sorted_by if bill in bills_to_receive else 'subcategory')
+        )
+
+    elif sorted_by == 'unit':
+        all_bills = sorted(
+            chain(BillToReceive.objects.all(), BillToPay.objects.all()),
+            key=lambda bill: getattr(bill.unit, 'name')
+        )
+
+    else:
+        all_bills = sorted(
+            chain(BillToReceive.objects.all(), BillToPay.objects.all()),
+            key=lambda bill: getattr(bill, sorted_by)
+        )
+
+    if sort_type == 'desc':
+        all_bills = reversed(all_bills)
+
+    context.update({'bills': all_bills})
 
     return render(request, 'home/bills.html', context)
 
@@ -180,3 +211,12 @@ def change_status(request, bill_type, bill_id, redirect_to='balance_page'):
 
     return redirect(redirect_to)
 
+
+def sort_bills(request):
+    sorted_by = request.POST['sort_by']
+    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
+
+    if sorted_by != '':
+        return redirect('sorted_bills', sorted_by=sorted_by, sort_type=sort_type)
+
+    return redirect('balance_bills')

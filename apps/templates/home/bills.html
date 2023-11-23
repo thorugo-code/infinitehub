@@ -139,7 +139,9 @@
                                 <h4 class="my-1">Bills</h4>
                             </div>
                             <div class="text-right mr-3">
-                                <button type="button" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                <button type="button"
+                                        class="btn btn-sm {% if sorted_by is None %}btn-neutral{% else %}btn-primary{% endif %}"
+                                        data-toggle="modal"
                                         data-target="#sortModal">
                                     <i class="fas fa-sort"></i>
                                 </button>
@@ -159,12 +161,13 @@
                                style="min-height: 45rem">
                             <thead class="thead-light">
                             <tr>
-                                <th scope="col" style="width:15%">Name</th>
+                                <th scope="col" style="width:15%"><span class="ml-4 pl-1">Name</span></th>
                                 <th scope="col" style="width:15%">Local</th>
                                 <th scope="col" style="width:15%">Client</th>
-                                <th scope="col" style="width:15%">Method</th>
-                                <th scope="col" style="width:15%">Value</th>
-                                <th scope="col" style="width:15%">Date</th>
+                                <th scope="col" style="width:15%">Category</th>
+                                <th scope="col" style="width:10%">Method</th>
+                                <th scope="col" style="width:10%">Value</th>
+                                <th scope="col" style="width:10%">Date</th>
                                 <th scope="col" style="width:10%">Status</th>
                                 <th scope="col" style="width: 0"></th>
                             </tr>
@@ -174,9 +177,9 @@
                                 <tr>
                                     <th scope="row">
                                         {% if bill in bills_to_pay %}
-                                            <i class="fas fa-arrow-down text-danger mr-2"></i>{{ bill.title }}
+                                            <i class="fas fa-arrow-down text-danger mr-3"></i>{{ bill.title }}
                                         {% else %}
-                                            <i class="fas fa-arrow-up text-success mr-2"></i>{{ bill.title }}
+                                            <i class="fas fa-arrow-up text-success mr-3"></i>{{ bill.title }}
                                         {% endif %}
                                     </th>
                                     <td>
@@ -187,6 +190,13 @@
                                             {{ bill.client.name }}
                                         {% else %}
                                             N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if bill in bills_to_receive %}
+                                            {{ bill.category }}
+                                        {% else %}
+                                            {{ bill.subcategory }}
                                         {% endif %}
                                     </td>
                                     <td>
@@ -1123,25 +1133,36 @@
                         <label class="form-control-label">Data</label>
                         <div class="row">
                             <div class="col-8 form-group form-control-label">
-                                <select class="form-control" id="unitFilter" name="unit">
-                                    <option value="category">Category</option>
-                                    <option value="client">Client</option>
-                                    <option value="date" selected>Due date</option>
-                                    <option value="unit">Local</option>
-                                    <option value="method">Method</option>
-                                    <option value="name">Name</option>
-                                    <option value="status">Status</option>
-                                    <option value="value">Value</option>
+                                <select class="form-control" id="unitFilter" name="sort_by">
+                                    <option value="">None</option>
+                                    <option value="category" {% if sorted_by == 'category' %} selected {% endif %}>
+                                        Category
+                                    </option>
+                                    <option value="client" {% if sorted_by == 'client' %} selected {% endif %}>Client
+                                    </option>
+                                    <option value="due_date" {% if sorted_by == 'due_date' %} selected {% endif %}>Due
+                                        date
+                                    </option>
+                                    <option value="unit" {% if sorted_by == 'unit' %} selected {% endif %}>Local
+                                    </option>
+                                    <option value="method" {% if sorted_by == 'method' %} selected {% endif %}>Method
+                                    </option>
+                                    <option value="title" {% if sorted_by == 'title' %} selected {% endif %}>Name
+                                    </option>
+                                    <option value="value" {% if sorted_by == 'value' %} selected {% endif %}>Value
+                                    </option>
                                 </select>
                             </div>
                             <div class="col-4 form-group align-items-center" style="display: flex">
                                 <div class="custom-control custom-checkbox custom-checkbox-primary mr-4">
-                                    <input class="custom-control-input" id="chk-asc" type="checkbox" checked
+                                    <input class="custom-control-input" id="chk-asc" type="checkbox" name="asc"
+                                            {% if sort_type == 'asc' or sort_type is None %} checked {% endif %}
                                            onclick="changeAscDesc(event)">
                                     <label class="custom-control-label" for="chk-asc">ASC</label>
                                 </div>
                                 <div class="custom-control custom-checkbox custom-checkbox-primary">
-                                    <input class="custom-control-input" id="chk-desc" type="checkbox"
+                                    <input class="custom-control-input" id="chk-desc" type="checkbox" name="desc"
+                                            {% if sort_type == 'desc' %} checked {% endif %}
                                            onclick="changeAscDesc(event)">
                                     <label class="custom-control-label" for="chk-desc">DESC</label>
                                 </div>
