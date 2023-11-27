@@ -7,12 +7,12 @@ from django.db.models import Q
 def get_paginated_clients(request, order_by):
     # query = Q()
     # clients_list = Client.objects.filter(query)
-    units_list = Unit.objects.all()
+    offices_list = Unit.objects.all()
 
     if order_by is not None:
-        paginator = Paginator(units_list.order_by(order_by), 6)
+        paginator = Paginator(offices_list.order_by(order_by), 6)
     else:
-        paginator = Paginator(units_list, 6)
+        paginator = Paginator(offices_list, 6)
 
     page = request.GET.get('page')
 
@@ -21,32 +21,32 @@ def get_paginated_clients(request, order_by):
 
 
 def home(request, order_by=None):
-    paginator, units = get_paginated_clients(request, order_by=order_by)
+    paginator, offices = get_paginated_clients(request, order_by=order_by)
 
     context = {
         'user_profile': Profile.objects.get(user=request.user),
-        'units': units,
+        'offices': offices,
     }
 
-    return render(request, 'home/units_home.html', context)
+    return render(request, 'home/offices_home.html', context)
 
 
 def create(request):
     if request.method == 'POST':
-        unit = Unit(
+        office = Unit(
             name=request.POST['name'],
             cnpj=request.POST['cnpj'],
             area=request.POST['area'],
             location=request.POST['location'],
         )
 
-        unit.save()
+        office.save()
 
-    return redirect('clients_home')
+    return redirect('offices_home')
 
 
 def delete(request, unit_id):
-    unit = Unit.objects.get(id=unit_id)
-    unit.delete()
+    office = Unit.objects.get(id=unit_id)
+    office.delete()
 
-    return redirect('clients_home')
+    return redirect('offices_home')

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, re_path
-from apps.home.views import assets, collaborators, inventory, login, profile, projects, balance, clients, units
+from apps.home.views import assets, collaborators, inventory, login, profile, projects, balance, clients, offices
 
 projects_list_urls = [
 
@@ -84,7 +84,11 @@ collaborators_urls = [
 
     path('collaborators/', collaborators.page_list, name='collaborators_list'),
 
-    path('collaborators/<str:name>', collaborators.details, name='collaborator_details'),
+    path('collaborators/<str:collab_name>-<int:collab_id>', collaborators.details, name='collaborator_details'),
+
+    path('collaborators/new', collaborators.new, name='collaborator_new'),
+
+    path('collaborators/change=<int:collab_id>', collaborators.change_status, name='collaborator_change_status'),
 ]
 
 inventory_urls = [
@@ -108,11 +112,11 @@ profile_urls = [
     path('profile/change-picture', profile.change_picture, name='change_profile_picture'),
 ]
 
-units_urls = [
+offices_urls = [
 
-    path('units/', units.home, name='units_home'),
-    path('units/new', units.create, name='units_create'),
-    path('units/delete=<int:unit_id>', units.delete, name='units_delete'),
+    path('offices/', offices.home, name='offices_home'),
+    path('offices/new', offices.create, name='offices_create'),
+    path('offices/delete=<int:unit_id>', offices.delete, name='offices_delete'),
 ]
 
 base_urls = [
@@ -125,7 +129,7 @@ base_urls = [
 ]
 
 urlpatterns = projects_list_urls + projects_page_urls + assets_urls + collaborators_urls + inventory_urls + profile_urls
-urlpatterns += balance_urls + clients_urls + units_urls + base_urls
+urlpatterns += balance_urls + clients_urls + offices_urls + base_urls
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

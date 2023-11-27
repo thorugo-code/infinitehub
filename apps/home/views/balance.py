@@ -2,7 +2,6 @@ from datetime import datetime
 from itertools import chain
 from django.shortcuts import render, redirect
 from apps.home.models import Profile, Unit, BillToReceive, BillToPay, Client, unmask_money
-from django.db.models import Sum
 
 
 def filter_options(value):
@@ -65,7 +64,7 @@ def bills(request, sorted_by=None, sort_type=None):
 
     context = {
         'user_profile': Profile.objects.get(user=request.user),
-        'units': Unit.objects.all(),
+        'offices': Unit.objects.all(),
         'clients': Client.objects.all(),
         'bills_to_receive': bills_to_receive,
         'bills_to_pay': bills_to_pay,
@@ -107,10 +106,10 @@ def bills(request, sorted_by=None, sort_type=None):
             key=lambda bill: getattr(bill, sorted_by if bill in bills_to_receive else 'subcategory')
         )
 
-    elif sorted_by == 'unit':
+    elif sorted_by == 'office':
         all_bills = sorted(
             chain(BillToReceive.objects.all(), BillToPay.objects.all()),
-            key=lambda bill: getattr(bill.unit, 'name')
+            key=lambda bill: getattr(bill.office, 'name')
         )
 
     else:
@@ -135,7 +134,7 @@ def new_bill(request, bill_type, redirect_to='balance_page'):
         if bill_type == 'income':
             bill = BillToReceive(
                 title=request.POST['bill_name'],
-                unit=Unit.objects.get(id=request.POST['bill_beneficiary']),
+                office=Unit.objects.get(id=request.POST['bill_beneficiary']),
                 category=filter_options(request.POST['bill_category']),
                 client=Client.objects.get(id=request.POST['bill_receive_client']),
                 value=unmask_money(request.POST['bill_value'], currency),
@@ -155,7 +154,7 @@ def new_bill(request, bill_type, redirect_to='balance_page'):
         elif bill_type == 'expense':
             bill = BillToPay(
                 title=request.POST['bill_name'],
-                unit=Unit.objects.get(id=request.POST['bill_pay_local']),
+                office=Unit.objects.get(id=request.POST['bill_pay_local']),
                 subcategory=filter_options(request.POST['bill_pay_category']),
                 method=filter_options(request.POST['bill_pay_method']),
                 value=unmask_money(request.POST['bill_pay_value'], currency),
@@ -220,3 +219,6 @@ def sort_bills(request):
         return redirect('sorted_bills', sorted_by=sorted_by, sort_type=sort_type)
 
     return redirect('balance_bills')
+
+
+

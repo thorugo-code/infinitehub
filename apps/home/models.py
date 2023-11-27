@@ -37,10 +37,10 @@ def custom_upload_path_projects(instance, filename):
 
 
 def custom_upload_path_bills(instance, filename):
-    unit = instance.unit.name.replace(" ", "_")
+    office = instance.unit.name.replace(" ", "_")
     year = datetime.now().strftime('%Y')
     month = datetime.now().strftime('%m')
-    return f'uploads/proofs/bills/{unit}/{year}/{month}/{filename}'
+    return f'uploads/proofs/bills/{office}/{year}/{month}/{filename}'
 
 
 class Equipments(models.Model):
@@ -158,7 +158,7 @@ class Profile(models.Model):
 
     # phone = models.CharField(max_length=20, default='')
 
-    unit = models.ForeignKey('Unit', related_name='members', on_delete=models.CASCADE, null=True, blank=True)
+    office = models.ForeignKey('Unit', related_name='members', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -273,7 +273,7 @@ class Task(models.Model):
 
 
 class Unit(models.Model):
-    avatar = models.ImageField(upload_to='uploads/units/avatar',
+    avatar = models.ImageField(upload_to='uploads/offices/avatar',
                                default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
     name = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=100)
@@ -291,11 +291,21 @@ class Client(models.Model):
     description = models.TextField()
 
 
+class Collaborator(models.Model):
+    birthday = models.DateField()
+    admission = models.DateField()
+    email = models.CharField(max_length=100)
+    contract = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    office = models.ForeignKey(Unit, related_name="collaborators", on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
+
+
 class BillToReceive(models.Model):
     project = models.ForeignKey(Project, related_name='bills_to_receive', on_delete=models.CASCADE, null=True,
                                 blank=True)
     title = models.CharField(max_length=100)
-    unit = models.ForeignKey(Unit, related_name='bills_to_receive', on_delete=models.CASCADE, null=True, blank=True)
+    office = models.ForeignKey(Unit, related_name='bills_to_receive', on_delete=models.CASCADE, null=True, blank=True)
 
     category = models.CharField(max_length=100, default='others')
     client = models.ForeignKey(Client, related_name='bills_to_receive', on_delete=models.CASCADE, null=True, blank=True)
@@ -331,7 +341,7 @@ class BillToPay(models.Model):
     project = models.ForeignKey(Project, related_name='bills_to_pay', on_delete=models.CASCADE,
                                 null=True, blank=True)
     title = models.CharField(max_length=100)
-    unit = models.ForeignKey(Unit, related_name='bills_to_pay', on_delete=models.CASCADE, null=True, blank=True)
+    office = models.ForeignKey(Unit, related_name='bills_to_pay', on_delete=models.CASCADE, null=True, blank=True)
 
     category = models.CharField(max_length=100, default='others')
     subcategory = models.CharField(max_length=100, default='others')
