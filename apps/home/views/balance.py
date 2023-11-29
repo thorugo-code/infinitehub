@@ -1,7 +1,6 @@
 from datetime import datetime
-from itertools import chain
 from django.shortcuts import render, redirect
-from apps.home.models import Profile, Unit, BillToReceive, BillToPay, Client, unmask_money
+from apps.home.models import Project, Profile, Office, Bill, Client, unmask_money
 
 
 def filter_options(value):
@@ -24,47 +23,33 @@ def filter_options(value):
         return value.replace('-', ' ').capitalize()
 
 
-def home(request):
-    context = {
-        'user_profile': Profile.objects.get(user=request.user),
-        'nearby_to_receive': BillToReceive.objects.filter(paid=False).order_by('due_date')[:8],
-        'nearby_to_pay': BillToPay.objects.filter(paid=False).order_by('due_date')[:8],
-        'date_now': datetime.now().date(),
-    }
+def home(request, sorted_by=None, sort_type=None):
+    currency = request.POST.get('currency', 'BRL')
 
-    return render(request, 'home/balance.html', context)
-
-
-def bills(request, sorted_by=None, sort_type=None):
-    currency = request.POST.get('currency', 'USD')
-
-    bills_to_receive = BillToReceive.objects.all()
-    bills_received = BillToReceive.objects.filter(paid=True)
-    bills_to_pay = BillToPay.objects.all()
-    bills_paid = BillToPay.objects.filter(paid=True)
-    bills_pending = chain(BillToReceive.objects.filter(paid=False), BillToPay.objects.filter(paid=False))
-    bills_late = chain(BillToReceive.objects.filter(paid=False, due_date__lt=datetime.now().date()),
-                       BillToPay.objects.filter(paid=False, due_date__lt=datetime.now().date()))
+    bills_to_receive = Bill.objects.filter(income=False)
+    bills_received = Bill.objects.filter(income=False, paid=True)
+    bills_to_pay = Bill.objects.filter(income=True)
+    bills_paid = Bill.objects.filter(income=True, paid=True)
+    bills_pending = Bill.objects.filter(paid=False)
+    bills_late = Bill.objects.filter(late=True)
 
     bills_to_receive_total = sum([bill.total for bill in bills_to_receive])
     bills_received_total = sum([bill.total for bill in bills_received])
-    bills_to_pay_total = sum([bill.value for bill in bills_to_pay])
-    bills_paid_total = sum([bill.value for bill in bills_paid])
-    bills_pending_total = sum([bill.total if bill in bills_to_receive else bill.value for bill in bills_pending])
-    bills_late_total = sum([bill.total if bill in bills_to_receive else bill.value for bill in bills_late])
+    bills_to_pay_total = sum([bill.total for bill in bills_to_pay])
+    bills_paid_total = sum([bill.total for bill in bills_paid])
+    bills_pending_total = sum([bill.total for bill in bills_pending])
+    bills_late_total = sum([bill.total for bill in bills_late])
 
     bills_to_receive_count = bills_to_receive.count()
     bills_received_count = bills_received.count()
     bills_to_pay_count = bills_to_pay.count()
     bills_paid_count = bills_paid.count()
-    bills_pending_count = len(
-        list(chain(BillToReceive.objects.filter(paid=False), BillToPay.objects.filter(paid=False))))
-    bills_late_count = len(list(chain(BillToReceive.objects.filter(paid=False, due_date__lt=datetime.now().date()),
-                                      BillToPay.objects.filter(paid=False, due_date__lt=datetime.now().date()))))
+    bills_pending_count = bills_pending.count()
+    bills_late_count = bills_late.count()
 
     context = {
         'user_profile': Profile.objects.get(user=request.user),
-        'offices': Unit.objects.all(),
+        'offices': Office.objects.all(),
         'clients': Client.objects.all(),
         'bills_to_receive': bills_to_receive,
         'bills_to_pay': bills_to_pay,
@@ -82,41 +67,23 @@ def bills(request, sorted_by=None, sort_type=None):
         'late_value': bills_late_total,
         'currency': currency,
         'date_now': datetime.now().date(),
-        'currency_symbol': '$' if currency == 'USD' else 'R$',
-        'sorted_by': sorted_by,
-        'sort_type': sort_type,
+        'currency_symbol': '$' if currency == 'USD' else 'R$' if currency == 'BRL' else '€',
+        'sorted_by': sorted_by.replace('-', '_') if sorted_by else None,
+        'sort_type': sort_type.replace('-', '_') if sort_type else None,
     }
 
-    if sorted_by is None and sort_type is None:
-        all_bills = reversed(
-            sorted(
-                chain(BillToReceive.objects.all(), BillToPay.objects.all()),
-                key=lambda bill: bill.created_at)
-        )
-
-    elif sorted_by == 'value':
-        all_bills = sorted(
-            chain(BillToReceive.objects.all(), BillToPay.objects.all()),
-            key=lambda bill: getattr(bill, sorted_by if bill in bills_to_pay else 'total')
-        )
-
-    elif sorted_by == 'category':
-        all_bills = sorted(
-            chain(BillToReceive.objects.all(), BillToPay.objects.all()),
-            key=lambda bill: getattr(bill, sorted_by if bill in bills_to_receive else 'subcategory')
-        )
+    if sorted_by == 'client':
+        all_bills = sorted(Bill.objects.all(), key=lambda bill: getattr(bill.client, 'name'))
 
     elif sorted_by == 'office':
-        all_bills = sorted(
-            chain(BillToReceive.objects.all(), BillToPay.objects.all()),
-            key=lambda bill: getattr(bill.office, 'name')
-        )
+        all_bills = sorted(Bill.objects.all(), key=lambda bill: getattr(bill.office, 'name'))
+
+    elif sorted_by == 'project':
+        all_bills = sorted(Bill.objects.all(), key=lambda bill: getattr(bill.project, 'title'))
 
     else:
-        all_bills = sorted(
-            chain(BillToReceive.objects.all(), BillToPay.objects.all()),
-            key=lambda bill: getattr(bill, sorted_by)
-        )
+        sorted_by = 'total' if sorted_by == 'value' else sorted_by
+        all_bills = sorted(Bill.objects.all(), key=lambda bill: getattr(bill, sorted_by))
 
     if sort_type == 'desc':
         all_bills = reversed(all_bills)
@@ -126,99 +93,72 @@ def bills(request, sorted_by=None, sort_type=None):
     return render(request, 'home/bills.html', context)
 
 
-def new_bill(request, bill_type, redirect_to='balance_page'):
-    if request.method == 'POST':
+def new_bill(request):
 
+    if request.method == 'POST':
         currency = request.POST.get('currency', 'USD')
+        bill = Bill(
+            # Foreign Keys
+            project=Project.objects.get(id=request.POST['project_id']) if request.POST.get('project_id', '') != '' else None,
+            client=Client.objects.get(id=request.POST['client_id']) if request.POST.get('client_id', '') != '' else None,
+            office=Office.objects.get(id=request.POST['office_id']) if request.POST.get('office_id', '') != '' else None,
+            created_by=Profile.objects.get(user=request.user),
 
-        if bill_type == 'income':
-            bill = BillToReceive(
-                title=request.POST['bill_name'],
-                office=Unit.objects.get(id=request.POST['bill_beneficiary']),
-                category=filter_options(request.POST['bill_category']),
-                client=Client.objects.get(id=request.POST['bill_receive_client']),
-                value=unmask_money(request.POST['bill_value'], currency),
-                fees=unmask_money(request.POST['bill_fees'], currency),
-                discount=unmask_money(request.POST['bill_discount'], currency),
-                total=unmask_money(request.POST['bill_total'], currency),
-                method=filter_options(request.POST['bill_method']),
-                due_date=request.POST['bill_due_date'],
-                number_of_installments=request.POST.get('bill_installments_method', 0),
-                value_of_installments=unmask_money(request.POST.get('bill_installments_value', ''), currency),
-                description=request.POST['bill_description'],
-                proof=request.FILES.get('bill_receive_proof', None),
-            )
+            # Char Fields
+            title=request.POST.get('title', ''),
+            category=filter_options(request.POST.get('category', '')),
+            subcategory=request.POST.get('subcategory', None),
+            method=filter_options(request.POST.get('method', '')),
 
-            bill.save()
+            # Date Fields
+            due_date=request.POST.get('due_date', None) if request.POST.get('due_date', None) != '' else None,
 
-        elif bill_type == 'expense':
-            bill = BillToPay(
-                title=request.POST['bill_name'],
-                office=Unit.objects.get(id=request.POST['bill_pay_local']),
-                subcategory=filter_options(request.POST['bill_pay_category']),
-                method=filter_options(request.POST['bill_pay_method']),
-                value=unmask_money(request.POST['bill_pay_value'], currency),
-                due_date=request.POST['bill_pay_date'],
-                description=request.POST['bill_pay_description'],
-                proof=request.FILES.get('bill_pay_proof', None),
-            )
+            # Text Fields
+            description=request.POST.get('description', ''),
 
-            bill.save()
+            # Money Fields
+            installments_value=unmask_money(request.POST.get('installments_value', ''), currency),
+            fees=unmask_money(request.POST.get('fees', ''), currency),
+            discount=unmask_money(request.POST.get('discount', ''), currency),
+            total=unmask_money(request.POST.get('total', ''), currency),
 
-    return redirect(redirect_to)
+            # Boolean Fields
+            income=True if request.POST['income'] == 'true' else False,
 
+            # Integer Fields
+            installments=request.POST.get('installments', 0),
 
-def delete_bill(request, bill_type, bill_id, redirect_to='balance_page'):
-    if request.method == 'POST':
+            # File Fields
+            proof=request.FILES.get('proof', None),
+        )
 
-        if bill_type == 'income':
-            bill = BillToReceive.objects.get(id=bill_id)
-        else:
-            bill = BillToPay.objects.get(id=bill_id)
-
-        bill.delete()
-
-    return redirect(redirect_to)
-
-
-def set_as_paid(request, redirect_to='balance_page'):
-    if request.method == 'POST':
-        bill_id = request.POST['bill_id']
-        bill_type = request.POST['bill_type']
-
-        if bill_type == 'income':
-            bill = BillToReceive.objects.get(id=bill_id)
-        else:
-            bill = BillToPay.objects.get(id=bill_id)
-
-        bill.paid = True
         bill.save()
 
-    return redirect(redirect_to)
+    return redirect('balance_page')
 
 
-def change_status(request, bill_type, bill_id, redirect_to='balance_page'):
+def delete_bill(request, bill_id):
     if request.method == 'POST':
+        bill = Bill.objects.get(id=bill_id)
+        bill.delete()
 
-        if bill_type == 'income':
-            bill = BillToReceive.objects.get(id=bill_id)
-        else:
-            bill = BillToPay.objects.get(id=bill_id)
+    return redirect('balance_page')
 
+
+def change_status(request, bill_id):
+    if request.method == 'POST':
+        bill = Bill.objects.get(id=bill_id)
         bill.paid = not bill.paid
         bill.save()
 
-    return redirect(redirect_to)
+    return redirect('balance_page')
 
 
 def sort_bills(request):
-    sorted_by = request.POST['sort_by']
+    sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
 
     if sorted_by != '':
         return redirect('sorted_bills', sorted_by=sorted_by, sort_type=sort_type)
 
-    return redirect('balance_bills')
-
-
-
+    return redirect('balance_page')

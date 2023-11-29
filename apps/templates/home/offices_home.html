@@ -254,9 +254,13 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                     <form id="newOfficeForm" method="post" action="{% url 'offices_create' %}">
                         {% csrf_token %}
+
+                        <input type="hidden" class="form-control" id="id" name="id" value="collab.id">
+
                         <div class="form-group form-control-label mb-3">
                             <label for="name">Name</label>
                             <input type="text" class="form-control" id="name" name="name">

@@ -183,7 +183,7 @@
                                         {% endif %}
                                     </th>
                                     <td>
-                                        {{ bill.unit.name }}
+                                        {{ bill.office.name }}
                                     </td>
                                     <td>
                                         {% if bill in bills_to_receive %}
@@ -304,7 +304,7 @@
                                                             <label for="beneficiary">Local</label>
                                                             <input class="form-control" id="beneficiary"
                                                                    name="bill_beneficiary"
-                                                                   value="{{ bill.unit.name }}" disabled>
+                                                                   value="{{ bill.office.name }}" disabled>
                                                         </div>
                                                         <div class="row">
                                                             <div class="col form-group form-control-label mb-3">
@@ -371,7 +371,7 @@
                                                                 <label for="beneficiary">Local</label>
                                                                 <input class="form-control" id="beneficiary"
                                                                        name="bill_beneficiary"
-                                                                       value="{{ bill.unit.name }}" disabled>
+                                                                       value="{{ bill.office.name }}" disabled>
                                                             </div>
                                                             <div class="col form-group form-control-label mb-3">
                                                                 <label for="category">Category</label>
@@ -477,7 +477,7 @@
                                                             <label for="beneficiary">Local</label>
                                                             <input class="form-control" id="beneficiary"
                                                                    name="bill_beneficiary"
-                                                                   value="{{ bill.unit.name }}" disabled>
+                                                                   value="{{ bill.office.name }}" disabled>
                                                         </div>
                                                         <div class="row">
                                                             <div class="col form-group form-control-label">
@@ -508,7 +508,7 @@
                                                     {% else %}
                                                         <form method="post"
                                                               id="paidConfirmFormExpense{{ bill.id }}"
-                                                              action="{% url 'change_bill_status' 'expense' bill.id 'balance_bills' %}">
+                                                              action="{% url 'change_bill_status' 'expense' bill.id 'balance_page' %}">
                                                             {% csrf_token %}
                                                         </form>
                                                         <div class="form-group form-control-label mb-3">
@@ -522,7 +522,7 @@
                                                                 <label for="beneficiary">Local</label>
                                                                 <input class="form-control" id="beneficiary"
                                                                        name="bill_beneficiary"
-                                                                       value="{{ bill.unit.name }}" disabled>
+                                                                       value="{{ bill.office.name }}" disabled>
                                                             </div>
                                                             <div class="col form-group form-control-label mb-3">
                                                                 <label for="category">Category</label>
@@ -677,96 +677,100 @@
                             </button>
                         </div>
                     </div>
-
                     <div id="bills-to-receive" class="tabcontent">
-
                         <form id="newBillReceiveForm"
                               method="post"
-                              action="{% url 'new_bill' 'income' 'balance_bills' %}"
+                              action="{% url 'new_bill' %}"
                               enctype="multipart/form-data"
                               onsubmit=blockSubmit(event,'submitReceiveButton')>
                             {% csrf_token %}
-                            <div class="form-group form-control-label mb-3">
-                                <label for="name">Name</label>
-                                <input class="form-control" id="name" name="bill_name">
-                            </div>
-                            <div class="form-group form-control-label mb-3">
-                                <label for="beneficiary">Local</label>
-                                <select class="form-control" id="beneficiary" name="bill_beneficiary">
-                                    {% for unit in units %}
-                                        <option value="{{ unit.id }}">{{ unit.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
                             <div class="row">
-                                <div class="col form-group form-control-label mb-3">
+                                <div class="col-6 form-group form-control-label mb-3">
+                                    <label for="name">Name</label>
+                                    <input class="form-control" id="name" name="title">
+                                </div>
+                                <div class="col-6 form-group form-control-label mb-3">
                                     <label for="category">Category</label>
-                                    <select class="form-control" id="category" name="bill_category">
+                                    <select class="form-control" id="category" name="category">
                                         <option value="int-earn">Interest earned</option>
                                         <option value="cap-pay">Capital payment</option>
                                         <option value="inc-inv">Income from investments</option>
                                         <option value="sales">Sales</option>
                                         <option value="eq-sales">Equipment sales</option>
                                     </select>
+
                                 </div>
-                                <div class="col form-group form-control-label mb-3">
+                            </div>
+                            <div class="row">
+                                <div class="col-6 form-group form-control-label mb-3">
+                                    <label for="beneficiary">Local</label>
+                                    <select class="form-control" id="beneficiary" name="office_id">
+                                        <option value=""></option>
+                                        {% for office in offices %}
+                                            <option value="{{ office.id }}">{{ office.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-6 form-group form-control-label mb-3">
                                     <label for="client">Client</label>
-                                    <select class="form-control" id="client" name="bill_receive_client">
+                                    <select class="form-control" id="client" name="client_id">
+                                        <option value=""></option>
                                         {% for client in clients %}
-                                            <option value="{{ client.id }}">{{ client.name }}</option>
+                                            <option value="{{ client.id }}">{{ client.name|truncatechars:25 }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col form-group form-control-label">
-                                    <label for="billValueInput">Value</label>
-                                    <input inputmode="decimal" class="form-control"
-                                           id="billValueInput"
-                                           name="bill_value" placeholder="">
-                                </div>
-                                <div class="col form-group form-control-label">
                                     <label for="billFeesInput">Fees</label>
                                     <input inputmode="decimal" class="form-control"
                                            id="billFeesInput"
-                                           name="bill_fees" placeholder="">
+                                           name="fees" placeholder="">
                                 </div>
                                 <div class="col form-group form-control-label">
                                     <label for="billDiscountInput">Discount</label>
                                     <input inputmode="decimal" class="form-control"
                                            id="billDiscountInput"
-                                           name="bill_discount" placeholder="">
+                                           name="discount" placeholder="">
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col form-group form-control-label">
                                     <label for="billReceiveTotalInput">Total</label>
                                     <input inputmode="decimal" class="form-control"
                                            id="billReceiveTotalInput"
-                                           name="bill_total" placeholder="">
+                                           name="total" placeholder="">
                                 </div>
-                                <div class="col form-group form-control-label">
+                            </div>
+                            <div class="row">
+                                <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
                                     <label for="billMethodInput">Method</label>
-                                    <select class="form-control" id="billMethodInput" name="bill_method">
+                                    <select class="form-control" id="billMethodInput" name="method">
                                         <option value="bank-slip">Bank slip</option>
                                         <option value="pix">Pix</option>
                                         <option value="transfer">Transfer</option>
                                         <option value="credit">Credit card</option>
                                     </select>
                                 </div>
-                                <div class="col form-group form-control-label">
+                                <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
                                     <label for="billDueDateInput">Due date</label>
                                     <input type="date" class="form-control"
                                            id="billDueDateInput"
-                                           name="bill_due_date" placeholder=""
+                                           name="due_date" placeholder=""
                                            onchange="unblockSubmit(event,'submitReceiveButton')">
+                                </div>
+                                <div class="col form-group form-control-label mb-3" style="flex: 0 0 20%; max-width: 20%">
+                                    <label for="currency">Currency</label>
+                                    <select class="form-control" id="currency" name="currency">
+                                        <option value="BRL">BRL</option>
+{#                                        <option value="USD">USD</option>#}
+{#                                        <option value="EUR">EUR</option>#}
+                                    </select>
                                 </div>
                             </div>
                             <div class="mt-2 form-group form-control-label align-items-center" style="display: flex">
                                 <label class="mb-0 mr-3">Installments</label>
                                 <label class="custom-toggle">
-                                    <input type="checkbox" name="bill_installments"
-                                           onchange="blockInstallmentsInputs()">
+                                    <input type="checkbox" onchange="blockInstallmentsInputs()">
                                     <span class="custom-toggle-slider rounded-circle" data-label-off="No"
                                           data-label-on="Yes"></span>
                                 </label>
@@ -775,7 +779,7 @@
                                 <div class="col-3 form-group form-control-label">
                                     <label for="billInstallmentsNumberMethodInput">Nº</label>
                                     <select class="form-control" id="billInstallmentsNumberMethodInput"
-                                            name="bill_installments_method" disabled>
+                                            name="installments" disabled>
                                         <script>
                                             for (let i = 1; i <= 24; i++) {
                                                 document.write(`<option value="${i}">${i}x</option>`);
@@ -787,22 +791,21 @@
                                     <label for="billInstallmentsValueInput">Value</label>
                                     <input inputmode="decimal" class="form-control"
                                            id="billInstallmentsValueInput"
-                                           name="bill_installments_value" placeholder="" disabled>
+                                           name="installments_value" placeholder="" disabled>
                                 </div>
                             </div>
                             <hr style="margin-bottom: 2rem; margin-top: 1rem">
                             <div class="form-group form-control-label">
                                 <label for="fileInput">Attach proof</label>
-                                <input type="file" name="bill_receive_proof" class="form-control-file"
+                                <input type="file" name="proof" class="form-control-file"
                                        id="fileInput">
                             </div>
                             <div class="form-group form-control-label">
                                 <label for="about">Description</label>
-                                <textarea rows="4" class="form-control" id="about" name="bill_description"
+                                <textarea rows="4" class="form-control" id="about" name="description"
                                           placeholder="A few words about ..."></textarea>
                             </div>
                         </form>
-
                         <div class="modal-footer px-0 pt-2 pb-4">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary" id="submitReceiveButton"
@@ -810,12 +813,9 @@
                                     disabled>Submit
                             </button>
                         </div>
-
                     </div>
-
                     <div id="bills-to-pay" class="tabcontent">
-
-                        <form id="newBillPayForm" method="post" action="{% url 'new_bill' 'expense' 'balance_bills' %}"
+                        <form id="newBillPayForm" method="post" action="{% url 'new_bill' %}"
                               enctype="multipart/form-data" onsubmit=blockSubmit(event,'submitBillPayButton')>
                             {% csrf_token %}
                             <div class="form-group form-control-label mb-3">
@@ -824,34 +824,30 @@
                             </div>
                             <div class="form-group form-control-label mb-3">
                                 <label for="local">Local</label>
-                                <select class="form-control" id="local" name="bill_pay_local">
-                                    {% for unit in units %}
-                                        <option value="{{ unit.id }}">{{ unit.name }}</option>
+                                <select class="form-control" id="local" name="office_id">
+                                    {% for office in offices %}
+                                        <option value="{{ office.id }}">{{ office.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="row">
                                 <div class="col form-group form-control-label mb-3">
                                     <label for="category">Category</label>
-                                    <select class="form-control" id="category" name="bill_pay_category">
-
+                                    <select class="form-control" id="category" name="category">
                                         <optgroup label="Bank">
                                             <option value="bank-fees">Bank fees</option>
                                         </optgroup>
-
                                         <optgroup label="Financial">
                                             <option value="loan-interest">Loan interest</option>
                                             <option value="fines-for-late-payment">Fines for late payment</option>
                                             <option value="IOF/IR-on-applications">IOF/IR on applications</option>
                                         </optgroup>
-
                                         <optgroup label="Maintenance">
                                             <option value="equipments">Equipments</option>
                                             <option value="cleaning-and-hygiene">Cleaning and hygiene</option>
                                             <option value="repairs-and-work">Repairs and work</option>
                                             <option value="utensils">Utensils</option>
                                         </optgroup>
-
                                         <optgroup label="Public fees">
                                             <option value="IPTU">IPTU</option>
                                             <option value="state-tax">State tax</option>
@@ -860,7 +856,6 @@
                                             <option value="employers'-union">Employers' union</option>
                                             <option value="business-license">Business license</option>
                                         </optgroup>
-
                                         <optgroup label="Staff">
                                             <option value="food">Food</option>
                                             <option value="INSS">INSS</option>
@@ -875,66 +870,57 @@
                                             <option value="union-contribution">Union contribution</option>
                                             <option value="salary">Salary</option>
                                         </optgroup>
-
                                         <optgroup label="Taxes">
                                             <option value="CSLL">CSLL</option>
                                             <option value="cofins">COFINS</option>
                                             <option value="simples-nacional">Simples Nacional</option>
                                         </optgroup>
-
                                     </select>
                                 </div>
-
-
                                 <div class="col form-group form-control-label">
                                     <label for="billMethodInput">Method</label>
-                                    <select class="form-control" id="billMethodInput" name="bill_pay_method">
+                                    <select class="form-control" id="billMethodInput" name="method">
                                         <option value="bank-slip">Bank slip</option>
                                         <option value="pix">Pix</option>
                                         <option value="transfer">Transfer</option>
                                         <option value="credit-card">Credit card</option>
                                     </select>
                                 </div>
-
-
                             </div>
                             <div class="row">
                                 <div class="col form-group form-control-label">
                                     <label for="billPayValueInput">Value</label>
                                     <input inputmode="decimal" class="form-control"
                                            id="billPayValueInput"
-                                           name="bill_pay_value" placeholder="">
+                                           name="total" placeholder="">
                                 </div>
                                 <div class="col form-group form-control-label">
-                                    <label for="billPayDateInput">Date</label>
+                                    <label for="billPayDateInput">Due date</label>
                                     <input type="date" class="form-control"
                                            id="billPayDateInput"
-                                           name="bill_pay_date" placeholder=""
+                                           name="due_date" placeholder=""
                                            onchange="unblockSubmit(event,'submitBillPayButton')">
                                 </div>
                             </div>
                             <hr style="margin-bottom: 2rem; margin-top: 1rem">
                             <div class="form-group form-control-label">
                                 <label for="fileInput">Attach proof</label>
-                                <input type="file" name="bill_pay_proof" class="form-control-file"
+                                <input type="file" name="proof" class="form-control-file"
                                        id="fileInput">
                             </div>
                             <div class="form-group form-control-label">
                                 <label for="about">Description</label>
-                                <textarea rows="4" class="form-control" id="about" name="bill_pay_description"
+                                <textarea rows="4" class="form-control" id="about" name="description"
                                           placeholder="A few words about ..."></textarea>
                             </div>
                         </form>
-
                         <div class="modal-footer px-0 pt-2 pb-4">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary" id="submitBillPayButton" form="newBillPayForm"
                                     disabled>Submit
                             </button>
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>
@@ -960,11 +946,11 @@
                     <form id="filterForm" method="post" action="">
                         {% csrf_token %}
                         <div class="form-group form-control-label">
-                            <label for="unitFilter">Local</label>
-                            <select class="form-control" id="unitFilter" name="unit">
+                            <label for="officeFilter">Local</label>
+                            <select class="form-control" id="officeFilter" name="office">
                                 <option value="all">All</option>
-                                {% for unit in units %}
-                                    <option value="{{ unit.id }}">{{ unit.name }}</option>
+                                {% for office in offices %}
+                                    <option value="{{ office.id }}">{{ office.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -1133,7 +1119,7 @@
                         <label class="form-control-label">Data</label>
                         <div class="row">
                             <div class="col-8 form-group form-control-label">
-                                <select class="form-control" id="unitFilter" name="sort_by">
+                                <select class="form-control" id="officeFilter" name="sort_by">
                                     <option value="">None</option>
                                     <option value="category" {% if sorted_by == 'category' %} selected {% endif %}>
                                         Category
@@ -1143,7 +1129,7 @@
                                     <option value="due_date" {% if sorted_by == 'due_date' %} selected {% endif %}>Due
                                         date
                                     </option>
-                                    <option value="unit" {% if sorted_by == 'unit' %} selected {% endif %}>Local
+                                    <option value="office" {% if sorted_by == 'office' %} selected {% endif %}>Local
                                     </option>
                                     <option value="method" {% if sorted_by == 'method' %} selected {% endif %}>Method
                                     </option>
@@ -1263,13 +1249,13 @@
             function setupInput(input) {
                 input.inputmask({
                     alias: "numeric",
-                    radixPoint: ".",
-                    groupSeparator: ",",
+                    radixPoint: ",",
+                    groupSeparator: ".",
                     autoGroup: true,
                     rightAlign: false,
                     autoUnmask: true,
                     numericInput: true,
-                    prefix: "USD ",
+                    prefix: "",
                 });
             }
 

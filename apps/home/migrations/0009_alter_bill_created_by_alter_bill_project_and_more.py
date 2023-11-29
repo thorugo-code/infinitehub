@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 ('paid', models.BooleanField(default=False)),
                 ('status', models.CharField(default='pending', max_length=100)),
                 ('created_at', models.DateField(auto_now_add=True)),
-                ('proof', models.FileField(blank=True, null=True, upload_to=apps.home.models.custom_upload_path_bills)),
+                ('proof', models.FileField(blank=True, null=True, upload_to=apps.home.models.upload_path_bills)),
                 ('created_by', models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='created_bills_to_pay', to=settings.AUTH_USER_MODEL)),
                 ('project', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='bills_to_pay', to='home.project')),
                 ('unit', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='bills_to_pay', to='home.unit')),

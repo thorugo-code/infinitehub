@@ -34,11 +34,13 @@ def home(request, order_by=None):
 def create(request):
     if request.method == 'POST':
         client = Client(
-            name=request.POST['name'],
-            cnpj=request.POST['cnpj'],
-            area=request.POST['area'],
-            location=request.POST['location'],
-            description=request.POST['about'],
+            name=request.POST.get('name', ''),
+            cnpj=request.POST.get('cnpj', ''),
+            email=request.POST.get('email', ''),
+            phone=request.POST.get('phone', ''),
+            area=request.POST.get('area', ''),
+            location=request.POST.get('location', ''),
+            description=request.POST.get('about', ''),
         )
 
         client.save()

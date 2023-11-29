@@ -60,17 +60,15 @@ assets_urls = [
 
 balance_urls = [
 
+    # path('balance/', balance.home, name='balance_page'),
     path('balance/', balance.home, name='balance_page'),
-    path('balance/bills/', balance.bills, name='balance_bills'),
 
-    path('balance/bills/new-<str:bill_type>/redirect=<str:redirect_to>', balance.new_bill, name='new_bill'),
-    path('balance/bills/delete-<str:bill_type>-<int:bill_id>/redirect=<str:redirect_to>', balance.delete_bill,
-         name='delete_bill'),
-    path('balance/bills/change-status-<str:bill_type>-<int:bill_id>/redirect=<str:redirect_to>', balance.change_status,
-         name='change_bill_status'),
+    path('balance/new', balance.new_bill, name='new_bill'),
+    path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
+    path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
 
-    path('balance/bills/sort', balance.sort_bills, name='sort_bills'),
-    path('balance/bills/sort=<str:sorted_by>-<str:sort_type>', balance.bills, name='sorted_bills'),
+    path('balance/order', balance.sort_bills, name='sort_bills'),
+    path('balance/order=<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
 ]
 
 clients_urls = [
@@ -116,13 +114,12 @@ offices_urls = [
 
     path('offices/', offices.home, name='offices_home'),
     path('offices/new', offices.create, name='offices_create'),
-    path('offices/delete=<int:unit_id>', offices.delete, name='offices_delete'),
+    path('offices/delete=<int:office_id>', offices.delete, name='offices_delete'),
 ]
 
 base_urls = [
 
     path('', login.index, name='home'),
-
     # Matches any html file
     re_path(r'^.*\.*', login.pages, name='pages'),
 

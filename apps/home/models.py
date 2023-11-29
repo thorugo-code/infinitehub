@@ -36,8 +36,8 @@ def custom_upload_path_projects(instance, filename):
     return f'uploads/projects/{client}/{project_name}/{year}/{month}/{filename}'
 
 
-def custom_upload_path_bills(instance, filename):
-    office = instance.unit.name.replace(" ", "_")
+def upload_path_bills(instance, filename):
+    office = instance.office.name.replace(" ", "_")
     year = datetime.now().strftime('%Y')
     month = datetime.now().strftime('%m')
     return f'uploads/proofs/bills/{office}/{year}/{month}/{filename}'
@@ -76,17 +76,13 @@ class Equipments(models.Model):
 
         img_name = f'{self.name}_{self.id}.png'
 
-        # Specify the directory where you want to save the image
         image_dir = f'apps/static/assets/uploads/qrcodes/equipments/{self.acquisition_date.strftime("%Y")}/' \
                     f'{self.acquisition_date.strftime("%m")}/{self.name}/'
 
-        # Create the directory if it doesn't exist
         os.makedirs(image_dir, exist_ok=True)
 
-        # Specify the full path to save the image
         image_path = os.path.join(image_dir, img_name)
 
-        # Save the QR code image to the specified path
         img.save(image_path)
 
         return image_path
@@ -158,7 +154,7 @@ class Profile(models.Model):
 
     # phone = models.CharField(max_length=20, default='')
 
-    office = models.ForeignKey('Unit', related_name='members', on_delete=models.CASCADE, null=True, blank=True)
+    office = models.ForeignKey('Office', related_name='members', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -185,52 +181,28 @@ class UploadedFile(models.Model):
         return self.file.name.split('.')[-1]
 
     def fileCategory(self):
-        models_3d = ['rvt', 'stp', 'igs', 'ifc', 'sat', 'dxf', 'dwg', 'prt', 'catpart', 'catproduct', 'cgr', 'obj',
-                     'stl', 'jt', 'dgn', 'fbx', 'sldprt', 'sldasm', 'x_t', 'x_b']
+        correlation = {
+            '3d-models': ['rvt', 'stp', 'igs', 'ifc', 'sat', 'dxf', 'dwg', 'prt', 'catpart', 'catproduct', 'cgr', 'obj',
+                          'stl', 'jt', 'dgn', 'fbx', 'sldprt', 'sldasm', 'x_t', 'x_b'],
+            'clouds': ['rcp', 'rcs', 'pod', 'fls', 'las', 'e57'],
+            'scripts': ['py', 'html', 'css', 'js', 'cs', 'c', 'cpp', 'json', 'xml', 'kt', 'kts'],
+            'executable': ['exe', 'msi', 'bat', 'sh', 'apk'],
+            'folders': ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'iso', 'dmg', 'pkg', 'deb', 'rpm'],
+            'unity': ['unitypackage', 'assets', 'prefab', 'mat', 'unity', 'unity3d', 'unitypackage', 'asset', 'meta',
+                      'ress'],
+            'database': ['db', 'sql', 'sqlite', 'sqlite3', 'db3', 'sqlite2', 'sqlite3-shm', 'sqlite3-wal'],
+            'office': ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp', 'rtf', 'txt', 'pdf', 'csv',
+                       'md'],
+            'images': ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'ico', 'tif', 'tiff', 'psd', 'ai', 'eps', 'ps',
+                       'indd', 'raw', 'webp'],
+            'video': ['mp4', 'avi', 'mov', 'wmv', 'flv', '3gp', 'webm', 'mkv', 'vob', 'ogv', 'ogg', 'drc', 'gifv',
+                      'mng', 'qt', 'yuv', 'rm', 'rmvb', 'asf', 'amv', 'm4p', 'm4v', 'mpg', 'mp2', 'mpeg', 'mpe',
+                      'mpv', 'm2v', 'svi', '3g2', 'mxf', 'roq', 'nsv', 'f4v', 'f4p', 'f4a', 'f4b'],
+        }
 
-        clouds = ['rcp', 'rcs', 'pod', 'fls', 'las', 'e57']
-
-        scripts = ['py', 'html', 'css', 'js', 'cs', 'c', 'cpp', 'json', 'xml', 'kt', 'kts']
-
-        executable = ['exe', 'msi', 'bat', 'sh', 'apk']
-
-        folders = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'iso', 'dmg', 'pkg', 'deb', 'rpm']
-
-        unity = ['unitypackage', 'assets', 'prefab', 'mat', 'unity', 'unity3d', 'unitypackage', 'asset', 'meta', 'ress']
-
-        database = ['db', 'sql', 'sqlite', 'sqlite3', 'db3', 'sqlite2', 'sqlite3-shm', 'sqlite3-wal']
-
-        office = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp', 'rtf', 'txt', 'pdf', 'csv', 'md']
-
-        images = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'ico', 'tif', 'tiff', 'psd', 'ai', 'eps', 'ps', 'indd',
-                  'raw', 'webp']
-
-        video = ['mp4', 'avi', 'mov', 'wmv', 'flv', '3gp', 'webm', 'mkv', 'vob', 'ogv', 'ogg', 'drc', 'gifv', 'mng',
-                 'qt', 'yuv', 'rm', 'rmvb', 'asf', 'amv', 'm4p', 'm4v', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'm2v',
-                 'svi', '3g2', 'mxf', 'roq', 'nsv', 'f4v', 'f4p', 'f4a', 'f4b']
-
-        if self.fileExtension() in models_3d:
-            return '3d-models'
-        elif self.fileExtension() in scripts:
-            return 'scripts'
-        elif self.fileExtension() in unity:
-            return 'unity'
-        elif self.fileExtension() in clouds:
-            return 'clouds'
-        elif self.fileExtension() in executable:
-            return 'executable'
-        elif self.fileExtension() in folders:
-            return 'folders'
-        elif self.fileExtension() in database:
-            return 'database'
-        elif self.fileExtension() in office:
-            return 'office'
-        elif self.fileExtension() in images:
-            return 'images'
-        elif self.fileExtension() in video:
-            return 'video'
-        else:
-            return 'others'
+        for key, value in correlation.items():
+            if self.fileExtension() in value:
+                return key
 
     def save(self, *args, **kwargs):
 
@@ -272,7 +244,7 @@ class Task(models.Model):
         project.save()
 
 
-class Unit(models.Model):
+class Office(models.Model):
     avatar = models.ImageField(upload_to='uploads/offices/avatar',
                                default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
     name = models.CharField(max_length=100)
@@ -286,7 +258,9 @@ class Client(models.Model):
                                default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
     name = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=100)
-    area = models.CharField(max_length=100, default='none')
+    email = models.CharField(max_length=100, default='')
+    phone = models.CharField(max_length=14, default='')
+    area = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
     description = models.TextField()
 
@@ -297,97 +271,75 @@ class Collaborator(models.Model):
     email = models.CharField(max_length=100)
     contract = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
-    office = models.ForeignKey(Unit, related_name="collaborators", on_delete=models.CASCADE)
+    office = models.ForeignKey(Office, related_name="collaborators", on_delete=models.CASCADE)
     status = models.BooleanField(default=True)
 
 
-class BillToReceive(models.Model):
-    project = models.ForeignKey(Project, related_name='bills_to_receive', on_delete=models.CASCADE, null=True,
-                                blank=True)
+class Bill(models.Model): # Adicionar currency
+    # Foreign Keys and Relationships
+    project = models.ForeignKey(Project, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)
+    client = models.ForeignKey(Client, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)
+    office = models.ForeignKey(Office, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)
+    created_by = models.ForeignKey(User, related_name='created_bills', on_delete=models.CASCADE)
+
+    # Char Fields
     title = models.CharField(max_length=100)
-    office = models.ForeignKey(Unit, related_name='bills_to_receive', on_delete=models.CASCADE, null=True, blank=True)
-
     category = models.CharField(max_length=100, default='others')
-    client = models.ForeignKey(Client, related_name='bills_to_receive', on_delete=models.CASCADE, null=True, blank=True)
-
-    value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
-    fees = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
-    discount = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
-    total = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
-
-    number_of_installments = models.IntegerField(default=0)
-    value_of_installments = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
-
+    subcategory = models.CharField(max_length=100, null=True, blank=True)
     method = models.CharField(max_length=100, default='others')
-    due_date = models.DateField(blank=True, null=True)
 
+    # Date Fields
+    created_at = models.DateField(auto_now_add=True)
+    due_date = models.DateField(blank=True, null=True)
+    paid_at = models.DateField(blank=True, null=True)
+
+    # Text Fields
     description = models.TextField()
 
+    # Money Fields
+    installments_value = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
+    fees = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
+    discount = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
+    total = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
+
+    # Boolean Fields
     paid = models.BooleanField(default=False)
+    late = models.BooleanField(default=False)
+    income = models.BooleanField(default=False)
 
-    created_at = models.DateField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='created_bills_to_receive', on_delete=models.CASCADE, default=1)
+    # Integer Fields
+    installments = models.IntegerField(default=0)
 
-    proof = models.FileField(upload_to=custom_upload_path_bills, null=True, blank=True)
+    # File Fields
+    proof = models.FileField(upload_to=upload_path_bills, null=True, blank=True)
 
     def __str__(self):
         return self.title
 
-    def save(self, *arg, **kwargs):
-        super().save()
+    def select_subcategory(self):
+        correlation = {
+            'Bank': ['Bank fees'],
+            'Financial': ['Loan interest', 'Fines for late payment', 'IOF/IR on applications'],
+            'Maintenance': ['Equipments', 'Cleaning and hygiene', 'Repairs and work', 'Utensils'],
+            'Public fees': ['IPTU', 'State tax', 'Municipal tax', 'City hall fees', "Employers' union",
+                            'Business license'],
+            'Staff': ['Salary', 'Union contribution', 'Confraternization', 'Bonus', 'Salary', 'FGTS', 'INSS',
+                      'Uniforms', 'Transportation voucher', 'Individual protection equipment', 'Training',
+                      'Occupational medicine', 'Food'],
+        }
 
+        for key, value in correlation.items():
+            if self.subcategory in value:
+                return key
 
-class BillToPay(models.Model):
-    project = models.ForeignKey(Project, related_name='bills_to_pay', on_delete=models.CASCADE,
-                                null=True, blank=True)
-    title = models.CharField(max_length=100)
-    office = models.ForeignKey(Unit, related_name='bills_to_pay', on_delete=models.CASCADE, null=True, blank=True)
+        return 'Others'
 
-    category = models.CharField(max_length=100, default='others')
-    subcategory = models.CharField(max_length=100, default='others')
-    client = models.ForeignKey(Client, related_name='bills_to_pay', on_delete=models.CASCADE,
-                               null=True, blank=True)
+    def save(self, *args, **kwargs):
+        if kwargs.get('paid') and self.paid:
+            self.paid_at = datetime.now()
 
-    method = models.CharField(max_length=100, default='others')
+        if self.due_date and self.due_date < datetime.now().date():
+            self.late = True
 
-    value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
-    due_date = models.DateField(blank=True, null=True)
-
-    description = models.TextField()
-
-    paid = models.BooleanField(default=False)
-
-    created_at = models.DateField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='created_bills_to_pay', on_delete=models.CASCADE, default=1)
-
-    proof = models.FileField(upload_to=custom_upload_path_bills, null=True, blank=True)
-
-    def __str__(self):
-        return self.title
-
-    def category_choose(self):
-
-        bank = ['Bank fees']
-        financial = ['Loan interest', 'Fines for late payment', 'IOF/IR on applications']
-        maintenance = ['Equipments', 'Cleaning and hygiene', 'Repairs and work', 'Utensils']
-        public_fees = ['IPTU', 'State tax', 'Municipal tax', 'City hall fees', "Employers' union", 'Business license']
-        staff = ['Salary', 'Union contribution', 'Confraternization', 'Bonus', 'Salary', 'FGTS', 'INSS', 'Uniforms',
-                 'Transportation voucher', 'Individual protection equipment', 'Training', 'Occupational medicine',
-                 'Food']
-
-        if self.subcategory in bank:
-            return 'Bank'
-        elif self.subcategory in financial:
-            return 'Financial'
-        elif self.subcategory in maintenance:
-            return 'Maintenance'
-        elif self.subcategory in public_fees:
-            return 'Public fees'
-        elif self.subcategory in staff:
-            return 'Staff'
-        else:
-            return 'Others'
-
-    def save(self, *arg, **kwargs):
-        self.category = self.category_choose()
-        super().save()
+        if not self.income and self.subcategory is None:
+            self.subcategory = self.select_subcategory()
