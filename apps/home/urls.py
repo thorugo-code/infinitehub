@@ -68,7 +68,13 @@ balance_urls = [
     path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
 
     path('balance/order', balance.sort_bills, name='sort_bills'),
-    path('balance/order=<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
+    path('balance/order:<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
+
+    path('balance/filter', balance.filter_bills, name='filter_bills'),
+    path('balance/filters:<str:filters>', balance.home, name='filtered_bills'),
+
+    path('balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', balance.home,
+         name='sorted_filtered_bills'),
 ]
 
 clients_urls = [

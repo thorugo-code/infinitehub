@@ -335,11 +335,17 @@ class Bill(models.Model): # Adicionar currency
         return 'Others'
 
     def save(self, *args, **kwargs):
-        if kwargs.get('paid') and self.paid:
-            self.paid_at = datetime.now()
 
-        if self.due_date and self.due_date < datetime.now().date():
+        if kwargs.get('paid'):
+            self.paid_at = datetime.now()
+            self.late = False
+        elif not kwargs.get('paid'):
+            self.paid_at = None
+
+        if self.due_date and datetime.strptime(str(self.due_date), '%Y-%m-%d').date() < datetime.now().date() and not self.paid:
             self.late = True
 
         if not self.income and self.subcategory is None:
             self.subcategory = self.select_subcategory()
+
+        super().save()

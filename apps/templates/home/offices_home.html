@@ -55,10 +55,10 @@
                         <thead class="thead-light">
                         <tr>
                             <th scope="col" style="width: 40%">Name</th>
-                            <th scope="col" style="width: 15%">Area</th>
-                            <th scope="col" style="width: 20%">Location</th>
-                            <th scope="col" style="width: 10%">Projects</th>
-                            <th scope="col" style="width: 15%">Balance</th>
+                            <th scope="col" style="width: 30%">Area</th>
+                            <th scope="col" style="width: 30%">Location</th>
+{#                            <th scope="col" style="width: 10%">Projects</th>#}
+{#                            <th scope="col" style="width: 15%">Balance</th>#}
                             <th scope="col" style="width: 0"></th>
                         </tr>
                         </thead>
@@ -89,12 +89,12 @@
                                 <td>
                                     <span>{{ office.location }}</span>
                                 </td>
-                                <td>
-                                    <span>{{ office.projects|wordcount }}</span>
-                                </td>
-                                <td>
-                                    <span class="badge badge-dot mr-4"></span>
-                                </td>
+{#                                <td>#}
+{#                                    <span>{{ office.projects|wordcount }}</span>#}
+{#                                </td>#}
+{#                                <td>#}
+{#                                    <span class="badge badge-dot mr-4"></span>#}
+{#                                </td>#}
                                 <td class="text-right">
                                     <div class="dropdown">
                                         <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"

@@ -18,8 +18,7 @@
                             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
                                 <li class="breadcrumb-item"><a href="">Administrative</a></li>
-                                <li class="breadcrumb-item"><a href="{% url 'balance_page' %}">Balance</a></li>
-                                <li class="breadcrumb-item active">Bills</li>
+                                <li class="breadcrumb-item active">Balance Sheet</li>
                             </ol>
                         </nav>
                     </div>
@@ -32,94 +31,99 @@
         <div class="header-body">
             <!-- Card stats -->
             <div class="row">
-                <div class="col-lg-3">
-                    <div class="card bg-gradient-success border-0 mb-3">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card bg-gradient-green border-0">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-8">
+                                <div class="col">
                                     <h5 class="card-title text-uppercase text-muted mb-0 text-white">Received</h5>
-                                    <span class="h2 font-weight-bold mb-0 text-white">
-                                        {% if received_value == 0 %}{{ currency_symbol }}0{% else %}
-                                            {{ received_value }}{% endif %}
-                                    </span>
+                                    <span class="h2 font-weight-bold mb-0 text-white">{% if received_value == 0 %}
+                                        {{ currency_symbol }}
+                                        0.0{% endif %}{{ received_value }} / {% if to_receive_value == 0 %}
+                                        {{ currency_symbol }}0.0{% endif %}{{ to_receive_value }}</span>
+                                    {#                                    <div class="progress progress-xs mt-3 mb-0">#}
+                                    {#                                        <div class="progress-bar bg-success" role="progressbar"#}
+                                    {#                                             aria-valuenow="{{ received_percentage }}"#}
+                                    {#                                             aria-valuemin="0" aria-valuemax="100"#}
+                                    {#                                             style="width: {{ received_percentage }}%;">#}
+                                    {#                                        </div>#}
+                                    {#                                    </div>#}
                                 </div>
-                                <div class="col-4">
-                                    <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
-                                        <i class="fas fa-arrow-alt-circle-up"></i>
-                                    </div>
-                                </div>
+                                {#                                <div class="col-auto">#}
+                                {#                                    <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"#}
+                                {#                                            aria-haspopup="true" aria-expanded="false">#}
+                                {#                                        <i class="fas fa-ellipsis-h"></i>#}
+                                {#                                    </button>#}
+                                {#                                    <div class="dropdown-menu dropdown-menu-right">#}
+                                {#                                        <a class="dropdown-item" href="#">Action</a>#}
+                                {#                                        <a class="dropdown-item" href="#">Another action</a>#}
+                                {#                                        <a class="dropdown-item" href="#">Something else here</a>#}
+                                {#                                    </div>#}
+                                {#                                </div>#}
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-white">Total bills: {{ received }}</span>
+                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3">
-                    <div class="card bg-gradient-danger border-0 mb-3">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card bg-gradient-red border-0">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-8">
+                                <div class="col">
                                     <h5 class="card-title text-uppercase text-muted mb-0 text-white">Paid</h5>
-                                    <span class="h2 font-weight-bold mb-0 text-white">
-                                        {% if paid_value == 0 %}{{ currency_symbol }}0{% else %}
-                                            {{ paid_value }}{% endif %}
-                                    </span>
-                                </div>
-                                <div class="col-4">
-                                    <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
-                                        <i class="fas fa-arrow-alt-circle-down"></i>
-                                    </div>
+                                    <span class="h2 font-weight-bold mb-0 text-white">{% if paid_value == 0 %}
+                                        {{ currency_symbol }}0.0{% endif %}{{ paid_value }} / {% if to_pay_value == 0 %}
+                                        {{ currency_symbol }}0.0{% endif %}{{ to_pay_value }}</span>
+                                    {#                                    <div class="progress progress-xs mt-3 mb-0">#}
+                                    {#                                        <div class="progress-bar bg-success" role="progressbar"#}
+                                    {#                                             aria-valuenow="{{ paid_percentage }}"#}
+                                    {#                                             aria-valuemin="0" aria-valuemax="100"#}
+                                    {#                                             style="width: {{ paid_percentage }}%;"></div>#}
+                                    {#                                    </div>#}
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-white">Total bills: {{ paid }}</span>
+                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3">
-                    <div class="card bg-gradient-info border-0 mb-3">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card bg-gradient-info border-0">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-8">
+                                <div class="col">
                                     <h5 class="card-title text-uppercase text-muted mb-0 text-white">Pending</h5>
-                                    <span class="h2 font-weight-bold mb-0 text-white">
-                                        {% if pending_value == 0 %}{{ currency_symbol }}0{% else %}
-                                            {{ pending_value }}{% endif %}
-                                    </span>
-                                </div>
-                                <div class="col-4">
-                                    <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
-                                        <i class="fas fa-hourglass-half"></i>
-                                    </div>
+                                    <span class="h2 font-weight-bold mb-0 text-white"><i
+                                            class="fas fa-arrow-up mr-1"></i>{% if to_receive_pending_value == 0 %}
+                                        {{ currency_symbol }}0.0{% endif %}{{ to_receive_pending_value }}<i
+                                            class="fas fa-arrow-down ml-2 mr-1"></i>{% if to_pay_pending_value == 0 %}
+                                        {{ currency_symbol }}0.0{% endif %}{{ to_pay_pending_value }}</span>
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-white">Total bills: {{ pending }}</span>
+                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3">
+                <div class="col-xl-3 col-md-6">
                     <div class="card bg-gradient-default border-0">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-8">
+                                <div class="col">
                                     <h5 class="card-title text-uppercase text-muted mb-0 text-white">Late</h5>
-                                    <span class="h2 font-weight-bold mb-0 text-white">
-                                        {% if late_value == 0 %}{{ currency_symbol }}0{% else %}
-                                            {{ late_value }}{% endif %}
-                                    </span>
-                                </div>
-                                <div class="col-4">
-                                    <div class="icon icon-shape bg-white text-dark rounded-circle shadow">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                    </div>
+                                    <span class="h2 font-weight-bold mb-0 text-white"><i
+                                            class="fas fa-arrow-up mr-1"></i>{% if to_receive_late_value == 0 %}
+                                        {{ currency_symbol }}0.0{% endif %}{{ to_receive_late_value }}<i
+                                            class="fas fa-arrow-down ml-2 mr-1"></i>{% if to_pay_late_value == 0 %}
+                                        {{ currency_symbol }}0.0{% endif %}{{ to_pay_late_value }}</span>
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-white">Total bills: {{ late }}</span>
+                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>
                             </p>
                         </div>
                     </div>
@@ -143,11 +147,46 @@
                                         class="btn btn-sm {% if sorted_by is None %}btn-neutral{% else %}btn-primary{% endif %}"
                                         data-toggle="modal"
                                         data-target="#sortModal">
-                                    <i class="fas fa-sort"></i>
+                                    {% if sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down"></i>{% elif sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up"></i>{% endif %}{% if sorted_by is not None %}
+                                    <span>{% if sorted_by == 'due_date' %}Date{% else %}
+                                        {{ sorted_by|capfirst }}{% endif %}</span>{% else %}
+                                    <i class="fas fa-sort"></i>{% endif %}
                                 </button>
-                                <button type="button" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                <button type="button"
+                                        class="btn btn-sm {% if filters is None %}btn-neutral{% else %}btn-primary{% endif %}"
+                                        data-toggle="modal"
                                         data-target="#filterModal">
                                     <i class="fas fa-filter"></i>
+                                    {% if filters is not None %}
+                                        {% load filters %}
+                                        {% with filters_list=filters|split:'&' %}
+                                            {% for filter_item in filters_list %}
+                                                {% if 'office=' in filter_item %}
+                                                    <span>Office</span>
+                                                {% elif 'from=' in filter_item %}
+                                                    <span>{% if not filters|first_filter:'due_date' %} | {% endif %}Date</span>
+                                                {% elif 'method=' in filter_item %}
+                                                    <span>{% if not filters|first_filter:'method' %} | {% endif %}Method</span>
+                                                {% elif 'client=' in filter_item %}
+                                                    <span>{% if not filters|first_filter:'client' %} | {% endif %}Client</span>
+                                                {% elif 'category=' in filter_item %}
+                                                    <span>{% if not filters|first_filter:'category' %} | {% endif %}Category</span>
+                                                {% elif 'value_min=' in filter_item %}
+                                                    <span>{% if not filters|first_filter:'value' %} | {% endif %}Value</span>
+                                                {% elif 'value_max=' in filter_item and filters|unique:'value' %}
+                                                    <span>{% if not filters|first_filter:'value' %} | {% endif %}Value</span>
+                                                {% elif 'late=' in filter_item %}
+                                                    <span>{% if not filters|first_filter:'late' %} | {% endif %}Late:Off</span>
+                                                {% elif 'paid=' in filter_item %}
+                                                    <span>{% if not filters|first_filter:'paid' %} | {% endif %}Paid:Off</span>
+                                                {% elif 'pending=' in filter_item %}
+                                                    <span>{% if not filters|first_filter:'pending' %} | {% endif %}Pending:Off</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endwith %}
+                                    {% endif %}
                                 </button>
                                 <button type="button" class="btn btn-sm btn-neutral" data-toggle="modal"
                                         data-target="#newBillModal">
@@ -161,14 +200,35 @@
                                style="min-height: 45rem">
                             <thead class="thead-light">
                             <tr>
-                                <th scope="col" style="width:15%"><span class="ml-4 pl-1">Name</span></th>
-                                <th scope="col" style="width:15%">Local</th>
-                                <th scope="col" style="width:15%">Client</th>
-                                <th scope="col" style="width:15%">Category</th>
-                                <th scope="col" style="width:10%">Method</th>
-                                <th scope="col" style="width:10%">Value</th>
-                                <th scope="col" style="width:10%">Date</th>
-                                <th scope="col" style="width:10%">Status</th>
+                                <th scope="col" style="width:20%"><span class="ml-4 pl-1">Title</span>
+                                    {% if sorted_by == 'title' and sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down ml-1"></i>{% elif sorted_by == 'title' and sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up ml-1"></i>{% endif %}</th>
+                                <th scope="col" style="width:15%">Office
+                                    {% if sorted_by == 'office' and sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down ml-1"></i>{% elif sorted_by == 'office' and sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up ml-1"></i>{% endif %}</th>
+                                <th scope="col" style="width:15%">Client
+                                    {% if sorted_by == 'client' and sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down ml-1"></i>{% elif sorted_by == 'client' and sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up ml-1"></i>{% endif %}</th>
+                                <th scope="col" style="width:15%">Category
+                                    {% if sorted_by == 'category' and sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down ml-1"></i>{% elif sorted_by == 'category' and sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up ml-1"></i>{% endif %}</th>
+                                <th scope="col" style="width:10%">Method
+                                    {% if sorted_by == 'method' and sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down ml-1"></i>{% elif sorted_by == 'method' and sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up ml-1"></i>{% endif %}</th>
+                                <th scope="col" style="width:10%">Value
+                                    {% if sorted_by == 'value' and sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down ml-1"></i>{% elif sorted_by == 'value' and sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up ml-1"></i>{% endif %}</th>
+                                <th scope="col" style="width:10%">Date
+                                    {% if sorted_by == 'due_date' and sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down ml-1"></i>{% elif sorted_by == 'due_date' and sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up ml-1"></i>{% endif %}</th>
+                                <th scope="col" style="width:5%">Status</th>
                                 <th scope="col" style="width: 0"></th>
                             </tr>
                             </thead>
@@ -176,53 +236,51 @@
                             {% for bill in bills %}
                                 <tr>
                                     <th scope="row">
-                                        {% if bill in bills_to_pay %}
-                                            <i class="fas fa-arrow-down text-danger mr-3"></i>{{ bill.title }}
+                                        {% if bill.income %}
+                                            <i class="fas fa-arrow-up text-success mr-3"></i>
+                                            {{ bill.title|truncatechars:25 }}
                                         {% else %}
-                                            <i class="fas fa-arrow-up text-success mr-3"></i>{{ bill.title }}
+                                            <i class="fas fa-arrow-down text-danger mr-3"></i>
+                                            {{ bill.title|truncatechars:25 }}
                                         {% endif %}
                                     </th>
                                     <td>
-                                        {{ bill.office.name }}
-                                    </td>
-                                    <td>
-                                        {% if bill in bills_to_receive %}
-                                            {{ bill.client.name }}
-                                        {% else %}
+                                        {% if bill.office is None %}
                                             N/A
+                                        {% else %}
+                                            {{ bill.office.name|truncatechars:25 }}
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if bill in bills_to_receive %}
-                                            {{ bill.category }}
+                                        {% if bill.client is None %}
+                                            N/A
                                         {% else %}
-                                            {{ bill.subcategory }}
+                                            {{ bill.client.name|truncatechars:25 }}
                                         {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ bill.category }}
                                     </td>
                                     <td>
                                         {{ bill.method }}
                                     </td>
                                     <td>
-                                        {% if bill in bills_to_pay %}
-                                            {{ bill.value }}
-                                        {% else %}
-                                            {{ bill.total }}
-                                        {% endif %}
+                                        {{ bill.total }}
                                     </td>
                                     <td>
-                                        {{ bill.due_date }}
+                                        {{ bill.due_date|date:'d/m/Y' }}
                                     </td>
                                     <td>
                                         <span class="badge badge-dot mr-4">
                                             {% if bill.paid %}
                                                 <i class="bg-success"></i>
                                                 <span class="status">paid</span>
-                                            {% elif not bill.paid and bill.due_date >= date_now %}
-                                                <i class="bg-info"></i>
-                                                <span class="status">pending</span>
-                                            {% else %}
+                                            {% elif bill.late %}
                                                 <i class="bg-danger"></i>
                                                 <span class="status">late</span>
+                                            {% else %}
+                                                <i class="bg-info"></i>
+                                                <span class="status">pending</span>
                                             {% endif %}
 
                                         </span>
@@ -242,19 +300,19 @@
                                                 {% if bill.paid %}
                                                     <a class="dropdown-item text-warning" href="" data-dismiss="modal"
                                                        data-toggle="modal"
-                                                       data-target="#paidConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}">
+                                                       data-target="#paidConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}">
                                                         Set as pending
                                                     </a>
                                                 {% else %}
                                                     <a class="dropdown-item text-success" href="" data-dismiss="modal"
                                                        data-toggle="modal"
-                                                       data-target="#paidConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}">
+                                                       data-target="#paidConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}">
                                                         Set as paid
                                                     </a>
                                                 {% endif %}
                                                 <a class="dropdown-item text-danger" href="" data-dismiss="modal"
                                                    data-toggle="modal"
-                                                   data-target="#deleteConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}">
+                                                   data-target="#deleteConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}">
                                                     Delete
                                                 </a>
                                             </div>
@@ -262,7 +320,7 @@
                                     </td>
                                 </tr>
                                 <div class="modal fade"
-                                     id="deleteConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}"
+                                     id="deleteConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}"
                                      tabindex="-1"
                                      role="dialog" aria-labelledby="deleteConfirmLabel{{ bill.id }}"
                                      aria-hidden="true">
@@ -291,11 +349,14 @@
                                                     {% if bill in bills_to_receive %}
                                                         <form method="post"
                                                               id="deleteConfirmFormIncome{{ bill.id }}"
-                                                              action="{% url 'delete_bill' 'income' bill.id 'balance_bills' %}">
+                                                              action="{% url 'delete_bill' bill.id %}">
                                                             {% csrf_token %}
+                                                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                                                            <input type="hidden" value="{{ filters }}" name="filters">
                                                         </form>
                                                         <div class="form-group form-control-label mb-3">
-                                                            <label for="name">Name</label>
+                                                            <label for="name">Title</label>
                                                             <input class="form-control" id="name"
                                                                    name="bill_name"
                                                                    value="{{ bill.title }}" disabled>
@@ -357,11 +418,14 @@
                                                     {% else %}
                                                         <form method="post"
                                                               id="deleteConfirmFormExpense{{ bill.id }}"
-                                                              action="{% url 'delete_bill' 'expense' bill.id 'balance_bills' %}">
+                                                              action="{% url 'delete_bill' bill.id %}">
                                                             {% csrf_token %}
+                                                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                                                            <input type="hidden" value="{{ filters }}" name="filters">
                                                         </form>
                                                         <div class="form-group form-control-label mb-3">
-                                                            <label for="name">Name</label>
+                                                            <label for="name">Title</label>
                                                             <input class="form-control" id="name"
                                                                    name="bill_name"
                                                                    value="{{ bill.title }}" disabled>
@@ -419,7 +483,7 @@
                                                 <button type="button" class="btn btn-secondary"
                                                         data-dismiss="modal">Cancel
                                                 </button>
-                                                {% if bill in bills_to_receive %}
+                                                {% if bill.income %}
                                                     <button type="submit" class="btn btn-danger"
                                                             form="deleteConfirmFormIncome{{ bill.id }}">
                                                         Delete
@@ -435,7 +499,7 @@
                                     </div>
                                 </div>
                                 <div class="modal fade"
-                                     id="paidConfirm{% if bill in bills_to_receive %}Income{% else %}Expense{% endif %}{{ bill.id }}"
+                                     id="paidConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}"
                                      tabindex="-1"
                                      role="dialog" aria-labelledby="paidConfirmLabel{{ bill.id }}"
                                      aria-hidden="true">
@@ -461,14 +525,17 @@
                                                     bill?
                                                     <br>
                                                     This action can be undone on bills page.
-                                                    {% if bill in bills_to_receive %}
+                                                    {% if bill.income %}
                                                         <form method="post"
                                                               id="paidConfirmFormIncome{{ bill.id }}"
-                                                              action="{% url 'change_bill_status' 'income' bill.id 'balance_bills' %}">
+                                                              action="{% url 'change_bill_status' bill.id %}">
                                                             {% csrf_token %}
+                                                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                                                            <input type="hidden" value="{{ filters }}" name="filters">
                                                         </form>
                                                         <div class="form-group form-control-label mb-3">
-                                                            <label for="name">Name</label>
+                                                            <label for="name">Title</label>
                                                             <input class="form-control" id="name"
                                                                    name="bill_name"
                                                                    value="{{ bill.title }}" disabled>
@@ -508,11 +575,14 @@
                                                     {% else %}
                                                         <form method="post"
                                                               id="paidConfirmFormExpense{{ bill.id }}"
-                                                              action="{% url 'change_bill_status' 'expense' bill.id 'balance_page' %}">
+                                                              action="{% url 'change_bill_status' bill.id %}">
                                                             {% csrf_token %}
+                                                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                                                            <input type="hidden" value="{{ filters }}" name="filters">
                                                         </form>
                                                         <div class="form-group form-control-label mb-3">
-                                                            <label for="name">Name</label>
+                                                            <label for="name">Title</label>
                                                             <input class="form-control" id="name"
                                                                    name="bill_name"
                                                                    value="{{ bill.title }}" disabled>
@@ -684,9 +754,13 @@
                               enctype="multipart/form-data"
                               onsubmit=blockSubmit(event,'submitReceiveButton')>
                             {% csrf_token %}
+                            <input type="hidden" name="income" value="true">
+                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                            <input type="hidden" value="{{ filters }}" name="filters">
                             <div class="row">
                                 <div class="col-6 form-group form-control-label mb-3">
-                                    <label for="name">Name</label>
+                                    <label for="name">Title</label>
                                     <input class="form-control" id="name" name="title">
                                 </div>
                                 <div class="col-6 form-group form-control-label mb-3">
@@ -705,7 +779,7 @@
                                 <div class="col-6 form-group form-control-label mb-3">
                                     <label for="beneficiary">Local</label>
                                     <select class="form-control" id="beneficiary" name="office_id">
-                                        <option value=""></option>
+                                        <option value="">N/A</option>
                                         {% for office in offices %}
                                             <option value="{{ office.id }}">{{ office.name }}</option>
                                         {% endfor %}
@@ -714,7 +788,7 @@
                                 <div class="col-6 form-group form-control-label mb-3">
                                     <label for="client">Client</label>
                                     <select class="form-control" id="client" name="client_id">
-                                        <option value=""></option>
+                                        <option value="">N/A</option>
                                         {% for client in clients %}
                                             <option value="{{ client.id }}">{{ client.name|truncatechars:25 }}</option>
                                         {% endfor %}
@@ -758,12 +832,13 @@
                                            name="due_date" placeholder=""
                                            onchange="unblockSubmit(event,'submitReceiveButton')">
                                 </div>
-                                <div class="col form-group form-control-label mb-3" style="flex: 0 0 20%; max-width: 20%">
+                                <div class="col form-group form-control-label mb-3"
+                                     style="flex: 0 0 20%; max-width: 20%">
                                     <label for="currency">Currency</label>
                                     <select class="form-control" id="currency" name="currency">
                                         <option value="BRL">BRL</option>
-{#                                        <option value="USD">USD</option>#}
-{#                                        <option value="EUR">EUR</option>#}
+                                        {#<option value="USD">USD</option>#}
+                                        {#<option value="EUR">EUR</option>#}
                                     </select>
                                 </div>
                             </div>
@@ -818,19 +893,15 @@
                         <form id="newBillPayForm" method="post" action="{% url 'new_bill' %}"
                               enctype="multipart/form-data" onsubmit=blockSubmit(event,'submitBillPayButton')>
                             {% csrf_token %}
-                            <div class="form-group form-control-label mb-3">
-                                <label for="title">Name</label>
-                                <input type="text" class="form-control" id="title" name="bill_name">
-                            </div>
-                            <div class="form-group form-control-label mb-3">
-                                <label for="local">Local</label>
-                                <select class="form-control" id="local" name="office_id">
-                                    {% for office in offices %}
-                                        <option value="{{ office.id }}">{{ office.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                            <input type="hidden" name="income" value="false">
+                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                            <input type="hidden" value="{{ filters }}" name="filters">
                             <div class="row">
+                                <div class="col form-group form-control-label mb-3">
+                                    <label for="title">Title</label>
+                                    <input type="text" class="form-control" id="title" name="title">
+                                </div>
                                 <div class="col form-group form-control-label mb-3">
                                     <label for="category">Category</label>
                                     <select class="form-control" id="category" name="category">
@@ -877,7 +948,25 @@
                                         </optgroup>
                                     </select>
                                 </div>
+                            </div>
+                            <div class="row">
+                                <div class="col form-group form-control-label mb-3">
+                                    <label for="local">Local</label>
+                                    <select class="form-control" id="local" name="office_id">
+                                        {% for office in offices %}
+                                            <option value="{{ office.id }}">{{ office.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                                 <div class="col form-group form-control-label">
+                                    <label for="billPayValueInput">Value</label>
+                                    <input inputmode="decimal" class="form-control"
+                                           id="billPayValueInput"
+                                           name="total" placeholder="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
                                     <label for="billMethodInput">Method</label>
                                     <select class="form-control" id="billMethodInput" name="method">
                                         <option value="bank-slip">Bank slip</option>
@@ -886,20 +975,21 @@
                                         <option value="credit-card">Credit card</option>
                                     </select>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col form-group form-control-label">
-                                    <label for="billPayValueInput">Value</label>
-                                    <input inputmode="decimal" class="form-control"
-                                           id="billPayValueInput"
-                                           name="total" placeholder="">
-                                </div>
-                                <div class="col form-group form-control-label">
+                                <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
                                     <label for="billPayDateInput">Due date</label>
                                     <input type="date" class="form-control"
                                            id="billPayDateInput"
                                            name="due_date" placeholder=""
                                            onchange="unblockSubmit(event,'submitBillPayButton')">
+                                </div>
+                                <div class="col form-group form-control-label mb-3"
+                                     style="flex: 0 0 20%; max-width: 20%">
+                                    <label for="currency">Currency</label>
+                                    <select class="form-control" id="currency" name="currency">
+                                        <option value="BRL">BRL</option>
+                                        {#<option value="USD">USD</option>#}
+                                        {#<option value="EUR">EUR</option>#}
+                                    </select>
                                 </div>
                             </div>
                             <hr style="margin-bottom: 2rem; margin-top: 1rem">
@@ -943,14 +1033,17 @@
                     </button>
                 </div>
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="filterForm" method="post" action="">
+                    <form id="filterForm" method="post" action="{% url 'filter_bills' %}">
                         {% csrf_token %}
+                        <input type="hidden" name="sort_by" value="{{ sorted_by }}">
+                        <input type="hidden" name="sort_type" value="{{ sort_type }}">
                         <div class="form-group form-control-label">
-                            <label for="officeFilter">Local</label>
+                            <label for="officeFilter">Office</label>
                             <select class="form-control" id="officeFilter" name="office">
                                 <option value="all">All</option>
                                 {% for office in offices %}
-                                    <option value="{{ office.id }}">{{ office.name }}</option>
+                                    <option value="{{ office.id }}"
+                                            {% if filters|extract_from_key:'office' == office.id %}selected{% endif %}>{{ office.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -960,25 +1053,46 @@
                                 <input type="date" class="form-control"
                                        id="startDateFilter"
                                        name="start_date"
-                                       value="{{ date_now|date:'Y-m-d' }}">
+                                       value="{% if 'from=' in filters %}{{ filters|extract_from_key:'from' }}{% else %}{{ date_now|date:'Y-m-d' }}{% endif %}">
                             </div>
                             <div class="col form-group form-control-label">
                                 <label for="endDateFilter">To</label>
                                 <input type="date" class="form-control"
                                        id="endDateFilter"
                                        name="end_date"
-                                       value="{{ date_now|date:'Y-m-d' }}">
+                                       value="{% if 'to=' in filters %}{{ filters|extract_from_key:'to' }}{% else %}{{ date_now|date:'Y-m-d' }}{% endif %}">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col form-group form-control-label">
                                 <label for="methodFilter">Method</label>
                                 <select class="form-control" id="methodFilter" name="method">
-                                    <option value="all">All</option>
-                                    <option value="bank-slip">Bank slip</option>
-                                    <option value="pix">Pix</option>
-                                    <option value="transfer">Transfer</option>
-                                    <option value="credit-card">Credit card</option>
+                                    {% if 'method=' in filters %}
+                                        {% with method_from_filter=filters|extract_from_key:'method' %}
+                                            <option value="all">All</option>
+                                            <option value="bank-slip"
+                                                    {% if method_from_filter == 'bank-slip' %}selected{% endif %}>Bank
+                                                slip
+                                            </option>
+                                            <option value="pix" {% if method_from_filter == 'pix' %}selected{% endif %}>
+                                                Pix
+                                            </option>
+                                            <option value="transfer"
+                                                    {% if method_from_filter == 'transfer' %}selected{% endif %}>
+                                                Transfer
+                                            </option>
+                                            <option value="credit-card"
+                                                    {% if method_from_filter == 'credit-card' %}selected{% endif %}>
+                                                Credit card
+                                            </option>
+                                        {% endwith %}
+                                    {% else %}
+                                        <option value="all">All</option>
+                                        <option value="bank-slip">Bank slip</option>
+                                        <option value="pix">Pix</option>
+                                        <option value="transfer">Transfer</option>
+                                        <option value="credit-card">Credit card</option>
+                                    {% endif %}
                                 </select>
                             </div>
                             <div class="col form-group form-control-label">
@@ -986,63 +1100,64 @@
                                 <select class="form-control" id="clientFilter" name="client">
                                     <option value="all">All</option>
                                     {% for client in clients %}
-                                        <option value="{{ client.id }}">{{ client.name }}</option>
+                                        <option value="{{ client.id }}"
+                                                {% if filters|extract_from_key:'client' == client.id %}selected{% endif %}>{{ client.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="col form-group form-control-label">
                                 <label for="categoryFilter">Category</label>
-                                <select class="form-control" id="categoryFilter">
+                                <select class="form-control" id="categoryFilter" name="category" aria-selected="income">
                                     <option value="all">All</option>
-                                    <option value="income">Income</option>
-                                    <option value="expense">Expense</option>
+                                    <option value="income" {% if filters|extract_from_key:'category' == 'income' %}selected{% endif %}>Income</option>
+                                    <option value="expense" {% if filters|extract_from_key:'category' == 'expense' %}selected{% endif %}>Expense</option>
                                     <optgroup label="Income subcategories">
-                                        <option value="int-earn">Interest earned</option>
-                                        <option value="cap-pay">Capital payment</option>
-                                        <option value="inc-inv">Income from investments</option>
-                                        <option value="sales">Sales</option>
-                                        <option value="eq-sales">Equipment sales</option>
+                                        <option value="int-earn" {% if filters|extract_from_key:'category' == 'int-earn' %}selected{% endif %}>Interest earned</option>
+                                        <option value="cap-pay" {% if filters|extract_from_key:'category' == 'cap-pay' %}selected{% endif %}>Capital payment</option>
+                                        <option value="inc-inv" {% if filters|extract_from_key:'category' == 'inc-inv' %}selected{% endif %}>Income from investments</option>
+                                        <option value="sales" {% if filters|extract_from_key:'category' == 'sales' %}selected{% endif %}>Sales</option>
+                                        <option value="eq-sales" {% if filters|extract_from_key:'category' == 'eq-sales' %}selected{% endif %}>Equipment sales</option>
                                     </optgroup>
                                     <optgroup label="Bank expenses">
-                                        <option value="bank-fees">Bank fees</option>
+                                        <option value="bank-fees" {% if filters|extract_from_key:'category' == 'bank-fees' %}selected{% endif %}>Bank fees</option>
                                     </optgroup>
                                     <optgroup label="Financial expenses">
-                                        <option value="loan-interest">Loan interest</option>
-                                        <option value="fines-for-late-payment">Fines for late payment</option>
-                                        <option value="IOF/IR-on-applications">IOF/IR on applications</option>
+                                        <option value="loan-interest" {% if filters|extract_from_key:'category' == 'loan-interest' %}selected{% endif %}>Loan interest</option>
+                                        <option value="fines-for-late-payment" {% if filters|extract_from_key:'category' == 'fines-for-late-payment' %}selected{% endif %}>Fines for late payment</option>
+                                        <option value="IOF/IR-on-applications" {% if filters|extract_from_key:'category' == 'IOF-IR-on-applications' %}selected{% endif %}>IOF/IR on applications</option>
                                     </optgroup>
                                     <optgroup label="Maintenance expenses">
-                                        <option value="equipments">Equipments</option>
-                                        <option value="cleaning-and-hygiene">Cleaning and hygiene</option>
-                                        <option value="repairs-and-work">Repairs and work</option>
-                                        <option value="utensils">Utensils</option>
+                                        <option value="equipments" {% if filters|extract_from_key:'category' == 'equipments' %}selected{% endif %}>Equipments</option>
+                                        <option value="cleaning-and-hygiene" {% if filters|extract_from_key:'category' == 'cleaning-and-hygiene' %}selected{% endif %}>Cleaning and hygiene</option>
+                                        <option value="repairs-and-work" {% if filters|extract_from_key:'category' == 'repairs-and-work' %}selected{% endif %}>Repairs and work</option>
+                                        <option value="utensils" {% if filters|extract_from_key:'category' == 'utensils' %}selected{% endif %}>Utensils</option>
                                     </optgroup>
                                     <optgroup label="Public fees expenses">
-                                        <option value="IPTU">IPTU</option>
-                                        <option value="state-tax">State tax</option>
-                                        <option value="municipal-tax">Municipal tax</option>
-                                        <option value="city-hall-fees">City hall fees</option>
-                                        <option value="employers'-union">Employers' union</option>
-                                        <option value="business-license">Business license</option>
+                                        <option value="IPTU" {% if filters|extract_from_key:'category' == 'IPTU' %}selected{% endif %}>IPTU</option>
+                                        <option value="state-tax" {% if filters|extract_from_key:'category' == 'state-tax' %}selected{% endif %}>State tax</option>
+                                        <option value="municipal-tax" {% if filters|extract_from_key:'category' == 'municipal-tax' %}selected{% endif %}>Municipal tax</option>
+                                        <option value="city-hall-fees" {% if filters|extract_from_key:'category' == 'city-hall-fees' %}selected{% endif %}>City hall fees</option>
+                                        <option value="employers'-union" {% if filters|extract_from_key:'category' == 'employers-union' %}selected{% endif %}>Employers' union</option>
+                                        <option value="business-license" {% if filters|extract_from_key:'category' == 'business-license' %}selected{% endif %}>Business license</option>
                                     </optgroup>
                                     <optgroup label="Staff expenses">
-                                        <option value="food">Food</option>
-                                        <option value="INSS">INSS</option>
-                                        <option value="occupational-medicine">Occupational medicine</option>
-                                        <option value="training">Training</option>
-                                        <option value="EPI">Individual protection equipment</option>
-                                        <option value="uniforms">Uniforms</option>
-                                        <option value="transportation">Transportation</option>
-                                        <option value="bonus">Bonus</option>
-                                        <option value="confraternization">Confraternization</option>
-                                        <option value="FGTS">FGTS</option>
-                                        <option value="union-contribution">Union contribution</option>
-                                        <option value="salary">Salary</option>
+                                        <option value="food" {% if filters|extract_from_key:'category' == 'food' %}selected{% endif %}>Food</option>
+                                        <option value="INSS" {% if filters|extract_from_key:'category' == 'INSS' %}selected{% endif %}>INSS</option>
+                                        <option value="occupational-medicine" {% if filters|extract_from_key:'category' == 'occupational-medicine' %}selected{% endif %}>Occupational medicine</option>
+                                        <option value="training" {% if filters|extract_from_key:'category' == 'training' %}selected{% endif %}>Training</option>
+                                        <option value="EPI" {% if filters|extract_from_key:'category' == 'EPI' %}selected{% endif %}>Individual protection equipment</option>
+                                        <option value="uniforms" {% if filters|extract_from_key:'category' == 'uniforms' %}selected{% endif %}>Uniforms</option>
+                                        <option value="transportation" {% if filters|extract_from_key:'category' == 'transportation' %}selected{% endif %}>Transportation</option>
+                                        <option value="bonus" {% if filters|extract_from_key:'category' == 'bonus' %}selected{% endif %}>Bonus</option>
+                                        <option value="confraternization" {% if filters|extract_from_key:'category' == 'confraternization' %}selected{% endif %}>Confraternization</option>
+                                        <option value="FGTS" {% if filters|extract_from_key:'category' == 'FGTS' %}selected{% endif %}>FGTS</option>
+                                        <option value="union-contribution" {% if filters|extract_from_key:'category' == 'union-contribution' %}selected{% endif %}>Union contribution</option>
+                                        <option value="salary" {% if filters|extract_from_key:'category' == 'salary' %}selected{% endif %}>Salary</option>
                                     </optgroup>
                                     <optgroup label="Taxes expenses">
-                                        <option value="CSLL">CSLL</option>
-                                        <option value="cofins">COFINS</option>
-                                        <option value="simples-nacional">Simples Nacional</option>
+                                        <option value="CSLL" {% if filters|extract_from_key:'category' == 'CSLL' %}selected{% endif %}>CSLL</option>
+                                        <option value="cofins" {% if filters|extract_from_key:'category' == 'cofins' %}selected{% endif %}>COFINS</option>
+                                        <option value="simples-nacional" {% if filters|extract_from_key:'category' == 'simples-nacional' %}selected{% endif %}>Simples Nacional</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -1051,34 +1166,35 @@
                         <div class="mt-2 form-group align-items-center" style="display: flex">
                             <label class="mb-0 mr-2" style="font-size: 0.875rem">Late</label>
                             <label class="custom-toggle custom-toggle-danger mr-4">
-                                <input type="checkbox" checked="" name="late_filter">
+                                <input type="checkbox" {% if filters|extract_from_key:'late' == 'false' %}{% else %}checked=""{% endif %} name="late_filter">
                                 <span class="custom-toggle-slider rounded-circle" data-label-off="No"
                                       data-label-on="Yes"></span>
                             </label>
                             <label class="mb-0 mr-2" style="font-size: 0.875rem">Paid</label>
                             <label class="custom-toggle custom-toggle-success mr-4">
-                                <input type="checkbox" checked="" name="paid_filter">
+                                <input type="checkbox" {% if filters|extract_from_key:'paid' == 'false' %}{% else %}checked=""{% endif %} name="paid_filter">
                                 <span class="custom-toggle-slider rounded-circle" data-label-off="No"
                                       data-label-on="Yes"></span>
                             </label>
                             <label class="mb-0 mr-2" style="font-size: 0.875rem">Pending</label>
                             <label class="custom-toggle custom-toggle-info">
-                                <input type="checkbox" checked="" name="pending_filter">
+                                <input type="checkbox" {% if filters|extract_from_key:'pending' == 'false' %}{% else %}checked=""{% endif %} name="pending_filter">
                                 <span class="custom-toggle-slider rounded-circle" data-label-off="No"
                                       data-label-on="Yes"></span>
                             </label>
                         </div>
                         <div class="form-group form-control-label">
                             <label for="valueFilter">Value</label>
-                            <div id="input-slider-range" data-range-value-min="100" data-range-value-max="500">
+                            <div id="input-slider-range" data-range-value-min="{{ min_value }}"
+                                 data-range-value-max="{{ max_value }}">
                             </div>
                             <div class="row">
                                 <div class="col-6">
-                                    <span class="range-slider-value value-low" data-range-value-low="200"
+                                    <span class="range-slider-value value-low" data-range-value-low="{% if 'value_min' in filters %}{{ filters|extract_from_key:'value_min' }}{% else %}{{ min_value }}{% endif %}"
                                           id="input-slider-range-value-low"></span>
                                 </div>
                                 <div class="col-6 text-right">
-                                    <span class="range-slider-value value-high" data-range-value-high="400"
+                                    <span class="range-slider-value value-high" data-range-value-high="{% if 'value_max' in filters %}{{ filters|extract_from_key:'value_max' }}{% else %}{{ max_value }}{% endif %}"
                                           id="input-slider-range-value-high"></span>
                                 </div>
                             </div>
@@ -1086,9 +1202,29 @@
                             <input type="hidden" id="rangeValueHighInput" name="range_value_high">
                         </div>
                     </form>
+                    <form action="{% url 'sort_bills' %}" method="post" id="unfilterForm">
+                    {% csrf_token %}
+                        <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                        {% if sort_type == 'asc' %}
+                            <input type="hidden" value="True" name="asc">
+                        {% elif sort_type == 'desc' %}
+                            <input type="hidden" value="True" name="desc">
+                        {% endif %}
+                    </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Cancel
+                    </button>
+                    {% if filters and sorted_by %}
+                        <button type="submit" class="btn btn-danger" id="filterButton" form="unfilterForm">
+                            Unfilter
+                        </button>
+                    {% elif filters %}
+                        <a href="{% url 'balance_page' %}" class="btn btn-danger">
+                            Unfilter
+                        </a>
+                    {% endif %}
                     <button type="submit" class="btn btn-primary" id="filterButton" form="filterForm">
                         Filter
                     </button>
@@ -1116,24 +1252,24 @@
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                     <form id="sortForm" method="post" action="{% url 'sort_bills' %}">
                         {% csrf_token %}
-                        <label class="form-control-label">Data</label>
+                        <input type="hidden" name="filters" value="{{ filters }}">
+                        <label class="form-control-label" for="sortByModalInput">Data</label>
                         <div class="row">
                             <div class="col-8 form-group form-control-label">
-                                <select class="form-control" id="officeFilter" name="sort_by">
-                                    <option value="">None</option>
+                                <select class="form-control" id="sortByModalInput" name="sort_by" onchange="clearChks(this)">
+                                    <option value=""></option>
                                     <option value="category" {% if sorted_by == 'category' %} selected {% endif %}>
                                         Category
                                     </option>
                                     <option value="client" {% if sorted_by == 'client' %} selected {% endif %}>Client
                                     </option>
-                                    <option value="due_date" {% if sorted_by == 'due_date' %} selected {% endif %}>Due
-                                        date
+                                    <option value="due_date" {% if sorted_by == 'due_date' %} selected {% endif %}>Date
                                     </option>
                                     <option value="office" {% if sorted_by == 'office' %} selected {% endif %}>Local
                                     </option>
                                     <option value="method" {% if sorted_by == 'method' %} selected {% endif %}>Method
                                     </option>
-                                    <option value="title" {% if sorted_by == 'title' %} selected {% endif %}>Name
+                                    <option value="title" {% if sorted_by == 'title' %} selected {% endif %}>Title
                                     </option>
                                     <option value="value" {% if sorted_by == 'value' %} selected {% endif %}>Value
                                     </option>
@@ -1142,7 +1278,7 @@
                             <div class="col-4 form-group align-items-center" style="display: flex">
                                 <div class="custom-control custom-checkbox custom-checkbox-primary mr-4">
                                     <input class="custom-control-input" id="chk-asc" type="checkbox" name="asc"
-                                            {% if sort_type == 'asc' or sort_type is None %} checked {% endif %}
+                                            {% if sort_type == 'asc' %} checked {% endif %}
                                            onclick="changeAscDesc(event)">
                                     <label class="custom-control-label" for="chk-asc">ASC</label>
                                 </div>
@@ -1233,14 +1369,27 @@
             let chkAsc = document.getElementById("chk-asc");
             let chkDesc = document.getElementById("chk-desc");
 
-            if (event.target.id === "chk-asc") {
-                chkDesc.checked = chkDesc.checked === false;
-            } else {
-                chkAsc.checked = chkAsc.checked === false;
+            if (event.target.id === "chk-asc" && chkAsc.checked) {
+                chkDesc.checked = false;
+            } else if (event.target.id === "chk-desc" && chkDesc.checked) {
+                chkAsc.checked = false;
             }
         }
 
         document.getElementById("defaultOpenBillsModal").click();
+
+        function clearChks(selectObject) {
+            let chkAsc = document.getElementById("chk-asc");
+            let chkDesc = document.getElementById("chk-desc");
+            let optionValue = selectObject.value
+
+            if (optionValue === '') {
+                chkAsc.checked = false;
+                chkDesc.checked = false;
+            } else if (chkAsc.checked === false && chkDesc.checked === false) {
+                chkDesc.checked = true;
+            }
+        }
 
     </script>
 
