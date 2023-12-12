@@ -61,9 +61,9 @@
                                 {#                                    </div>#}
                                 {#                                </div>#}
                             </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>
-                            </p>
+{#                            <p class="mt-3 mb-0 text-sm">#}
+{#                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>#}
+{#                            </p>#}
                         </div>
                     </div>
                 </div>
@@ -84,9 +84,6 @@
                                     {#                                    </div>#}
                                 </div>
                             </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -103,9 +100,6 @@
                                         {{ currency_symbol }}0.0{% endif %}{{ to_pay_pending_value }}</span>
                                 </div>
                             </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -122,9 +116,6 @@
                                         {{ currency_symbol }}0.0{% endif %}{{ to_pay_late_value }}</span>
                                 </div>
                             </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -132,7 +123,7 @@
         </div>
     </div>
 
-    <div class="container-fluid mt-2">
+    <div class="container-fluid">
         <div class="row">
             <!-- Bills Card -->
             <div class="col">
@@ -236,13 +227,16 @@
                             {% for bill in bills %}
                                 <tr>
                                     <th scope="row">
-                                        {% if bill.income %}
-                                            <i class="fas fa-arrow-up text-success mr-3"></i>
-                                            {{ bill.title|truncatechars:25 }}
-                                        {% else %}
-                                            <i class="fas fa-arrow-down text-danger mr-3"></i>
-                                            {{ bill.title|truncatechars:25 }}
-                                        {% endif %}
+                                        <a data-toggle="modal" href="" data-dismiss="modal"
+                                           data-target="#detailsBill{% if bill.income %}Income{% else %}Expense{% endif %}Modal{{ bill.id }}">
+                                            <div>
+                                            {% if bill.income %}
+                                                <i class="fas fa-arrow-up text-success mr-3"></i><span class="text-black-50">{{ bill.title|truncatechars:25 }}</span>
+                                            {% else %}
+                                                <i class="fas fa-arrow-down text-danger mr-3"></i><span class="text-black-50">{{ bill.title|truncatechars:25 }}</span>
+                                            {% endif %}
+                                            </div>
+                                        </a>
                                     </th>
                                     <td>
                                         {% if bill.office is None %}
@@ -292,35 +286,458 @@
                                                 <i class="fas fa-ellipsis-v"></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                <a class="dropdown-item"
-                                                   href="">
+                                                <a class="dropdown-item" data-toggle="modal" href="" data-dismiss="modal"
+                                                   data-target="#detailsBill{% if bill.income %}Income{% else %}Expense{% endif %}Modal{{ bill.id }}">
                                                     Open
                                                 </a>
                                                 <div class="dropdown-divider"></div>
                                                 {% if bill.paid %}
                                                     <a class="dropdown-item text-warning" href="" data-dismiss="modal"
                                                        data-toggle="modal"
-                                                       data-target="#paidConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}">
+                                                       data-target="#paidConfirm{{ bill.id }}">
                                                         Set as pending
                                                     </a>
                                                 {% else %}
                                                     <a class="dropdown-item text-success" href="" data-dismiss="modal"
                                                        data-toggle="modal"
-                                                       data-target="#paidConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}">
+                                                       data-target="#paidConfirm{{ bill.id }}">
                                                         Set as paid
                                                     </a>
                                                 {% endif %}
                                                 <a class="dropdown-item text-danger" href="" data-dismiss="modal"
                                                    data-toggle="modal"
-                                                   data-target="#deleteConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}">
+                                                   data-target="#deleteConfirm{{ bill.id }}">
                                                     Delete
                                                 </a>
                                             </div>
                                         </div>
                                     </td>
                                 </tr>
+
+                                <!-- Details Expense Modal -->
+                                <div class="modal fade" id="detailsBillExpenseModal{{ bill.id }}" tabindex="-1" role="dialog"
+                                     aria-labelledby="detailsBillExpenseModal{{ bill.id }}Label" aria-hidden="true">
+                                    <div class="modal-dialog my-6" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2 align-items-center">
+                                                <h5 class="modal-title" style="margin-left: auto">
+                                                    <i class="fas fa-arrow-down text-danger" style="font-size: 1rem"></i>
+                                                </h5>
+                                                <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
+                                                      id="detailsBillExpenseModal{{ bill.id }}Label">{% if bill.title != '' %}{{ bill.title|truncatechars:25 }}{% else %}Bill{% endif %}</span>
+                                                <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                        data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <form id="editBillExpenseForm{{ bill.id }}" method="post" action="{% url 'edit_bill' bill.id %}"
+                                                      enctype="multipart/form-data" onsubmit=blockSubmit(event,'editBillExpenseButton{{ bill.id }}')>
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="income" value="false">
+                                                    <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                    <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                                                    <input type="hidden" value="{{ filters }}" name="filters">
+                                                    <input type="hidden" value="{{ bill.id }}" name="bill_id">
+                                                    <div class="row">
+                                                        <div class="col form-group form-control-label mb-3">
+                                                            <label for="titleDetails">Title</label>
+                                                            <input type="text" class="form-control" id="title" name="titleDetails" value="{{ bill.title }}">
+                                                        </div>
+                                                        <div class="col form-group form-control-label mb-3">
+                                                            <label for="categoryDetails">Category</label>
+                                                            <select class="form-control" id="categoryDetails" name="category">
+                                                                <optgroup label="Bank">
+                                                                    <option value="bank-fees" {% if bill.category == 'Bank fees' %}selected{% endif %}>Bank fees</option>
+                                                                </optgroup>
+                                                                <optgroup label="Financial">
+                                                                    <option value="loan-interest" {% if bill.category == 'Loan interest' %}selected{% endif %}>Loan interest</option>
+                                                                    <option value="fines-for-late-payment" {% if bill.category == 'Fines for late payment' %}selected{% endif %}>Fines for late payment</option>
+                                                                    <option value="IOF/IR-on-applications" {% if bill.category == 'IOF/IR on applications' %}selected{% endif %}>IOF/IR on applications</option>
+                                                                </optgroup>
+                                                                <optgroup label="Maintenance">
+                                                                    <option value="equipments" {% if bill.category == 'Equipments' %}selected{% endif %}>Equipments</option>
+                                                                    <option value="cleaning-and-hygiene" {% if bill.category == 'Cleaning and hygiene' %}selected{% endif %}>Cleaning and hygiene</option>
+                                                                    <option value="repairs-and-work" {% if bill.category == 'Repairs and work' %}selected{% endif %}>Repairs and work</option>
+                                                                    <option value="utensils" {% if bill.category == 'Utensils' %}selected{% endif %}>Utensils</option>
+                                                                </optgroup>
+                                                                <optgroup label="Public fees">
+                                                                    <option value="IPTU" {% if bill.category == 'IPTU' %}selected{% endif %}>IPTU</option>
+                                                                    <option value="state-tax" {% if bill.category == 'State tax' %}selected{% endif %}>State tax</option>
+                                                                    <option value="municipal-tax" {% if bill.category == 'Municipal tax' %}selected{% endif %}>Municipal tax</option>
+                                                                    <option value="city-hall-fees" {% if bill.category == 'City hall fees' %}selected{% endif %}>City hall fees</option>
+                                                                    <option value="employers'-union" {% if bill.category == "Employers' union" %}selected{% endif %}>Employers' union</option>
+                                                                    <option value="business-license" {% if bill.category == 'Business license' %}selected{% endif %}>Business license</option>
+                                                                </optgroup>
+                                                                <optgroup label="Staff">
+                                                                    <option value="food" {% if bill.category == 'Food' %}selected{% endif %}>Food</option>
+                                                                    <option value="INSS" {% if bill.category == 'INSS' %}selected{% endif %}>INSS</option>
+                                                                    <option value="occupational-medicine" {% if bill.category == 'Occupational medicine' %}selected{% endif %}>Occupational medicine</option>
+                                                                    <option value="training" {% if bill.category == 'Training' %}selected{% endif %}>Training</option>
+                                                                    <option value="EPI" {% if bill.category == 'EPI' %}selected{% endif %}>Individual protection equipment</option>
+                                                                    <option value="uniforms" {% if bill.category == 'Uniforms' %}selected{% endif %}>Uniforms</option>
+                                                                    <option value="transportation" {% if bill.category == 'Transportation' %}selected{% endif %}>Transportation</option>
+                                                                    <option value="bonus" {% if bill.category == 'Bonus' %}selected{% endif %}>Bonus</option>
+                                                                    <option value="confraternization" {% if bill.category == 'Confraternization' %}selected{% endif %}>Confraternization</option>
+                                                                    <option value="FGTS" {% if bill.category == 'FGTS' %}selected{% endif %}>FGTS</option>
+                                                                    <option value="union-contribution" {% if bill.category == 'Union contribution' %}selected{% endif %}>Union contribution</option>
+                                                                    <option value="salary" {% if bill.category == 'Salary' %}selected{% endif %}>Salary</option>
+                                                                </optgroup>
+                                                                <optgroup label="Taxes">
+                                                                    <option value="CSLL" {% if bill.category == 'CSLL' %}selected{% endif %}>CSLL</option>
+                                                                    <option value="cofins" {% if bill.category == 'Cofins' %}selected{% endif %}>COFINS</option>
+                                                                    <option value="simples-nacional" {% if bill.category == 'Simples nacional' %}selected{% endif %}>Simples Nacional</option>
+                                                                </optgroup>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col form-group form-control-label mb-3">
+                                                            <label for="localDetails">Local</label>
+                                                            <select class="form-control" id="localDetails" name="office_id">
+                                                                {% for office in offices %}
+                                                                    <option value="{{ office.id }}" {% if bill.office.id == office.id %}selected{% endif %}>{{ office.name }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col form-group form-control-label">
+                                                            <label for="billPayValueInputDetails{{ bill.id }}">Total</label>
+                                                            <input inputmode="decimal" class="form-control"
+                                                                   id="billPayValueInputDetails{{ bill.id }}"
+                                                                   name="total" placeholder="" value="{{ bill.total|without_currency }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
+                                                            <label for="billMethodInputDetails">Method</label>
+                                                            <select class="form-control" id="billMethodInputDetails" name="method">
+                                                                <option value="bank-slip" {% if bill.method == 'Bank slip' %}selected{% endif %}>Bank slip</option>
+                                                                <option value="pix" {% if bill.method == 'Pix' %}selected{% endif %}>Pix</option>
+                                                                <option value="transfer" {% if bill.method == 'Transfer' %}selected{% endif %}>Transfer</option>
+                                                                <option value="credit-card" {% if bill.method == 'Credit card' %}selected{% endif %}>Credit card</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
+                                                            <label for="billPayDateInputDetails">Due date</label>
+                                                            <input type="date" class="form-control"
+                                                                   id="billPayDateInputDetails"
+                                                                   name="due_date" placeholder=""
+                                                                   onchange="unblockSubmit(event,'submitEditBillIncomeButton{{ bill.id }}')"
+                                                                   value="{{ bill.due_date|date:'Y-m-d' }}">
+                                                        </div>
+                                                        <div class="col form-group form-control-label mb-3"
+                                                             style="flex: 0 0 20%; max-width: 20%">
+                                                            <label for="currencyDetails">Currency</label>
+                                                            <select class="form-control" id="currencyDetails" name="currency">
+                                                                <option value="BRL" {% if bill.currency == 'BRL' %}selected{% endif %}>BRL</option>
+                                                                {#<option value="USD">USD</option>#}
+                                                                {#<option value="EUR">EUR</option>#}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <hr style="margin-bottom: 2rem; margin-top: 1rem">
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileInputDetails">{% if bill.proof %}Uploaded proof: {{ bill.proof|file_name_only_with_extension|truncatechars:40 }}{% else %}Attach proof{% endif %}</label>
+                                                        <input type="file" name="proof" class="form-control-file"
+                                                               id="fileInputDetails">
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="aboutDetails">Description</label>
+                                                        <textarea rows="4" class="form-control" id="aboutDetails" name="description"
+                                                                  placeholder="A few words about ...">{{ bill.description }}</textarea>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer pt-1">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary" id="editBillExpenseButton{{ bill.id }}" form="editBillExpenseForm{{ bill.id }}">
+                                                    Save
+                                                </button>
+                                                {% if bill.proof %}
+                                                    <a href="{% url 'download_proof' bill.id %}"
+                                                       class="btn btn-success">Download</a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Details Income Modal -->
+                                <div class="modal fade" id="detailsBillIncomeModal{{ bill.id }}" tabindex="-1" role="dialog"
+                                     aria-labelledby="detailsBillIncomeModal{{ bill.id }}Label" aria-hidden="true">
+                                    <div class="modal-dialog my-6" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2 align-items-center">
+                                                <h5 class="modal-title" style="margin-left: auto">
+                                                    <i class="fas fa-arrow-up text-green" style="font-size: 1rem"></i>
+                                                </h5>
+                                                <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
+                                                      id="detailsBillIncomeModal{{ bill.id }}Label">{% if bill.title != '' %}{{ bill.title|truncatechars:25 }}{% else %}Bill{% endif %}</span>
+                                                <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                        data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <form id="editBillIncomeForm{{ bill.id }}" method="post" action="{% url 'edit_bill' bill.id %}"
+                                                      enctype="multipart/form-data"
+                                                      onsubmit=blockSubmit(event,'submitReceiveButton')>
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="income" value="true">
+                                                    <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                    <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                                                    <input type="hidden" value="{{ filters }}" name="filters">
+                                                    <div class="row">
+                                                        <div class="col-6 form-group form-control-label mb-3">
+                                                            <label for="nameDetails">Title</label>
+                                                            <input class="form-control" id="nameDetails" name="title" value="{{ bill.title }}">
+                                                        </div>
+                                                        <div class="col-6 form-group form-control-label mb-3">
+                                                            <label for="categoryDetails">Category</label>
+                                                            <select class="form-control" id="categoryDetails" name="category">
+                                                                <option value="int-earn" {% if bill.category == 'Interest earned' %}selected{% endif %}>Interest earned</option>
+                                                                <option value="cap-pay" {% if bill.category == 'Capital payment' %}selected{% endif %}>Capital payment</option>
+                                                                <option value="inc-inv" {% if bill.category == 'Income investment' %}selected{% endif %}>Income from investments</option>
+                                                                <option value="sales" {% if bill.category == 'Sales' %}selected{% endif %}>Sales</option>
+                                                                <option value="eq-sales" {% if bill.category == 'Equipament sales' %}selected{% endif %}>Equipment sales</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-6 form-group form-control-label mb-3">
+                                                            <label for="beneficiaryDetails">Local</label>
+                                                            <select class="form-control" id="beneficiaryDetails" name="office_id">
+                                                                <option value="">N/A</option>
+                                                                {% for office in offices %}
+                                                                    <option value="{{ office.id }}" {% if bill.office.id == office.id %}selected{% endif %}>{{ office.name }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-6 form-group form-control-label mb-3">
+                                                            <label for="clientDetails">Client</label>
+                                                            <select class="form-control" id="clientDetails" name="client_id">
+                                                                <option value="">N/A</option>
+                                                                {% for client in clients %}
+                                                                    <option value="{{ client.id }}" {% if bill.client.id == client.id %}selected{% endif %}>{{ client.name|truncatechars:25 }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col form-group form-control-label">
+                                                            <label for="billFeesInputDetails{{ bill.id }}">Fees</label>
+                                                            <input inputmode="decimal" class="form-control"
+                                                                   id="billFeesInputDetails{{ bill.id }}"
+                                                                   name="fees" placeholder="" value="{{ bill.fees|without_currency }}">
+                                                        </div>
+                                                        <div class="col form-group form-control-label">
+                                                            <label for="billDiscountInputDetails{{ bill.id }}">Discount</label>
+                                                            <input inputmode="decimal" class="form-control"
+                                                                   id="billDiscountInputDetails{{ bill.id }}"
+                                                                   name="discount" placeholder="" value="{{ bill.discount|without_currency }}">
+                                                        </div>
+                                                        <div class="col form-group form-control-label">
+                                                            <label for="billReceiveTotalInputDetails{{ bill.id }}">Total</label>
+                                                            <input inputmode="decimal" class="form-control"
+                                                                   id="billReceiveTotalInputDetails{{ bill.id }}"
+                                                                   name="total" placeholder="" value="{{ bill.total|without_currency }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
+                                                            <label for="billMethodInputDetails">Method</label>
+                                                            <select class="form-control" id="billMethodInputDetails" name="method">
+                                                                <option value="bank-slip" {% if bill.method == 'Bank slip' %}selected{% endif %}>Bank slip</option>
+                                                                <option value="pix" {% if bill.method == 'Pix' %}selected{% endif %}>Pix</option>
+                                                                <option value="transfer" {% if bill.method == 'Transfer' %}selected{% endif %}>Transfer</option>
+                                                                <option value="credit-card" {% if bill.method == 'Credit card' %}selected{% endif %}>Credit card</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
+                                                            <label for="billDueDateInputDetails">Due date</label>
+                                                            <input type="date" class="form-control"
+                                                                   id="billDueDateInputDetails"
+                                                                   name="due_date" placeholder=""
+                                                                   onchange="unblockSubmit(event,'editBillIncomeButton{{ bill.id }}')"
+                                                                   value="{{ bill.due_date|date:'Y-m-d' }}" >
+                                                        </div>
+                                                        <div class="col form-group form-control-label mb-3"
+                                                             style="flex: 0 0 20%; max-width: 20%">
+                                                            <label for="currencyDetails">Currency</label>
+                                                            <select class="form-control" id="currencyDetails" name="currency">
+                                                                <option value="BRL" {% if bill.currency == 'BRL' %}selected{% endif %}>BRL</option>
+                                                                {#<option value="USD">USD</option>#}
+                                                                {#<option value="EUR">EUR</option>#}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    {% if bill.installments != 0 %}
+                                                        <div class="mt-2 form-group form-control-label align-items-center" style="display: flex">
+                                                            <label class="mb-0 mr-3">Installments</label>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-3 form-group form-control-label">
+                                                                <label for="billInstallmentsNumberMethodInputDetails">Nº</label>
+                                                                <select class="form-control" id="billInstallmentsNumberMethodInputDetails"
+                                                                        name="installments">
+                                                                    <script>
+                                                                        for (let i = 1; i <= 24; i++) {
+                                                                            if (i == {{ bill.installments }}) {
+                                                                                document.write(`<option value="${i}" selected>${i}x</option>`);
+                                                                            } else {
+                                                                                document.write(`<option value="${i}">${i}x</option>`);
+                                                                            }
+                                                                        }
+                                                                    </script>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="billInstallmentsValueInputDetails{{ bill.id }}">Value</label>
+                                                                <input inputmode="decimal" class="form-control"
+                                                                       id="billInstallmentsValueInputDetails{{ bill.id }}"
+                                                                       name="installments_value" placeholder="" value="{{ bill.installments_value|without_currency }}">
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                    <hr style="margin-bottom: 2rem; margin-top: 1rem">
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileInputDetails">{% if bill.proof %}Uploaded proof: {{ bill.proof|file_name_only_with_extension|truncatechars:40 }}{% else %}Attach proof{% endif %}</label>
+                                                        <input type="file" name="proof" class="form-control-file"
+                                                               id="fileInputDetails">
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="aboutDetails">Description</label>
+                                                        <textarea rows="4" class="form-control" id="aboutDetails" name="description"
+                                                                  placeholder="A few words about ...">{{ bill.description }}</textarea>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer pt-1">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary" id="editBillIncomeButton{{ bill.id }}"
+                                                        form="editBillIncomeForm{{ bill.id }}">
+                                                    Save
+                                                </button>
+                                                {% if bill.proof %}
+                                                    <a href="{% url 'download_proof' bill.id %}"
+                                                       class="btn btn-success">Download</a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Change Status Modal -->
                                 <div class="modal fade"
-                                     id="deleteConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}"
+                                     id="paidConfirm{{ bill.id }}"
+                                     tabindex="-1"
+                                     role="dialog" aria-labelledby="paidConfirmLabel{{ bill.id }}"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog my-6" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2">
+                                                <h5 class="modal-title my-1" style="margin-left: auto">
+                                                    <i class="ni ni-fat-delete text-blue"
+                                                       style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                </h5>
+                                                <span class="ml-3 my-1"
+                                                      style="margin-right: auto; font-size: 1.2rem"
+                                                      id="paidConfirmModalLabel{{ bill.id }}">Are you sure?</span>
+                                                <button type="button" class="close mt--4"
+                                                        style="margin-left: -30px" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body py-0"
+                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <p class="text-center">Are you sure you want to change status of this
+                                                    bill?
+                                                    <br>
+                                                    This action can be undone on bills page.</p>
+                                                <form method="post"
+                                                      id="paidConfirmForm{{ bill.id }}"
+                                                      action="{% url 'change_bill_status' bill.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                    <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                                                    <input type="hidden" value="{{ filters }}" name="filters">
+                                                </form>
+                                                <div class="form-group form-control-label mb-3">
+                                                    <label for="name">Title</label>
+                                                    <input class="form-control" id="name"
+                                                           name="bill_name"
+                                                           value="{{ bill.title }}" disabled>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col form-group form-control-label mb-3">
+                                                        <label for="beneficiary">Office</label>
+                                                        <input class="form-control" id="beneficiary"
+                                                               name="bill_beneficiary"
+                                                               value="{% if bill.office.name %}{{ bill.office.name }}{% else %}N/A{% endif %}" disabled>
+                                                    </div>
+                                                    <div class="col form-group form-control-label mb-3">
+                                                        <label for="category">Category</label>
+                                                        <input class="form-control" id="category"
+                                                               name="bill_category"
+                                                               value="{{ bill.category }}" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col form-group form-control-label">
+                                                        <label for="billTotalInput">Total</label>
+                                                        <input inputmode="decimal"
+                                                               class="form-control"
+                                                               id="billTotalInput"
+                                                               name="bill_total" placeholder=""
+                                                               value="{{ bill.total }}" disabled>
+                                                    </div>
+                                                    <div class="col form-group form-control-label">
+                                                        <label for="billDueDateInput">Due
+                                                            date</label>
+                                                        <input type="date" class="form-control"
+                                                               id="billDueDateInput"
+                                                               name="bill_due_date" placeholder=""
+                                                               value="{{ bill.due_date|date:'Y-m-d' }}"
+                                                               disabled>
+                                                    </div>
+                                                </div>
+                                                {% if bill.proof %}
+                                                    <div class="form-group form-control-label mb-2">
+                                                        <label>Proof: {{ bill.proof|file_name_only_with_extension }}</label>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="form-group form-control-label">
+                                                    <label for="about">Description</label>
+                                                    <textarea rows="4" class="form-control"
+                                                              id="about"
+                                                              name="bill_description"
+                                                              disabled>{{ bill.description }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer pt-1">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Cancel
+                                                </button>
+                                                {% if bill.paid %}
+                                                    <button type="submit" class="btn btn-warning"
+                                                            form="paidConfirmForm{{ bill.id }}">
+                                                        Set as pending
+                                                    </button>
+                                                {% else %}
+                                                    <button type="submit" class="btn btn-success"
+                                                            form="paidConfirmForm{{ bill.id }}">
+                                                        Set as paid
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade"
+                                     id="deleteConfirm{{ bill.id }}"
                                      tabindex="-1"
                                      role="dialog" aria-labelledby="deleteConfirmLabel{{ bill.id }}"
                                      aria-hidden="true">
@@ -346,322 +763,96 @@
                                                     bill?
                                                     <br>
                                                     This action cannot be undone.
-                                                    {% if bill in bills_to_receive %}
-                                                        <form method="post"
-                                                              id="deleteConfirmFormIncome{{ bill.id }}"
-                                                              action="{% url 'delete_bill' bill.id %}">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
-                                                            <input type="hidden" value="{{ filters }}" name="filters">
-                                                        </form>
-                                                        <div class="form-group form-control-label mb-3">
-                                                            <label for="name">Title</label>
-                                                            <input class="form-control" id="name"
-                                                                   name="bill_name"
-                                                                   value="{{ bill.title }}" disabled>
-                                                        </div>
-                                                        <div class="form-group form-control-label mb-3">
-                                                            <label for="beneficiary">Local</label>
-                                                            <input class="form-control" id="beneficiary"
-                                                                   name="bill_beneficiary"
-                                                                   value="{{ bill.office.name }}" disabled>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col form-group form-control-label mb-3">
-                                                                <label for="category">Category</label>
-                                                                <input class="form-control" id="category"
-                                                                       name="bill_category"
-                                                                       value="{{ bill.category }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label mb-3">
-                                                                <label for="client">Client</label>
-                                                                <input class="form-control" id="client"
-                                                                       name="bill_receive_client"
-                                                                       value="{{ bill.client.name }}"
-                                                                       disabled>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billTotalInfo">Total</label>
-                                                                <input inputmode="decimal"
-                                                                       class="form-control"
-                                                                       id="billTotalInfo"
-                                                                       name="bill_total" placeholder=""
-                                                                       value="{{ bill.total }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billMethodInput">Method</label>
-                                                                <input class="form-control"
-                                                                       id="billMethodInput"
-                                                                       name="bill_method"
-                                                                       value="{{ bill.method }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billDueDateInput">Due
-                                                                    date</label>
-                                                                <input type="date" class="form-control"
-                                                                       id="billDueDateInput"
-                                                                       name="bill_due_date" placeholder=""
-                                                                       value="{{ bill.due_date|date:'Y-m-d' }}"
-                                                                       disabled>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group form-control-label">
-                                                            <label for="about">Description</label>
-                                                            <textarea rows="4" class="form-control"
-                                                                      id="about"
-                                                                      name="bill_description"
-                                                                      disabled>{{ bill.description }}</textarea>
-                                                        </div>
-                                                    {% else %}
-                                                        <form method="post"
-                                                              id="deleteConfirmFormExpense{{ bill.id }}"
-                                                              action="{% url 'delete_bill' bill.id %}">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
-                                                            <input type="hidden" value="{{ filters }}" name="filters">
-                                                        </form>
-                                                        <div class="form-group form-control-label mb-3">
-                                                            <label for="name">Title</label>
-                                                            <input class="form-control" id="name"
-                                                                   name="bill_name"
-                                                                   value="{{ bill.title }}" disabled>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col form-group form-control-label mb-3">
-                                                                <label for="beneficiary">Local</label>
-                                                                <input class="form-control" id="beneficiary"
-                                                                       name="bill_beneficiary"
-                                                                       value="{{ bill.office.name }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label mb-3">
-                                                                <label for="category">Category</label>
-                                                                <input class="form-control" id="category"
-                                                                       name="bill_category"
-                                                                       value="{{ bill.subcategory }}" disabled>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billTotalInput">Value</label>
-                                                                <input inputmode="decimal"
-                                                                       class="form-control"
-                                                                       id="billTotalInput"
-                                                                       name="bill_total" placeholder=""
-                                                                       value="{{ bill.value }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billMethodInput">Method</label>
-                                                                <input class="form-control"
-                                                                       id="billMethodInput"
-                                                                       name="bill_method"
-                                                                       value="{{ bill.method }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billDueDateInput">Due
-                                                                    date</label>
-                                                                <input type="date" class="form-control"
-                                                                       id="billDueDateInput"
-                                                                       name="bill_due_date" placeholder=""
-                                                                       value="{{ bill.due_date|date:'Y-m-d' }}"
-                                                                       disabled>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group form-control-label">
-                                                            <label for="about">Description</label>
-                                                            <textarea rows="4" class="form-control"
-                                                                      id="about"
-                                                                      name="bill_description"
-                                                                      disabled>{{ bill.description }}</textarea>
-                                                        </div>
-                                                    {% endif %}
+                                                </p>
+                                                <form method="post"
+                                                      id="deleteConfirmForm{{ bill.id }}"
+                                                      action="{% url 'delete_bill' bill.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                    <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                                                    <input type="hidden" value="{{ filters }}" name="filters">
+                                                </form>
+                                                <div class="row">
+                                                    <div class="col form-group form-control-label mb-3">
+                                                        <label for="name">Title</label>
+                                                        <input class="form-control" id="name"
+                                                               name="bill_name"
+                                                               value="{{ bill.title }}" disabled>
+                                                    </div>
+                                                    <div class="col form-group form-control-label mb-3">
+                                                        <label for="beneficiary">Local</label>
+                                                        <input class="form-control" id="beneficiary"
+                                                               name="bill_beneficiary"
+                                                               value="{% if bill.office.name %}{{ bill.office.name }}{% else %}N/A{% endif %}" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col form-group form-control-label mb-3">
+                                                        <label for="client">Client</label>
+                                                        <input class="form-control" id="client"
+                                                               name="bill_receive_client"
+                                                               value="{% if bill.client.name %}{{ bill.client.name }}{% else %}N/A{% endif %}"
+                                                               disabled>
+                                                    </div>
+                                                    <div class="col form-group form-control-label mb-3">
+                                                        <label for="category">Category</label>
+                                                        <input class="form-control" id="category"
+                                                               name="bill_category"
+                                                               value="{{ bill.category }}" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col form-group form-control-label">
+                                                        <label for="billTotalInfo">Total</label>
+                                                        <input inputmode="decimal"
+                                                               class="form-control"
+                                                               id="billTotalInfo"
+                                                               name="bill_total" placeholder=""
+                                                               value="{{ bill.total }}" disabled>
+                                                    </div>
+                                                    <div class="col form-group form-control-label">
+                                                        <label for="billMethodInput">Method</label>
+                                                        <input class="form-control"
+                                                               id="billMethodInput"
+                                                               name="bill_method"
+                                                               value="{{ bill.method }}" disabled>
+                                                    </div>
+                                                    <div class="col form-group form-control-label">
+                                                        <label for="billDueDateInput">Due
+                                                            date</label>
+                                                        <input type="date" class="form-control"
+                                                               id="billDueDateInput"
+                                                               name="bill_due_date" placeholder=""
+                                                               value="{{ bill.due_date|date:'Y-m-d' }}"
+                                                               disabled>
+                                                    </div>
+                                                </div>
+                                                {% if bill.proof %}
+                                                    <div class="form-group form-control-label mb-2">
+                                                        <label>Proof: {{ bill.proof|file_name_only_with_extension }}</label>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="form-group form-control-label">
+                                                    <label for="about">Description</label>
+                                                    <textarea rows="4" class="form-control"
+                                                              id="about"
+                                                              name="bill_description"
+                                                              disabled>{{ bill.description }}</textarea>
+                                                </div>
                                             </div>
-                                            <div class="modal-footer">
+                                            <div class="modal-footer pt-1">
                                                 <button type="button" class="btn btn-secondary"
                                                         data-dismiss="modal">Cancel
                                                 </button>
-                                                {% if bill.income %}
-                                                    <button type="submit" class="btn btn-danger"
-                                                            form="deleteConfirmFormIncome{{ bill.id }}">
-                                                        Delete
-                                                    </button>
-                                                {% else %}
-                                                    <button type="submit" class="btn btn-danger"
-                                                            form="deleteConfirmFormExpense{{ bill.id }}">
-                                                        Delete
-                                                    </button>
-                                                {% endif %}
+                                                <button type="submit" class="btn btn-danger"
+                                                        form="deleteConfirmForm{{ bill.id }}">
+                                                    Delete
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal fade"
-                                     id="paidConfirm{% if bill.income %}Income{% else %}Expense{% endif %}{{ bill.id }}"
-                                     tabindex="-1"
-                                     role="dialog" aria-labelledby="paidConfirmLabel{{ bill.id }}"
-                                     aria-hidden="true">
-                                    <div class="modal-dialog my-6" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header mt-2">
-                                                <h5 class="modal-title my-1" style="margin-left: auto">
-                                                    <i class="ni ni-fat-delete text-blue"
-                                                       style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                </h5>
-                                                <span class="ml-3 my-1"
-                                                      style="margin-right: auto; font-size: 1.2rem"
-                                                      id="paidConfirmModalLabel{{ bill.id }}">Are you sure?</span>
-                                                <button type="button" class="close mt--4"
-                                                        style="margin-left: -30px" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body py-0"
-                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <p class="text-center">Are you sure you want to change status of this
-                                                    bill?
-                                                    <br>
-                                                    This action can be undone on bills page.
-                                                    {% if bill.income %}
-                                                        <form method="post"
-                                                              id="paidConfirmFormIncome{{ bill.id }}"
-                                                              action="{% url 'change_bill_status' bill.id %}">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
-                                                            <input type="hidden" value="{{ filters }}" name="filters">
-                                                        </form>
-                                                        <div class="form-group form-control-label mb-3">
-                                                            <label for="name">Title</label>
-                                                            <input class="form-control" id="name"
-                                                                   name="bill_name"
-                                                                   value="{{ bill.title }}" disabled>
-                                                        </div>
-                                                        <div class="form-group form-control-label mb-3">
-                                                            <label for="beneficiary">Local</label>
-                                                            <input class="form-control" id="beneficiary"
-                                                                   name="bill_beneficiary"
-                                                                   value="{{ bill.office.name }}" disabled>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billTotalInfo">Total</label>
-                                                                <input inputmode="decimal"
-                                                                       class="form-control"
-                                                                       id="billTotalInfo"
-                                                                       name="bill_total" placeholder=""
-                                                                       value="{{ bill.total }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billDueDateInput">Due
-                                                                    date</label>
-                                                                <input type="date" class="form-control"
-                                                                       id="billDueDateInput"
-                                                                       name="bill_due_date" placeholder=""
-                                                                       value="{{ bill.due_date|date:'Y-m-d' }}"
-                                                                       disabled>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group form-control-label">
-                                                            <label for="about">Description</label>
-                                                            <textarea rows="4" class="form-control"
-                                                                      id="about"
-                                                                      name="bill_description"
-                                                                      disabled>{{ bill.description }}</textarea>
-                                                        </div>
-                                                    {% else %}
-                                                        <form method="post"
-                                                              id="paidConfirmFormExpense{{ bill.id }}"
-                                                              action="{% url 'change_bill_status' bill.id %}">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
-                                                            <input type="hidden" value="{{ filters }}" name="filters">
-                                                        </form>
-                                                        <div class="form-group form-control-label mb-3">
-                                                            <label for="name">Title</label>
-                                                            <input class="form-control" id="name"
-                                                                   name="bill_name"
-                                                                   value="{{ bill.title }}" disabled>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col form-group form-control-label mb-3">
-                                                                <label for="beneficiary">Local</label>
-                                                                <input class="form-control" id="beneficiary"
-                                                                       name="bill_beneficiary"
-                                                                       value="{{ bill.office.name }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label mb-3">
-                                                                <label for="category">Category</label>
-                                                                <input class="form-control" id="category"
-                                                                       name="bill_category"
-                                                                       value="{{ bill.subcategory }}" disabled>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billTotalInput">Value</label>
-                                                                <input inputmode="decimal"
-                                                                       class="form-control"
-                                                                       id="billTotalInput"
-                                                                       name="bill_total" placeholder=""
-                                                                       value="{{ bill.value }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billDueDateInput">Due
-                                                                    date</label>
-                                                                <input type="date" class="form-control"
-                                                                       id="billDueDateInput"
-                                                                       name="bill_due_date" placeholder=""
-                                                                       value="{{ bill.due_date|date:'Y-m-d' }}"
-                                                                       disabled>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group form-control-label">
-                                                            <label for="about">Description</label>
-                                                            <textarea rows="4" class="form-control"
-                                                                      id="about"
-                                                                      name="bill_description"
-                                                                      disabled>{{ bill.description }}</textarea>
-                                                        </div>
-                                                    {% endif %}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                        data-dismiss="modal">Cancel
-                                                </button>
-                                                {% if bill in bills_to_receive %}
-                                                    {% if bill.paid %}
-                                                        <button type="submit" class="btn btn-warning"
-                                                                form="paidConfirmFormIncome{{ bill.id }}">
-                                                            Set as pending
-                                                        </button>
-                                                    {% else %}
-                                                        <button type="submit" class="btn btn-success"
-                                                                form="paidConfirmFormIncome{{ bill.id }}">
-                                                            Set as paid
-                                                        </button>
-                                                    {% endif %}
-                                                {% else %}
-                                                    {% if bill.paid %}
-                                                        <button type="submit" class="btn btn-warning"
-                                                                form="paidConfirmFormExpense{{ bill.id }}">
-                                                            Set as pending
-                                                        </button>
-                                                    {% else %}
-                                                        <button type="submit" class="btn btn-success"
-                                                                form="paidConfirmFormExpense{{ bill.id }}">
-                                                            Set as paid
-                                                        </button>
-                                                    {% endif %}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
                             {% endfor %}
                             </tbody>
                         </table>
@@ -748,9 +939,7 @@
                         </div>
                     </div>
                     <div id="bills-to-receive" class="tabcontent">
-                        <form id="newBillReceiveForm"
-                              method="post"
-                              action="{% url 'new_bill' %}"
+                        <form id="newBillReceiveForm" method="post" action="{% url 'new_bill' %}"
                               enctype="multipart/form-data"
                               onsubmit=blockSubmit(event,'submitReceiveButton')>
                             {% csrf_token %}
@@ -959,7 +1148,7 @@
                                     </select>
                                 </div>
                                 <div class="col form-group form-control-label">
-                                    <label for="billPayValueInput">Value</label>
+                                    <label for="billPayValueInput">Total</label>
                                     <input inputmode="decimal" class="form-control"
                                            id="billPayValueInput"
                                            name="total" placeholder="">
@@ -1414,6 +1603,15 @@
             setupInput($("#billReceiveTotalInput"));
             setupInput($("#billInstallmentsValueInput"));
             setupInput($("#billPayValueInput"));
+
+            for (let i = 1; i <= {{ max_id }}; i++) {
+                setupInput($("#billValueInputDetails" + i));
+                setupInput($("#billFeesInputDetails" + i));
+                setupInput($("#billDiscountInputDetails" + i));
+                setupInput($("#billReceiveTotalInputDetails" + i));
+                setupInput($("#billInstallmentsValueInputDetails" + i));
+                setupInput($("#billPayValueInputDetails" + i));
+            }
         });
     </script>
 

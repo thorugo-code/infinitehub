@@ -37,7 +37,7 @@ def custom_upload_path_projects(instance, filename):
 
 
 def upload_path_bills(instance, filename):
-    office = instance.office.name.replace(" ", "_")
+    office = instance.office.name.replace(" ", "_") if instance.office else 'none'
     year = datetime.now().strftime('%Y')
     month = datetime.now().strftime('%m')
     return f'uploads/proofs/bills/{office}/{year}/{month}/{filename}'
@@ -275,7 +275,8 @@ class Collaborator(models.Model):
     status = models.BooleanField(default=True)
 
 
-class Bill(models.Model): # Adicionar currency
+# Adicionar currency
+class Bill(models.Model):
     # Foreign Keys and Relationships
     project = models.ForeignKey(Project, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)
     client = models.ForeignKey(Client, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)

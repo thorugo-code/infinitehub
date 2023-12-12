@@ -1,12 +1,19 @@
+import os
 from datetime import datetime
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from apps.home.models import Project, Profile, Office, Bill, Client, unmask_money
 
 
 def check_late_bills():
-    bills = Bill.objects.filter(Q(due_date__lt=datetime.now().date()) & Q(paid=False))
-    for bill in bills:
+    late_bills = Bill.objects.filter(Q(due_date__lt=datetime.now().date()) & Q(paid=False))
+    unlate_bills = Bill.objects.filter(Q(due_date__gte=datetime.now().date()) & Q(paid=False) & Q(late=True))
+    for bill in late_bills:
+        bill.save()
+
+    for bill in unlate_bills:
+        bill.late = False
         bill.save()
 
 
@@ -91,7 +98,7 @@ def filter_bill_objects(filters):
             if max_value:
                 bills = bills.filter(total__lte=max_value)
 
-    return bills
+    return bills, bills.order_by('-id').first().id if bills.count() > 0 else 0
 
 
 def home(request, sorted_by=None, sort_type=None, filters=None):
@@ -99,7 +106,7 @@ def home(request, sorted_by=None, sort_type=None, filters=None):
 
     currency = request.POST.get('currency', 'BRL')
 
-    all_bills = filter_bill_objects(filters)
+    all_bills, max_id = filter_bill_objects(filters)
 
     bills_to_receive = all_bills.filter(income=True)
     bills_received = all_bills.filter(income=True, paid=True)
@@ -184,7 +191,7 @@ def home(request, sorted_by=None, sort_type=None, filters=None):
     if sort_type == 'desc':
         all_bills = reversed(all_bills)
 
-    context.update({'bills': all_bills})
+    context.update({'bills': all_bills, 'max_id': max_id})
 
     return render(request, 'home/bills.html', context)
 
@@ -249,6 +256,9 @@ def new_bill(request):
 def delete_bill(request, bill_id):
     if request.method == 'POST':
         bill = Bill.objects.get(id=bill_id)
+        if bill.proof:
+            os.remove(bill.proof.path)
+
         bill.delete()
 
     sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
@@ -363,3 +373,55 @@ def filter_bills(request):
         return redirect('balance_page')
     else:
         return redirect('filtered_bills', filters=filter_string)
+
+
+def download_bill(request, bill_id):
+    bill = Bill.objects.get(id=bill_id)
+    file_path = bill.proof.path
+    with open(file_path, 'rb') as file:
+        response = HttpResponse(file.read(), content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{bill.proof.name.split("/")[-1]}"'
+        return response
+
+
+def edit_bill(request, bill_id):
+    bill = Bill.objects.get(id=bill_id)
+    if request.method == 'POST':
+        currency = request.POST.get('currency', 'USD')
+        # bill.project = Project.objects.get(id=request.POST.get('project_id', bill.project.id))
+        bill.client = Client.objects.get(id=request.POST['client_id']) if request.POST.get(
+            'client_id') else bill.client if request.POST.get('client_id') != '' else None
+        bill.office = Office.objects.get(id=request.POST['office_id']) if request.POST.get(
+            'office_id') else bill.office if request.POST.get('office_id') != '' else None
+        bill.title = request.POST.get('title', bill.title)
+        bill.category = filter_options(request.POST['category']) if request.POST.get('category') else bill.category
+        bill.method = filter_options(request.POST['method']) if request.POST.get('method') else bill.method
+        bill.due_date = request.POST.get('due_date', bill.due_date)
+        bill.description = request.POST.get('description', bill.description)
+        bill.installments_value = unmask_money(request.POST['installments_value'], currency) if request.POST.get(
+            'installments_value') else bill.installments_value
+        bill.fees = unmask_money(request.POST['fees'], currency) if request.POST.get('fees') else bill.fees
+        bill.discount = unmask_money(request.POST['discount'], currency) if request.POST.get(
+            'discount') else bill.discount
+        bill.total = unmask_money(request.POST['total'], currency) if request.POST.get('total') else bill.total
+        bill.installments = request.POST.get('installments', 0)
+        if request.FILES.get('proof') and request.FILES.get('proof') != bill.proof and bill.proof:
+            os.remove(bill.proof.path)
+            bill.proof = request.FILES['proof']
+        else:
+            bill.proof = request.FILES.get('proof', bill.proof)
+
+        bill.save()
+
+    sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
+    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
+    filters = request.POST.get('filters', 'None')
+
+    if sorted_by != '' and filters != 'None':
+        return redirect('sorted_filtered_bills', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
+    elif sorted_by != '':
+        return redirect('sorted_bills', sorted_by=sorted_by, sort_type=sort_type)
+    elif filters != 'None':
+        return redirect('filtered_bills', filters=filters)
+    else:
+        return redirect('balance_page')

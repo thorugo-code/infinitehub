@@ -157,3 +157,16 @@ def unique(value, string):
                 return False
 
     return True
+
+
+@register.filter(name='without_currency')
+@stringfilter
+def without_currency(value, currency='BRL'):
+    if currency == 'BRL':
+        symbol = 'R$'
+    else:
+        symbol = '$'
+
+    digits = value.replace(symbol, '').strip()
+    if len(digits) >= 3:
+        return digits[:-3].replace(',', '.') + ',' + digits[-2:]
