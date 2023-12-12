@@ -10,10 +10,9 @@
 
             <!-- Collapse -->
             <div class="collapse navbar-collapse" id="sidenav-collapse-main">
-
-                <!-- Project's items -->
-                <ul class="navbar-nav mt-3" id="principalNavList">
-
+                <!-- Up items -->
+                <ul class="navbar-nav mt-2" id="principalNavList">
+                    <!-- Projects items -->
                     <li class="nav-item">
                         <a class="nav-link collapsed" id="collapse-projects"
                            href="#navbar-projects" data-toggle="collapse" role="button" aria-expanded="false"
@@ -50,7 +49,7 @@
                             </ul>
                         </div>
                     </li>
-
+                    <!-- Assets items -->
                     <li class="nav-item">
                         <a class="nav-link collapsed" id="collapse-assets"
                            href="#navbar-assets" data-toggle="collapse" role="button" aria-expanded="false"
@@ -87,7 +86,7 @@
                             </ul>
                         </div>
                     </li>
-
+                    <!-- Administratives items -->
                     <li class="nav-item">
                         <a class="nav-link collapsed" id="collapse-clients"
                            href="#navbar-administrative" data-toggle="collapse" role="button" aria-expanded="false"
@@ -118,7 +117,7 @@
                             </ul>
                         </div>
                     </li>
-
+                    <!-- Clients items -->
                     <li class="nav-item">
                         <a class="nav-link collapsed" id="collapse-financial"
                            href="#navbar-financial" data-toggle="collapse" role="button" aria-expanded="false"
@@ -134,44 +133,31 @@
                                         <span class="nav-link-text mr-1"> All </span>
                                     </a>
                                 </li>
-                                {#                                <li class="nav-item">#}
-                                {#                                    <a class="nav-link"#}
-                                {#                                       href="{% url 'inventory_list' %}">#}
-                                {#                                        <span class="nav-link-text"> Inventory </span>#}
-                                {#                                    </a>#}
-                                {#                                </li>#}
                             </ul>
                         </div>
                     </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" id="collapse-collaborators"
-                           href="#navbar-collaborators" data-toggle="collapse" role="button"
-                           aria-expanded="false" aria-controls="navbar-collaborator">
-                            <i class="fas fa-user-friends text-yellow" style="opacity: 90%"></i>
-                            <span class="nav-link-text">Collaborators</span>
-                        </a>
-                        <div class="collapse" id="navbar-collaborators" style>
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item">
-                                    <a href="/collaborators/" class="nav-link">
-                                        <span class="sidenav-normal"> All </span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-
+                    <!-- Collaborators items -->
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link collapsed" id="collapse-collaborators"#}
+{#                           href="#navbar-collaborators" data-toggle="collapse" role="button"#}
+{#                           aria-expanded="false" aria-controls="navbar-collaborator">#}
+{#                            <i class="fas fa-user-friends text-yellow" style="opacity: 90%"></i>#}
+{#                            <span class="nav-link-text">Collaborators</span>#}
+{#                        </a>#}
+{#                        <div class="collapse" id="navbar-collaborators" style>#}
+{#                            <ul class="nav nav-sm flex-column">#}
+{#                                <li class="nav-item">#}
+{#                                    <a href="/collaborators/" class="nav-link">#}
+{#                                        <span class="sidenav-normal"> All </span>#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                            </ul>#}
+{#                        </div>#}
+{#                    </li>#}
                 </ul>
 
-                <!-- Navigation -->
+                <!-- Down items -->
                 <ul class="navbar-nav navbar-item-fixed-bottom" id="bottomNavList" style="background: #fff">
-                    {#                    <li class="nav-item">#}
-                    {#                        <a class="nav-link" href="/profile/">#}
-                    {#                            <i class="ni ni-circle-08 text-default"></i>#}
-                    {#                            <span class="nav-link-text">Profile</span>#}
-                    {#                        </a>#}
-                    {#                    </li>#}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">
                             <i class="ni ni-button-power text-red"></i>
