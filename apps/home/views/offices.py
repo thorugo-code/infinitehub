@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
 from apps.home.models import Profile, Office
 from django.core.paginator import Paginator
-from django.db.models import Q
+
+
+def get_permission(request, permission_type, model='office'):
+    return request.user.has_perm(f'home.{permission_type}_{model}')
 
 
 def get_paginated_clients(request, order_by):
@@ -21,6 +24,9 @@ def get_paginated_clients(request, order_by):
 
 
 def home(request, order_by=None):
+    if not get_permission(request, 'view'):
+        return render(request, 'home/page-404.html')
+
     paginator, offices = get_paginated_clients(request, order_by=order_by)
 
     context = {
@@ -32,12 +38,15 @@ def home(request, order_by=None):
 
 
 def create(request):
+    if not get_permission(request, 'add'):
+        return render(request, 'home/page-404.html')
+
     if request.method == 'POST':
         office = Office(
             name=request.POST['name'],
             cnpj=request.POST['cnpj'],
-            area=request.POST['area'],
-            location=request.POST['location'],
+            location=request.POST['address'],
+            description=request.POST['description'],
         )
 
         office.save()
@@ -46,7 +55,27 @@ def create(request):
 
 
 def delete(request, office_id):
+    if not get_permission(request, 'delete'):
+        return render(request, 'home/page-404.html')
+
     office = Office.objects.get(id=office_id)
     office.delete()
+
+    return redirect('offices_home')
+
+
+def edit(request, office_id):
+    if not get_permission(request, 'change'):
+        return render(request, 'home/page-404.html')
+
+    office = Office.objects.get(id=office_id)
+
+    if request.method == 'POST':
+        office.name = request.POST.get('name', office.name)
+        office.cnpj = request.POST.get('cnpj', office.cnpj)
+        office.description = request.POST.get('description', office.description)
+        office.location = request.POST.get('address', office.location)
+
+        office.save()
 
     return redirect('offices_home')

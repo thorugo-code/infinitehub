@@ -8,8 +8,12 @@ from apps.home.models import Profile
 
 @login_required(login_url="/login/")
 def index(request):
-    context = {'segment': 'index',
-               'user_profile': Profile.objects.get(user=request.user)}
+    user_profile, create = Profile.objects.get_or_create(user=request.user)
+
+    context = {
+        'segment': 'index',
+        'user_profile': user_profile,
+    }
 
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
@@ -17,17 +21,14 @@ def index(request):
 
 @login_required(login_url="/login/")
 def pages(request):
-    context = {}
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
-    try:
-        user_profile = Profile.objects.get(user=request.user)
-        context['user_profile'] = user_profile
-    except Profile.DoesNotExist:
-        pass
+    user_profile, create = Profile.objects.get_or_create(user=request.user)
+    context = {
+        'user_profile': user_profile,
+    }
 
     try:
-
         load_template = request.path.split('/')[-1]
 
         if load_template == 'admin':
@@ -38,11 +39,9 @@ def pages(request):
         return HttpResponse(html_template.render(context, request))
 
     except template.TemplateDoesNotExist:
-
         html_template = loader.get_template('home/page-404.html')
         return HttpResponse(html_template.render(context, request))
 
     except:
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
-

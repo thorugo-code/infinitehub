@@ -6,6 +6,10 @@ from django.shortcuts import render, redirect
 from apps.home.models import Project, Profile, Office, Bill, Client, unmask_money
 
 
+def get_permission(request, permission_type, model='bill'):
+    return request.user.has_perm(f'home.{permission_type}_{model}')
+
+
 def check_late_bills():
     late_bills = Bill.objects.filter(Q(due_date__lt=datetime.now().date()) & Q(paid=False))
     unlate_bills = Bill.objects.filter(Q(due_date__gte=datetime.now().date()) & Q(paid=False) & Q(late=True))
@@ -101,7 +105,37 @@ def filter_bill_objects(filters):
     return bills, bills.order_by('-id').first().id if bills.count() > 0 else 0
 
 
+def sort_bill_objects(bills, sorted_by, sort_type):
+    if sorted_by is not None:
+        sorted_by = sorted_by.replace('-', '_')
+
+    if sorted_by == 'client':
+        all_bills = sorted(bills, key=lambda bill: getattr(bill.client, 'name', ''))
+
+    elif sorted_by == 'office':
+        all_bills = sorted(bills, key=lambda bill: getattr(bill.office, 'name', ''))
+
+    elif sorted_by == 'project':
+        all_bills = sorted(bills, key=lambda bill: getattr(bill.project, 'title', ''))
+
+    else:
+        sorted_by = 'total' if sorted_by == 'value' else sorted_by
+        sorted_by = 'created_at' if sorted_by is None else sorted_by
+        all_bills = sorted(bills, key=lambda bill: getattr(bill, sorted_by, ''))
+
+    if sort_type == 'desc':
+        all_bills = reversed(all_bills)
+
+    return all_bills
+
+
 def home(request, sorted_by=None, sort_type=None, filters=None):
+    if not get_permission(request, 'view', 'bill'):
+        context = {
+            'user_profile': Profile.objects.get(user=request.user),
+        }
+        return render(request, 'home/page-404.html', context)
+
     check_late_bills()
 
     currency = request.POST.get('currency', 'BRL')
@@ -141,10 +175,8 @@ def home(request, sorted_by=None, sort_type=None, filters=None):
         'bills_to_pay': bills_to_pay,
         'received': bills_received_count,
         'received_value': bills_received_total,
-        # 'received_percentage': bills_received_total / bills_to_receive_total * 100 if bills_to_receive_total != 0 else 0,
         'paid': bills_paid_count,
         'paid_value': bills_paid_total,
-        # 'paid_percentage': bills_paid_total / bills_to_pay_total * 100 if bills_to_pay_total != 0 else 0,
         'to_receive': bills_to_receive_count,
         'to_receive_value': bills_to_receive_total,
         'to_receive_late_value': bills_to_receive_late_total,
@@ -171,32 +203,18 @@ def home(request, sorted_by=None, sort_type=None, filters=None):
                                                                                           '') if Bill.objects.all().count() > 0 else 0,
     }
 
-    if sorted_by is not None:
-        sorted_by = sorted_by.replace('-', '_')
-
-    if sorted_by == 'client':
-        all_bills = sorted(all_bills, key=lambda bill: getattr(bill.client, 'name', ''))
-
-    elif sorted_by == 'office':
-        all_bills = sorted(all_bills, key=lambda bill: getattr(bill.office, 'name', ''))
-
-    elif sorted_by == 'project':
-        all_bills = sorted(all_bills, key=lambda bill: getattr(bill.project, 'title', ''))
-
-    else:
-        sorted_by = 'total' if sorted_by == 'value' else sorted_by
-        sorted_by = 'created_at' if sorted_by is None else sorted_by
-        all_bills = sorted(all_bills, key=lambda bill: getattr(bill, sorted_by, ''))
-
-    if sort_type == 'desc':
-        all_bills = reversed(all_bills)
-
-    context.update({'bills': all_bills, 'max_id': max_id})
+    context.update({'bills': sort_bill_objects(all_bills, sorted_by, sort_type), 'max_id': max_id})
 
     return render(request, 'home/bills.html', context)
 
 
 def new_bill(request):
+    if not get_permission(request, 'add', 'bill'):
+        context = {
+            'user_profile': Profile.objects.get(user=request.user),
+        }
+        return render(request, 'home/page-404.html', context)
+
     if request.method == 'POST':
         currency = request.POST.get('currency', 'USD')
         bill = Bill(
@@ -243,9 +261,9 @@ def new_bill(request):
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
     filters = request.POST.get('filters', 'None')
 
-    if sorted_by != '' and filters != 'None':
+    if sorted_by != '' and sorted_by != 'None' and filters != 'None':
         return redirect('sorted_filtered_bills', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    elif sorted_by != '':
+    elif sorted_by != '' and sorted_by != 'None':
         return redirect('sorted_bills', sorted_by=sorted_by, sort_type=sort_type)
     elif filters != 'None':
         return redirect('filtered_bills', filters=filters)
@@ -254,6 +272,12 @@ def new_bill(request):
 
 
 def delete_bill(request, bill_id):
+    if not get_permission(request, 'delete', 'bill'):
+        context = {
+            'user_profile': Profile.objects.get(user=request.user),
+        }
+        return render(request, 'home/page-404.html', context)
+
     if request.method == 'POST':
         bill = Bill.objects.get(id=bill_id)
         if bill.proof:
@@ -265,9 +289,9 @@ def delete_bill(request, bill_id):
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
     filters = request.POST.get('filters', 'None')
 
-    if sorted_by != '' and filters != 'None':
+    if sorted_by != '' and sorted_by != 'None' and filters != 'None':
         return redirect('sorted_filtered_bills', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    elif sorted_by != '':
+    elif sorted_by != '' and sorted_by != 'None':
         return redirect('sorted_bills', sorted_by=sorted_by, sort_type=sort_type)
     elif filters != 'None':
         return redirect('filtered_bills', filters=filters)
@@ -276,6 +300,12 @@ def delete_bill(request, bill_id):
 
 
 def change_status(request, bill_id):
+    if not get_permission(request, 'change', 'bill'):
+        context = {
+            'user_profile': Profile.objects.get(user=request.user),
+        }
+        return render(request, 'home/page-404.html', context)
+
     bill = Bill.objects.get(id=bill_id)
     if not bill.paid:
         bill.paid = True
@@ -288,9 +318,9 @@ def change_status(request, bill_id):
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
     filters = request.POST.get('filters', 'None')
 
-    if sorted_by != '' and filters != 'None':
+    if sorted_by != '' and sorted_by != 'None' and filters != 'None':
         return redirect('sorted_filtered_bills', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    elif sorted_by != '':
+    elif sorted_by != '' and sorted_by != 'None':
         return redirect('sorted_bills', sorted_by=sorted_by, sort_type=sort_type)
     elif filters != 'None':
         return redirect('filtered_bills', filters=filters)
@@ -298,7 +328,7 @@ def change_status(request, bill_id):
         return redirect('balance_page')
 
 
-def sort_bills(request):
+def sort_and_filter_bills(request):
     sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
     filters = request.POST.get('filters', 'None')
@@ -376,6 +406,12 @@ def filter_bills(request):
 
 
 def download_bill(request, bill_id):
+    if not get_permission(request, 'view', 'bill'):
+        context = {
+            'user_profile': Profile.objects.get(user=request.user),
+        }
+        return render(request, 'home/page-404.html', context)
+
     bill = Bill.objects.get(id=bill_id)
     file_path = bill.proof.path
     with open(file_path, 'rb') as file:
@@ -385,6 +421,12 @@ def download_bill(request, bill_id):
 
 
 def edit_bill(request, bill_id):
+    if not get_permission(request, 'change', 'bill'):
+        context = {
+            'user_profile': Profile.objects.get(user=request.user),
+        }
+        return render(request, 'home/page-404.html', context)
+
     bill = Bill.objects.get(id=bill_id)
     if request.method == 'POST':
         currency = request.POST.get('currency', 'USD')
@@ -417,9 +459,9 @@ def edit_bill(request, bill_id):
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
     filters = request.POST.get('filters', 'None')
 
-    if sorted_by != '' and filters != 'None':
+    if sorted_by != '' and sorted_by != 'None' and filters != 'None':
         return redirect('sorted_filtered_bills', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    elif sorted_by != '':
+    elif sorted_by != '' and sorted_by != 'None':
         return redirect('sorted_bills', sorted_by=sorted_by, sort_type=sort_type)
     elif filters != 'None':
         return redirect('filtered_bills', filters=filters)

@@ -2,7 +2,7 @@ import os
 import qrcode
 from datetime import datetime
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 
@@ -154,22 +154,21 @@ class Profile(models.Model):
 
     # phone = models.CharField(max_length=20, default='')
 
-    office = models.ForeignKey('Office', related_name='members', on_delete=models.CASCADE, null=True, blank=True)
+    office = models.ForeignKey('Office', related_name='members', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.user.username} Profile'
+        return f'{self.user.username} profile'
 
     def save(self, *args, **kwargs):
         super().save()
-        user = self.user
-        user.save()
 
 
 class UploadedFile(models.Model):
-    project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
+    client = models.ForeignKey('Client', related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
     file = models.FileField(upload_to=custom_upload_path_projects)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.CASCADE, default=1)
+    uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.SET_NULL, default=1, null=True)
     category = models.CharField(max_length=100, default='others')
     description = models.TextField(default='')
     value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
@@ -209,10 +208,14 @@ class UploadedFile(models.Model):
         super().save()
 
         project = self.project
-        total_budget = project.uploaded_files.aggregate(models.Sum('value'))['value__sum'] or Money(0, 'USD')
 
-        project.budget = total_budget
-        project.save()
+        if project:
+            total_budget = project.uploaded_files.aggregate(models.Sum('value'))['value__sum'] or Money(0, 'USD')
+            project.budget = total_budget
+            project.save()
+            client = self.project.client
+
+        super().save()
 
 
 class Task(models.Model):
@@ -224,11 +227,11 @@ class Task(models.Model):
 
     completed = models.BooleanField(default=False)
     completed_at = models.DateField(null=True, blank=True)
-    completed_by = models.ForeignKey(User, related_name='completed_tasks', on_delete=models.CASCADE, null=True,
+    completed_by = models.ForeignKey(User, related_name='completed_tasks', on_delete=models.SET_NULL, null=True,
                                      blank=True)
 
     created_at = models.DateField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='created_tasks', on_delete=models.CASCADE, default=1)
+    created_by = models.ForeignKey(User, related_name='created_tasks', on_delete=models.SET_NULL, default=1, null=True)
 
     def __str__(self):
         return self.title
@@ -249,8 +252,8 @@ class Office(models.Model):
                                default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
     name = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=100)
-    area = models.CharField(max_length=100, default='none')
     location = models.CharField(max_length=100)
+    description = models.TextField(default='')
 
 
 class Client(models.Model):
@@ -261,7 +264,7 @@ class Client(models.Model):
     email = models.CharField(max_length=100, default='')
     phone = models.CharField(max_length=14, default='')
     area = models.CharField(max_length=100)
-    location = models.CharField(max_length=100)
+    location = models.CharField(max_length=200)
     description = models.TextField()
 
 
@@ -271,17 +274,17 @@ class Collaborator(models.Model):
     email = models.CharField(max_length=100)
     contract = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
-    office = models.ForeignKey(Office, related_name="collaborators", on_delete=models.CASCADE)
+    office = models.ForeignKey(Office, related_name="collaborators", on_delete=models.SET_NULL, null=True)
     status = models.BooleanField(default=True)
 
 
 # Adicionar currency
 class Bill(models.Model):
     # Foreign Keys and Relationships
-    project = models.ForeignKey(Project, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)
-    client = models.ForeignKey(Client, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)
-    office = models.ForeignKey(Office, related_name='bills', on_delete=models.CASCADE, null=True, blank=True)
-    created_by = models.ForeignKey(User, related_name='created_bills', on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
+    client = models.ForeignKey(Client, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
+    office = models.ForeignKey(Office, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(User, related_name='created_bills', on_delete=models.SET_NULL, null=True)
 
     # Char Fields
     title = models.CharField(max_length=100)
