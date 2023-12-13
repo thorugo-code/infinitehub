@@ -1,185 +1,182 @@
 <nav class="sidenav navbar navbar-vertical  fixed-left  navbar-expand-xs navbar-light bg-white" id="sidenav-main">
-    <div class="scrollbar-inner">
-        <!-- Brand -->
-        <div class="sidenav-header  align-items-center">
-            <a class="navbar-brand mt-1" href="/">
-                <img src="/static/assets/img/logo/0.5x/small-logo-default-bg@0.5x.png" class="navbar-brand-img">
-            </a>
-        </div>
-        <div class="navbar-inner">
+    <!-- Brand -->
+    <div class="sidenav-header  align-items-center">
+        <a class="navbar-brand mt-1" href="/">
+            <img src="/static/assets/img/logo/0.5x/small-logo-default-bg@0.5x.png" class="navbar-brand-img">
+        </a>
+    </div>
+    <div class="navbar-inner">
 
-            <!-- Collapse -->
-            <div class="collapse navbar-collapse" id="sidenav-collapse-main">
-
-                <!-- Project's items -->
-                <ul class="navbar-nav mt-3" id="principalNavList">
-
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" id="collapse-projects"
-                           href="#navbar-projects" data-toggle="collapse" role="button" aria-expanded="false"
-                           aria-controls="navbar-projects">
-                            <i class="ni ni-app text-gray"></i>
-                            <span class="nav-link-text">Projects</span>
-                        </a>
-                        <div class="collapse" id="navbar-projects" style="">
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item">
-                                    <a href="{% url 'project_list' %}"
-                                       class="nav-link">
-                                        <span class="sidenav-normal"> All </span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'project_list' 'archive' %}"
-                                       class="nav-link">
-                                        <span class="sidenav-normal"> Archive </span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link"
-                                       href="{% url 'project_list' 'finished' %}">
-                                        <span class="nav-link-text"> Finished </span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link"
-                                       href="{% url 'project_list' 'working' %}">
-                                        <span class="nav-link-text"> Working </span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" id="collapse-assets"
-                           href="#navbar-assets" data-toggle="collapse" role="button" aria-expanded="false"
-                           aria-controls="navbar-projects">
-                            <i class="ni ni-folder-17 text-primary"></i>
-                            <span class="nav-link-text">Assets</span>
-                        </a>
-                        <div class="collapse" id="navbar-assets" style="">
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item">
-                                    <a href="{% url 'assets_hub' %}"
-                                       class="nav-link">
-                                        <span class="sidenav-normal"> All </span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link"
-                                       href="{% url 'assets_list' '3d-models' %}">
-                                        <span class="nav-link-text"> 3D Models </span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'assets_list' 'scripts' %}"
-                                       class="nav-link">
-                                        <span class="sidenav-normal"> Scripts </span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'assets_list' 'unity' %}"
-                                       class="nav-link">
-                                        <span class="sidenav-normal"> Unity </span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" id="collapse-clients"
-                           href="#navbar-administrative" data-toggle="collapse" role="button" aria-expanded="false"
-                           aria-controls="navbar-administrative">
-                            <i class="ni ni-briefcase-24 text-green"></i>
-                            <span class="nav-link-text">Administrative</span>
-                        </a>
-                        <div class="collapse" id="navbar-administrative" style="">
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item">
-                                    <a href="{% url 'balance_page' %}"
-                                       class="nav-link">
-                                        <span class="sidenav-normal"> Balance Sheet </span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link"
-                                       href="{% url 'inventory_list' %}">
-                                        <span class="nav-link-text"> Inventory </span>
-                                    </a>
-                                </li>
+        <!-- Collapse -->
+        <div class="collapse navbar-collapse" id="sidenav-collapse-main">
+            <!-- Up items -->
+            <ul class="navbar-nav mt-2" id="principalNavList">
+                <!-- Projects items -->
+                <li class="nav-item">
+                    <a class="nav-link collapsed" id="collapse-projects"
+                       href="#navbar-projects" data-toggle="collapse" role="button" aria-expanded="false"
+                       aria-controls="navbar-projects">
+                        <i class="ni ni-app text-gray"></i>
+                        <span class="nav-link-text">Projects</span>
+                    </a>
+                    <div class="collapse" id="navbar-projects" style="">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{% url 'project_list' %}"
+                                   class="nav-link">
+                                    <span class="sidenav-normal"> All </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'project_list' 'archive' %}"
+                                   class="nav-link">
+                                    <span class="sidenav-normal"> Archive </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   href="{% url 'project_list' 'finished' %}">
+                                    <span class="nav-link-text"> Finished </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   href="{% url 'project_list' 'working' %}">
+                                    <span class="nav-link-text"> Working </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Assets items -->
+                <li class="nav-item">
+                    <a class="nav-link collapsed" id="collapse-assets"
+                       href="#navbar-assets" data-toggle="collapse" role="button" aria-expanded="false"
+                       aria-controls="navbar-projects">
+                        <i class="ni ni-folder-17 text-primary"></i>
+                        <span class="nav-link-text">Assets</span>
+                    </a>
+                    <div class="collapse" id="navbar-assets" style="">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{% url 'assets_hub' %}"
+                                   class="nav-link">
+                                    <span class="sidenav-normal"> All </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   href="{% url 'assets_list' '3d-models' %}">
+                                    <span class="nav-link-text"> 3D Models </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'assets_list' 'scripts' %}"
+                                   class="nav-link">
+                                    <span class="sidenav-normal"> Scripts </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'assets_list' 'unity' %}"
+                                   class="nav-link">
+                                    <span class="sidenav-normal"> Unity </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Administratives items -->
+                <li class="nav-item">
+                    <a class="nav-link collapsed" id="collapse-clients"
+                       href="#navbar-administrative" data-toggle="collapse" role="button" aria-expanded="false"
+                       aria-controls="navbar-administrative">
+                        <i class="ni ni-briefcase-24 text-green"></i>
+                        <span class="nav-link-text">Administrative</span>
+                    </a>
+                    <div class="collapse" id="navbar-administrative" style="">
+                        <ul class="nav nav-sm flex-column">
+                            {% if perms.home.view_bill %}
+                            <li class="nav-item">
+                                <a href="{% url 'balance_page' %}"
+                                   class="nav-link">
+                                    <span class="sidenav-normal"> Balance Sheet </span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   href="{% url 'inventory_list' %}">
+                                    <span class="nav-link-text"> Inventory </span>
+                                </a>
+                            </li>
+                            {% if perms.home.view_office %}
                                 <li class="nav-item">
                                     <a class="nav-link"
                                        href="{% url 'offices_home' %}">
                                         <span class="nav-link-text"> Offices </span>
                                     </a>
                                 </li>
-                            </ul>
-                        </div>
-                    </li>
-
+                            {% endif %}
+                        </ul>
+                    </div>
+                </li>
+                <!-- Clients items -->
+                {% if perms.home.view_client %}
                     <li class="nav-item">
-                        <a class="nav-link collapsed" id="collapse-financial"
-                           href="#navbar-financial" data-toggle="collapse" role="button" aria-expanded="false"
-                           aria-controls="navbar-financial">
+                        <a class="nav-link" href="{% url 'clients_home' %}">
                             <i class="fas fa-users text-orange"></i>
                             <span class="nav-link-text">Clients</span>
                         </a>
-                        <div class="collapse" id="navbar-financial" style="">
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item">
-                                    <a class="nav-link"
-                                       href="{% url 'clients_home' %}">
-                                        <span class="nav-link-text mr-1"> All </span>
-                                    </a>
-                                </li>
-                                {#                                <li class="nav-item">#}
-                                {#                                    <a class="nav-link"#}
-                                {#                                       href="{% url 'inventory_list' %}">#}
-                                {#                                        <span class="nav-link-text"> Inventory </span>#}
-                                {#                                    </a>#}
-                                {#                                </li>#}
-                            </ul>
-                        </div>
                     </li>
+                {% endif %}
 
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" id="collapse-collaborators"
-                           href="#navbar-collaborators" data-toggle="collapse" role="button"
-                           aria-expanded="false" aria-controls="navbar-collaborator">
-                            <i class="fas fa-user-friends text-yellow" style="opacity: 90%"></i>
-                            <span class="nav-link-text">Collaborators</span>
-                        </a>
-                        <div class="collapse" id="navbar-collaborators" style>
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item">
-                                    <a href="/collaborators/" class="nav-link">
-                                        <span class="sidenav-normal"> All </span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link collapsed" id="collapse-financial"#}
+{#                       href="#navbar-financial" data-toggle="collapse" role="button" aria-expanded="false"#}
+{#                       aria-controls="navbar-financial">#}
+{#                        <i class="fas fa-users text-orange"></i>#}
+{#                        <span class="nav-link-text">Clients</span>#}
+{#                    </a>#}
+{#                    <div class="collapse" id="navbar-financial" style="">#}
+{#                        <ul class="nav nav-sm flex-column">#}
+{#                            <li class="nav-item">#}
+{#                                <a class="nav-link"#}
+{#                                   href="{% url 'clients_home' %}">#}
+{#                                    <span class="nav-link-text mr-1"> All </span>#}
+{#                                </a>#}
+{#                            </li>#}
+{#                        </ul>#}
+{#                    </div>#}
+{#                </li>#}
+                <!-- Collaborators items -->
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link collapsed" id="collapse-collaborators"#}
+{#                       href="#navbar-collaborators" data-toggle="collapse" role="button"#}
+{#                       aria-expanded="false" aria-controls="navbar-collaborator">#}
+{#                        <i class="fas fa-user-friends text-yellow" style="opacity: 90%"></i>#}
+{#                        <span class="nav-link-text">Collaborators</span>#}
+{#                    </a>#}
+{#                    <div class="collapse" id="navbar-collaborators" style>#}
+{#                        <ul class="nav nav-sm flex-column">#}
+{#                            <li class="nav-item">#}
+{#                                <a href="/collaborators/" class="nav-link">#}
+{#                                    <span class="sidenav-normal"> All </span>#}
+{#                                </a>#}
+{#                            </li>#}
+{#                        </ul>#}
+{#                    </div>#}
+{#                </li>#}
+            </ul>
 
-                </ul>
-
-                <!-- Navigation -->
-                <ul class="navbar-nav navbar-item-fixed-bottom" id="bottomNavList" style="background: #fff">
-                    {#                    <li class="nav-item">#}
-                    {#                        <a class="nav-link" href="/profile/">#}
-                    {#                            <i class="ni ni-circle-08 text-default"></i>#}
-                    {#                            <span class="nav-link-text">Profile</span>#}
-                    {#                        </a>#}
-                    {#                    </li>#}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">
-                            <i class="ni ni-button-power text-red"></i>
-                            <span class="nav-link-text">Logout</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <!-- Down items -->
+            <ul class="navbar-nav navbar-item-fixed-bottom" id="bottomNavList" style="background: #fff; bottom: 15px">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">
+                        <i class="ni ni-button-power text-red"></i>
+                        <span class="nav-link-text">Logout</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </nav>

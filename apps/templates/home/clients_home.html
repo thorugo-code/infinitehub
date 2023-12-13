@@ -33,18 +33,20 @@
                                 <h3 class="mb-0">Clients</h3>
                             </div>
                             <div class="col text-right">
-                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                   data-target="#sortModal">
-                                    <i class="fas fa-sort"></i>
-                                </a>
-                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                   data-target="#filterModal">
-                                    <i class="fas fa-filter"></i>
-                                </a>
-                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                   data-target="#newClientModal">
-                                    <i class="fas fa-plus"></i>
-                                </a>
+{#                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+{#                                   data-target="#sortModal">#}
+{#                                    <i class="fas fa-sort"></i>#}
+{#                                </a>#}
+{#                                <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+{#                                   data-target="#filterModal">#}
+{#                                    <i class="fas fa-filter"></i>#}
+{#                                </a>#}
+                                {% if perms.home.add_client %}
+                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                                       data-target="#newClientModal">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -53,10 +55,12 @@
                            style="min-height: 531.61px">
                         <thead class="thead-light">
                         <tr>
-                            <th scope="col" style="width: 40%">Name</th>
-                            <th scope="col" style="width: 20%">CNPJ</th>
-                            <th scope="col" style="width: 20%">Area</th>
-                            <th scope="col" style="width: 20%">Location</th>
+                            <th scope="col" style="width: 25%">Name</th>
+                            <th scope="col" style="width: 15%">CNPJ</th>
+                            <th scope="col" style="width: 15%">Area</th>
+                            <th scope="col" style="width: 18%">Email</th>
+                            <th scope="col" style="width: 12%">Phone</th>
+                            <th scope="col" style="width: 15%">Address</th>
                             <th scope="col" style="width: 0"></th>
                         </tr>
                         </thead>
@@ -65,7 +69,8 @@
                         {% for client in clients %}
                             <tr>
                                 <th scope="row" class="py-3">
-                                    <a href=""
+                                    <a href="" data-dismiss="modal" data-toggle="modal"
+                                       data-target="#detailsClientModal{{ client.id }}"
                                        class="media align-items-center">
                                         <div class="avatar rounded-circle mr-3">
                                             <img
@@ -76,7 +81,7 @@
                                         <div class="media-body">
                                                     <span class="name mb-0 ml-2 text-sm"
                                                           style="font-weight: 400; color: #525f7f">
-                                                        {{ client.name }}
+                                                        {{ client.name|truncatechars:30 }}
                                                     </span>
                                         </div>
                                     </a>
@@ -85,10 +90,28 @@
                                     <span>{{ client.cnpj }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ client.area }}</span>
+                                    <span>{{ client.area|truncatechars:30 }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ client.location }}</span>
+                                    {% if client.email is null or client.email == '' %}
+                                        <span class="text-muted">-</span>
+                                    {% else %}
+                                        <span>{{ client.email|truncatechars:30 }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if client.phone is null or client.phone == '' %}
+                                        <span class="text-muted">-</span>
+                                    {% else %}
+                                        <span>{{ client.phone }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if client.location is null or client.location == '' %}
+                                        <span class="text-muted">-</span>
+                                    {% else %}
+                                        <span>{{ client.location|truncatechars:23 }}</span>
+                                    {% endif %}
                                 </td>
                                 <td class="text-right">
                                     <div class="dropdown">
@@ -97,15 +120,96 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                            {#                                            <a class="dropdown-item" href="">Open</a>#}
-                                            {#                                            <div class="dropdown-divider"></div>#}
-                                            <a class="dropdown-item text-danger" href="" data-dismiss="modal"
-                                               data-toggle="modal"
-                                               data-target="#deleteConfirm{{ client.id }}">Delete</a>
+                                            <a class="dropdown-item" href="" data-dismiss="modal" data-toggle="modal"
+                                               data-target="#detailsClientModal{{ client.id }}">Open</a>
+                                            {% if perms.home.delete_client %}
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item text-danger" href="" data-dismiss="modal"
+                                                   data-toggle="modal"
+                                                   data-target="#deleteConfirm{{ client.id }}">Delete</a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </td>
                             </tr>
+
+                            <!-- Details Modal -->
+                            <div class="modal fade" id="detailsClientModal{{ client.id }}" tabindex="-1" role="dialog"
+                                 aria-labelledby="detailsClientModal{{ client.id }}Label" aria-hidden="true">
+                                <div class="modal-dialog my-6" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header mt-2 align-items-center">
+                                            <h5 class="modal-title" style="margin-left: auto">
+                                                <i class="fas fa-user-tie text-blue" style="font-size: 1.5rem"></i>
+                                            </h5>
+                                            <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
+                                                  id="detailsClientModal{{ client.id }}Label">{{ client.name|truncatechars:30 }}</span>
+                                            <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                    data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                            <form id="editClientForm{{ client.id }}" method="post" action="{% url 'edit_client' client.id %}">
+                                                {% csrf_token %}
+                                                <div class="row">
+                                                    <div class="col-7 form-group form-control-label mb-3">
+                                                        <label for="name">Name</label>
+                                                        <input type="text" class="form-control" id="name" name="name"
+                                                               placeholder="Client name" value="{{ client.name }}" {% if not perms.home.change_client %}disabled{% endif %}>
+                                                    </div>
+                                                    <div class="col-5 form-group form-control-label mb-3">
+                                                        <label for="cnpj">CNPJ</label>
+                                                        <input type="text" class="form-control" id="cnpj" name="cnpj"
+                                                               placeholder="00.000.000/0000-00" value="{{ client.cnpj }}" {% if not perms.home.change_client %}disabled{% endif %}>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-control-label">
+                                                    <label for="area">Area</label>
+                                                    <input type="text" class="form-control"
+                                                           id="area"
+                                                           name="area" placeholder="Client area of activity" value="{{ client.area }}" {% if not perms.home.change_client %}disabled{% endif %}>
+                                                </div>
+                                                <div class="form-group form-control-label">
+                                                    <label for="address">Address</label>
+                                                    <input type="text" class="form-control"
+                                                           id="address"
+                                                           name="address" placeholder="Client address" value="{{ client.location }}" {% if not perms.home.change_client %}disabled{% endif %}>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col form-group form-control-label">
+                                                        <label for="area">Email</label>
+                                                        <input type="email" id="area" name="email"
+                                                               class="form-control" placeholder="client@email.com" value="{{ client.email }}" {% if not perms.home.change_client %}disabled{% endif %}>
+                                                    </div>
+                                                    <div class="col form-group form-control-label">
+                                                        <label for="phone">Phone</label>
+                                                        <input type="text" id="phone" name="phone"
+                                                               class="form-control" placeholder="(00) 0000-0000" value="{{ client.phone }}" {% if not perms.home.change_client %}disabled{% endif %}>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-control-label">
+                                                    <label for="about">About</label>
+                                                    <textarea rows="4" class="form-control" id="about" name="about"
+                                                              placeholder="A few words about the client ..." {% if not perms.home.change_client %}disabled{% endif %}>{{ client.description }}</textarea>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer pt-1">
+                                            {% if perms.home.change_client %}
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                Cancel
+                                            </button>
+                                            <button type="submit" class="btn btn-primary" id="submitButton" form="editClientForm{{ client.id }}">
+                                                Save
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delete Modal -->
                             <div class="modal fade" id="deleteConfirm{{ client.id }}" tabindex="-1"
                                  role="dialog" aria-labelledby="deleteConfirmLabel{{ client.id }}"
                                  aria-hidden="true">
@@ -161,6 +265,7 @@
                                     </div>
                                 </div>
                             </div>
+
                         {% endfor %}
                         </tbody>
                     </table>
@@ -231,64 +336,64 @@
     </div>
 
     <!-- Filter Modal -->
-    <div class="modal fade" id="filterModal" tabindex="-1" role="dialog"
-         aria-labelledby="filterModalLabel" aria-hidden="true">
-        <div class="modal-dialog my-6" role="document">
-            <div class="modal-content">
-                <div class="modal-header mt-2 align-items-center">
-                    <h5 class="modal-title" style="margin-left: auto">
-                        <i class="ni ni-ui-04 text-blue" style="font-size: 1.5rem"></i>
-                    </h5>
-                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
-                          id="filterModalLabel">Filter</span>
-                    <button type="button" class="close mt--4" style="margin-left: -30px"
-                            data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="filterButton"
-                            disabled>Filter
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+{#    <div class="modal fade" id="filterModal" tabindex="-1" role="dialog"#}
+{#         aria-labelledby="filterModalLabel" aria-hidden="true">#}
+{#        <div class="modal-dialog my-6" role="document">#}
+{#            <div class="modal-content">#}
+{#                <div class="modal-header mt-2 align-items-center">#}
+{#                    <h5 class="modal-title" style="margin-left: auto">#}
+{#                        <i class="ni ni-ui-04 text-blue" style="font-size: 1.5rem"></i>#}
+{#                    </h5>#}
+{#                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"#}
+{#                          id="filterModalLabel">Filter</span>#}
+{#                    <button type="button" class="close mt--4" style="margin-left: -30px"#}
+{#                            data-dismiss="modal" aria-label="Close">#}
+{#                        <span aria-hidden="true">&times;</span>#}
+{#                    </button>#}
+{#                </div>#}
+{#                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">#}
+{##}
+{#                </div>#}
+{#                <div class="modal-footer">#}
+{#                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>#}
+{#                    <button type="submit" class="btn btn-primary" id="filterButton"#}
+{#                            disabled>Filter#}
+{#                    </button>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
     <!-- Sort Modal -->
-    <div class="modal fade" id="sortModal" tabindex="-1" role="dialog"
-         aria-labelledby="sortModalLabel" aria-hidden="true">
-        <div class="modal-dialog my-6" role="document">
-            <div class="modal-content">
-                <div class="modal-header mt-2 align-items-center">
-                    <h5 class="modal-title" style="margin-left: auto">
-                        <i class="ni ni-bullet-list-67 text-blue" style="font-size: 1.4rem"></i>
-                    </h5>
-                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
-                          id="sortModalLabel">Sort</span>
-                    <button type="button" class="close mt--4" style="margin-left: -30px"
-                            data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+{#    <div class="modal fade" id="sortModal" tabindex="-1" role="dialog"#}
+{#         aria-labelledby="sortModalLabel" aria-hidden="true">#}
+{#        <div class="modal-dialog my-6" role="document">#}
+{#            <div class="modal-content">#}
+{#                <div class="modal-header mt-2 align-items-center">#}
+{#                    <h5 class="modal-title" style="margin-left: auto">#}
+{#                        <i class="ni ni-bullet-list-67 text-blue" style="font-size: 1.4rem"></i>#}
+{#                    </h5>#}
+{#                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"#}
+{#                          id="sortModalLabel">Sort</span>#}
+{#                    <button type="button" class="close mt--4" style="margin-left: -30px"#}
+{#                            data-dismiss="modal" aria-label="Close">#}
+{#                        <span aria-hidden="true">&times;</span>#}
+{#                    </button>#}
+{#                </div>#}
+{#                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">#}
+{##}
+{#                </div>#}
+{#                <div class="modal-footer">#}
+{#                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>#}
+{#                    <button type="submit" class="btn btn-primary" id="sortButton"#}
+{#                            disabled>Sort#}
+{#                    </button>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="sortButton"
-                            disabled>Sort
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- New Equipment Modal -->
+    <!-- New Client Modal -->
     <div class="modal fade" id="newClientModal" tabindex="-1" role="dialog"
          aria-labelledby="newEquipmentModalLabel" aria-hidden="true">
         <div class="modal-dialog my-6" role="document">
@@ -307,31 +412,40 @@
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                     <form id="newClientForm" method="post" action="{% url 'create_client' %}">
                         {% csrf_token %}
-                        <div class="form-group form-control-label mb-3">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" name="name"
-                                   placeholder="Client name">
+                        <div class="row">
+                            <div class="col-7 form-group form-control-label mb-3">
+                                <label for="name">Name</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                       placeholder="Client name">
+                            </div>
+                            <div class="col-5 form-group form-control-label mb-3">
+                                <label for="cnpj">CNPJ</label>
+                                <input type="text" class="form-control" id="cnpj" name="cnpj"
+                                       placeholder="00.000.000/0000-00">
+                            </div>
                         </div>
-                        <div class="form-group form-control-label mb-3">
-                            <label for="cnpj">CNPJ</label>
-                            <input type="text" class="form-control" id="cnpj" name="cnpj"
-                                   placeholder="00.000.000/0000-00">
+                        <div class="form-group form-control-label">
+                            <label for="area">Area</label>
+                            <input type="text" class="form-control"
+                                   id="area"
+                                   name="area" placeholder="Client area of activity">
+                        </div>
+                        <div class="form-group form-control-label">
+                            <label for="address">Address</label>
+                            <input type="text" class="form-control"
+                                   id="address"
+                                   name="address" placeholder="Client address">
                         </div>
                         <div class="row">
-                            <div class="col">
-                                <div class="form-group form-control-label">
-                                    <label for="area">Area</label>
-                                    <input type="text" id="area" name="area"
-                                           class="form-control" placeholder="Client area of activity">
-                                </div>
+                            <div class="col form-group form-control-label">
+                                <label for="area">Email</label>
+                                <input type="email" id="area" name="email"
+                                       class="form-control" placeholder="client@email.com">
                             </div>
-                            <div class="col">
-                                <div class="form-group form-control-label">
-                                    <label for="location">Location</label>
-                                    <input inputmode="decimal" class="form-control"
-                                           id="location"
-                                           name="location" placeholder="Client location">
-                                </div>
+                            <div class="col form-group form-control-label">
+                                <label for="phone">Phone</label>
+                                <input type="text" id="phone" name="phone"
+                                       class="form-control" placeholder="(00) 0000-0000">
                             </div>
                         </div>
                         <div class="form-group form-control-label">
@@ -353,7 +467,9 @@
         </div>
     </div>
 
-    {% include "includes/footer.html" %}
+    <div class="container-fluid">
+        {% include "includes/footer.html" %}
+    </div>
 
 {% endblock content %}
 
@@ -376,6 +492,23 @@
                 input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
             } else {
                 input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
+            }
+        });
+
+        document.getElementById('phone').addEventListener('input', function (event) {
+            let input = event.target;
+            let inputValue = input.value.replace(/\D/g, '');
+
+            if (inputValue.length <= 2) {
+                input.value = inputValue.replace(/^(\d{0,2})/, '($1)');
+            } else if (inputValue.length <= 6) {
+                input.value = inputValue.replace(/^(\d{2})(\d{0,4})/, '($1) $2');
+            } else if (inputValue.length <= 10) {
+                input.value = inputValue.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else if (inputValue.length <= 11) {
+                input.value = inputValue.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            } else {
+                input.value = inputValue.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
             }
         });
     </script>

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from apps.home.models import Profile, Unit, Collaborator, UploadedDocument
+from apps.home.models import Profile, Office, Collaborator, UploadedDocument
 from django.core.paginator import Paginator
 from django.db.models import Q
 import os
@@ -33,7 +33,7 @@ def page_list(request):
     context = {
         'collaborators': get_paginated_collaborators(request, **request.GET),
         'user_profile': Profile.objects.get(user=request.user),
-        'offices': Unit.objects.all(),
+        'offices': Office.objects.all(),
     }
 
     return render(request, 'home/collaborators-list.html', context)
@@ -86,7 +86,7 @@ def new(request):
         contract=request.POST['contract'],
         first_name=request.POST['first_name'],
         last_name=request.POST['last_name'],
-        office=Unit.objects.get(id=request.POST['office'])
+        office=Office.objects.get(id=request.POST['office'])
     )
 
     new_collab.save()

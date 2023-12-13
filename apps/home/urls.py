@@ -61,22 +61,29 @@ assets_urls = [
 balance_urls = [
 
     path('balance/', balance.home, name='balance_page'),
-    path('balance/bills/', balance.bills, name='balance_bills'),
 
-    path('balance/bills/new-<str:bill_type>/redirect=<str:redirect_to>', balance.new_bill, name='new_bill'),
-    path('balance/bills/delete-<str:bill_type>-<int:bill_id>/redirect=<str:redirect_to>', balance.delete_bill,
-         name='delete_bill'),
-    path('balance/bills/change-status-<str:bill_type>-<int:bill_id>/redirect=<str:redirect_to>', balance.change_status,
-         name='change_bill_status'),
+    path('balance/new', balance.new_bill, name='new_bill'),
+    path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
+    path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
+    path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
 
-    path('balance/bills/sort', balance.sort_bills, name='sort_bills'),
-    path('balance/bills/sort=<str:sorted_by>-<str:sort_type>', balance.bills, name='sorted_bills'),
+    path('balance/order', balance.sort_and_filter_bills, name='sort_bills'),
+    path('balance/filter', balance.filter_bills, name='filter_bills'),
+
+    path('balance/order:<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
+    path('balance/filters:<str:filters>', balance.home, name='filtered_bills'),
+    path('balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', balance.home,
+         name='sorted_filtered_bills'),
+
+    path('balance/download-bill=<int:bill_id>', balance.download_bill, name='download_proof'),
 ]
 
 clients_urls = [
 
     path('clients/', clients.home, name='clients_home'),
+
     path('clients/new', clients.create, name='create_client'),
+    path('clients/edit-client=<int:client_id>', clients.edit, name='edit_client'),
     path('clients/delete=<int:client_id>', clients.delete, name='delete_client'),
 ]
 
@@ -119,14 +126,15 @@ profile_urls = [
 offices_urls = [
 
     path('offices/', offices.home, name='offices_home'),
+
     path('offices/new', offices.create, name='offices_create'),
-    path('offices/delete=<int:unit_id>', offices.delete, name='offices_delete'),
+    path('offices/edit=<int:office_id>', offices.edit, name='offices_edit'),
+    path('offices/delete=<int:office_id>', offices.delete, name='offices_delete'),
 ]
 
 base_urls = [
 
     path('', login.index, name='home'),
-
     # Matches any html file
     re_path(r'^.*\.*', login.pages, name='pages'),
 

@@ -1,5 +1,6 @@
 from django import template
 from django.template.defaultfilters import stringfilter
+from apps.home.models import Office
 
 register = template.Library()
 
@@ -111,3 +112,61 @@ def reformatted_category(value):
 def url_name(value):
     return value.replace(' ', '-').lower()
 
+
+@register.filter(name='split')
+@stringfilter
+def split(value, split_tag):
+    return value.split(split_tag)
+
+
+@register.filter(name='office_name')
+@stringfilter
+def office_name(value):
+    return Office.objects.get(id=int(value)).name
+
+
+@register.filter(name='extract_from_key')
+@stringfilter
+def extract_from_key(value, key):
+    key_pairs = value.split('&')
+    extracted_value = [val for val in key_pairs if val.startswith(key)][0].split('=')[1]
+    if extracted_value.isdigit():
+        return int(extracted_value)
+    elif '.' in extracted_value:
+        return float(extracted_value)
+    else:
+        return extracted_value
+
+
+@register.filter(name='first_filter')
+@stringfilter
+def first_filter(value, filter):
+    return value.startswith(filter)
+
+
+@register.filter(name='unique')
+@stringfilter
+def unique(value, string):
+    list_of_string = value.split('&')
+    count = 0
+
+    for tag in list_of_string:
+        if string in tag:
+            count += 1
+            if count > 1:
+                return False
+
+    return True
+
+
+@register.filter(name='without_currency')
+@stringfilter
+def without_currency(value, currency='BRL'):
+    if currency == 'BRL':
+        symbol = 'R$'
+    else:
+        symbol = '$'
+
+    digits = value.replace(symbol, '').strip()
+    if len(digits) >= 3:
+        return digits[:-3].replace(',', '.') + ',' + digits[-2:]
