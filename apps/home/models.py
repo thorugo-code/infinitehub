@@ -43,6 +43,13 @@ def custom_upload_path_bills(instance, filename):
     return f'uploads/proofs/bills/{office}/{year}/{month}/{filename}'
 
 
+def custom_upload_path_documents(instance, filename):
+    collab_first_name = instance.collab.first_name.replace(" ", "_")
+    collab_last_name = instance.collab.last_name.replace(" ", "_")
+    category = instance.category.replace(" ", "_")
+    return f'uploads/documents/{collab_first_name}_{collab_last_name}/{category}/{filename}'
+
+
 class Equipments(models.Model):
     acquisition_date = models.DateField(default=datetime.now)
     name = models.CharField(max_length=100, default='Untitled')
@@ -292,12 +299,19 @@ class Client(models.Model):
 
 
 class Collaborator(models.Model):
-    birthday = models.DateField()
+    about = models.TextField(default='')
+    address = models.CharField(max_length=100, default='')
     admission = models.DateField()
-    email = models.CharField(max_length=100)
+    birthday = models.DateField()
+    city = models.TextField(default='')
     contract = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
+    country = models.CharField(max_length=50, default='')
+    email = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100, default='')
+    last_name = models.CharField(max_length=100, default='')
     office = models.ForeignKey(Unit, related_name="collaborators", on_delete=models.CASCADE)
+    postal_code = models.TextField(default='')
+    state = models.CharField(max_length=2, default='')
     status = models.BooleanField(default=True)
 
 
@@ -391,3 +405,13 @@ class BillToPay(models.Model):
     def save(self, *arg, **kwargs):
         self.category = self.category_choose()
         super().save()
+
+
+class UploadedDocument(models.Model):
+    collab = models.ForeignKey(Collaborator, related_name='document', on_delete=models.CASCADE)
+    category = models.CharField(max_length=50)
+    description = models.TextField()
+    expiration = models.DateField()
+    file = models.FileField(upload_to=custom_upload_path_documents, blank=True, null=True)
+    name = models.CharField(max_length=100)
+    uploaded = models.DateField()

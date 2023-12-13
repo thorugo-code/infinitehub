@@ -84,11 +84,15 @@ collaborators_urls = [
 
     path('collaborators/', collaborators.page_list, name='collaborators_list'),
 
-    path('collaborators/<str:collab_name>-<int:collab_id>', collaborators.details, name='collaborator_details'),
+    path('collaborators/<str:collab_first_name>-<str:collab_last_name>-<int:collab_id>', collaborators.details, name='collaborator_details'),
 
     path('collaborators/new', collaborators.new, name='collaborator_new'),
 
+    path('collaborators/new-document=<int:collab_id>', collaborators.newdoc, name='document_new'),
+
     path('collaborators/change=<int:collab_id>', collaborators.change_status, name='collaborator_change_status'),
+
+    path('collaborators/<int:document_id>/delete', collaborators.delete_document, name='delete_document'),
 ]
 
 inventory_urls = [

@@ -68,9 +68,9 @@
                         {% for collab in collaborators %}
                             <tr>
                                 <th scope="row">
-                                    <a href="{% url 'collaborator_details' collab.name collab.id %}">
+                                    <a href="{% url 'collaborator_details' collab.first_name collab.last_name collab.id %}">
                                         <div class="text-black-50">
-                                             <span>{{ collab.name }}</span>
+                                             <span>{{ collab.first_name }} {{collab.last_name}}</span>
                                         </div>
                                     </a>
                                 </th>
@@ -103,7 +103,7 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                            <a class="dropdown-item" href="">Open</a>
+                                            <a class="dropdown-item" href="{% url 'collaborator_details' collab.first_name collab.last_name collab.id %}">Open</a>
                                             <div class="dropdown-divider"></div>
                                             {% if collab.status %}
                                             <a class="dropdown-item text-danger" href="{% url 'collaborator_change_status' collab.id %}">Disable</a>
@@ -260,10 +260,19 @@
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                     <form id="newCollaboratorForm" method="post" action="{% url 'collaborator_new' %}">
                         {% csrf_token %}
-                        <div class="form-group form-control-label mb-3">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" name="name"
-                                   placeholder="Collaborator's name">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group form-control-label mb-3">
+                                    <label for="first-name">First Name</label>
+                                    <input type="text" class="form-control" id="first-name" name="first_name">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group form-control-label mb-3">
+                                    <label for="last-name">Last Name</label>
+                                    <input type="text" class="form-control" id="last-name" name="last_name">
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col">
