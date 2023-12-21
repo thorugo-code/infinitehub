@@ -1,26 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from apps.home.models import Profile, Office, Collaborator, UploadedDocument
+from apps.home.models import Profile, Office, Document
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.http import HttpResponse, Http404
 from django.db.models import Q
+import datetime
 import os
 
 
 def get_paginated_collaborators(request, **kwargs):
-    collaborators = Collaborator.objects.all()
-
-    # # Loop through all the filters provided in kwargs
-    # for key, value in kwargs.items():
-    #     # Check if the filter key is a valid field in your Profile model
-    #     if key in Profile._meta.get_fields():
-    #         # If the filter value is not empty, filter the queryset
-    #         if value:
-    #             # If you want to apply 'OR' logic between filters, use Q objects
-    #             collaborators = collaborators.filter(Q(**{key: value}))
-    #
-    # exclude_query = Q(user__is_superuser=True) | Q(user=request.user)
-    #
-    # collaborators = collaborators.exclude(exclude_query)
-    # collaborators = collaborators.order_by('user__first_name')
+    collaborators = Profile.objects.filter(user__is_superuser=False).order_by('user__first_name')
 
     paginator = Paginator(collaborators, 6)
     page_number = request.GET.get('page')
@@ -39,26 +28,25 @@ def page_list(request):
     return render(request, 'home/collaborators-list.html', context)
 
 
-def details(request, collab_first_name, collab_last_name, collab_id):
+def details(request, slug):
 
-    collab = Collaborator.objects.get(id=collab_id)
+    collab = Profile.objects.get(slug=slug)
 
     if request.method == 'POST':
         collab.about = request.POST.get('about', collab.about)
         collab.address = request.POST.get('address', collab.address)
         collab.city = request.POST.get('city', collab.city)
         collab.country = request.POST.get('country', collab.country)
-        collab.first_name = request.POST.get('first_name', collab.first_name)
-        collab.last_name = request.POST.get('last_name', collab.last_name)
+        collab.user.first_name = request.POST.get('first_name', collab.user.first_name)
+        collab.user.last_name = request.POST.get('last_name', collab.user.last_name)
         collab.postal_code = request.POST.get('postal_code', collab.postal_code)
         collab.state = request.POST.get('state', collab.state)
         collab.save()
+        collab.user.save()
 
         return redirect(
             'collaborator_details',
-            collab_first_name=collab.first_name,
-            collab_id=collab.id,
-            collab_last_name=collab.last_name,
+            slug=collab.slug,
         )
 
     edit_mode = request.GET.get('edit')
@@ -72,7 +60,7 @@ def details(request, collab_first_name, collab_last_name, collab_id):
         'collaborator': collab,
         'user_profile': Profile.objects.get(user=request.user),
         'edit_mode': edit_mode,
-        'document_list': UploadedDocument.objects.filter(collab=collab),
+        'date': datetime.datetime.now().date(),
     }
 
     return render(request, 'home/collaborator-page.html', context)
@@ -95,48 +83,49 @@ def new(request):
 
 
 def newdoc(request, collab_id):
-    collab = Collaborator.objects.get(id=collab_id)
-
-    new_document = UploadedDocument(
-        category=request.POST['category'],
-        collab=collab,
+    new_document = Document(
+        user=User.objects.get(id=collab_id),
+        category=request.POST.get('category', 'None'),
         description=request.POST['description'],
         expiration=request.POST['expiration'],
         file=request.FILES['file'],
         name=request.POST['name'],
-        uploaded=request.POST['uploaded'],
     )
 
     new_document.save()
 
-    return redirect('collaborator_details', collab_first_name=collab.first_name, collab_last_name=collab.last_name,
-                    collab_id=collab.id)
+    return redirect('collaborator_details', slug=Profile.objects.get(id=collab_id).slug)
 
 
 def change_status(request, collab_id):
-    collab = Collaborator.objects.get(id=collab_id)
-    collab.status = not collab.status
+    collab = Profile.objects.get(id=collab_id)
+    collab.active = not collab.active
 
     collab.save()
 
     return redirect('collaborators_list')
 
 
-def delete_document(request, document_id):
-    uploaded_document = get_object_or_404(UploadedDocument, id=document_id)
-    document_path = uploaded_document.file.path
+def delete_document(request, slug, document_id):
+    document = get_object_or_404(Document, id=document_id)
+    document_path = document.file.path
     if os.path.exists(document_path):
         os.remove(document_path)
 
-    collab_id = uploaded_document.collab.id
-    collab_first_name = uploaded_document.collab.first_name
-    collab_last_name = uploaded_document.collab.last_name
+    document.delete()
 
-    uploaded_document.delete()
-
-    return redirect('collaborator_details',
-                    collab_first_name=collab_first_name,
-                    collab_last_name=collab_last_name,
-                    collab_id=collab_id)
+    return redirect('collaborator_details', slug=slug)
 
 
+def download_document(request, document_id):
+    document = get_object_or_404(Document, id=document_id)
+
+    document_path = document.file.path
+
+    if os.path.exists(document_path):
+        with open(document_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type='application/force-download')
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(document_path)
+            return response
+
+    raise Http404

@@ -1,10 +1,17 @@
 import os
 import qrcode
+import random
+import string
 from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User, Group
 from djmoney.models.fields import MoneyField
+from django.utils.text import slugify
 from djmoney.money import Money
+
+
+def rand_slug():
+    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(20))
 
 
 def unmask_money(value, currency):
@@ -44,10 +51,9 @@ def upload_path_bills(instance, filename):
 
 
 def custom_upload_path_documents(instance, filename):
-    collab_first_name = instance.collab.first_name.replace(" ", "_")
-    collab_last_name = instance.collab.last_name.replace(" ", "_")
+    collab_name = instance.user.get_full_name().replace(" ", "_")
     category = instance.category.replace(" ", "_")
-    return f'uploads/documents/{collab_first_name}_{collab_last_name}/{category}/{filename}'
+    return f'uploads/documents/{collab_name}/{category}/{filename}'
 
 
 class Equipments(models.Model):
@@ -142,31 +148,48 @@ class Project(models.Model):
 
 
 class Profile(models.Model):
-    first_login = models.BooleanField(default=True)
+    slug = models.SlugField(max_length=100, default='')
+    # Foreign Keys and Relationships
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    office = models.ForeignKey('Office', related_name="collaborators", on_delete=models.SET_NULL, null=True)
 
+    # File Fields
     avatar = models.ImageField(upload_to='apps/static/assets/uploads/profile_pics',
                                default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
 
-    # birthday = models.DateField(null=True, blank=True)
-
-    about = models.TextField(default='')
-
+    # Char Fields
     address = models.CharField(max_length=150, default='')
-
     city = models.CharField(max_length=100, default='')
     state = models.CharField(max_length=100, default='')
     country = models.CharField(max_length=100, default='')
     postal_code = models.CharField(max_length=20, default='')
+    contract = models.CharField(max_length=100, default='')
+    phone = models.CharField(max_length=20, default='')
 
-    # phone = models.CharField(max_length=20, default='')
+    # Date Fields
+    admission = models.DateField(null=True, blank=True, default=None)
+    birthday = models.DateField(null=True, blank=True, default=None)
 
-    office = models.ForeignKey('Office', related_name='members', on_delete=models.SET_NULL, null=True, blank=True)
+    # Text Fields
+    about = models.TextField(default='')
+
+    # Boolean Fields
+    active = models.BooleanField(default=True)
+    first_access = models.BooleanField(default=True)
 
     def __str__(self):
-        return f'{self.user.username} profile'
+        return self.user.username
 
     def save(self, *args, **kwargs):
+        if not self.slug and self.user.get_full_name() != '':
+            self.slug = slugify(self.user.get_full_name() + '-' + str(self.id))
+        elif self.slug != slugify(self.user.get_full_name() + '-' + str(self.id)) or kwargs.get('slug'):
+            self.slug = slugify(self.user.get_full_name() + '-' + str(self.id))
+        elif self.user.get_full_name() == '':
+            self.slug = slugify(str(self.id))
+        else:
+            pass
+
         super().save()
 
 
@@ -240,6 +263,8 @@ class Task(models.Model):
     created_at = models.DateField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='created_tasks', on_delete=models.SET_NULL, default=1, null=True)
 
+    owner = models.ForeignKey(User, related_name='user_tasks', on_delete=models.SET_NULL, null=True, blank=True)
+
     def __str__(self):
         return self.title
 
@@ -273,23 +298,6 @@ class Client(models.Model):
     area = models.CharField(max_length=100)
     location = models.CharField(max_length=200)
     description = models.TextField()
-
-
-class Collaborator(models.Model):
-    about = models.TextField(default='')
-    address = models.CharField(max_length=100, default='')
-    admission = models.DateField()
-    birthday = models.DateField()
-    city = models.TextField(default='')
-    contract = models.CharField(max_length=100)
-    country = models.CharField(max_length=50, default='')
-    email = models.CharField(max_length=100)
-    first_name = models.CharField(max_length=100, default='')
-    last_name = models.CharField(max_length=100, default='')
-    office = models.ForeignKey(Unit, related_name="collaborators", on_delete=models.SET_NULL, null=True)
-    postal_code = models.TextField(default='')
-    state = models.CharField(max_length=2, default='')
-    status = models.BooleanField(default=True)
 
 
 # Adicionar currency
@@ -369,11 +377,13 @@ class Bill(models.Model):
         super().save()
 
 
-class UploadedDocument(models.Model):
-    collab = models.ForeignKey(Collaborator, related_name='document', on_delete=models.CASCADE)
+class Document(models.Model):
+    user = models.ForeignKey(User, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
     category = models.CharField(max_length=50)
     description = models.TextField()
     expiration = models.DateField()
     file = models.FileField(upload_to=custom_upload_path_documents, blank=True, null=True)
     name = models.CharField(max_length=100)
-    uploaded = models.DateField()
+    uploaded_at = models.DateField(auto_now_add=True, null=True)
+    uploaded_by = models.ForeignKey(User, related_name='uploaded_documents', on_delete=models.SET_NULL, null=True,
+                                    default=None)

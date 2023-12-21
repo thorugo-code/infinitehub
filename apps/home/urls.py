@@ -91,7 +91,7 @@ collaborators_urls = [
 
     path('collaborators/', collaborators.page_list, name='collaborators_list'),
 
-    path('collaborators/<str:collab_first_name>-<str:collab_last_name>-<int:collab_id>', collaborators.details, name='collaborator_details'),
+    path('collaborators/<slug:slug>', collaborators.details, name='collaborator_details'),
 
     path('collaborators/new', collaborators.new, name='collaborator_new'),
 
@@ -99,7 +99,11 @@ collaborators_urls = [
 
     path('collaborators/change=<int:collab_id>', collaborators.change_status, name='collaborator_change_status'),
 
-    path('collaborators/<int:document_id>/delete', collaborators.delete_document, name='delete_document'),
+    path('collaborators/download=<int:document_id>', collaborators.download_document,
+         name='download_collaborator_document'),
+
+    path('collaborators/<slug:slug>/delete-document=<int:document_id>', collaborators.delete_document,
+         name='delete_document'),
 ]
 
 inventory_urls = [

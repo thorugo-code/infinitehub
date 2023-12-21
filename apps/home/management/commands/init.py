@@ -12,3 +12,6 @@ class Command(BaseCommand):
             profile, created = Profile.objects.get_or_create(user=user)
             if created:
                 self.stdout.write(f'Profile created for user: {self.style.SUCCESS(user.username)}')
+            elif not profile.slug:
+                profile.save(slug=True)
+                self.stdout.write(f'Profile slug created for user: {self.style.SUCCESS(user.username)}')

@@ -19,12 +19,12 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 profile = Profile.objects.get(user=user)
-                if profile.first_login:
-                    profile.first_login = False
-                    profile.save()
-                    return redirect("profile")
-                else:
-                    return redirect("home")
+                # if profile.first_access:
+                #     profile.first_access = False
+                #     profile.save()
+                #     return redirect("profile")
+                # else:
+                return redirect("home")
             else:
                 msg = 'Invalid credentials'
         else:
