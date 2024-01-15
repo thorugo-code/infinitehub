@@ -1,0 +1,279 @@
+{% extends 'layouts/base-fullscreen-nologo.html' %}
+
+{% block title %} Profile {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <style>
+        .pointer-hover:hover {
+            cursor: pointer;
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="content mb-6">
+        <div class="container-fluid">
+            <div class="col-md-8 col-12 mr-auto ml-auto">
+                <div class="wizard-container">
+                    <div class="card wizard-card" data-color="red" id="wizard">
+                        <form action="{% url 'send_profile_infos' %}" method="post" id="profileForm"
+                              enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <!-- You can switch " data-color="blue" "  with one of the next bright colors: "green", "orange", "red", "purple" -->
+                            <div class="wizard-header text-center border-bottom-0 mb-lg-4 mb-sm-4 mb-3">
+                                <h3 class="wizard-title my-4">
+                                    Build Your Profile
+                                </h3>
+                                <h5 class="card-description my-2 font-weight-300"></h5>
+                                <h5 class="card-description my-2 font-weight-300"></h5>
+                                <h5 class="card-description my-2 font-weight-300">This information will let us know more
+                                    about you &#128512;</h5>
+                            </div>
+                            <div class="wizard-navigation mx-lg-8 mx-sm-5 mx-5">
+                                <ul class="nav nav-pills">
+                                    <li class="nav-item" style="width: 33.33333%">
+                                        <a class="nav-link text-center active" href="#about" data-toggle="tab"
+                                           role="tab" aria-selected="false" disabled>
+                                            Basic Info
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" style="width: 33.33333%">
+                                        <a class="nav-link text-center" href="#address" data-toggle="tab" role="tab"
+                                           disabled>
+                                            Address
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" style="width: 33.33333%">
+                                        <a class="nav-link text-center" href="#account" data-toggle="tab" role="tab"
+                                           aria-selected="true" disabled>
+                                            About
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tab-content card-body">
+                                <div class="tab-pane active" id="about">
+                                    <div class="row justify-content-center py-0 py-lg-5 pt-sm-3 px-lg-5">
+                                        <div class="col-lg-4 col-md-5 pb-5 pb-lg-0 mr-sm-4">
+                                            <div class="card-profile-image align-items-center justify-content-center"
+                                                 style="background-color: #adb5bd00; height: 180px; display: flex">
+                                                <input type="file" id="profilePictureInput" style="display: none"
+                                                       accept="image/*" name="avatar">
+                                                <label for="profilePictureInput">
+                                                    <img class="rounded-circle pointer-hover"
+                                                         style="min-width: 180px; height: 180px; object-fit: cover; background-color: #fff; z-index: 1"
+                                                         id="profilePictureAvatar"
+                                                         src="{{ user.avatar.url|slice:"5:"|default:"/static/assets/img/icons/custom/1x/placeholder.webp" }}"
+                                                         alt="Profile Picture">
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-7 col-md-6 mr-lg-2">
+                                            <div class="row">
+                                                <div class="col form-group form-control-label mb-3">
+                                                    <label for="first-name">First Name</label>
+                                                    <input type="text" class="form-control" id="first-name"
+                                                           name="first_name" placeholder="" autofocus=""
+                                                           required="" value="{{ user.user.first_name }}">
+                                                </div>
+                                                <div class="col form-group form-control-label mb-3">
+                                                    <label for="last-name">Last Name</label>
+                                                    <input type="text" class="form-control" id="last-name"
+                                                           name="last_name" placeholder="" autofocus=""
+                                                           required="" value="{{ user.user.last_name }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-control-label select-wizard">
+                                                <label for="office">Office</label>
+                                                <select id="office" name="office" class="form-control">
+                                                    {% for office in offices %}
+                                                        <option value="{{ office.id }}"
+                                                                {% if user.office.id == office.id %}selected{% endif %}>{{ office.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="address">
+                                    <div class="row justify-content-center py-0 py-lg-5 py-sm-3">
+                                        <div class="col-sm-7">
+                                            <div class="form-group form-control-label bmd-form-group">
+                                                <label class="bmd-label-static" for="street">Street</label>
+                                                <input type="text" class="form-control" id="street" name="street"
+                                                       autofocus="" required="" value="{{ user.street }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group form-control-label bmd-form-group">
+                                                <label class="bmd-label-static" for="street-no">Nº</label>
+                                                <input type="number" class="form-control" id="street-no"
+                                                       name="street_number" autofocus="" required=""
+                                                       value="{{ user.street_number }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group form-control-label select-wizard">
+                                                <label for="country">Country</label>
+                                                <select id="country" class="form-control" onchange="loadStates()" autofocus="" required="">
+                                                    <option value="" disabled selected></option>
+                                                    <!-- Add country options dynamically from your JSON data -->
+                                                    {% for country in world %}
+                                                        <option value="{{ country }}"
+                                                                {% if context.user.country == country %}selected{% endif %}>{{ country }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group form-control-label bmd-form-group">
+                                                <label for="state">State</label>
+                                                <select id="state" class="form-control" disabled onchange="loadCities()">
+                                                    <option value="" disabled selected></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group form-control-label bmd-form-group">
+                                                <label for="city">City</label>
+                                                <select id="city" class="form-control" disabled>
+                                                    <option value="" disabled selected></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="account">
+                                    <div class="row justify-content-center py-0 py-lg-5 py-sm-3">
+                                        <div class="col-lg-10 px-lg-4">
+                                            <div class="form-group form-control-label">
+                                                <label for="about">About</label>
+                                                <textarea rows="6" class="form-control" id="about"
+                                                          name="about"
+                                                          placeholder="A few words about you...">{{ user.about }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="wizard-footer card-footer border-0 pt-0">
+                                <div class="row">
+                                    <div class="mr-auto ml-lg-3 mb-lg-3">
+                                        <input type="button"
+                                               class="btn btn-previous btn-fill btn-secondary btn-wd ml-3 disabled"
+                                               name="previous" value="Previous" style="display: none;">
+                                    </div>
+                                    <div class="ml-auto mr-lg-3 mb-lg-3">
+                                        <input type="button" class="btn btn-next btn-fill btn-primary btn-wd mr-3"
+                                               name="next"
+                                               value="Next">
+                                        <button type="submit" class="btn btn-finish btn-fill btn-success btn-wd mr-3"
+                                                name="finish" form="profileForm"
+                                                value="Finish" style="display: none;">
+                                            Finish
+                                        </button>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascript %}
+
+    <script src="/static/assets/js/wizard.js"></script>
+
+    <script>
+
+        document.getElementById('profilePictureInput').addEventListener('change', function (event) {
+            const fileInput = event.target;
+            const previewImage = document.getElementById('profilePictureAvatar');
+
+            const file = fileInput.files[0];
+            if (file) {
+                // Read the selected file as a data URL and set it as the source of the image
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+    </script>
+
+    <script>
+        const jsonData = {{ world|safe }};
+        const countryDropdown = document.getElementById('country');
+        const stateDropdown = document.getElementById('state');
+        const cityDropdown = document.getElementById('city');
+
+        // Populate the country dropdown
+        for (const country in jsonData) {
+            const option = document.createElement('option');
+            option.value = country;
+            option.text = country;
+            countryDropdown.add(option);
+        }
+
+        function loadStates() {
+            // Clear existing options
+            stateDropdown.innerHTML = '<option value="" disabled selected></option>';
+
+            const selectedCountry = countryDropdown.value;
+
+            if (selectedCountry && jsonData[selectedCountry]) {
+                // Enable the state dropdown
+                stateDropdown.disabled = false;
+
+                // Populate the state dropdown
+                for (const state in jsonData[selectedCountry]) {
+                    console.log(state);
+                    const option = document.createElement('option');
+                    option.value = state;
+                    option.text = state;
+                    stateDropdown.add(option);
+                }
+            } else {
+                // If no country is selected, disable the state and city dropdowns
+                stateDropdown.disabled = true;
+                cityDropdown.disabled = true;
+            }
+        }
+
+        function loadCities() {
+            // Clear existing options
+            cityDropdown.innerHTML = '<option value="" disabled selected></option>';
+
+            const selectedCountry = countryDropdown.value;
+            const selectedState = stateDropdown.value;
+
+            if (selectedCountry && selectedState && jsonData[selectedCountry][selectedState]) {
+                // Enable the city dropdown
+                cityDropdown.disabled = false;
+
+                // Populate the city dropdown
+                for (const city of jsonData[selectedCountry][selectedState]) {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.text = city;
+                    cityDropdown.add(option);
+                }
+            } else {
+                // If no country or state is selected, disable the city dropdown
+                cityDropdown.disabled = true;
+            }
+        }
+    </script>
+
+{% endblock javascript %}
+

@@ -97,22 +97,22 @@
                                     {% endif %}
                                 </th>
                                 <td>
-                                    <span>{{ collab.user.username }}</span>
+                                    <span>{{ collab.user.username|email_tag }}</span>
                                 </td>
                                 <td>
                                     <span>{% if collab.phone %}{{ collab.phone }}{% else %}-{% endif %}</span>
                                 </td>
                                 <td>
-                                    <span>{% if collab.office %}{{ collab.office.name }}{% else %}-{% endif %}</span>
+                                    <span>{{ collab.office.name|truncatechars:30|default:'-' }}</span>
                                 </td>
                                 <td>
-                                    <span>{% if collab.admission %}{{ collab.admission|date:'d/m/Y' }}{% else %}-{% endif %}</span>
+                                    <span>{{ collab.admission|date:'d/m/Y'|default:'-' }}</span>
                                 </td>
                                 <td>
-                                    <span>{% if collab.aso %}{{ collab.aso|date:'d/m/Y' }}{% else %}N/A{% endif %}</span>
+                                    <span>{{ collab.aso|date:'d/m/Y'|default:'-' }}</span>
                                 </td>
                                 <td>
-                                    {% if collab.active %}
+                                    {% if collab.user.is_active %}
                                     <span class="badge badge-dot">
                                         <i class="bg-success"></i>
                                         <span class="status mr-3">active</span>

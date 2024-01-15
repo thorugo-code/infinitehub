@@ -170,3 +170,9 @@ def without_currency(value, currency='BRL'):
     digits = value.replace(symbol, '').strip()
     if len(digits) >= 3:
         return digits[:-3].replace(',', '.') + ',' + digits[-2:]
+
+
+@register.filter(name='email_tag')
+@stringfilter
+def email_tag(value):
+    return value.split('@')[0] + '@...'

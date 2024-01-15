@@ -158,7 +158,8 @@ class Profile(models.Model):
                                default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
 
     # Char Fields
-    address = models.CharField(max_length=150, default='')
+    street = models.CharField(max_length=150, default='')
+    street_number = models.CharField(max_length=20, default='')
     city = models.CharField(max_length=100, default='')
     state = models.CharField(max_length=100, default='')
     country = models.CharField(max_length=100, default='')
@@ -174,7 +175,6 @@ class Profile(models.Model):
     about = models.TextField(default='')
 
     # Boolean Fields
-    active = models.BooleanField(default=True)
     first_access = models.BooleanField(default=True)
 
     def __str__(self):

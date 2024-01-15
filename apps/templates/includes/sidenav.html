@@ -129,25 +129,6 @@
                         </a>
                     </li>
                 {% endif %}
-
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link collapsed" id="collapse-financial"#}
-{#                       href="#navbar-financial" data-toggle="collapse" role="button" aria-expanded="false"#}
-{#                       aria-controls="navbar-financial">#}
-{#                        <i class="fas fa-users text-orange"></i>#}
-{#                        <span class="nav-link-text">Clients</span>#}
-{#                    </a>#}
-{#                    <div class="collapse" id="navbar-financial" style="">#}
-{#                        <ul class="nav nav-sm flex-column">#}
-{#                            <li class="nav-item">#}
-{#                                <a class="nav-link"#}
-{#                                   href="{% url 'clients_home' %}">#}
-{#                                    <span class="nav-link-text mr-1"> All </span>#}
-{#                                </a>#}
-{#                            </li>#}
-{#                        </ul>#}
-{#                    </div>#}
-{#                </li>#}
                 <!-- Collaborators items -->
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'collaborators_list' %}">
@@ -155,27 +136,16 @@
                         <span class="nav-link-text">Collaborators</span>
                     </a>
                 </li>
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link collapsed" id="collapse-collaborators"#}
-{#                       href="#navbar-collaborators" data-toggle="collapse" role="button"#}
-{#                       aria-expanded="false" aria-controls="navbar-collaborator">#}
-{#                        <i class="fas fa-user-friends text-yellow" style="opacity: 90%"></i>#}
-{#                        <span class="nav-link-text">Collaborators</span>#}
-{#                    </a>#}
-{#                    <div class="collapse" id="navbar-collaborators" style>#}
-{#                        <ul class="nav nav-sm flex-column">#}
-{#                            <li class="nav-item">#}
-{#                                <a href="/collaborators/" class="nav-link">#}
-{#                                    <span class="sidenav-normal"> All </span>#}
-{#                                </a>#}
-{#                            </li>#}
-{#                        </ul>#}
-{#                    </div>#}
-{#                </li>#}
             </ul>
 
             <!-- Down items -->
             <ul class="navbar-nav navbar-item-fixed-bottom" id="bottomNavList" style="background: #fff; bottom: 15px">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'profile' %}">
+                        <i class="ni ni-single-02"></i>
+                        <span class="nav-link-text">Profile</span>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">
                         <i class="ni ni-button-power text-red"></i>
