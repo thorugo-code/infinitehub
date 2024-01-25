@@ -149,6 +149,7 @@ class Project(models.Model):
 
 class Profile(models.Model):
     slug = models.SlugField(max_length=100, default='')
+
     # Foreign Keys and Relationships
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     office = models.ForeignKey('Office', related_name="collaborators", on_delete=models.SET_NULL, null=True)
@@ -166,9 +167,13 @@ class Profile(models.Model):
     postal_code = models.CharField(max_length=20, default='')
     contract = models.CharField(max_length=100, default='')
     phone = models.CharField(max_length=20, default='')
+    position = models.CharField(max_length=100, default='')
+
+    # Integer Fields
+    identification = models.IntegerField(default=0)
 
     # Date Fields
-    admission = models.DateField(null=True, blank=True, default=None)
+    aso = models.DateField(null=True, blank=True, default=None)
     birthday = models.DateField(null=True, blank=True, default=None)
 
     # Text Fields
@@ -182,11 +187,13 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug and self.user.get_full_name() != '':
-            self.slug = slugify(self.user.get_full_name() + '-' + str(self.id))
-        elif self.slug != slugify(self.user.get_full_name() + '-' + str(self.id)) or kwargs.get('slug'):
-            self.slug = slugify(self.user.get_full_name() + '-' + str(self.id))
+            self.slug = slugify(self.user.get_full_name() + '-' + str(self.user.id))
+        elif self.slug != slugify(self.user.get_full_name() + '-' + str(self.user.id)) or kwargs.get('slug'):
+            self.slug = slugify(self.user.get_full_name() + '-' + str(self.user.id))
         elif self.user.get_full_name() == '':
-            self.slug = slugify(str(self.id))
+            self.slug = slugify(str(self.user.id))
+        elif self.slug.endswith('none'):
+            self.slug = self.slug.replace('none', str(self.user.id))
         else:
             pass
 
@@ -198,7 +205,8 @@ class UploadedFile(models.Model):
     client = models.ForeignKey('Client', related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
     file = models.FileField(upload_to=custom_upload_path_projects)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.SET_NULL, default=1, null=True)
+    uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.SET_NULL, default=1,
+                                    null=True)
     category = models.CharField(max_length=100, default='others')
     description = models.TextField(default='')
     value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
@@ -368,7 +376,8 @@ class Bill(models.Model):
         elif not kwargs.get('paid'):
             self.paid_at = None
 
-        if self.due_date and datetime.strptime(str(self.due_date), '%Y-%m-%d').date() < datetime.now().date() and not self.paid:
+        if self.due_date and datetime.strptime(str(self.due_date),
+                                               '%Y-%m-%d').date() < datetime.now().date() and not self.paid:
             self.late = True
 
         if not self.income and self.subcategory is None:
@@ -382,8 +391,35 @@ class Document(models.Model):
     category = models.CharField(max_length=50)
     description = models.TextField()
     expiration = models.DateField()
+    expired = models.BooleanField(default=False)
     file = models.FileField(upload_to=custom_upload_path_documents, blank=True, null=True)
     name = models.CharField(max_length=100)
     uploaded_at = models.DateField(auto_now_add=True, null=True)
     uploaded_by = models.ForeignKey(User, related_name='uploaded_documents', on_delete=models.SET_NULL, null=True,
                                     default=None)
+
+    def __str__(self):
+        return self.name
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+
+        if str(self.name).lower() == 'aso':
+            user_profile = Profile.objects.get(user=self.user)
+            aso_files = sorted(Document.objects.filter(user=self.user, name__iexact='aso'), key=lambda x: x.expiration)
+            last_aso = aso_files[-1] if aso_files else None
+            user_profile.aso = last_aso.expiration if aso_files else None
+            user_profile.save()
+
+    def save(self, *args, **kwargs):
+        super().save()
+
+        if str(self.name).lower() == 'aso':
+            try:
+                expiration_date = datetime.strptime(self.expiration, '%Y-%m-%d').date()
+            except TypeError:
+                expiration_date = self.expiration
+
+            user_profile = Profile.objects.get(user=self.user)
+            user_profile.aso = expiration_date if user_profile.aso is None or user_profile.aso < expiration_date else user_profile.aso
+            user_profile.save()

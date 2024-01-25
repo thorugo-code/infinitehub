@@ -157,7 +157,7 @@
                                                 {% if 'office=' in filter_item %}
                                                     <span>Office</span>
                                                 {% elif 'from=' in filter_item %}
-                                                    <span>{% if not filters|first_filter:'due_date' %} | {% endif %}Date</span>
+                                                    <span>{% if not filters|first_filter:'from' %} | {% endif %}Date</span>
                                                 {% elif 'method=' in filter_item %}
                                                     <span>{% if not filters|first_filter:'method' %} | {% endif %}Method</span>
                                                 {% elif 'client=' in filter_item %}
@@ -1256,14 +1256,14 @@
                                 <input type="date" class="form-control"
                                        id="startDateFilter"
                                        name="start_date"
-                                       value="{% if 'from=' in filters %}{{ filters|extract_from_key:'from' }}{% else %}{{ date_now|date:'Y-m-d' }}{% endif %}">
+                                       value="{% if 'from=' in filters %}{{ filters|extract_from_key:'from' }}{% else %}{% endif %}">
                             </div>
                             <div class="col form-group form-control-label">
                                 <label for="endDateFilter">To</label>
                                 <input type="date" class="form-control"
                                        id="endDateFilter"
                                        name="end_date"
-                                       value="{% if 'to=' in filters %}{{ filters|extract_from_key:'to' }}{% else %}{{ date_now|date:'Y-m-d' }}{% endif %}">
+                                       value="{% if 'to=' in filters %}{{ filters|extract_from_key:'to' }}{% else %}{% endif %}">
                             </div>
                         </div>
                         <div class="row">
@@ -1579,8 +1579,6 @@
             }
         }
 
-        document.getElementById("defaultOpenBillsModal").click();
-
         function clearChks(selectObject) {
             let chkAsc = document.getElementById("chk-asc");
             let chkDesc = document.getElementById("chk-desc");
@@ -1593,6 +1591,8 @@
                 chkDesc.checked = true;
             }
         }
+
+        document.getElementById("defaultOpenBillsModal").click();
 
     </script>
 

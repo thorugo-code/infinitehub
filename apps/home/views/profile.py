@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from apps.home.models import UploadedFile, Profile
+from apps.home.models import UploadedFile, Profile, Task, Document
 
 
 def details(request):
@@ -10,6 +10,18 @@ def details(request):
 
     context = {
         'user_profile': user_profile,
+        'completed_tasks': Task.objects.filter(created_by=user, completed=True).count(),
+        'completed_tasks_percentage': (Task.objects.filter(created_by=user,
+                                                           completed=True).count() / Task.objects.filter(
+            created_by=user).count()) * 100 if Task.objects.filter(created_by=user).count() > 0 else 0,
+        'project_files': UploadedFile.objects.filter(uploaded_by=user, project__isnull=False).count(),
+        'project_files_percentage': (UploadedFile.objects.filter(uploaded_by=user,
+                                                                 project__isnull=False).count() / UploadedFile.objects.filter(
+            uploaded_by=user).count()) * 100 if UploadedFile.objects.filter(uploaded_by=user).count() > 0 else 0,
+        'uploaded_documents': Document.objects.filter(user=user, uploaded_by=user).count(),
+        'uploaded_documents_percentage': (Document.objects.filter(user=user,
+                                                                  uploaded_by=user).count() / Document.objects.filter(
+            user=user).count()) * 100 if Document.objects.filter(user=user).count() > 0 else 0,
         'user_files': user_files,
         'user_files_number': user_files_count
     }
@@ -41,4 +53,3 @@ def change_picture(request):
         return redirect('profile')
 
     return redirect('profile')
-

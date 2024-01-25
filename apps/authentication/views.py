@@ -30,6 +30,11 @@ def login_view(request):
                             'username': check_profile.user.username,
                             'logged': 'true',
                         }
+                else:
+                    request.session['registration_data'] = {
+                        'username': user.username,
+                        'logged': 'true',
+                    }
 
                 return redirect("fill_profile")
 
@@ -80,7 +85,8 @@ def fill_profile(request):
         # Check if user already exists
         if Profile.objects.filter(user__username=request.session['registration_data']['username']).exists():
             profile = Profile.objects.get(user__username=request.session['registration_data']['username'])
-            profile.office = Office.objects.get(id=request.POST['office'])
+            profile.office = Office.objects.get(id=request.POST['office']) if request.POST.get(
+                'office') else profile.office
             profile.street = request.POST.get('street', profile.street)
             profile.street_number = request.POST.get('street_number', profile.street_number)
             profile.city = request.POST.get('city', profile.city)
@@ -89,11 +95,14 @@ def fill_profile(request):
             profile.about = request.POST.get('about', profile.about)
             profile.first_access = False
             profile.avatar = request.FILES.get('avatar', profile.avatar)
+            profile.phone = request.POST.get('phone', profile.phone)
+            profile.birthday = request.POST.get('birthday', profile.birthday)
+            profile.position = request.POST.get('position', profile.position)
 
         else:
             profile = Profile(
                 user=user_object,
-                office=Office.objects.get(id=request.POST['office']),
+                office=Office.objects.get(id=request.POST['office']) if request.POST.get('office') else None,
                 street=request.POST['street'],
                 street_number=request.POST['street_number'],
                 city=request.POST['city'],
@@ -101,15 +110,15 @@ def fill_profile(request):
                 country=request.POST['country'],
                 about=request.POST['about'],
                 first_access=False,
+                phone=request.POST['phone'],
+                birthday=request.POST['birthday'],
+                position=request.POST['position'],
             )
 
             profile.avatar = request.FILES.get('avatar', profile.avatar)
 
         profile.save()
         user_object.save()
-
-        # profile.postal_code = request.POST.get('postal_code', None)
-        # profile.phone = request.POST['phone']
 
         msg = 'User created! You can now <a href="/login/">login</a>'
 
@@ -120,12 +129,14 @@ def fill_profile(request):
             return redirect("/login/", {"msg": msg, "success": success})
 
     else:
+        user_profile = Profile.objects.filter(user__username=request.session['registration_data']['username']) if \
+            request.session.get('registration_data') else None
+        user_profile = user_profile[0] if user_profile else None
+
         context = {
             "world": json.load(open(f'{CORE_DIR}/apps/static/assets/world.json', 'r', encoding='utf-8')),
             "offices": Office.objects.all(),
-            "user": Profile.objects.filter(user__username=request.session['registration_data'][
-                'username'])[0] if Profile.objects.filter(user__username=request.session['registration_data'][
-                'username']) else "",
+            "user": user_profile,
         }
 
         return render(request, "home/profile-wizard.html", context)

@@ -72,6 +72,10 @@ def filter_bill_objects(filters):
             if from_date and to_date and from_date < to_date:
                 bills = bills.filter(due_date__gte=from_date)
                 bills = bills.filter(due_date__lte=to_date)
+            elif from_date:
+                bills = bills.filter(due_date__gte=from_date)
+            elif to_date:
+                bills = bills.filter(due_date__lte=to_date)
 
             if method != 'all':
                 bills = bills.filter(method=method)

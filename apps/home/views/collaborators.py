@@ -8,78 +8,122 @@ import datetime
 import os
 
 
-def get_paginated_collaborators(request, **kwargs):
-    collaborators = Profile.objects.filter(user__is_superuser=False).order_by('user__first_name')
-
-    paginator = Paginator(collaborators, 6)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    return page_obj
+def check_expired_documents():
+    expired_documents = Document.objects.filter(Q(expiration__lt=datetime.datetime.now().date()) & Q(expired=False))
+    for doc in expired_documents:
+        doc.expired = True
+        doc.save()
 
 
-def page_list(request):
+def filter_documents_objects(user, filters):
+    documents = Document.objects.filter(user=user)
+
+    if filters:
+        filters_list = filters.split('&')
+
+        category = 'all'
+        from_date, to_date = False, False
+        expired, up_to_date = True, True
+
+        for item in filters_list:
+            from_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith(
+                'from') else from_date
+            to_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('to') else to_date
+            category = item.split('=')[1] if item.startswith('category') else category
+
+            if from_date and to_date and from_date < to_date:
+                documents = documents.filter(expiration__gte=from_date)
+                documents = documents.filter(expiration__lte=to_date)
+            elif from_date:
+                documents = documents.filter(expiration__gte=from_date)
+            elif to_date:
+                documents = documents.filter(expiration__lte=to_date)
+
+            if category != 'all':
+                documents = documents.filter(category=category if category else None)
+
+    return documents
+
+
+def sort_documents_objects(documents, sorted_by, sort_type):
+    if sorted_by is not None:
+        sorted_by = sorted_by.replace('-', '_')
+    else:
+        sorted_by = ''
+
+    documents = sorted(documents, key=lambda document: getattr(document, sorted_by, ''))
+
+    if sort_type == 'desc':
+        documents = reversed(documents)
+
+    return documents
+
+
+def get_permission(request, permission_type, model='bill'):
+    return request.user.has_perm(f'home.{permission_type}_{model}')
+
+
+def page_list(request, filters=None, sorted_by=None, sort_type=None):
+    check_expired_documents()
+
+    collaborators = filter_collaborators_objects(filters)
+    collaborators = sort_collaborators_objects(collaborators, sorted_by, sort_type)
+
+    collaborators = list(collaborators)
+
+    min_aso_date = sorted(collaborators, key=lambda collaborator: collaborator.aso if collaborator.aso else datetime.date.max)[0].aso if len(collaborators) > 0 else 0
+    max_aso_date = sorted(collaborators, key=lambda collaborator: collaborator.aso if collaborator.aso else datetime.date.min)[-1].aso if len(collaborators) > 0 else 0
+
     context = {
-        'collaborators': get_paginated_collaborators(request, **request.GET),
+        'sorted_by': sorted_by.replace('-', '_') if sorted_by else None,
+        'sort_type': sort_type.replace('-', '_') if sort_type else None,
+        'filters': filters,
+        'collaborators': collaborators,
         'user_profile': Profile.objects.get(user=request.user),
         'offices': Office.objects.all(),
+        'min_aso_date': min_aso_date,
+        'max_aso_date': max_aso_date,
     }
 
     return render(request, 'home/collaborators-list.html', context)
 
 
-def details(request, slug):
+def details(request, slug, sorted_by=None, sort_type=None, filters=None):
+    if not get_permission(request, 'view', 'document'):
+        context = {
+            'user_profile': Profile.objects.get(user=request.user),
+        }
+        return render(request, 'home/page-404.html', context)
+
+    check_expired_documents()
 
     collab = Profile.objects.get(slug=slug)
+    documents = filter_documents_objects(collab.user, filters)
+    documents = sort_documents_objects(documents, sorted_by, sort_type)
 
-    if request.method == 'POST':
-        collab.about = request.POST.get('about', collab.about)
-        collab.address = request.POST.get('address', collab.address)
-        collab.city = request.POST.get('city', collab.city)
-        collab.country = request.POST.get('country', collab.country)
-        collab.user.first_name = request.POST.get('first_name', collab.user.first_name)
-        collab.user.last_name = request.POST.get('last_name', collab.user.last_name)
-        collab.postal_code = request.POST.get('postal_code', collab.postal_code)
-        collab.state = request.POST.get('state', collab.state)
-        collab.save()
-        collab.user.save()
+    aso_document = Document.objects.filter(user=collab.user, name__iexact='aso').order_by(
+        'expiration').last()
 
-        return redirect(
-            'collaborator_details',
-            slug=collab.slug,
-        )
+    days_to_aso = (aso_document.expiration - datetime.datetime.now().date()).days if aso_document else None
 
-    edit_mode = request.GET.get('edit')
-
-    if edit_mode is not None:
-        edit_mode = True
-    else:
-        edit_mode = False
+    expired_documents_count = Document.objects.filter(user=collab.user, expired=True).count()
 
     context = {
+        'sorted_by': sorted_by.replace('-', '_') if sorted_by else None,
+        'sort_type': sort_type.replace('-', '_') if sort_type else None,
+        'filters': filters,
         'collaborator': collab,
+        'collaborator_documents': documents,
+        'collaborator_all_documents': Document.objects.filter(user=collab.user).count(),
         'user_profile': Profile.objects.get(user=request.user),
-        'edit_mode': edit_mode,
-        'date': datetime.datetime.now().date(),
+        'aso_date': aso_document.expiration if aso_document else None,
+        'aso_expiration': days_to_aso,
+        'expired_documents': expired_documents_count,
+        'expired_documents_percentage': (expired_documents_count / Document.objects.filter(
+            user=collab.user).count()) * 100 if Document.objects.filter(user=collab.user).count() > 0 else 0,
     }
 
     return render(request, 'home/collaborator-page.html', context)
-
-
-def new(request):
-    new_collab = Collaborator(
-        birthday=request.POST['birthday'],
-        admission=request.POST['admission'],
-        email=request.POST['email'],
-        contract=request.POST['contract'],
-        first_name=request.POST['first_name'],
-        last_name=request.POST['last_name'],
-        office=Office.objects.get(id=request.POST['office'])
-    )
-
-    new_collab.save()
-
-    return redirect('collaborators_list')
 
 
 def newdoc(request, collab_id):
@@ -94,22 +138,22 @@ def newdoc(request, collab_id):
 
     new_document.save()
 
-    return redirect('collaborator_details', slug=Profile.objects.get(id=collab_id).slug)
+    return redirect('collaborator_details', slug=Profile.objects.get(user__id=collab_id).slug)
 
 
 def change_status(request, collab_id):
     collab = Profile.objects.get(id=collab_id)
-    collab.active = not collab.active
+    collab.user.is_active = not collab.user.is_active
 
-    collab.save()
+    collab.user.save()
 
     return redirect('collaborators_list')
 
 
 def delete_document(request, slug, document_id):
     document = get_object_or_404(Document, id=document_id)
-    document_path = document.file.path
-    if os.path.exists(document_path):
+    document_path = document.file.path if document.file else None
+    if document_path and os.path.exists(document_path):
         os.remove(document_path)
 
     document.delete()
@@ -129,3 +173,193 @@ def download_document(request, document_id):
             return response
 
     raise Http404
+
+
+def sort_docs(request, slug):
+    sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
+    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
+    filters = request.POST.get('filters', 'None')
+
+    if sorted_by != '' and filters != 'None':
+        return redirect('sorted_filtered_documents', sorted_by=sorted_by, sort_type=sort_type, filters=filters,
+                        slug=slug)
+    elif sorted_by != '':
+        return redirect('sorted_documents', sorted_by=sorted_by, sort_type=sort_type, slug=slug)
+    elif filters != 'None':
+        return redirect('filtered_documents', filters=filters, slug=slug)
+    else:
+        return redirect('collaborator_details', slug=slug)
+
+
+def filter_docs(request, slug):
+    from_date = request.POST['from']
+    to_date = request.POST['to']
+    category = request.POST['category']
+    expired = request.POST.get('expired')
+
+    filter_list = [
+        f'from={from_date}' if from_date != '' and from_date != to_date else '%',
+        f'to={to_date}' if to_date != '' and from_date != to_date else '%',
+        f'category={category}' if category != 'all' else '%',
+    ]
+
+    filter_string = '&'.join(filter_list)
+    if filter_string.startswith('%&'):
+        filter_string = filter_string[2:]
+    if filter_string.endswith('&'):
+        filter_string = filter_string[:-1]
+
+    filter_string = filter_string.replace('%&', '')
+    filter_string = filter_string.replace('/', '-')
+    filter_string = filter_string[:-2] if filter_string.endswith('&%') else filter_string
+
+    if request.POST['sort_by'] != 'None' and filter_string != '%':
+        return redirect('sorted_filtered_documents',
+                        sorted_by=request.POST['sort_by'].replace('_', '-'),
+                        sort_type=request.POST['sort_type'],
+                        filters=filter_string, slug=slug)
+    elif filter_string == '%' and request.POST['sort_by'] != 'None':
+        return redirect('sorted_documents',
+                        sorted_by=request.POST['sort_by'].replace('_', '-'),
+                        sort_type=request.POST['sort_type'], slug=slug)
+    elif filter_string == '%':
+        return redirect('collaborator_details', slug=slug)
+    else:
+        return redirect('filtered_documents', filters=filter_string, slug=slug)
+
+
+def filter_collaborators(request):
+    office = request.POST['office']
+    group = request.POST['group']
+    from_date = request.POST['from']
+    to_date = request.POST['to']
+    disabled = request.POST.get('disabled_filter', None)
+    active = request.POST.get('active_filter', None)
+
+    filter_list = [
+        f'office={office}' if office != 'all' else '%',
+        f'group={group}' if group != 'all' else '%',
+        f'from={from_date}' if from_date != '' else '%',
+        f'to={to_date}' if to_date != '' else '%',
+        f'disabled=off' if not disabled else '%',
+        f'active=off' if not active else '%',
+    ]
+
+    filter_string = '&'.join(filter_list)
+    if filter_string.startswith('%&'):
+        filter_string = filter_string[2:]
+    if filter_string.endswith('&'):
+        filter_string = filter_string[:-1]
+
+    filter_string = filter_string.replace('%&', '')
+    filter_string = filter_string.replace('/', '-')
+    filter_string = filter_string[:-2] if filter_string.endswith('&%') else filter_string
+
+    if request.POST['sort_by'] != 'None' and filter_string != '%':
+        return redirect('sorted_filtered_collaborators',
+                        sorted_by=request.POST['sort_by'].replace('_', '-'),
+                        sort_type=request.POST['sort_type'],
+                        filters=filter_string)
+    elif filter_string == '%' and request.POST['sort_by'] != 'None':
+        return redirect('sorted_collaborators',
+                        sorted_by=request.POST['sort_by'].replace('_', '-'),
+                        sort_type=request.POST['sort_type'])
+    elif filter_string == '%':
+        return redirect('collaborators_list')
+    else:
+        return redirect('filtered_collaborators', filters=filter_string)
+
+
+def sort_collaborators(request):
+    sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
+    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
+    filters = request.POST.get('filters', 'None')
+
+    if sorted_by != '' and filters != 'None':
+        return redirect('sorted_filtered_collaborators', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
+    elif sorted_by != '':
+        return redirect('sorted_collaborators', sorted_by=sorted_by, sort_type=sort_type)
+    elif filters != 'None':
+        return redirect('filtered_collaborators', filters=filters)
+    else:
+        return redirect('collaborators_list')
+
+
+def filter_collaborators_objects(filters):
+    collaborators = Profile.objects.filter(user__username__endswith='@infinitefoundry.com').order_by('user__first_name')
+
+    groups = {
+        'admin': [
+            'admin@infinitefoundry.com',
+            'vitorhugo@infinitefoundry.com',
+        ],
+        'financial': [
+            'joaoeisinger@infinitefoundry.com',
+            'dieynieleandrade@infinitefoundry.com',
+        ]
+    }
+
+    if filters:
+        filters_list = filters.split('&')
+
+        office, group = 'all', 'all'
+        from_date, to_date = None, None
+        disabled, active = True, True
+
+        for item in filters_list:
+            office = item.split('=')[1] if item.startswith('office') else office
+            group = item.split('=')[1] if item.startswith('group') else group
+            from_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith(
+                'from') else from_date
+            to_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('to') else to_date
+            disabled = False if item.startswith('disabled') else disabled
+            active = False if item.startswith('active') else active
+
+        if office != 'all':
+            collaborators = collaborators.filter(office=office if office else None)
+
+        if group != 'all':
+            collaborators = collaborators.filter(user__username__in=groups[group])
+
+        if to_date is not None:
+            collaborators = collaborators.filter(birthday__lte=to_date)
+
+        if from_date is not None:
+            collaborators = collaborators.filter(birthday__gte=from_date)
+
+        if not disabled:
+            collaborators = collaborators.filter(user__is_active=True)
+
+        if not active:
+            collaborators = collaborators.filter(user__is_active=False)
+
+    return collaborators
+
+
+def sort_collaborators_objects(collaborators, sorted_by, sort_type):
+    if sorted_by is not None:
+        sorted_by = sorted_by.replace('-', '_')
+    else:
+        sorted_by = ''
+
+    if sorted_by == 'birthday':
+        if sort_type == 'asc':
+            collaborators = sorted(collaborators, key=lambda
+                collaborator: collaborator.birthday if collaborator.birthday else datetime.date.max)
+        else:
+            collaborators = sorted(collaborators, key=lambda
+                collaborator: collaborator.birthday if collaborator.birthday else datetime.date.min)
+    elif sorted_by == 'aso':
+        if sort_type == 'asc':
+            collaborators = sorted(collaborators, key=lambda
+                collaborator: collaborator.aso if collaborator.aso else datetime.date.max)
+        else:
+            collaborators = sorted(collaborators, key=lambda
+                collaborator: collaborator.aso if collaborator.aso else datetime.date.min)
+    else:
+        collaborators = sorted(collaborators, key=lambda collaborator: getattr(collaborator, sorted_by, ''))
+
+    if sort_type == 'desc':
+        collaborators = reversed(collaborators)
+
+    return collaborators

@@ -1,6 +1,7 @@
 from django import template
 from django.template.defaultfilters import stringfilter
 from apps.home.models import Office
+from datetime import datetime
 
 register = template.Library()
 
@@ -176,3 +177,99 @@ def without_currency(value, currency='BRL'):
 @stringfilter
 def email_tag(value):
     return value.split('@')[0] + '@...'
+
+
+@register.filter(name='from_to')
+@stringfilter
+def from_to(value):
+    list_of_string = value.split('&')
+    from_in = False
+    to_in = False
+    for tag in list_of_string:
+        if tag.startswith('from'):
+            from_in = True
+        elif tag.startswith('to'):
+            to_in = True
+
+        if from_in and to_in:
+            return True
+    else:
+        return False
+
+
+@register.filter(name='both_from_to')
+@stringfilter
+def both_from_to(value):
+    list_of_string = value.split('&')
+    from_in = False
+    to_in = False
+    for tag in list_of_string:
+        if tag.startswith('from'):
+            from_in = True
+        elif tag.startswith('to'):
+            to_in = True
+
+        if from_in and to_in:
+            return True
+    else:
+        return False
+
+
+@register.filter(name='xor_from_to')
+@stringfilter
+def xor_from_to(value):
+    list_of_string = value.split('&')
+    from_in = False
+    to_in = False
+    for tag in list_of_string:
+        if tag.startswith('from='):
+            from_in = True
+        elif tag.startswith('to='):
+            to_in = True
+    else:
+        return from_in != to_in
+
+
+@register.filter(name='time_to_date')
+@stringfilter
+def time_to_date(value):
+    try:
+        return (datetime.strptime(value, "%d/%m/%Y").date() - datetime.today().date()).days
+    except ValueError:
+        try:
+            return (datetime.strptime(value, "%Y-%m-%d").date() - datetime.today().date()).days
+        except ValueError:
+            return None
+
+
+@register.filter(name='time_from_date')
+@stringfilter
+def time_from_date(value):
+    try:
+        return (datetime.today().date() - datetime.strptime(value, "%d/%m/%Y").date()).days
+    except ValueError:
+        try:
+            return (datetime.today().date() - datetime.strptime(value, "%Y-%m-%d").date()).days
+        except ValueError:
+            return None
+
+
+@register.filter(name='check_group')
+@stringfilter
+def check_group(value, group):
+    if group == 'finance':
+        finance_group = [
+            'joaoeisinger@infinitefoundry.com',
+            'dieynieleandrade@infinitefoundry.com',
+
+        ]
+        return value in finance_group
+
+    elif group == 'admin':
+        admin_group = [
+            'admin@infinitefoundry.com',
+            'vitorhugo@infinitefoundry.com',
+        ]
+
+    elif group == 'collaborator':
+        return value.endswith('@infinitefoundry.com')

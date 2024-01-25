@@ -87,23 +87,48 @@ clients_urls = [
     path('clients/delete=<int:client_id>', clients.delete, name='delete_client'),
 ]
 
-collaborators_urls = [
-
-    path('collaborators/', collaborators.page_list, name='collaborators_list'),
+collaborators_page_urls = [
 
     path('collaborators/<slug:slug>', collaborators.details, name='collaborator_details'),
 
-    path('collaborators/new', collaborators.new, name='collaborator_new'),
-
     path('collaborators/new-document=<int:collab_id>', collaborators.newdoc, name='document_new'),
-
-    path('collaborators/change=<int:collab_id>', collaborators.change_status, name='collaborator_change_status'),
 
     path('collaborators/download=<int:document_id>', collaborators.download_document,
          name='download_collaborator_document'),
 
     path('collaborators/<slug:slug>/delete-document=<int:document_id>', collaborators.delete_document,
          name='delete_document'),
+
+    path('collaborators/<slug:slug>/filter', collaborators.filter_docs, name='filter_documents'),
+
+    path('collaborators/<slug:slug>/order', collaborators.sort_docs, name='sort_documents'),
+
+    path('collaborators/<slug:slug>/order:<str:sorted_by>-<str:sort_type>', collaborators.details,
+         name='sorted_documents'),
+
+    path('collaborators/<slug:slug>/filters:<str:filters>', collaborators.details,
+         name='filtered_documents'),
+
+    path('collaborators/<slug:slug>/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', collaborators.details,
+         name='sorted_filtered_documents'),
+]
+
+collaborators_list_urls = [
+
+    path('collaborators/', collaborators.page_list, name='collaborators_list'),
+
+    path('collaborators/change=<int:collab_id>', collaborators.change_status, name='collaborator_change_status'),
+
+    path('collaborators/order/', collaborators.sort_collaborators, name='sort_collaborators'),
+
+    path('collaborators/filter/', collaborators.filter_collaborators, name='filter_collaborators'),
+
+    path('collaborators/order:<str:sorted_by>-<str:sort_type>', collaborators.page_list, name='sorted_collaborators'),
+
+    path('collaborators/filters:<str:filters>', collaborators.page_list, name='filtered_collaborators'),
+
+    path('collaborators/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', collaborators.page_list,
+         name='sorted_filtered_collaborators'),
 ]
 
 inventory_urls = [
@@ -144,8 +169,8 @@ base_urls = [
 
 ]
 
-urlpatterns = projects_list_urls + projects_page_urls + assets_urls + collaborators_urls + inventory_urls + profile_urls
-urlpatterns += balance_urls + clients_urls + offices_urls + base_urls
+urlpatterns = projects_list_urls + projects_page_urls + assets_urls + collaborators_page_urls + collaborators_list_urls
+urlpatterns += balance_urls + inventory_urls + profile_urls + clients_urls + offices_urls + base_urls
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
