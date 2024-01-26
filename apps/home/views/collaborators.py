@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from apps.home.models import Profile, Office, Document
 from django.contrib.auth.models import User
-from django.core.paginator import Paginator
 from django.http import HttpResponse, Http404
 from django.db.models import Q
 import datetime
@@ -363,3 +362,19 @@ def sort_collaborators_objects(collaborators, sorted_by, sort_type):
         collaborators = reversed(collaborators)
 
     return collaborators
+
+
+def fill_collaborator_initial_infos(request, slug):
+    collaborator = Profile.objects.get(slug=slug)
+
+    identification = request.POST.get('identification', None)
+    admission = request.POST.get('admission', None)
+    cpf = request.POST.get('cpf', None)
+
+    collaborator.identification = identification if identification else collaborator.identification
+    collaborator.admission = admission if admission and admission != '' else collaborator.admission
+    collaborator.cpf = cpf if cpf else collaborator.cpf
+
+    collaborator.save()
+
+    return redirect('collaborator_details', slug=slug)

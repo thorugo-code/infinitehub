@@ -129,6 +129,8 @@ collaborators_list_urls = [
 
     path('collaborators/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', collaborators.page_list,
          name='sorted_filtered_collaborators'),
+
+    path('collaborators/fill=<str:slug>', collaborators.fill_collaborator_initial_infos, name='fill_collaborator'),
 ]
 
 inventory_urls = [

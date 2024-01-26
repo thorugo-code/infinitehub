@@ -18,10 +18,6 @@ def details(request):
         'project_files_percentage': (UploadedFile.objects.filter(uploaded_by=user,
                                                                  project__isnull=False).count() / UploadedFile.objects.filter(
             uploaded_by=user).count()) * 100 if UploadedFile.objects.filter(uploaded_by=user).count() > 0 else 0,
-        'uploaded_documents': Document.objects.filter(user=user, uploaded_by=user).count(),
-        'uploaded_documents_percentage': (Document.objects.filter(user=user,
-                                                                  uploaded_by=user).count() / Document.objects.filter(
-            user=user).count()) * 100 if Document.objects.filter(user=user).count() > 0 else 0,
         'user_files': user_files,
         'user_files_number': user_files_count
     }

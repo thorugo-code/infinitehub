@@ -159,6 +159,7 @@ class Profile(models.Model):
                                default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
 
     # Char Fields
+    cpf = models.CharField(max_length=20, default='')
     street = models.CharField(max_length=150, default='')
     street_number = models.CharField(max_length=20, default='')
     city = models.CharField(max_length=100, default='')
@@ -174,6 +175,7 @@ class Profile(models.Model):
 
     # Date Fields
     aso = models.DateField(null=True, blank=True, default=None)
+    admission = models.DateField(null=True, blank=True, default=None)
     birthday = models.DateField(null=True, blank=True, default=None)
 
     # Text Fields
@@ -407,6 +409,13 @@ class Document(models.Model):
         if str(self.name).lower() == 'aso':
             user_profile = Profile.objects.get(user=self.user)
             aso_files = sorted(Document.objects.filter(user=self.user, name__iexact='aso'), key=lambda x: x.expiration)
+            last_aso = aso_files[-1] if aso_files else None
+            user_profile.aso = last_aso.expiration if aso_files else None
+            user_profile.save()
+
+        if str(self.name).lower() == 'asos':
+            user_profile = Profile.objects.get(user=self.user)
+            aso_files = sorted(Document.objects.filter(user=self.user, name__iexact='asos'), key=lambda x: x.expiration)
             last_aso = aso_files[-1] if aso_files else None
             user_profile.aso = last_aso.expiration if aso_files else None
             user_profile.save()

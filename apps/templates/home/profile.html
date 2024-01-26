@@ -117,7 +117,7 @@
             <div class="col-xl-8 order-xl-1">
                 <!-- Info Cards -->
                 <div class="row">
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <div class="card bg-gradient-default" style="height: 85%; min-width: 0">
                             <div class="card-body p-4">
                                 <h5 class="card-title text-uppercase text-muted mb-0 text-white">Tasks
@@ -130,7 +130,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <div class="card bg-gradient-purple" style="height: 85%; min-width: 0">
                             <div class="card-body p-4">
                                 <h5 class="card-title text-uppercase text-muted mb-0 text-white">Project Files</h5>
@@ -138,18 +138,6 @@
                                 <div class="progress progress-xs mt-4 mb-0 text-sm">
                                     <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ project_files_percentage }}"
                                          aria-valuemin="0" aria-valuemax="100" style="width: {{ project_files_percentage }}%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="card bg-gradient-danger" style="height: 85%; min-width: 0">
-                            <div class="card-body p-4">
-                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">Uploaded Documents</h5>
-                                <span class="h2 font-weight-bold mb-0 text-white">{{ uploaded_documents }}/{{ user_profile.user.documents.all.count }}</span>
-                                <div class="progress progress-xs mt-4 mb-0 text-sm">
-                                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ uploaded_documents_percentage }}"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: {{ uploaded_documents_percentage }}%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -368,7 +356,7 @@
                 </div>
                 <div class="row">
                     <!-- Tasks Card -->
-                    <div class="col-xl-6">
+                    <div class="col">
                         <div class="card shadow">
                             <div class="card-header">
                                 <div class="row align-items-center">
@@ -419,249 +407,6 @@
                                         </li>
                                     {% endfor %}
                                 </ul>
-                            </div>
-                            <div class="card-footer py-2" style="border-top: 0 !important"></div>
-                        </div>
-                    </div>
-                    <!-- Documents Card -->
-                    <div class="col-xl-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <h3 class="mb-0">Documents</h3>
-                                    </div>
-{#                                    <div class="col text-right">#}
-{#                                        <a class="btn btn-sm btn-neutral" data-target="#sortDocumentsModal" data-toggle="modal"#}
-{#                                           href="#">#}
-{#                                            <i class="fas fa-sort"></i>#}
-{#                                        </a>#}
-{#                                        <a class="btn btn-sm btn-neutral" data-target="#filterDocumentsModal"#}
-{#                                           data-toggle="modal"#}
-{#                                           href="#">#}
-{#                                            <i class="fas fa-filter"></i>#}
-{#                                        </a>#}
-{#                                        <a class="btn btn-sm btn-neutral" data-target="#newDocumentModal"#}
-{#                                           data-toggle="modal"#}
-{#                                           href="#">#}
-{#                                            <i class="fas fa-plus"></i>#}
-{#                                        </a>#}
-{#                                    </div>#}
-                                </div>
-                            </div>
-                            <div class="table-responsive" style="height: 14rem; overflow-y: auto">
-                                <table class="table align-items-center table-flush">
-                                    <thead class="thead-light">
-                                    <tr>
-                                        <th scope="col" class="py-2" style="width: 100%">Name</th>
-                                        <th scope="col" class="py-2" style="width: 0">Expiration</th>
-                                        <th scope="col" style="width: 0"></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for document in user_profile.user.documents.all %}
-                                        <tr>
-                                            <th scope="row" class="py-2">
-                                                <a data-target="#watchDocumentModal{{ document.id }}"
-                                                   data-toggle="modal" href="">
-                                                    <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                         alt="{{ document.name }}" style="height: 18px">
-                                                    <span class="text-black-50 ml-2">{{ document.name }}</span>
-                                                </a>
-                                            </th>
-                                            <td class="py-2">{{ document.expiration|date:'d/m/Y' }}</td>
-                                            <td class="text-right p-2">
-                                                <div class="dropdown">
-                                                    <a aria-expanded="false" aria-haspopup="true"
-                                                       class="btn btn-sm btn-icon-only text-light"
-                                                       data-toggle="dropdown" href="#" role="button">
-                                                        <i class="fas fa-ellipsis-v"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                        <a class="dropdown-item"
-                                                           data-target="#watchDocumentModal{{ document.id }}"
-                                                           data-toggle="modal"
-                                                           href="">Open</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item text-success"
-                                                           href="{% url 'download_collaborator_document' document.id %}">
-                                                            Download
-                                                        </a>
-                                                        <a class="dropdown-item text-danger"
-                                                           data-target="#deleteConfirmDocument{{ document.id }}"
-                                                           data-toggle="modal"
-                                                           href="">Delete</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <!-- Watch File Modal -->
-                                        <div aria-hidden="true"
-                                             aria-labelledby="watchDocumentModalLabel{{ document.id }}"
-                                             class="modal fade" id="watchDocumentModal{{ document.id }}"
-                                             role="dialog"
-                                             tabindex="-1">
-                                            <div class="modal-dialog my-6" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header mt-2 mb--1">
-                                                        <h5 class="modal-title my-1"
-                                                            style="margin-left: auto">
-                                                            <i></i>
-                                                        </h5>
-                                                        <span class="ml-3 my-1"
-                                                              id="newPageModalLabel{{ document.id }}"
-                                                              style="margin-right: auto; font-size: 1.2rem"></span>
-                                                        <button aria-label="Close" class="close mt--4"
-                                                                data-dismiss="modal"
-                                                                style="margin-left: -30px"
-                                                                type="button">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body py-0"
-                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                        <form action=""
-                                                              id="downloadFile{{ document.id }}"
-                                                              method="post">
-                                                            {% csrf_token %}
-                                                            {% load filters %}
-                                                            <div class="form-group mt--1"
-                                                                 style="display: flex; justify-content: center">
-                                                                <img
-                                                                        alt="New File"
-                                                                        id="filePreviewModal{{ document.id }}"
-                                                                        src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                                        style="height: 130px"/>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-8 form-group form-control-label">
-                                                                    <label for="fileName{{ document.id }}"
-                                                                           style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                                    <input class="form-control" disabled
-                                                                           id="fileName{{ document.id }}"
-                                                                           type="text"
-                                                                           value="{{ document.name }}">
-                                                                </div>
-                                                                <div class="col-4 form-group form-control-label col">
-                                                                    <label for="fileUploadUser{{ document.id }}"
-                                                                           style="font-size:0.8125rem; font-weight:600">Category</label>
-                                                                    <input class="form-control" disabled
-                                                                           id="fileUploadUser{{ document.id }}"
-                                                                           type="text"
-                                                                           value="{{ document.category }}">
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="form-group form-control-label col-lg-6">
-                                                                    <label for="fileType{{ document.id }}"
-                                                                           style="font-size:0.8125rem; font-weight:600">Expiration</label>
-                                                                    <input class="form-control" disabled
-                                                                           id="fileType{{ document.id }}"
-                                                                           type="text"
-                                                                           value="{{ document.expiration|date:'d/m/Y' }}">
-                                                                </div>
-                                                                <div class="form-group form-control-label col-lg-6">
-                                                                    <label for="fileValue{{ document.id }}"
-                                                                           style="font-size:0.8125rem; font-weight:600">Uploaded
-                                                                        at</label>
-                                                                    <input class="form-control"
-                                                                           disabled
-                                                                           id="fileValue{{ document.id }}"
-                                                                           inputmode="decimal"
-                                                                           value="{{ document.uploaded_at|date:'d/m/Y' }}">
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group form-control-label">
-                                                                <label for="fileDescription{{ document.id }}"
-                                                                       style="font-size:0.8125rem; font-weight:600">Description</label>
-                                                                <textarea class="form-control"
-                                                                          disabled
-                                                                          id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button class="btn btn-secondary" data-dismiss="modal"
-                                                                type="button">Cancel
-                                                        </button>
-                                                        <button class="btn btn-danger text-white"
-                                                                data-dismiss="modal"
-                                                                data-target="#deleteConfirmDocument{{ document.id }}"
-                                                                data-toggle="modal">
-                                                            Delete
-                                                        </button>
-                                                        <a class="btn btn-success"
-                                                           href="{% url 'download_collaborator_document' document.id %}">Download</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Delete Confirm Modal -->
-                                        <div aria-hidden="true"
-                                             aria-labelledby="deleteConfirmDocumentLabel{{ document.id }}"
-                                             class="modal fade" id="deleteConfirmDocument{{ document.id }}"
-                                             role="dialog"
-                                             tabindex="-1">
-                                            <div class="modal-dialog my-6" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header mt-2">
-                                                        <h5 class="modal-title my-1"
-                                                            style="margin-left: auto">
-                                                            <i class="ni ni-fat-delete text-blue"
-                                                               style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                        </h5>
-                                                        <span class="ml-3 my-1"
-                                                              id="deleteConfirmModalLabel"
-                                                              style="margin-right: auto; font-size: 1.2rem">Are you sure?</span>
-                                                        <button aria-label="Close" class="close mt--4"
-                                                                data-dismiss="modal"
-                                                                style="margin-left: -30px"
-                                                                type="button">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body py-0"
-                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                        <form action="{% url 'delete_document' user_profile.slug document.id %}"
-                                                              id="deleteConfirmDocumentForm{{ document.id }}"
-                                                              method="post">
-                                                            {% csrf_token %}
-                                                            <div class="form-group mt-4"
-                                                                 style="display: flex; justify-content: center">
-                                                                <img
-                                                                        alt="New File"
-                                                                        id="filePreviewModal"
-                                                                        src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                                        style="height: 130px"/>
-                                                            </div>
-                                                            <div class="form-group form-control-label">
-                                                                <label for="fileName{{ document.id }}"
-                                                                       style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                                <input class="form-control" disabled
-                                                                       id="fileName{{ document.id }}"
-                                                                       type="text"
-                                                                       value="{{ document.name|file_name_only_with_extension }}">
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button class="btn btn-secondary" data-dismiss="modal"
-                                                                type="button">Cancel
-                                                        </button>
-                                                        <button class="btn btn-danger"
-                                                                form="deleteConfirmDocumentForm{{ document.id }}"
-                                                                type="submit">Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
                             </div>
                             <div class="card-footer py-2" style="border-top: 0 !important"></div>
                         </div>
