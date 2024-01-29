@@ -270,6 +270,7 @@ def check_group(value, group):
             'admin@infinitefoundry.com',
             'vitorhugo@infinitefoundry.com',
         ]
+        return value in admin_group
 
     elif group == 'collaborator':
         return value.endswith('@infinitefoundry.com')

@@ -29,16 +29,22 @@ class Command(BaseCommand):
             'change_bill',
             'delete_bill',
             'view_bill',
+            'add_document',
+            'change_document',
+            'delete_document',
+            'view_document',
+            'change_collaborator',
+            'delete_collaborator',
         ]
-
-        admin_permissions = Permission.objects.filter(Q(codename__in=admin_permissions_list))
-
-        collaborators_requirement = '@infinitefoundry.com'
 
         collaborators_permissions_list = [
             'view_client',
             'view_office',
         ]
+
+        collaborators_requirement = '@infinitefoundry.com'
+
+        admin_permissions = Permission.objects.filter(Q(codename__in=admin_permissions_list))
 
         collaborators_permissions = Permission.objects.filter(Q(codename__in=collaborators_permissions_list))
 

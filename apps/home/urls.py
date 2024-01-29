@@ -152,6 +152,10 @@ profile_urls = [
     path('profile/', profile.details, name='profile'),
 
     path('profile/change-picture', profile.change_picture, name='change_profile_picture'),
+
+    path('profile/edit', profile.edit, name='edit_profile'),
+
+    path('profile/save', profile.edit, name='send_edit_profile'),
 ]
 
 offices_urls = [

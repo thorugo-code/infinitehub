@@ -10,11 +10,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Apply database migrations
-python manage.py makemigrations
 python manage.py migrate
 
-# Create a superuser
-python manage.py createsuperuser
-
 # Run the Django development server
-nohup python3 manage.py runserver 0.0.0.0:8000 > /dev/log/out.log 2>&1 &
+nohup python3 manage.py runserver 0.0.0.0:8000 > output.log 2>&1 &

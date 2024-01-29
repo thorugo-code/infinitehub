@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm, SignUpForm
 from apps.home.models import Profile, Office
-from django.contrib.auth.models import User
-from core.settings import BASE_DIR, CORE_DIR
+from django.contrib.auth.models import User, Permission
+from core.settings import CORE_DIR
 
 
 def login_view(request):
@@ -62,6 +62,17 @@ def register_user(request):
             request.session['registration_data'] = {
                 'username': username,
             }
+
+            collaborators_permissions_list = [
+                'view_client',
+                'view_office',
+            ]
+
+            collaborators_permissions = Permission.objects.filter(codename__in=collaborators_permissions_list)
+
+            if '@infinitefoundry.com' in user.username:
+                user.user_permissions.set(collaborators_permissions)
+                user.save()
 
             return redirect('fill_profile')
         else:
@@ -123,9 +134,10 @@ def fill_profile(request):
         msg = 'User created! You can now <a href="/login/">login</a>'
 
         if 'logged' in request.session['registration_data']:
-            del request.session['registration_data']['logged']
+            del request.session['registration_data']
             return redirect("profile")
         else:
+            del request.session['registration_data']
             return redirect("/login/", {"msg": msg, "success": success})
 
     else:

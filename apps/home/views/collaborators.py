@@ -65,7 +65,7 @@ def get_permission(request, permission_type, model='bill'):
 def page_list(request, filters=None, sorted_by=None, sort_type=None):
     check_expired_documents()
 
-    collaborators = filter_collaborators_objects(filters)
+    collaborators = filter_collaborators_objects(request, filters)
     collaborators = sort_collaborators_objects(collaborators, sorted_by, sort_type)
 
     collaborators = list(collaborators)
@@ -230,16 +230,16 @@ def filter_docs(request, slug):
 def filter_collaborators(request):
     office = request.POST['office']
     group = request.POST['group']
-    from_date = request.POST['from']
-    to_date = request.POST['to']
+    # from_date = request.POST['from']
+    # to_date = request.POST['to']
     disabled = request.POST.get('disabled_filter', None)
     active = request.POST.get('active_filter', None)
 
     filter_list = [
         f'office={office}' if office != 'all' else '%',
         f'group={group}' if group != 'all' else '%',
-        f'from={from_date}' if from_date != '' else '%',
-        f'to={to_date}' if to_date != '' else '%',
+        # f'from={from_date}' if from_date != '' else '%',
+        # f'to={to_date}' if to_date != '' else '%',
         f'disabled=off' if not disabled else '%',
         f'active=off' if not active else '%',
     ]
@@ -274,6 +274,9 @@ def sort_collaborators(request):
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
     filters = request.POST.get('filters', 'None')
 
+    if sorted_by == 'identification':
+        sorted_by = 'id'
+
     if sorted_by != '' and filters != 'None':
         return redirect('sorted_filtered_collaborators', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
     elif sorted_by != '':
@@ -284,8 +287,13 @@ def sort_collaborators(request):
         return redirect('collaborators_list')
 
 
-def filter_collaborators_objects(filters):
-    collaborators = Profile.objects.filter(user__username__endswith='@infinitefoundry.com').order_by('user__first_name')
+def filter_collaborators_objects(request, filters):
+    if request.user.is_staff:
+        collaborators = Profile.objects.filter(user__username__endswith='@infinitefoundry.com').order_by('user__first_name')
+    else:
+        # Remove admin users from collaborators list
+        collaborators = Profile.objects.filter(user__username__endswith='@infinitefoundry.com').exclude(user__username__in=[
+            'admin@infinitefoundry.com'])
 
     groups = {
         'admin': [
@@ -355,6 +363,20 @@ def sort_collaborators_objects(collaborators, sorted_by, sort_type):
         else:
             collaborators = sorted(collaborators, key=lambda
                 collaborator: collaborator.aso if collaborator.aso else datetime.date.min)
+    elif sorted_by == 'admission':
+        if sort_type == 'asc':
+            collaborators = sorted(collaborators, key=lambda
+                collaborator: collaborator.admission if collaborator.admission else datetime.date.max)
+        else:
+            collaborators = sorted(collaborators, key=lambda
+                collaborator: collaborator.admission if collaborator.admission else datetime.date.min)
+    elif sorted_by == 'id':
+        if sort_type == 'asc':
+            collaborators = sorted(collaborators, key=lambda
+                collaborator: collaborator.identification if collaborator.identification is not None else float('inf'))
+        else:
+            collaborators = sorted(collaborators, key=lambda
+                collaborator: collaborator.identification if collaborator.identification is not None else -1)
     else:
         collaborators = sorted(collaborators, key=lambda collaborator: getattr(collaborator, sorted_by, ''))
 
@@ -367,9 +389,9 @@ def sort_collaborators_objects(collaborators, sorted_by, sort_type):
 def fill_collaborator_initial_infos(request, slug):
     collaborator = Profile.objects.get(slug=slug)
 
-    identification = request.POST.get('identification', None)
-    admission = request.POST.get('admission', None)
-    cpf = request.POST.get('cpf', None)
+    identification = request.POST.get('identification', collaborator.identification)
+    admission = request.POST.get('admission', collaborator.admission)
+    cpf = request.POST.get('cpf', collaborator.cpf)
 
     collaborator.identification = identification if identification else collaborator.identification
     collaborator.admission = admission if admission and admission != '' else collaborator.admission

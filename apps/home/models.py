@@ -171,7 +171,7 @@ class Profile(models.Model):
     position = models.CharField(max_length=100, default='')
 
     # Integer Fields
-    identification = models.IntegerField(default=0)
+    identification = models.IntegerField(default=None, null=True, blank=True)
 
     # Date Fields
     aso = models.DateField(null=True, blank=True, default=None)
