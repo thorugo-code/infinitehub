@@ -78,13 +78,25 @@ balance_urls = [
     path('balance/download-bill=<int:bill_id>', balance.download_bill, name='download_proof'),
 ]
 
-clients_urls = [
+clients_list_urls = [
 
     path('clients/', clients.home, name='clients_home'),
 
     path('clients/new', clients.create, name='create_client'),
-    path('clients/edit-client=<int:client_id>', clients.edit, name='edit_client'),
+
     path('clients/delete=<int:client_id>', clients.delete, name='delete_client'),
+
+    path('clients/order', clients.sort, name='sort_clients'),
+
+    path('clients/order:<str:sorted_by>-<str:sort_type>', clients.home, name='sorted_clients'),
+]
+
+client_page_urls = [
+
+    path('clients/<slug:slug>', clients.details, name='client_details'),
+
+    path('clients/<slug:slug>/edit', clients.details, name='edit_client'),
+
 ]
 
 collaborators_page_urls = [
@@ -176,7 +188,8 @@ base_urls = [
 ]
 
 urlpatterns = projects_list_urls + projects_page_urls + assets_urls + collaborators_page_urls + collaborators_list_urls
-urlpatterns += balance_urls + inventory_urls + profile_urls + clients_urls + offices_urls + base_urls
+urlpatterns += balance_urls + inventory_urls + profile_urls + clients_list_urls + offices_urls + client_page_urls
+urlpatterns += base_urls
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

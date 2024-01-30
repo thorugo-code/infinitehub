@@ -21,29 +21,30 @@ class Command(BaseCommand):
         ]
 
         admin_permissions_list = [
-            'add_client',
-            'change_client',
-            'delete_client',
-            'view_client',
-            'add_office',
-            'change_office',
-            'delete_office',
-            'view_office',
             'add_bill',
             'change_bill',
             'delete_bill',
             'view_bill',
+            'add_client',
+            'change_client',
+            'delete_client',
+            'view_client',
+            'change_collaborator',
+            'delete_collaborator',
             'add_document',
             'change_document',
             'delete_document',
             'view_document',
-            'change_collaborator',
-            'delete_collaborator',
+            'add_office',
+            'change_office',
+            'delete_office',
+            'view_office',
         ]
 
         collaborators_permissions_list = [
             'view_client',
             'view_office',
+            'view_client',
         ]
 
         staff_permissions_list = [

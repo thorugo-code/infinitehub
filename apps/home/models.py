@@ -299,15 +299,41 @@ class Office(models.Model):
 
 
 class Client(models.Model):
+    slug = models.SlugField(max_length=100, default='')
     avatar = models.ImageField(upload_to='uploads/clients/avatar',
                                default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+
+    # Foreign Keys and Relationships
+    office = models.ForeignKey(Office, related_name='clients', on_delete=models.SET_NULL, null=True)
+
+    # Char Fields
     name = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=100)
-    email = models.CharField(max_length=100, default='')
+    xml_email = models.CharField(max_length=100, default='')
+    contact_email = models.CharField(max_length=100, default='')
     phone = models.CharField(max_length=14, default='')
     area = models.CharField(max_length=100)
     location = models.CharField(max_length=200)
+
+    # Text Fields
     description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.name != '':
+            self.slug = slugify(self.name + '-' + str(self.id))
+        elif self.slug != slugify(self.name + '-' + str(self.id)) or kwargs.get('slug'):
+            self.slug = slugify(self.name + '-' + str(self.id))
+        elif self.name == '':
+            self.slug = slugify(str(self.id))
+        elif self.slug.endswith('none'):
+            self.slug = self.slug.replace('none', str(self.id))
+        else:
+            pass
+
+        super().save()
 
 
 # Adicionar currency
@@ -389,16 +415,28 @@ class Bill(models.Model):
 
 
 class Document(models.Model):
+    # Foreign Keys and Relationships
     user = models.ForeignKey(User, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
-    category = models.CharField(max_length=50)
-    description = models.TextField()
-    expiration = models.DateField()
-    expired = models.BooleanField(default=False)
-    file = models.FileField(upload_to=custom_upload_path_documents, blank=True, null=True)
-    name = models.CharField(max_length=100)
-    uploaded_at = models.DateField(auto_now_add=True, null=True)
+    client = models.ForeignKey(Client, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
     uploaded_by = models.ForeignKey(User, related_name='uploaded_documents', on_delete=models.SET_NULL, null=True,
                                     default=None)
+
+    # Char Fields
+    category = models.CharField(max_length=50)
+    name = models.CharField(max_length=100)
+
+    # Text Fields
+    description = models.TextField()
+
+    # Date Fields
+    expiration = models.DateField()
+    uploaded_at = models.DateField(auto_now_add=True, null=True)
+
+    # Boolean Fields
+    expired = models.BooleanField(default=False)
+
+    # File Fields
+    file = models.FileField(upload_to=custom_upload_path_documents, blank=True, null=True)
 
     def __str__(self):
         return self.name
