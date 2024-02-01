@@ -307,8 +307,15 @@
                                         </a>
                                     </th>
                                     <td class="py-2">{% if document.category != 'none' %}
-                                        {{ document.category|default:'-' }}{% else %}-{% endif %}</td>
-                                    <td class="py-2 {% if document.expired %}text-danger{% elif document.expiration|time_to_date <= 30 %}text-warning{% endif %}">{{ document.expiration|date:'d/m/Y' }} ({{ document.expiration|time_to_date }} days)</td>
+                                        {{ document.category|default:'-' }}{% else %}-{% endif %}
+                                    </td>
+                                    {% if document.expiration %}
+                                        <td class="py-2 {% if document.expired %}text-danger{% elif document.expiration|time_to_date <= 30 %}text-warning{% endif %}">
+                                            {{ document.expiration|date:'d/m/Y' }} ({{ document.expiration|time_to_date }} days)
+                                        </td>
+                                    {% else %}
+                                        <td class="py-2">-</td>
+                                    {% endif %}
                                     <td class="text-right p-2">
                                         <div class="dropdown">
                                             <a aria-expanded="false" aria-haspopup="true"
@@ -555,14 +562,12 @@
                     <div class="row">
                         <div class="col form-group form-control-label mb-3">
                             <label for="expiration">Expiration</label>
-                            <input class="form-control" id="expiration" name="expiration"
-                                   onchange="enableButtons()" required="" autofocus=""
-                                   type="date">
+                            <input class="form-control" id="expiration" name="expiration" type="date">
                         </div>
                         <div class="col form-group form-control-label">
                             <label for="documentCategoryInput">Category</label>
                             <select class="form-control" id="documentCategoryInput" name="category">
-                                <option value="none">--Select--</option>
+                                <option value=""></option>
                                 <option value="Personal">Personal</option>
                                 <option value="Professional">Professional</option>
                             </select>
