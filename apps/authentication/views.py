@@ -128,8 +128,8 @@ def fill_profile(request):
 
             profile.avatar = request.FILES.get('avatar', profile.avatar)
 
-        profile.save()
         user_object.save()
+        profile.save()
 
         msg = 'User created! You can now <a href="/login/">login</a>'
 

@@ -63,8 +63,8 @@ def edit(request):
         profile.birthday = request.POST.get('birthday', profile.birthday)
         profile.position = request.POST.get('position', profile.position)
 
-        profile.save()
         user_object.save()
+        profile.save()
 
         return redirect("profile")
 

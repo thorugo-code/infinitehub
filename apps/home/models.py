@@ -205,7 +205,7 @@ class Profile(models.Model):
 class UploadedFile(models.Model):
     project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
     client = models.ForeignKey('Client', related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
-    file = models.FileField(upload_to=custom_upload_path_projects)
+    file = models.FileField(upload_to=custom_upload_path_projects, max_length=500)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.SET_NULL, default=1,
                                     null=True)
@@ -392,9 +392,9 @@ class Document(models.Model):
     user = models.ForeignKey(User, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
     category = models.CharField(max_length=50)
     description = models.TextField()
-    expiration = models.DateField()
+    expiration = models.DateField(null=True, blank=True, default=None)
     expired = models.BooleanField(default=False)
-    file = models.FileField(upload_to=custom_upload_path_documents, blank=True, null=True)
+    file = models.FileField(upload_to=custom_upload_path_documents, max_length=500, blank=True, null=True)
     name = models.CharField(max_length=100)
     uploaded_at = models.DateField(auto_now_add=True, null=True)
     uploaded_by = models.ForeignKey(User, related_name='uploaded_documents', on_delete=models.SET_NULL, null=True,
@@ -423,7 +423,7 @@ class Document(models.Model):
     def save(self, *args, **kwargs):
         super().save()
 
-        if str(self.name).lower() == 'aso':
+        if str(self.name).lower() == 'aso' and self.expiration is not None:
             try:
                 expiration_date = datetime.strptime(self.expiration, '%Y-%m-%d').date()
             except TypeError:

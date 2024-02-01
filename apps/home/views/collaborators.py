@@ -100,7 +100,7 @@ def details(request, slug, sorted_by=None, sort_type=None, filters=None):
     documents = filter_documents_objects(collab.user, filters)
     documents = sort_documents_objects(documents, sorted_by, sort_type)
 
-    aso_document = Document.objects.filter(user=collab.user, name__iexact='aso').order_by(
+    aso_document = Document.objects.filter(user=collab.user, name__iexact='aso', expiration__isnull=False).order_by(
         'expiration').last()
 
     days_to_aso = (aso_document.expiration - datetime.datetime.now().date()).days if aso_document else None
@@ -128,9 +128,9 @@ def details(request, slug, sorted_by=None, sort_type=None, filters=None):
 def newdoc(request, collab_id):
     new_document = Document(
         user=User.objects.get(id=collab_id),
-        category=request.POST.get('category', 'None'),
+        category=request.POST['category'],
         description=request.POST['description'],
-        expiration=request.POST['expiration'],
+        expiration=request.POST['expiration'] if request.POST['expiration'] != '' else None,
         file=request.FILES['file'],
         name=request.POST['name'],
     )
