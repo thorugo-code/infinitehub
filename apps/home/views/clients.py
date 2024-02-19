@@ -117,43 +117,20 @@ def sort(request):
 
 
 def filter_clients_objects(request, filters):
-    return Client.objects.all()
+    clients = Client.objects.all()
 
-    # if filters:
-    #     filters_list = filters.split('&')
-    #
-    #     office, group = 'all', 'all'
-    #     from_date, to_date = None, None
-    #     disabled, active = True, True
-    #
-    #     for item in filters_list:
-    #         office = item.split('=')[1] if item.startswith('office') else office
-    #         group = item.split('=')[1] if item.startswith('group') else group
-    #         from_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith(
-    #             'from') else from_date
-    #         to_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('to') else to_date
-    #         disabled = False if item.startswith('disabled') else disabled
-    #         active = False if item.startswith('active') else active
-    #
-    #     if office != 'all':
-    #         collaborators = collaborators.filter(office=office if office else None)
-    #
-    #     if group != 'all':
-    #         collaborators = collaborators.filter(user__username__in=groups[group])
-    #
-    #     if to_date is not None:
-    #         collaborators = collaborators.filter(birthday__lte=to_date)
-    #
-    #     if from_date is not None:
-    #         collaborators = collaborators.filter(birthday__gte=from_date)
-    #
-    #     if not disabled:
-    #         collaborators = collaborators.filter(user__is_active=True)
-    #
-    #     if not active:
-    #         collaborators = collaborators.filter(user__is_active=False)
-    #
-    # return collaborators
+    if filters:
+        filters_list = filters.split('&')
+
+        office = 'all'
+
+        for item in filters_list:
+            office = item.split('=')[1] if item.startswith('office') else office
+
+        if office != 'all':
+            clients = clients.filter(office=office if office else None)
+
+    return clients
 
 
 def sort_clients_objects(clients, sorted_by, sort_type):
@@ -174,3 +151,35 @@ def sort_clients_objects(clients, sorted_by, sort_type):
         clients = reversed(clients)
 
     return clients
+
+
+def filter_clients(request):
+    office = request.POST['office']
+
+    filter_list = [
+        f'office={office}' if office != 'all' else '%',
+    ]
+
+    filter_string = '&'.join(filter_list)
+    if filter_string.startswith('%&'):
+        filter_string = filter_string[2:]
+    if filter_string.endswith('&'):
+        filter_string = filter_string[:-1]
+
+    filter_string = filter_string.replace('%&', '')
+    filter_string = filter_string.replace('/', '-')
+    filter_string = filter_string[:-2] if filter_string.endswith('&%') else filter_string
+
+    if request.POST['sort_by'] != 'None' and filter_string != '%':
+        return redirect('sorted_filtered_clients',
+                        sorted_by=request.POST['sort_by'].replace('_', '-'),
+                        sort_type=request.POST['sort_type'],
+                        filters=filter_string)
+    elif filter_string == '%' and request.POST['sort_by'] != 'None':
+        return redirect('sorted_clients',
+                        sorted_by=request.POST['sort_by'].replace('_', '-'),
+                        sort_type=request.POST['sort_type'])
+    elif filter_string == '%':
+        return redirect('clients_home')
+    else:
+        return redirect('filtered_clients', filters=filter_string)

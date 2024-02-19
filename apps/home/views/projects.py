@@ -121,20 +121,13 @@ def details(request, id):
         return redirect('project_details', id=project.id)
 
     user_profile = Profile.objects.get(user=request.user)
-    tasks = Task.objects.filter(project=project)
-
-    edit_mode = request.GET.get('edit')
-
-    if edit_mode is not None:
-        edit_mode = True
-    else:
-        edit_mode = False
+    tasks = sorted(Task.objects.filter(project=project), key=lambda x: x.deadline)
 
     context = {
         'project': project,
         'user_profile': user_profile,
         'tasks': tasks,
-        'edit_mode': edit_mode
+        'collaborators': Profile.objects.all(),
     }
 
     return render(request, 'home/project.html', context)

@@ -89,6 +89,13 @@ clients_list_urls = [
     path('clients/order', clients.sort, name='sort_clients'),
 
     path('clients/order:<str:sorted_by>-<str:sort_type>', clients.home, name='sorted_clients'),
+
+    path('clients/filter', clients.filter_clients, name='filter_clients'),
+
+    path('clients/filters:<str:filters>', clients.home, name='filtered_clients'),
+
+    path('clients/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', clients.home,
+         name='sorted_filtered_clients'),
 ]
 
 client_page_urls = [

@@ -188,18 +188,24 @@ class Profile(models.Model):
         return self.user.username
 
     def save(self, *args, **kwargs):
+        super().save()
+
         if not self.slug and self.user.get_full_name() != '':
             self.slug = slugify(self.user.get_full_name() + '-' + str(self.user.id))
+            self.save()
         elif self.slug != slugify(self.user.get_full_name() + '-' + str(self.user.id)) or kwargs.get('slug'):
             self.slug = slugify(self.user.get_full_name() + '-' + str(self.user.id))
+            self.save()
         elif self.user.get_full_name() == '':
             self.slug = slugify(str(self.user.id))
+            self.save()
         elif self.slug.endswith('none'):
             self.slug = self.slug.replace('none', str(self.user.id))
+            self.save()
         else:
             pass
 
-        super().save()
+        self.save()
 
 
 class UploadedFile(models.Model):
@@ -322,18 +328,22 @@ class Client(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        super().save()
+
         if not self.slug and self.name != '':
             self.slug = slugify(self.name + '-' + str(self.id))
+            self.save()
         elif self.slug != slugify(self.name + '-' + str(self.id)) or kwargs.get('slug'):
             self.slug = slugify(self.name + '-' + str(self.id))
+            self.save()
         elif self.name == '':
             self.slug = slugify(str(self.id))
+            self.save()
         elif self.slug.endswith('none'):
             self.slug = self.slug.replace('none', str(self.id))
+            self.save()
         else:
             pass
-
-        super().save()
 
 
 # Adicionar currency

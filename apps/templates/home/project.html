@@ -20,6 +20,7 @@
             </div>
         </div>
     </div>
+    
     <!-- Page Title -->
     <div class="pb-7" style="margin-top: -14rem">
         <div class="container-fluid">
@@ -48,10 +49,9 @@
             </div>
         </div>
     </div>
+    
     <!-- Page Widgets -->
     <div class="mt--5 pb-4">
-    <div class="container-fluid">
-    <!-- Card stats -->
     <div class="container-fluid">
         <div class="row pb-4">
             <div class="col-xl-7">
@@ -428,7 +428,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="card shadow">
                     <div class="card-header">
                         <div class="row align-items-center">
@@ -436,14 +435,14 @@
                                 <h3 class="mb-0">Tasks</h3>
                             </div>
                             <div class="col text-right">
-                                {#                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
-                                {#                                       data-target="#sortTasksModal">#}
-                                {#                                        <i class="fas fa-sort"></i>#}
-                                {#                                    </a>#}
-                                {#                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
-                                {#                                       data-target="#filterTasksModal">#}
-                                {#                                        <i class="fas fa-filter"></i>#}
-                                {#                                    </a>#}
+                                {# <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+                                {#    data-target="#sortTasksModal">#}
+                                {#     <i class="fas fa-sort"></i>#}
+                                {# </a>#}
+                                {# <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+                                {#    data-target="#filterTasksModal">#}
+                                {#     <i class="fas fa-filter"></i>#}
+                                {# </a>#}
                                 <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
                                    data-target="#newTaskModal">
                                     <i class="fas fa-plus"></i>
@@ -459,136 +458,55 @@
                             {% for task in tasks %}
 
                                 <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                                        
+                                    <div class="checklist-item {% if task.priority == 1 %} 
+                                    checklist-item-success {% elif task.priority == 2 %} 
+                                    checklist-item-medium {% elif task.priority == 3 %}
+                                    checklist-item-danger {% else %} checklist-item-info {% endif %}{% if task.completed %}
+                                    checklist-item-checked{% endif %}">
+                                        <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
+                                            <div class="checklist-info">
+                                                <h5 class="checklist-title mb-0 {% if not task.completed and task.deadline|time_to_date < 0 %}text-danger{% endif %}">{{ task.title }}</h5>
+                                                <small class="{% if task.priority == 1 %}
+                                                text-success {% elif task.priority == 2 %} 
+                                                text-medium {% elif task.priority == 3 %}
+                                                text-danger {% else %} text-info {% endif %}">
+                                                    {% if task.priority == 1 %}
+                                                        Low {% elif task.priority == 2 %} 
+                                                        Medium {% elif task.priority == 3 %}
+                                                        High {% else %} 
+                                                        None
+                                                    {% endif %}
+                                                </small>
+                                                <small class="text-nowrap {% if not task.completed and task.deadline|time_to_date < 0 %}text-danger{% else %}text-default{% endif %}">
+                                                - {{ task.deadline|date:'d/m/Y' }}
+                                                </small>
+                                            </div>
+                                        </a>
+                                        <div>
+                                            <div class="custom-control custom-checkbox {% if task.priority == 1 %}
+                                            custom-checkbox-success {% elif task.priority == 2 %}
+                                            custom-checkbox-medium {% elif task.priority == 3 %}
+                                            custom-checkbox-danger {% else %} 
+                                            custom-checkbox-info {% endif %}">
+                                                <form method="post" id="changeStatusTask{{ task.id }}"
+                                                      action="{% url 'change_task_status' project.id task.id %}">
+                                                    {% csrf_token %}
+                                                    <label class="custom-control custom-checkbox">
+                                                        <input class="custom-control-input"
+                                                               id="chk-todo-task-{{ task.id }}"
+                                                               type="checkbox"
+                                                               {% if task.completed %}checked{% endif %}
+                                                               onchange="submitCheckboxForm({{ task.id }})">
+                                                        <label class="custom-control-label"
+                                                               for="chk-todo-task-{{ task.id }}"></label>
+                                                    </label>
+                                                </form>
 
-                                    {% if task.priority == 1 %}
-
-                                        <div class="checklist-item checklist-item-success {% if task.completed %}checklist-item-checked{% endif %}">
-                                            <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
-                                                <div class="checklist-info">
-                                                    <h5 class="checklist-title mb-0">{{ task.title }}</h5>
-                                                    <small class="text-success">Low</small><small
-                                                        class="text-nowrap text-default">
-                                                    - {{ task.deadline|date:'d/m/Y' }}</small>
-                                                </div>
-                                            </a>
-                                            <div>
-                                                <div class="custom-control custom-checkbox custom-checkbox-success">
-
-                                                    <form method="post" id="changeStatusTask{{ task.id }}"
-                                                          action="{% url 'change_task_status' project.id task.id %}">
-                                                        {% csrf_token %}
-                                                        <label class="custom-control custom-checkbox">
-                                                            <input class="custom-control-input"
-                                                                   id="chk-todo-task-{{ task.id }}"
-                                                                   type="checkbox"
-                                                                   {% if task.completed %}checked{% endif %}
-                                                                   onchange="submitCheckboxForm({{ task.id }})">
-                                                            <label class="custom-control-label"
-                                                                   for="chk-todo-task-{{ task.id }}"></label>
-                                                        </label>
-                                                    </form>
-
-                                                </div>
                                             </div>
                                         </div>
-
-                                    {% elif task.priority == 2 %}
-
-                                        <div class="checklist-item checklist-item-medium {% if task.completed %}checklist-item-checked{% endif %}">
-                                            <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
-                                                <div class="checklist-info">
-                                                    <h5 class="checklist-title mb-0">{{ task.title }}</h5>
-                                                    <small class="text-medium">Medium</small><small
-                                                        class="text-nowrap text-default">
-                                                    - {{ task.deadline|date:'d/m/Y' }}</small>
-                                                </div>
-                                            </a>
-                                            <div>
-                                                <div class="custom-control custom-checkbox custom-checkbox-medium">
-
-                                                    <form method="post" id="changeStatusTask{{ task.id }}"
-                                                          action="{% url 'change_task_status' project.id task.id %}">
-                                                        {% csrf_token %}
-                                                        <label class="custom-control custom-checkbox">
-                                                            <input class="custom-control-input"
-                                                                   id="chk-todo-task-{{ task.id }}"
-                                                                   type="checkbox"
-                                                                   {% if task.completed %}checked{% endif %}
-                                                                   onchange="submitCheckboxForm({{ task.id }})">
-                                                            <label class="custom-control-label"
-                                                                   for="chk-todo-task-{{ task.id }}"></label>
-                                                        </label>
-                                                    </form>
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    {% elif task.priority == 3 %}
-
-                                        <div class="checklist-item checklist-item-danger {% if task.completed %}checklist-item-checked{% endif %}">
-                                            <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
-                                                <div class="checklist-info">
-                                                    <h5 class="checklist-title mb-0">{{ task.title }}</h5>
-                                                    <small class="text-danger">High</small><small
-                                                        class="text-nowrap text-default">
-                                                    - {{ task.deadline|date:'d/m/Y' }}</small>
-                                                </div>
-                                            </a>
-                                            <div>
-                                                <div class="custom-control custom-checkbox custom-checkbox-danger">
-
-                                                    <form method="post" id="changeStatusTask{{ task.id }}"
-                                                          action="{% url 'change_task_status' project.id task.id %}">
-                                                        {% csrf_token %}
-                                                        <label class="custom-control custom-checkbox">
-                                                            <input class="custom-control-input"
-                                                                   id="chk-todo-task-{{ task.id }}"
-                                                                   type="checkbox"
-                                                                   {% if task.completed %}checked{% endif %}
-                                                                   onchange="submitCheckboxForm({{ task.id }})">
-                                                            <label class="custom-control-label"
-                                                                   for="chk-todo-task-{{ task.id }}"></label>
-                                                        </label>
-                                                    </form>
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    {% else %}
-
-                                        <div class="checklist-item checklist-item-info {% if task.completed %}checklist-item-checked{% endif %}">
-                                            <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
-                                                <div class="checklist-info">
-                                                    <h5 class="checklist-title mb-0">{{ task.title }}</h5>
-                                                    <small class="text-info">None</small><small
-                                                        class="text-nowrap text-default">
-                                                    - {{ task.deadline|date:'d/m/Y' }}</small>
-                                                </div>
-                                            </a>
-                                            <div>
-                                                <div class="custom-control custom-checkbox custom-checkbox-info">
-
-                                                    <form method="post" id="changeStatusTask{{ task.id }}"
-                                                          action="{% url 'change_task_status' project.id task.id %}">
-                                                        {% csrf_token %}
-                                                        <label class="custom-control custom-checkbox">
-                                                            <input class="custom-control-input"
-                                                                   id="chk-todo-task-{{ task.id }}"
-                                                                   type="checkbox"
-                                                                   {% if task.completed %}checked{% endif %}
-                                                                   onchange="submitCheckboxForm({{ task.id }})">
-                                                            <label class="custom-control-label"
-                                                                   for="chk-todo-task-{{ task.id }}"></label>
-                                                        </label>
-                                                    </form>
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    {% endif %}
+                                    </div>
+                                
                                 </li>
 
                                 <!-- Task Details Modal -->
@@ -706,6 +624,7 @@
             </div>
         </div>
     </div>
+    
     <!-- Footer -->
     <div class="container-fluid mt--4">
         {% include "includes/footer.html" %}
@@ -789,11 +708,24 @@
                           action="{% url 'submit_task' project.id %}"
                           onsubmit="disableSubmitTaskButton()">
                         {% csrf_token %}
-                        <div class="form-group form-control-label">
-                            <label for="taskTitle">Title</label>
-                            <input type="text" class="form-control"
-                                   id="taskTitle"
-                                   name="taskTitle" placeholder="">
+                        <div class="row">
+                            <div class="form-group form-control-label col">
+                                <label for="taskTitle">Title</label>
+                                <input type="text" class="form-control"
+                                       id="taskTitle"
+                                       name="taskTitle" placeholder="">
+                            </div>
+                            <div class="form-group form-control-label col-4">
+                                <label for="taskOwnerInput">Owner</label>
+                                <select class="form-control" id="taskOwnerInput" name="taskOwner">
+                                    <option value=""></option>
+                                    {% for collab in collaborators %}
+                                        {% if collab.user.username != 'admin@infinitefoundry.com' %}
+                                            <option value="{{ collab.user.id }}">{{ collab.user.get_full_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="form-group form-control-label col">
