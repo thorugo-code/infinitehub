@@ -126,15 +126,114 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0 text-capitalize">Progress track</h3>
+                    </div>
+                    <div class="card-body p-0 pb-2">
+                        <ul class="list-group list-group-flush list" style="max-height: 360px; overflow: auto">
+                            {% for project in user_profile.user.assigned_projects.all %}
+                                <li class="list-group-item border-top-0 px-4 mx-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto p-0">
+                                            <a href="" class="avatar rounded-circle">
+                                                <img alt=""
+                                                     src="../../assets/img/small-logos/logo-jira.svg">
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="" class="text-muted"><h5>{{ project.title }} - Nice</h5></a>
+                                            <div class="progress progress-xs mb-0">
+                                                <div class="progress-bar bg-success" role="progressbar" aria-valuenow="90"
+                                                     aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item border-top-0 px-4 mx-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto p-0">
+                                            <a href="" class="avatar rounded-circle">
+                                                <img alt=""
+                                                     src="../../assets/img/small-logos/logo-jira.svg">
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="" class="text-muted"><h5>{{ project.title }} - Good</h5></a>
+                                            <div class="progress progress-xs mb-0">
+                                                <div class="progress-bar bg-yellow" role="progressbar" aria-valuenow="90"
+                                                     aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item border-top-0 px-4 mx-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto p-0">
+                                            <a href="" class="avatar rounded-circle">
+                                                <img alt=""
+                                                     src="../../assets/img/small-logos/logo-jira.svg">
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="" class="text-muted"><h5>{{ project.title }} - Ok</h5></a>
+                                            <div class="progress progress-xs mb-0">
+                                                <div class="progress-bar bg-info" role="progressbar" aria-valuenow="90"
+                                                     aria-valuemin="0" aria-valuemax="100" style="width: 30%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item border-top-0 px-4 mx-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto p-0">
+                                            <a href="" class="avatar rounded-circle">
+                                                <img alt=""
+                                                     src="../../assets/img/small-logos/logo-jira.svg">
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="" class="text-muted"><h5>{{ project.title }} - Bad</h5></a>
+                                            <div class="progress progress-xs mb-0">
+                                                <div class="progress-bar bg-red" role="progressbar" aria-valuenow="90"
+                                                     aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item border-top-0 px-4 mx-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto p-0">
+                                            <a href="" class="avatar rounded-circle">
+                                                <img alt=""
+                                                     src="../../assets/img/small-logos/logo-jira.svg">
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="" class="text-muted"><h5>{{ project.title }} - Bad</h5></a>
+                                            <div class="progress progress-xs mb-0">
+                                                <div class="progress-bar bg-red" role="progressbar" aria-valuenow="90"
+                                                     aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            
             </div>
             <div class="col-xl-8 order-xl-1">
                 <!-- Info Cards -->
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div class="card bg-gradient-default" style="height: 85%; min-width: 0">
                             <div class="card-body p-4">
-                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">Tasks
-                                    Completed</h5>
+                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">
+                                    Completed tasks
+                                </h5>
                                 <span class="h2 font-weight-bold mb-0 text-white">{{ completed_tasks }}/{{ user_profile.user.created_tasks.all.count }}</span>
                                 <div class="progress progress-xs mt-4 mb-0 text-sm">
                                     <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ completed_tasks_percentage }}"
@@ -143,8 +242,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="card bg-gradient-purple" style="height: 85%; min-width: 0">
+                    <div class="col-sm-4">
+                        <div class="card" style="height: 85%; min-width: 0; background: linear-gradient(87deg, #539dff 0, #1160ef 100%) !important">
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">Completed Projects</h5>
+                                <span class="h2 font-weight-bold mb-0 text-white">- /{{ user_profile.user.assigned_projects.all.count }}</span>
+                                <div class="progress progress-xs mt-4 mb-0 text-sm">
+                                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ completed_tasks_percentage }}"
+                                         aria-valuemin="0" aria-valuemax="100" style="width: {{ completed_tasks_percentage }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="card bg-gradient-blue" style="height: 85%; min-width: 0">
                             <div class="card-body p-4">
                                 <h5 class="card-title text-uppercase text-muted mb-0 text-white">Project Files</h5>
                                 <span class="h2 font-weight-bold mb-0 text-white">{{ project_files }}/{{ user_profile.user.uploaded_files.all.count }}</span>

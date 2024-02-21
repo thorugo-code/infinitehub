@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
-from apps.home.models import Project, UploadedFile, Profile, Task
+from apps.home.models import Project, UploadedFile, Profile, Task, Client
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 import os
 from datetime import datetime
@@ -57,7 +58,10 @@ def page_list(request, situation=None):
     context = {
         'projects_list': projects,
         'user_profile': user_profile,
-        'situation': situation
+        'situation': situation,
+        'clients': sorted(Client.objects.all(), key=lambda x: x.name),
+        'collaborators': Profile.objects.filter(user__username__endswith='@infinitefoundry.com').exclude(
+            user__username__startswith='admin'),
     }
 
     return render(request, "home/projectsList.html", context)
@@ -68,9 +72,8 @@ def create_project(request):
 
         # Retrieve form data
         title = request.POST['title']
-        client = request.POST['client']
+        client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
         country = request.POST['country']
-        client_area = request.POST['client_area']
         start_date = request.POST['start_date']
         deadline = request.POST['deadline']
         about = request.POST['about']
@@ -80,11 +83,15 @@ def create_project(request):
             title=title,
             client=client,
             country=country,
-            client_area=client_area,
             start_date=start_date,
             deadline=deadline,
             about=about,
         )
+
+        project.save()
+
+        for collaborator_id in request.POST.getlist("collaborators-choice"):
+            project.assigned_to.add(User.objects.get(id=Profile.objects.get(id=collaborator_id).user.id))
 
         project.save()
 
@@ -110,24 +117,36 @@ def details(request, id):
 
     if request.method == 'POST':
         project.title = request.POST.get('title', project.title)
-        project.client = request.POST.get('client', project.client)
-        project.client_area = request.POST.get('client_area', project.client_area)
+        project.client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
         project.country = request.POST.get('country', project.country)
         project.start_date = request.POST.get('start_date', project.start_date)
         project.deadline = request.POST.get('deadline', project.deadline)
         project.about = request.POST.get('about', project.about)
+        project.assigned_to.clear()
+        for collaborator_id in request.POST.getlist("collaborators-choice"):
+            project.assigned_to.add(User.objects.get(id=Profile.objects.get(id=collaborator_id).user.id))
+
         project.save()
 
         return redirect('project_details', id=project.id)
 
     user_profile = Profile.objects.get(user=request.user)
     tasks = sorted(Task.objects.filter(project=project), key=lambda x: x.deadline)
+    edit_mode = request.GET.get('edit')
+
+    if edit_mode is not None:
+        edit_mode = True
+    else:
+        edit_mode = False
 
     context = {
         'project': project,
         'user_profile': user_profile,
         'tasks': tasks,
-        'collaborators': Profile.objects.all(),
+        'collaborators': Profile.objects.filter(user__username__endswith='@infinitefoundry.com').exclude(
+            user__username__startswith='admin'),
+        'edit_mode': edit_mode,
+        'clients': Client.objects.all(),
     }
 
     return render(request, 'home/project.html', context)
@@ -244,7 +263,8 @@ def submit_task(request, project_id):
             description=request.POST.get('taskDescription'),
             deadline=request.POST.get('taskDeadline'),
             priority=int(request.POST.get('taskPriority')),
-            created_by=request.user
+            created_by=request.user,
+            owner=User.objects.get(id=request.POST['taskOwner']) if request.POST.get('taskOwner') else None
         )
 
         task.save()
@@ -272,6 +292,7 @@ def edit_task(request, project_id, task_id):
         task.description = request.POST.get('taskDescriptionEdit', task.description)
         task.deadline = request.POST.get('taskDeadlineEdit', task.deadline)
         task.priority = int(request.POST.get('taskPriorityEdit', task.priority))
+        task.owner = User.objects.get(id=request.POST['taskOwnerEdit']) if request.POST.get('taskOwnerEdit') else task.owner
         task.save()
 
         return redirect('project_details', id=project.id)

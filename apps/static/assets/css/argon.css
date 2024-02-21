@@ -25832,3 +25832,46 @@ input.datetimepicker[data-color="yellow"] + .bootstrap-datetimepicker-widget but
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.dev/svgjs' width='1440' height='600' preserveAspectRatio='none' viewBox='0 0 1440 600'%3e%3cg mask='url(%26quot%3b%23SvgjsMask2978%26quot%3b)' fill='none'%3e%3crect width='1440' height='600' x='0' y='0' fill='rgba(0%2c 113%2c 194%2c 1)'%3e%3c/rect%3e%3cpath d='M425%2c585.143C450.455%2c584.61%2c466.819%2c561.585%2c479.964%2c539.78C493.743%2c516.924%2c508.53%2c490.602%2c496.292%2c466.885C483.379%2c441.858%2c453.149%2c432.41%2c425%2c433.257C398.403%2c434.057%2c373.463%2c447.577%2c360.771%2c470.964C348.606%2c493.381%2c353.39%2c519.941%2c365.895%2c542.17C378.695%2c564.924%2c398.899%2c585.69%2c425%2c585.143' fill='rgba(255%2c 255%2c 255%2c 0.15)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M468.811%2c221.526C490.221%2c221.297%2c508.743%2c207.018%2c518.437%2c187.927C527.283%2c170.505%2c522.487%2c150.822%2c513.53%2c133.457C503.512%2c114.036%2c490.622%2c93.07%2c468.811%2c91.723C445.329%2c90.273%2c424.385%2c106.478%2c413.378%2c127.272C403.038%2c146.805%2c406.111%2c169.956%2c417.315%2c189.007C428.346%2c207.763%2c447.053%2c221.758%2c468.811%2c221.526' fill='rgba(255%2c 255%2c 255%2c 0.15)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M1267.902%2c142.424C1293.879%2c141.815%2c1322.155%2c139.325%2c1336.218%2c117.475C1351.214%2c94.176%2c1348.691%2c63.356%2c1333.853%2c39.956C1319.974%2c18.067%2c1293.801%2c8.733%2c1267.902%2c9.736C1243.821%2c10.669%2c1223.615%2c24.695%2c1210.242%2c44.743C1194.812%2c67.874%2c1179.67%2c96.868%2c1193.804%2c120.813C1207.822%2c144.56%2c1240.334%2c143.07%2c1267.902%2c142.424' fill='rgba(255%2c 255%2c 255%2c 0.15)' class='triangle-float1'%3e%3c/path%3e%3cpath d='M1171.114%2c386.99C1214.521%2c385.51%2c1241.446%2c344.729%2c1262.365%2c306.667C1282.255%2c270.476%2c1298.87%2c227.91%2c1278.189%2c192.164C1257.53%2c156.456%2c1212.316%2c146.895%2c1171.114%2c148.943C1133.81%2c150.797%2c1100.806%2c170.289%2c1081.011%2c201.962C1059.798%2c235.903%2c1050.882%2c277.297%2c1068.406%2c313.282C1088.18%2c353.888%2c1125.975%2c388.529%2c1171.114%2c386.99' fill='rgba(255%2c 255%2c 255%2c 0.15)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M346.693%2c131.141C363.276%2c130.8%2c373.91%2c115.364%2c381.819%2c100.784C389.253%2c87.079%2c393.903%2c71.234%2c386.684%2c57.415C378.98%2c42.667%2c363.313%2c32.752%2c346.693%2c33.545C331.144%2c34.287%2c320.299%2c47.294%2c312.81%2c60.941C305.674%2c73.945%2c302.526%2c88.923%2c308.974%2c102.281C316.35%2c117.562%2c329.729%2c131.49%2c346.693%2c131.141' fill='rgba(255%2c 255%2c 255%2c 0.15)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M1456.369%2c354.085C1512.304%2c353.317%2c1553.273%2c306.124%2c1578.629%2c256.261C1601.395%2c211.491%2c1600.21%2c160.531%2c1577.601%2c115.681C1552.127%2c65.147%2c1512.957%2c13.034%2c1456.369%2c13.727C1400.456%2c14.412%2c1366.024%2c69.005%2c1340.177%2c118.59C1316.79%2c163.456%2c1305.767%2c214.325%2c1328.154%2c259.699C1353.322%2c310.708%2c1399.494%2c354.866%2c1456.369%2c354.085' fill='rgba(255%2c 255%2c 255%2c 0.15)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M863.554%2c342.587C918.767%2c341.918%2c950.626%2c287.098%2c978.805%2c239.612C1007.872%2c190.63%2c1044.571%2c134.326%2c1016.572%2c84.726C988.339%2c34.71%2c920.983%2c34.674%2c863.554%2c35.442C808.002%2c36.185%2c745.355%2c40.677%2c717.46%2c88.724C689.494%2c136.894%2c715.579%2c194.187%2c743.361%2c242.464C771.237%2c290.904%2c807.67%2c343.264%2c863.554%2c342.587' fill='rgba(255%2c 255%2c 255%2c 0.15)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M934.325%2c362.156C972.21%2c359.481%2c1001.039%2c330.36%2c1017.728%2c296.244C1032.363%2c266.328%2c1026.624%2c233.16%2c1012.087%2c203.196C994.816%2c167.596%2c973.888%2c124.974%2c934.325%2c124.334C894.256%2c123.686%2c872.067%2c165.873%2c852.08%2c200.607C832.168%2c235.211%2c809.57%2c274.082%2c827.683%2c309.661C846.949%2c347.504%2c891.965%2c365.147%2c934.325%2c362.156' fill='rgba(255%2c 255%2c 255%2c 0.15)' class='triangle-float1'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask2978'%3e%3crect width='1440' height='600' fill='white'%3e%3c/rect%3e%3c/mask%3e%3cstyle%3e %40keyframes float1 %7b 0%25%7btransform: translate(0%2c 0)%7d 50%25%7btransform: translate(-10px%2c 0)%7d 100%25%7btransform: translate(0%2c 0)%7d %7d .triangle-float1 %7b animation: float1 5s infinite%3b %7d %40keyframes float2 %7b 0%25%7btransform: translate(0%2c 0)%7d 50%25%7btransform: translate(-5px%2c -5px)%7d 100%25%7btransform: translate(0%2c 0)%7d %7d .triangle-float2 %7b animation: float2 4s infinite%3b %7d %40keyframes float3 %7b 0%25%7btransform: translate(0%2c 0)%7d 50%25%7btransform: translate(0%2c -10px)%7d 100%25%7btransform: translate(0%2c 0)%7d %7d .triangle-float3 %7b animation: float3 6s infinite%3b %7d %3c/style%3e%3c/defs%3e%3c/svg%3e");
     background-size: cover;
 }
+
+.choices {
+    /* Add your styles here */
+    border: 1px solid #dee2e6 !important;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.choices__list--multiple .choices__item {
+    /* Add your styles here */
+    background-color: #5e72e4 !important;
+    border: 0 !important;
+    padding: 5px 10px;
+    margin: 3px;
+    font-size: 14px;
+}
+
+.choices[data-type*=select-multiple] .choices__button, .choices[data-type*=text] .choices__button {
+    /* Add your styles here */
+    border-left: 1px solid #FFFFFF !important;
+}
+
+.choices__list--multiple .choices__item--choice {
+    /* Add your styles here */
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 3px;
+    padding: 5px 10px;
+    margin: 3px;
+    font-size: 14px;
+}
+
+.choices__input {
+    /* Add your styles here */
+    background-color: #fff !important;
+    color: #555 !important;
+}
+
+.choices__inner {
+    background-color: #fff !important;
+    border: 0 !important;
+    padding: .5rem .5rem .5rem !important;
+}

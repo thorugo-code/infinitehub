@@ -42,7 +42,11 @@
                             </a>
                         </h1>
                         <p class="text-lead text-light mt--2">
-                            <a target="_blank" class="text-white" aria-label="Client's name">{{ project.client }}</a>
+                            {% if project.client %}
+                                <a target="_blank" class="text-white ml-1" aria-label="Client's name">{{ project.client.name }}</a>
+                            {% elif project.client_str %}
+                                <i class="text-white ml-1">"{{ project.client_str }}"</i>
+                            {% endif %}
                         </p>
                     </div>
                 </div>
@@ -51,7 +55,7 @@
     </div>
     
     <!-- Page Widgets -->
-    <div class="mt--5 pb-4">
+    <div class="mt--6 pb-4"></div>
     <div class="container-fluid">
         <div class="row pb-4">
             <div class="col-xl-7">
@@ -78,126 +82,202 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <!-- Card body (ADD CONTENT) -->
+                            <!-- Card body -->
                             <div class="card-body" style="padding: 2rem">
                                 {% if edit_mode %}
-                                    <div class="px-3">
-                                        <div class="form-group form-control-label">
-                                            <label class="form-control-label" for="title">Title</label>
-                                            <input type="text" id="title" name="title" class="form-control"
-                                                   placeholder="Client's name" value="{{ project.title }}">
+                                    <div class="row px-3">
+                                        <div class="col-lg-6">
+                                            <div class="form-group form-control-label">
+                                                <label class="form-control-label" for="title">Title</label>
+                                                <input type="text" id="title" name="title" class="form-control"
+                                                       placeholder="Client's name" value="{{ project.title }}">
+                                            </div>
                                         </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group form-control-label">
+                                                <label for="client" class="form-control-label">Client</label>
+                                                {% if edit_mode %}
+                                                    <select class="form-control" id="client" name="client">
+                                                        {% if not project.client and project.client_str %}
+                                                            <option value="" disabled selected>{{ project.client.name|default:project.client_str|truncatechars:25 }}</option>
+                                                        {% else %}
+                                                            <option value=""></option>
+                                                        {% endif %}
+                                                        {% for client in clients %}
+                                                            <option value="{{ client.id }}"
+                                                                    {% if project.client == client %}selected{% endif %}>
+                                                                {{ client.name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                {% else %}
+                                                    <input type="text" id="client" name="client"
+                                                           class="form-control"
+                                                           placeholder="Client's name"
+                                                           value="{{ project.client.name|default:project.client_str|truncatechars:25 }}"
+                                                           disabled>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="px-3">
+                                        <div class="form-group form-control-label mb-3 pb-1">
+                                        <label for="choices-collaborators">
+                                            Collaborators
+                                        </label>
+                                        <select id="choices-collaborators" name="collaborators-choice" multiple>
+                                            {% for collaborator in collaborators %}
+                                                <option value="{{ collaborator.id }}" {% if collaborator.user in project.assigned_to.all %}selected{% endif %}>{{ collaborator.user.get_full_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    </div>
+                                {% else %}
+                                    <div class="avatar-group pl-3 pb-4 align-items-center">
+                                        {% for collaborator in project.assigned_to.all %}
+                                            <a href="" class="avatar avatar-sm rounded-circle border-0"
+                                               style="background-color: #fff;"
+                                               data-toggle="tooltip" data-original-title="{{ collaborator.get_full_name }}">
+                                                <div class="avatar avatar-sm rounded-circle">
+                                                    <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
+                                                         alt="Image placeholder"
+                                                         src="{{ collaborator.profile.avatar.url|slice:"5:" }}">
+                                                </div>
+                                            </a>
+                                        {% endfor %}
                                     </div>
                                 {% endif %}
                                 <div class="px-3">
                                     <div class="row">
-                                        <div class="col-lg-5">
-                                            <div class="form-group form-control-label">
-                                                <label class="form-control-label">Client</label>
-                                                {% if edit_mode %}
-                                                    <input type="text" id="client" name="client"
-                                                           class="form-control"
-                                                           placeholder="Client's name"
-                                                           value="{{ project.client }}">
-                                                {% else %}
-                                                    <input type="text" id="client" name="client"
-                                                           class="form-control"
-                                                           placeholder="Client's name"
-                                                           value="{{ project.client }}"
-                                                           disabled>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-5">
-                                            <div class="form-group form-control-label">
-                                                <label class="form-control-label" for="input-client-area">Area
-                                                    of
-                                                    activity</label>
-                                                {% if edit_mode %}
-                                                    <input type="text" id="client_area" name="client_area"
-                                                           class="form-control"
-                                                           placeholder="Client's area of activity"
-                                                           value="{{ project.client_area }}">
-                                                {% else %}
-                                                    <input type="text" id="client_area" name="client_area"
-                                                           class="form-control"
-                                                           placeholder="Client's area of activity"
-                                                           value="{{ project.client_area }}" disabled>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-2 form-control-label">
-                                            <label for="input-client-area">Country</label>
-                                            <div class="form-group">
-                                                {% if edit_mode %}
-                                                    <select class="form-control" , id="country" ,
-                                                            name="country">
-                                                        <option value="br"
-                                                                {% if project.country == 'br' %}selected{% endif %}>
-                                                            Brazil
-                                                        </option>
-                                                        <option value="pt"
-                                                                {% if project.country == 'pt' %}selected{% endif %}>
-                                                            Portugal
-                                                        </option>
-                                                    </select>
-                                                {% else %}
-                                                    {% if project.country == "br" %}
-                                                        <img src="/static/assets/img/icons/custom/1x/br.png"
-                                                             alt="br"
-                                                             style="height: 25px; margin-top: 0.5rem">
-                                                    {% elif project.country == "pt" %}
-                                                        <img src="/static/assets/img/icons/custom/1x/pt.png"
-                                                             alt="pt"
-                                                             style="height: 25px; margin-top: 0.5rem">
+                                        {% if edit_mode %}
+                                            <div class="col-lg-4">
+                                                <div class="form-group form-control-label">
+                                                    <label for="input-date">Start:</label>
+                                                    {% if edit_mode %}
+                                                        <input type="date" id="input-date" class="form-control"
+                                                               name="start_date"
+                                                               value="{{ project.start_date|date:'Y-m-d' }}">
+                                                    {% else %}
+                                                        <input type="text" id="input-date" name="start_date"
+                                                               class="form-control" placeholder="dd/mm/aaaa"
+                                                               value="{{ project.start_date|date:'d/m/Y' }}"
+                                                               disabled>
                                                     {% endif %}
-                                                {% endif %}
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="px-3">
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="form-group form-control-label">
-                                                <label for="input-date">Start:</label>
-                                                {% if edit_mode %}
-                                                    <input type="date" id="input-date" class="form-control"
-                                                           name="start_date"
-                                                           value="{{ project.start_date|date:'Y-m-d' }}">
-                                                {% else %}
-                                                    <input type="text" id="input-date" name="start_date"
-                                                           class="form-control" placeholder="dd/mm/aaaa"
-                                                           value="{{ project.start_date|date:'d/m/Y' }}"
-                                                           disabled>
-                                                {% endif %}
+                                            <div class="col-lg-4">
+                                                <div class="form-group form-control-label">
+                                                    <label for="input-address">Deadline:</label>
+                                                    {% if edit_mode %}
+                                                        <input type="date" id="input-date" class="form-control"
+                                                               name="deadline"
+                                                               value="{{ project.deadline|date:'Y-m-d' }}">
+                                                    {% else %}
+                                                        <input type="text" id="input-date" name="deadline"
+                                                               class="form-control" placeholder="dd/mm/aaaa"
+                                                               value="{{ project.deadline|date:'d/m/Y' }}"
+                                                               disabled>
+                                                    {% endif %}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="form-group form-control-label">
-                                                <label for="input-address">Deadline:</label>
-                                                {% if edit_mode %}
-                                                    <input type="date" id="input-date" class="form-control"
-                                                           name="deadline"
-                                                           value="{{ project.deadline|date:'Y-m-d' }}">
-                                                {% else %}
-                                                    <input type="text" id="input-date" name="deadline"
-                                                           class="form-control" placeholder="dd/mm/aaaa"
-                                                           value="{{ project.deadline|date:'d/m/Y' }}"
-                                                           disabled>
-                                                {% endif %}
+                                            <div class="col-lg-4 form-control-label">
+                                                <label for="input-client-area">Country</label>
+                                                <div class="form-group">
+                                                    {% if edit_mode %}
+                                                        <select class="form-control" , id="country" ,
+                                                                name="country">
+                                                            <option value="br"
+                                                                    {% if project.country == 'br' %}selected{% endif %}>
+                                                                Brazil
+                                                            </option>
+                                                            <option value="pt"
+                                                                    {% if project.country == 'pt' %}selected{% endif %}>
+                                                                Portugal
+                                                            </option>
+                                                        </select>
+                                                    {% else %}
+                                                        {% if project.country == "br" %}
+                                                            <img src="/static/assets/img/icons/custom/1x/br.png"
+                                                                 alt="br"
+                                                                 style="height: 25px; margin-top: 0.5rem">
+                                                        {% elif project.country == "pt" %}
+                                                            <img src="/static/assets/img/icons/custom/1x/pt.png"
+                                                                 alt="pt"
+                                                                 style="height: 25px; margin-top: 0.5rem">
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
                                             </div>
-                                        </div>
+                                        {% else %}
+                                            <div class="col-lg-5">
+                                                <div class="form-group form-control-label">
+                                                    <label for="input-date">Start:</label>
+                                                    {% if edit_mode %}
+                                                        <input type="date" id="input-date" class="form-control"
+                                                               name="start_date"
+                                                               value="{{ project.start_date|date:'Y-m-d' }}">
+                                                    {% else %}
+                                                        <input type="text" id="input-date" name="start_date"
+                                                               class="form-control" placeholder="dd/mm/aaaa"
+                                                               value="{{ project.start_date|date:'d/m/Y' }}"
+                                                               disabled>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5">
+                                                <div class="form-group form-control-label">
+                                                    <label for="input-address">Deadline:</label>
+                                                    {% if edit_mode %}
+                                                        <input type="date" id="input-date" class="form-control"
+                                                               name="deadline"
+                                                               value="{{ project.deadline|date:'Y-m-d' }}">
+                                                    {% else %}
+                                                        <input type="text" id="input-date" name="deadline"
+                                                               class="form-control" placeholder="dd/mm/aaaa"
+                                                               value="{{ project.deadline|date:'d/m/Y' }}"
+                                                               disabled>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 form-control-label">
+                                                <label for="input-client-area">Country</label>
+                                                <div class="form-group">
+                                                    {% if edit_mode %}
+                                                        <select class="form-control" , id="country" ,
+                                                                name="country">
+                                                            <option value="br"
+                                                                    {% if project.country == 'br' %}selected{% endif %}>
+                                                                Brazil
+                                                            </option>
+                                                            <option value="pt"
+                                                                    {% if project.country == 'pt' %}selected{% endif %}>
+                                                                Portugal
+                                                            </option>
+                                                        </select>
+                                                    {% else %}
+                                                        {% if project.country == "br" %}
+                                                            <img src="/static/assets/img/icons/custom/1x/br.png"
+                                                                 alt="br"
+                                                                 style="height: 25px; margin-top: 0.5rem">
+                                                        {% elif project.country == "pt" %}
+                                                            <img src="/static/assets/img/icons/custom/1x/pt.png"
+                                                                 alt="pt"
+                                                                 style="height: 25px; margin-top: 0.5rem">
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="px-3">
                                     <div class="form-group form-control-label">
                                         <label for="about">About</label>
                                         {% if edit_mode %}
-                                            <textarea rows="4" class="form-control" id="about" name="about"
+                                            <textarea rows="6" class="form-control" id="about" name="about"
                                                       placeholder="A few words about the project ...">{{ project.about }}</textarea>
                                         {% else %}
-                                            <textarea rows="4" class="form-control" id="about" name="about"
+                                            <textarea rows="6" class="form-control" id="about" name="about"
                                                       placeholder="A few words about the project ..."
                                                       disabled>{{ project.about }}</textarea>
                                         {% endif %}
@@ -516,23 +596,17 @@
                                         <div class="modal-content">
                                             <div class="modal-header mt-2 align-items-center">
                                                 <h5 class="modal-title my-1" style="margin-left: auto">
-                                                    {% if task.priority == 0 %}
-                                                        <i class="fas fa-circle text-info"
-                                                           style="font-size: 0.9rem"></i>
-                                                    {% elif task.priority == 1 %}
-                                                        <i class="fas fa-circle text-success"
-                                                           style="font-size: 0.9rem"></i>
-                                                    {% elif task.priority == 2 %}
-                                                        <i class="fas fa-circle text-medium"
-                                                           style="font-size: 0.9rem"></i>
-                                                    {% elif task.priority == 3 %}
-                                                        <i class="fas fa-circle text-danger"
-                                                           style="font-size: 0.9rem"></i>
-                                                    {% endif %}
+                                                    <i class="fas fa-circle {% if task.priority == 1 %}
+                                                    text-success{% elif task.priority == 2 %}
+                                                    text-medium{% elif task.priority == 3 %}
+                                                    text-danger{% else %}
+                                                    text-info{% endif %}"
+                                                       style="font-size: 0.9rem">
+                                                    </i>
                                                 </h5>
-                                                <span class="ml-3 my-1"
+                                                <span class="ml-3 my-1 {% if not task.completed and task.deadline|time_to_date < 0 %}text-danger{% endif %}"
                                                       style="margin-right: auto; font-size: 1.2rem"
-                                                      id="newFileModalLabel">{{ task.title|truncatechars:'25' }}</span>
+                                                      id="newFileModalLabel">{{ task.title|truncatechars:'30' }}</span>
                                                 <button type="button" class="close mt--4" style="margin-left: -30px"
                                                         data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
@@ -544,28 +618,19 @@
                                                       action="{% url 'edit_task' project.id task.id %}"
                                                       onsubmit="disableSubmitTaskButton()">
                                                     {% csrf_token %}
-                                                    <div class="form-group form-control-label">
-                                                        <label for="taskTitleEdit">Title</label>
-                                                        <input type="text" class="form-control"
-                                                               id="taskTitleEdit"
-                                                               name="taskTitleEdit" placeholder=""
-                                                               value="{{ task.title }}">
-                                                    </div>
                                                     <div class="row">
                                                         <div class="form-group form-control-label col">
-                                                            <label for="taskDeadlineEdit">Deadline</label>
-                                                            <input type="date" class="form-control"
-                                                                   id="taskDeadlineEdit"
-                                                                   name="taskDeadlineEdit" placeholder=""
-                                                                   onchange="enableSubmitTaskButton()"
-                                                                   onemptied="disableSubmitTaskButton()"
-                                                                   value="{{ task.deadline|date:"Y-m-d" }}">
+                                                            <label for="taskTitleEdit">Title</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="taskTitleEdit"
+                                                                   name="taskTitleEdit" placeholder=""
+                                                                   value="{{ task.title }}">
                                                         </div>
-                                                        <div class="form-group form-control-label col">
+                                                        <div class="form-group form-control-label col-4">
                                                             <label for="taskPriorityInputEdit">Priority</label>
                                                             <select class="form-control" id="taskPriorityInputEdit"
                                                                     name="taskPriorityEdit">
-                                                                <option value="0">--Select--</option>
+                                                                <option value="0"></option>
                                                                 <option value="3"
                                                                         {% if task.priority == 3 %}selected{% endif %}>
                                                                     High
@@ -585,6 +650,28 @@
                                                             </select>
                                                         </div>
                                                     </div>
+                                                    <div class="row">
+                                                        <div class="form-group form-control-label col">
+                                                            <label for="taskDeadlineEdit">Deadline</label>
+                                                            <input type="date" class="form-control {% if not task.completed and task.deadline|time_to_date < 0 %}text-danger{% endif %}"
+                                                                   id="taskDeadlineEdit"
+                                                                   name="taskDeadlineEdit" placeholder=""
+                                                                   onchange="enableSubmitTaskButton()"
+                                                                   onemptied="disableSubmitTaskButton()"
+                                                                   value="{{ task.deadline|date:"Y-m-d" }}">
+                                                        </div>
+                                                        <div class="form-group form-control-label col">
+                                                            <label for="taskOwnerEditInput">Owner</label>
+                                                            <select class="form-control" id="taskOwnerEditInput" name="taskOwnerEdit">
+                                                                <option value=""></option>
+                                                                {% for collab in collaborators %}
+                                                                    {% if collab.user.username != 'admin@infinitefoundry.com' %}
+                                                                        <option value="{{ collab.user.id }}" {% if task.owner == collab.user %}selected{% endif %}>{{ collab.user.get_full_name }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                     <div class="form-group mb-2 form-control-label">
                                                         <label for="taskDescriptionEdit">Description</label>
                                                         <textarea class="form-control"
@@ -600,13 +687,65 @@
                                                     Cancel
                                                 </button>
                                                 <a class="btn btn-danger"
-                                                   href="{% url 'delete_task' project.id task.id %}">
+                                                   href="#" data-dismiss="modal" data-toggle="modal" data-target="#deleteTaskConfirm{{ task.id }}">
                                                     Delete
                                                 </a>
                                                 <button type="submit" class="btn btn-success"
                                                         form="editTask{{ task.id }}"
                                                         id="editTaskButton">
                                                     Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Task Confirm Modal -->
+                                <div class="modal fade" id="deleteTaskConfirm{{ task.id }}"
+                                     tabindex="-1" role="dialog"
+                                     aria-labelledby="deleteTaskConfirmLabel{{ task.id }}"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog my-6" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2">
+                                                <h5 class="modal-title my-1"
+                                                    style="margin-left: auto">
+                                                    <i class="ni ni-fat-delete text-blue"
+                                                       style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                </h5>
+                                                <span class="ml-3 my-1"
+                                                      style="margin-right: auto; font-size: 1.2rem"
+                                                      id="deleteTaskConfirmModalLabel">Are you sure?</span>
+                                                <button type="button" class="close mt--4"
+                                                        style="margin-left: -30px"
+                                                        data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body pb-0"
+                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <form method="post"
+                                                      id="deleteTaskConfirmForm{{ task.id }}"
+                                                      action="{% url 'delete_task' project.id task.id %}">
+                                                    {% csrf_token %}
+                                                    <div class="form-group">
+                                                        <p class="text-center">Are you sure you want to delete this task?
+                                                            <br>
+                                                            <i>"{{ task.title }}"</i>
+                                                            <br>
+                                                            This action cannot be undone.
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Cancel
+                                                </button>
+
+                                                <button type="submit" class="btn btn-danger"
+                                                        form="deleteTaskConfirmForm{{ task.id }}">
+                                                    Delete
                                                 </button>
                                             </div>
                                         </div>
@@ -620,7 +759,6 @@
 
                     <div class="card-footer py-2" style="border-top: 0 !important"></div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -716,14 +854,13 @@
                                        name="taskTitle" placeholder="">
                             </div>
                             <div class="form-group form-control-label col-4">
-                                <label for="taskOwnerInput">Owner</label>
-                                <select class="form-control" id="taskOwnerInput" name="taskOwner">
-                                    <option value=""></option>
-                                    {% for collab in collaborators %}
-                                        {% if collab.user.username != 'admin@infinitefoundry.com' %}
-                                            <option value="{{ collab.user.id }}">{{ collab.user.get_full_name }}</option>
-                                        {% endif %}
-                                    {% endfor %}
+                                <label for="taskPriorityInput">Priority</label>
+                                <select class="form-control" id="taskPriorityInput" name="taskPriority">
+                                    <option value="0"></option>
+                                    <option value="3">High</option>
+                                    <option value="2">Medium</option>
+                                    <option value="1">Low</option>
+                                    <option value="0">None</option>
                                 </select>
                             </div>
                         </div>
@@ -737,13 +874,14 @@
                                        onemptied="disableSubmitTaskButton()">
                             </div>
                             <div class="form-group form-control-label col">
-                                <label for="taskPriorityInput">Priority</label>
-                                <select class="form-control" id="taskPriorityInput" name="taskPriority">
-                                    <option value="0">--Select--</option>
-                                    <option value="3">High</option>
-                                    <option value="2">Medium</option>
-                                    <option value="1">Low</option>
-                                    <option value="0">None</option>
+                                <label for="taskOwnerInput">Owner</label>
+                                <select class="form-control" id="taskOwnerInput" name="taskOwner">
+                                    <option value=""></option>
+                                    {% for collab in collaborators %}
+                                        {% if collab.user.username != 'admin@infinitefoundry.com' %}
+                                            <option value="{{ collab.user.id }}">{{ collab.user.get_full_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
@@ -1188,9 +1326,22 @@
         });
 
     </script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let tagsInput = document.getElementById('choices-collaborators');
 
+            let choices = new Choices(tagsInput, {
+                removeItemButton: true,
+                maxItemCount: 20,
+            });
+        });
+    </script>
 
 {% endblock javascripts %}
 
-</div>
-</div>
+

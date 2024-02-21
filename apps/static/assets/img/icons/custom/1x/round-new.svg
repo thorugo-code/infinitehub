@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Default" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-width: 43px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: #fff;
+        stroke: #ccc;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        stroke-width: 25px;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="21.5" y="21.5" width="457" height="457" rx="228.5" ry="228.5"/>
+  <rect class="cls-2" x="242.42" y="122" width="16.16" height="257" rx="8.08" ry="8.08"/>
+  <rect class="cls-2" x="242.42" y="122" width="16.16" height="257" rx="8.08" ry="8.08" transform="translate(501 0) rotate(90)"/>
+</svg>

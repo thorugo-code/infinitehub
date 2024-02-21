@@ -120,19 +120,35 @@ class Equipments(models.Model):
 
 
 class Project(models.Model):
-    working = models.BooleanField(default=True)
+    # Foreign Keys and Relationships
+    client = models.ForeignKey('Client', related_name='projects', on_delete=models.SET_NULL, null=True)
+    office = models.ForeignKey('Office', related_name='projects', on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(User, related_name='created_projects', on_delete=models.SET_NULL, null=True)
+    assigned_to = models.ManyToManyField(User, related_name='assigned_projects')
+
+    # Char and Text Fields
     title = models.CharField(max_length=100)
-    client = models.CharField(max_length=100)
+    client_str = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
-    client_area = models.CharField(max_length=100)
+    about = models.TextField()
+
+    # Boolean Fields
+    working = models.BooleanField(default=True)
+    finished = models.BooleanField(default=False)
+
+    # Date Fields
     start_date = models.DateField()
     deadline = models.DateField()
-    about = models.TextField()
+
+    # Money Fields
     budget = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+
+    # Image Fields
     img = models.ImageField(upload_to=f'apps/static/assets/uploads/',
                             default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+
+    # Integer Fields
     completition = models.IntegerField(default=0)
-    finished = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -439,7 +455,7 @@ class Document(models.Model):
     description = models.TextField()
 
     # Date Fields
-    expiration = models.DateField()
+    expiration = models.DateField(default=None, null=True, blank=True)
     uploaded_at = models.DateField(auto_now_add=True, null=True)
 
     # Boolean Fields
