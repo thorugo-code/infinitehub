@@ -100,7 +100,7 @@ def details(request, slug, sorted_by=None, sort_type=None, filters=None):
     documents = filter_documents_objects(collab.user, filters)
     documents = sort_documents_objects(documents, sorted_by, sort_type)
 
-    aso_document = Document.objects.filter(user=collab.user, name__iexact='aso', expiration__isnull=False).order_by(
+    aso_document = Document.objects.filter(user=collab.user, category='ASO', expiration__isnull=False).order_by(
         'expiration').last()
 
     days_to_aso = (aso_document.expiration - datetime.datetime.now().date()).days if aso_document else None
@@ -133,6 +133,7 @@ def newdoc(request, collab_id):
         expiration=request.POST['expiration'] if request.POST['expiration'] != '' else None,
         file=request.FILES['file'],
         name=request.POST['name'],
+        uploaded_by=request.user,
     )
 
     new_document.save()
@@ -156,6 +157,18 @@ def delete_document(request, slug, document_id):
         os.remove(document_path)
 
     document.delete()
+
+    return redirect('collaborator_details', slug=slug)
+
+
+def edit_document(request, slug, document_id):
+    document = Document.objects.get(id=document_id)
+    if request.method == 'POST':
+        document.category = request.POST.get('category', document.category)
+        document.description = request.POST.get('description', document.description)
+        document.expiration = request.POST.get('expiration', document.expiration)
+        document.name = request.POST.get('name', document.name)
+        document.save()
 
     return redirect('collaborator_details', slug=slug)
 
@@ -230,16 +243,12 @@ def filter_docs(request, slug):
 def filter_collaborators(request):
     office = request.POST['office']
     group = request.POST['group']
-    # from_date = request.POST['from']
-    # to_date = request.POST['to']
     disabled = request.POST.get('disabled_filter', None)
     active = request.POST.get('active_filter', None)
 
     filter_list = [
         f'office={office}' if office != 'all' else '%',
         f'group={group}' if group != 'all' else '%',
-        # f'from={from_date}' if from_date != '' else '%',
-        # f'to={to_date}' if to_date != '' else '%',
         f'disabled=off' if not disabled else '%',
         f'active=off' if not active else '%',
     ]

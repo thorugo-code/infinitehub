@@ -118,6 +118,9 @@ collaborators_page_urls = [
     path('collaborators/<slug:slug>/delete-document=<int:document_id>', collaborators.delete_document,
          name='delete_document'),
 
+    path('collaborators/<slug:slug>/edit-document=<int:document_id>', collaborators.edit_document,
+         name='edit_document'),
+
     path('collaborators/<slug:slug>/filter', collaborators.filter_docs, name='filter_documents'),
 
     path('collaborators/<slug:slug>/order', collaborators.sort_docs, name='sort_documents'),

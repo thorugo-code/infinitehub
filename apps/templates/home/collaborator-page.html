@@ -310,8 +310,9 @@
                                         {{ document.category|default:'-' }}{% else %}-{% endif %}
                                     </td>
                                     {% if document.expiration %}
-                                        <td class="py-2 {% if document.expired %}text-danger{% elif document.expiration|time_to_date <= 30 %}text-warning{% endif %}">
-                                            {{ document.expiration|date:'d/m/Y' }} ({{ document.expiration|time_to_date }} days)
+                                        <td class="py-2">
+                                            <span>{{ document.expiration|date:'d/m/Y' }}</span>
+                                            <span class="{% if document.expired %}text-danger{% elif document.expiration|time_to_date <= 30 %}text-warning{% endif %}">({{ document.expiration|time_to_date }} days)</span>
                                         </td>
                                     {% else %}
                                         <td class="py-2">-</td>
@@ -367,62 +368,55 @@
                                             </div>
                                             <div class="modal-body py-0"
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <form action=""
-                                                      id="downloadFile{{ document.id }}"
+                                                <form action="{% url 'edit_document' collaborator.slug document.id %}"
+                                                      id="editFile{{ document.id }}"
                                                       method="post">
                                                     {% csrf_token %}
                                                     {% load filters %}
                                                     <div class="form-group mt--1"
                                                          style="display: flex; justify-content: center">
-                                                        <img
-                                                                alt="New File"
-                                                                id="filePreviewModal{{ document.id }}"
-                                                                src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                                style="height: 130px"/>
+                                                        <img alt="New File" id="filePreviewModal{{ document.id }}"
+                                                             src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                             style="height: 130px"/>
+                                                    </div>
+                                                    <div class="form-group form-control-label justify-content-center" style="display: flex">
+                                                        <span class="h5 mb-0 text-muted font-weight-light">
+                                                            uploaded: {{ document.uploaded_by.first_name }}
+                                                            {% if document.uploaded_by %}-{% endif %}
+                                                            {{ document.uploaded_at|date:'d/m/Y' }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileName{{ document.id }}"
+                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                        <input class="form-control" id="fileName{{ document.id }}"
+                                                               type="text" value="{{ document.name }}" name="name">
                                                     </div>
                                                     <div class="row">
-                                                        <div class="col-8 form-group form-control-label">
-                                                            <label for="fileName{{ document.id }}"
-                                                                   style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                            <input class="form-control" disabled
-                                                                   id="fileName{{ document.id }}"
-                                                                   type="text"
-                                                                   value="{{ document.name }}">
-                                                        </div>
-                                                        <div class="col-4 form-group form-control-label col">
-                                                            <label for="fileUploadUser{{ document.id }}"
-                                                                   style="font-size:0.8125rem; font-weight:600">Category</label>
-                                                            <input class="form-control" disabled
-                                                                   id="fileUploadUser{{ document.id }}"
-                                                                   type="text"
-                                                                   value="{{ document.category }}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group form-control-label col-lg-6">
+                                                        <div class="form-group form-control-label col-sm-6">
                                                             <label for="fileType{{ document.id }}"
                                                                    style="font-size:0.8125rem; font-weight:600">Expiration</label>
-                                                            <input class="form-control" disabled
-                                                                   id="fileType{{ document.id }}"
-                                                                   type="text"
-                                                                   value="{{ document.expiration|date:'d/m/Y' }}">
+                                                            <input class="form-control" id="fileType{{ document.id }}"
+                                                                   type="date" name="expiration"
+                                                                   value="{{ document.expiration|date:'Y-m-d' }}">
                                                         </div>
-                                                        <div class="form-group form-control-label col-lg-6">
-                                                            <label for="fileValue{{ document.id }}"
-                                                                   style="font-size:0.8125rem; font-weight:600">Uploaded
-                                                                at</label>
-                                                            <input class="form-control"
-                                                                   disabled
-                                                                   id="fileValue{{ document.id }}"
-                                                                   inputmode="decimal"
-                                                                   value="{{ document.uploaded_at|date:'d/m/Y' }}">
+                                                        <div class="col-sm-6 form-group form-control-label col">
+                                                            <label for="fileUploadUser{{ document.id }}"
+                                                                   style="font-size:0.8125rem; font-weight:600">Category</label>
+                                                            <select class="form-control" name="category"
+                                                                    id="fileUploadUser{{ document.id }}">
+                                                                <option value=""></option>
+                                                                <option value="ASO" {% if document.category == 'ASO' %}selected{% endif %}>ASO</option>
+                                                                <option value="Payslip" {% if document.category == 'Payslip' %}selected{% endif %}>Payslip</option>
+                                                                <option value="Personal" {% if document.category == 'Personal' %}selected{% endif %}>Personal</option>
+                                                                <option value="Professional" {% if document.category == 'Professional' %}selected{% endif %}>Professional</option>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div class="form-group form-control-label">
                                                         <label for="fileDescription{{ document.id }}"
                                                                style="font-size:0.8125rem; font-weight:600">Description</label>
-                                                        <textarea class="form-control"
-                                                                  disabled
+                                                        <textarea class="form-control" name="description"
                                                                   id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
                                                     </div>
                                                 </form>
@@ -434,11 +428,18 @@
                                                 <button class="btn btn-danger text-white"
                                                         data-dismiss="modal"
                                                         data-target="#deleteConfirmDocument{{ document.id }}"
-                                                        data-toggle="modal">
+                                                        data-toggle="modal" data-original-title="Delete">
                                                     Delete
                                                 </button>
-                                                <a class="btn btn-success"
-                                                   href="{% url 'download_collaborator_document' document.id %}">Download</a>
+                                                <a class="btn btn-success" data-toggle="tooltip" data-original-title="Download"
+                                                   href="{% url 'download_collaborator_document' document.id %}">
+                                                    Download
+                                                </a>
+                                                <button class="btn btn-primary text-white"
+                                                        type="submit"
+                                                        form="editFile{{ document.id }}">
+                                                    Save
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -568,6 +569,8 @@
                             <label for="documentCategoryInput">Category</label>
                             <select class="form-control" id="documentCategoryInput" name="category">
                                 <option value=""></option>
+                                <option value="ASO">ASO</option>
+                                <option value="Payslip">Payslip</option>
                                 <option value="Personal">Personal</option>
                                 <option value="Professional">Professional</option>
                             </select>
@@ -625,6 +628,14 @@
                         <label for="documentCategoryInput">Category</label>
                         <select class="form-control" id="documentCategoryInput" name="category">
                             <option value="all"></option>
+                            <option value="ASO"
+                                    {% if filters|extract_from_key:'category' == 'ASO' %}selected{% endif %}>
+                                ASO
+                            </option>
+                            <option value="Payslip"
+                                    {% if filters|extract_from_key:'category' == 'Payslip' %}selected{% endif %}>
+                                Payslip
+                            </option>
                             <option value="Personal"
                                     {% if filters|extract_from_key:'category' == 'Personal' %}selected{% endif %}>
                                 Personal
@@ -796,6 +807,7 @@
     </div>
 </div>
 
+<!-- Footer -->
 <div class="container-fluid mt-4">
 
     {% include "includes/footer.html" %}

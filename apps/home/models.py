@@ -221,8 +221,6 @@ class Profile(models.Model):
         else:
             pass
 
-        self.save()
-
 
 class UploadedFile(models.Model):
     project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
@@ -470,16 +468,9 @@ class Document(models.Model):
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
 
-        if str(self.name).lower() == 'aso':
+        if self.category == 'ASO':
             user_profile = Profile.objects.get(user=self.user)
             aso_files = sorted(Document.objects.filter(user=self.user, name__iexact='aso'), key=lambda x: x.expiration)
-            last_aso = aso_files[-1] if aso_files else None
-            user_profile.aso = last_aso.expiration if aso_files else None
-            user_profile.save()
-
-        if str(self.name).lower() == 'asos':
-            user_profile = Profile.objects.get(user=self.user)
-            aso_files = sorted(Document.objects.filter(user=self.user, name__iexact='asos'), key=lambda x: x.expiration)
             last_aso = aso_files[-1] if aso_files else None
             user_profile.aso = last_aso.expiration if aso_files else None
             user_profile.save()
@@ -487,7 +478,7 @@ class Document(models.Model):
     def save(self, *args, **kwargs):
         super().save()
 
-        if str(self.name).lower() == 'aso' and self.expiration is not None:
+        if self.category == 'ASO' and self.expiration is not None:
             try:
                 expiration_date = datetime.strptime(self.expiration, '%Y-%m-%d').date()
             except TypeError:
