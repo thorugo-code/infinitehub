@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
-from apps.home.models import Project, UploadedFile, Profile, Task, Client
+from apps.home.models import Project, UploadedFile, Profile, Task, Client, Link
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 import os
@@ -319,3 +319,29 @@ def change_task_status(request, project_id, task_id):
         return redirect('project_details', id=project.id)
 
     return redirect('project_details', id=project.id)
+
+
+def add_link(request, project_id):
+    project = Project.objects.get(id=project_id)
+
+    if request.method == 'POST':
+        link = Link(
+            project=project,
+            title=request.POST.get('linkTitle'),
+            path=request.POST.get('linkURL'),
+            created_by=request.user,
+        )
+
+        link.save()
+
+        return redirect('project_details', id=project.id)
+
+    return redirect('project_details', id=project.id)
+
+
+def delete_link(request, project_id, link_id):
+    project = Project.objects.get(id=project_id)
+    link = Link.objects.get(id=link_id, project=project)
+    link.delete()
+
+    return redirect('project_details', id=project_id)

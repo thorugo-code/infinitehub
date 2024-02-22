@@ -8,6 +8,29 @@ from django.contrib.auth.models import User, Group
 from djmoney.models.fields import MoneyField
 from django.utils.text import slugify
 from djmoney.money import Money
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+
+
+def get_favicon(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            html_content = response.text
+            soup = BeautifulSoup(html_content, 'html.parser')
+            favicon_link = soup.find('link', rel='icon') or soup.find('link', rel='shortcut icon')
+
+            if favicon_link:
+                favicon_url = favicon_link.get('href')
+                absolute_favicon_url = urljoin(url, favicon_url)
+
+                return absolute_favicon_url
+
+    except Exception as e:
+        print(f"Error fetching favicon: {e}")
+
+    return None
 
 
 def rand_slug():
@@ -360,7 +383,7 @@ class Client(models.Model):
             pass
 
 
-# Adicionar currency
+# Add currency
 class Bill(models.Model):
     # Foreign Keys and Relationships
     project = models.ForeignKey(Project, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
@@ -487,3 +510,51 @@ class Document(models.Model):
             user_profile = Profile.objects.get(user=self.user)
             user_profile.aso = expiration_date if user_profile.aso is None or user_profile.aso < expiration_date else user_profile.aso
             user_profile.save()
+
+
+class Link(models.Model):
+    # Foreign Keys and Relationships
+    project = models.ForeignKey(Project, related_name='links', on_delete=models.SET_NULL, null=True, blank=True)
+    client = models.ForeignKey(Client, related_name='links', on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(User, related_name='created_links', on_delete=models.SET_NULL, null=True)
+
+    # URL
+    path = models.URLField()
+
+    # Date Fields
+    created_at = models.DateField(auto_now_add=True)
+
+    # Char and Text Fields
+    title = models.CharField(max_length=100)
+    icon = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.path
+
+    def save(self, *args, **kwargs):
+        super().save()
+
+        # Correlation
+        correlation = {
+            'my.sharepoint.com': 'onedrive.svg',
+            'onedrive': 'onedrive.svg',
+            'drive.google.com': 'google-drive.svg',
+            'youtube': 'youtube.svg',
+            'github': 'github.svg',
+        }
+
+        if not self.icon:
+            for key, value in correlation.items():
+                if key in self.path:
+                    self.icon = f'/static/assets/img/icons/common/{value}'
+                    break
+
+            if not self.icon:
+                favicon = get_favicon(self.path)
+                self.icon = favicon if favicon else 'https://img.icons8.com/ios/50/ios-application-placeholder.png'
+
+            self.save()
+
+        if not self.title:
+            self.title = self.path.split('//')[-1]
+            self.save()

@@ -43,6 +43,10 @@ projects_page_urls = [
     path('projects/id=<int:project_id>/edit=<int:task_id>/', projects.edit_task, name='edit_task'),
 
     path('projects/id=<int:project_id>/delete-task=<int:task_id>', projects.delete_task, name='delete_task'),
+
+    path('projects/id=<int:project_id>/link', projects.add_link, name='add_link'),
+
+    path('projects/id=<int:project_id>/delete-link=<int:link_id>', projects.delete_link, name='delete_link'),
 ]
 
 assets_urls = [
