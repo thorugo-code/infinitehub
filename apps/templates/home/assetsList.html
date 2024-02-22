@@ -39,9 +39,9 @@
                             <thead class="thead-light">
                             <tr>
                                 <th scope="col" class="sort" data-sort="name" style="width: 40%">File</th>
-                                <th scope="col" class="sort" data-sort="client" style="width: 20%">Project</th>
-                                <th scope="col" class="sort" data-sort="area" style="width: 20%">Client</th>
-                                <th scope="col" class="sort" data-sort="value" style="width: 20%">Value</th>
+                                <th scope="col" class="sort" data-sort="client" style="width: 25%">Project</th>
+                                <th scope="col" class="sort" data-sort="area" style="width: 25%">Client</th>
+                                <th scope="col" class="sort" data-sort="value" style="width: 10%">Size</th>
                                 <th scope="col" style="width: 90px"></th>
                             </tr>
                             </thead>
@@ -223,15 +223,13 @@
 
                                     </th>
                                     <td>
-                                        {{ file.project.title }}
+                                        {{ file.project.title|truncatechars:30 }}
                                     <td>
-                                        {{ file.project.client }}
+                                        {{ file.project.client.name|default:file.project.client_str|truncatechars:30 }}
                                     </td>
                                     <td>
-                                        {{ file.value }}
+                                        {{ file.file.size|filesizeformat }}
                                     </td>
-
-
                                     <td class="text-right">
 
 

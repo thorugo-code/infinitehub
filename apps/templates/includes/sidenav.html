@@ -50,40 +50,10 @@
                 </li>
                 <!-- Assets items -->
                 <li class="nav-item">
-                    <a class="nav-link collapsed" id="collapse-assets"
-                       href="#navbar-assets" data-toggle="collapse" role="button" aria-expanded="false"
-                       aria-controls="navbar-projects">
-                        <i class="ni ni-folder-17 text-primary"></i>
+                    <a class="nav-link" href="{% url 'assets_hub' %}">
+                        <i class="ni ni-folder-17 text-primary" style="opacity: 90%"></i>
                         <span class="nav-link-text">Assets</span>
                     </a>
-                    <div class="collapse" id="navbar-assets" style="">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a href="{% url 'assets_hub' %}"
-                                   class="nav-link">
-                                    <span class="sidenav-normal"> All </span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   href="{% url 'assets_list' '3d-models' %}">
-                                    <span class="nav-link-text"> 3D Models </span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{% url 'assets_list' 'scripts' %}"
-                                   class="nav-link">
-                                    <span class="sidenav-normal"> Scripts </span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{% url 'assets_list' 'unity' %}"
-                                   class="nav-link">
-                                    <span class="sidenav-normal"> Unity </span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
                 <!-- Administratives items -->
                 <li class="nav-item">
