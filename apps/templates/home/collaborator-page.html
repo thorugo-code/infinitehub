@@ -393,14 +393,14 @@
                                                                type="text" value="{{ document.name }}" name="name">
                                                     </div>
                                                     <div class="row">
-                                                        <div class="form-group form-control-label col-sm-6">
+                                                        <div class="form-group form-control-label col-sm-4">
                                                             <label for="fileType{{ document.id }}"
                                                                    style="font-size:0.8125rem; font-weight:600">Expiration</label>
                                                             <input class="form-control" id="fileType{{ document.id }}"
                                                                    type="date" name="expiration"
                                                                    value="{{ document.expiration|date:'Y-m-d' }}">
                                                         </div>
-                                                        <div class="col-sm-6 form-group form-control-label col">
+                                                        <div class="col-sm-5 form-group form-control-label col">
                                                             <label for="fileUploadUser{{ document.id }}"
                                                                    style="font-size:0.8125rem; font-weight:600">Category</label>
                                                             <select class="form-control" name="category"
@@ -411,6 +411,16 @@
                                                                 <option value="Personal" {% if document.category == 'Personal' %}selected{% endif %}>Personal</option>
                                                                 <option value="Professional" {% if document.category == 'Professional' %}selected{% endif %}>Professional</option>
                                                             </select>
+                                                        </div>
+                                                        <div class="col-sm-3 form-group form-control-label">
+                                                            <label class="form-control-label">Shared</label>
+                                                            <div class="mt-2 form-group align-items-center" style="display: flex">
+                                                                <label class="custom-toggle custom-toggle-success mr-4">
+                                                                    <input type="checkbox" {% if document.shared %}checked=""{% endif %} name="shared">
+                                                                    <span class="custom-toggle-slider rounded-circle" data-label-off="No"
+                                                                          data-label-on="Yes"></span>
+                                                                </label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group form-control-label">
@@ -561,19 +571,29 @@
                                placeholder="" type="text">
                     </div>
                     <div class="row">
-                        <div class="col form-group form-control-label mb-3">
+                        <div class="col-sm-4 form-group form-control-label mb-3">
                             <label for="expiration">Expiration</label>
                             <input class="form-control" id="expiration" name="expiration" type="date">
                         </div>
-                        <div class="col form-group form-control-label">
-                            <label for="documentCategoryInput">Category</label>
-                            <select class="form-control" id="documentCategoryInput" name="category">
+                        <div class="col-sm-5 form-group form-control-label">
+                            <label for="newDocumentCategoryInput">Category</label>
+                            <select class="form-control" id="newDocumentCategoryInput" name="category">
                                 <option value=""></option>
                                 <option value="ASO">ASO</option>
                                 <option value="Payslip">Payslip</option>
                                 <option value="Personal">Personal</option>
                                 <option value="Professional">Professional</option>
                             </select>
+                        </div>
+                        <div class="col-sm-3 form-group form-control-label">
+                            <label class="form-control-label">Shared</label>
+                            <div class="mt-2 form-group align-items-center" style="display: flex">
+                                <label class="custom-toggle custom-toggle-success mr-4">
+                                    <input type="checkbox" name="shared">
+                                    <span class="custom-toggle-slider rounded-circle" data-label-off="No"
+                                          data-label-on="Yes"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group mb-2 form-control-label">

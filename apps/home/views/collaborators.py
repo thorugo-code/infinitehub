@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from apps.home.models import Profile, Office, Document
-from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
+from django.contrib.auth.models import User
 from django.db.models import Q
 import datetime
 import os
@@ -134,6 +134,7 @@ def newdoc(request, collab_id):
         file=request.FILES['file'],
         name=request.POST['name'],
         uploaded_by=request.user,
+        shared=True if request.POST.get('shared', False) else False,
     )
 
     new_document.save()
@@ -168,6 +169,7 @@ def edit_document(request, slug, document_id):
         document.description = request.POST.get('description', document.description)
         document.expiration = request.POST.get('expiration', document.expiration)
         document.name = request.POST.get('name', document.name)
+        document.shared = True if request.POST.get('shared', False) else False
         document.save()
 
     return redirect('collaborator_details', slug=slug)

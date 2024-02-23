@@ -8,7 +8,10 @@ import os
 
 def details(request):
     user = request.user
-    shared_documents = Document.objects.filter(shared=True) | Document.objects.filter(category='Payslip')
+    if user.has_perm('home.view_document'):
+        shared_documents = Document.objects.filter(user=user)
+    else:
+        shared_documents = Document.objects.filter(shared=True, user=user)
 
     all_tasks = Task.objects.filter(owner=user)
     tasks_to_do = all_tasks.filter(completed=False)
