@@ -8,7 +8,7 @@ import os
 
 def details(request):
     user = request.user
-    shared_documents = Document.objects.filter(shared=True)
+    shared_documents = Document.objects.filter(shared=True) | Document.objects.filter(category='Payslip')
 
     all_tasks = Task.objects.filter(owner=user)
     tasks_to_do = all_tasks.filter(completed=False)
