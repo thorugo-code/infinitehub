@@ -161,7 +161,7 @@
                                                 <div class="progress">
                                                     <div class="progress-bar {% if project.finished %}bg-success{% else %}bg-info{% endif %}"
                                                          role="progressbar"
-                                                         aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                                                         aria-valuenow="{{ project.completition }}" aria-valuemin="0" aria-valuemax="100"
                                                          style="width: {{ project.completition }}%;"></div>
                                                 </div>
                                             </div>

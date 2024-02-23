@@ -182,6 +182,8 @@ profile_urls = [
     path('profile/edit', profile.edit, name='edit_profile'),
 
     path('profile/save', profile.edit, name='send_edit_profile'),
+
+    path('profile/delete-file=<int:file_id>', profile.delete_file, name='delete_file_from_profile'),
 ]
 
 offices_urls = [
@@ -194,11 +196,9 @@ offices_urls = [
 ]
 
 base_urls = [
-
     path('', login.index, name='home'),
     # Matches any html file
     re_path(r'^.*\.*', login.pages, name='pages'),
-
 ]
 
 urlpatterns = projects_list_urls + projects_page_urls + assets_urls + collaborators_page_urls + collaborators_list_urls

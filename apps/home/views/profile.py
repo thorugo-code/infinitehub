@@ -1,28 +1,31 @@
 from django.shortcuts import render, redirect
-from apps.home.models import UploadedFile, Profile, Task, Office
+from apps.home.models import Profile, Task, Office, Document, UploadedFile
 from django.contrib.auth.models import User
 from core.settings import CORE_DIR
 import json
+import os
 
 
 def details(request):
     user = request.user
-    user_profile = Profile.objects.get(user=user)
-    user_files = UploadedFile.objects.filter(uploaded_by=user)
-    user_files_count = user_files.count()
+    shared_documents = Document.objects.filter(shared=True)
+
+    all_tasks = Task.objects.filter(owner=user)
+    tasks_to_do = all_tasks.filter(completed=False)
+    tasks_completed = all_tasks.filter(completed=True)
+    all_projects = user.assigned_projects.all()
+    projects_to_do = all_projects.filter(finished=False)
+    projects_completed = all_projects.filter(finished=True)
 
     context = {
-        'user_profile': user_profile,
-        'completed_tasks': Task.objects.filter(created_by=user, completed=True).count(),
-        'completed_tasks_percentage': (Task.objects.filter(created_by=user,
-                                                           completed=True).count() / Task.objects.filter(
-            created_by=user).count()) * 100 if Task.objects.filter(created_by=user).count() > 0 else 0,
-        'project_files': UploadedFile.objects.filter(uploaded_by=user, project__isnull=False).count(),
-        'project_files_percentage': (UploadedFile.objects.filter(uploaded_by=user,
-                                                                 project__isnull=False).count() / UploadedFile.objects.filter(
-            uploaded_by=user).count()) * 100 if UploadedFile.objects.filter(uploaded_by=user).count() > 0 else 0,
-        'user_files': user_files,
-        'user_files_number': user_files_count
+        'user_profile': Profile.objects.get(user=user),
+        'shared_documents': shared_documents,
+        'tasks': sorted(tasks_to_do, key=lambda x: x.deadline),
+        'projects': reversed(sorted(projects_to_do, key=lambda x: x.completition)),
+        'completed_tasks': tasks_completed.count(),
+        'completed_tasks_percentage': (tasks_completed.count() / all_tasks.count()) * 100 if all_tasks.count() > 0 else 0,
+        'completed_projects': projects_completed.count(),
+        'completed_projects_percentage': (projects_completed.count() / all_projects.count()) * 100 if all_projects.count() > 0 else 0,
     }
 
     return render(request, 'home/profile.html', context)
@@ -79,4 +82,18 @@ def edit(request):
         }
 
         return render(request, "home/profile-wizard.html", context)
+
+
+def delete_file(request, file_id):
+    uploaded_file = UploadedFile.objects.get(id=file_id)
+    file_path = uploaded_file.file.path
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    uploaded_file.value = 0
+    uploaded_file.save()
+
+    uploaded_file.delete()
+
+    return redirect('profile')
 

@@ -6,6 +6,7 @@
     
     {% load filters %}
 
+    <!-- Header -->
     <div class="header pb-6 d-flex align-items-center"
          style="min-height: 600px">
         <!-- Mask -->
@@ -13,32 +14,35 @@
         <!-- Header container -->
         <div class="container-fluid d-flex align-items-center">
             <div class="row mb-9">
-                <div class="col-lg-7 col-md-10 ml-6">
+                <div class="col-lg-7 col-md-10 col-sm-9 col-8 ml-lg-6 ml-4">
                     <h1 class="display-2 text-white">
                         Hello!
                     </h1>
                     <h1 class="display-3 text-white">
-                        {{ user_profile.user.first_name }} {{ user_profile.user.last_name }},
-                        <p class="text-white mt-0 mb-5">This is your profile page. You can see the progress you've made
-                            with your work and manage your personal informations.</p>
+                        {{ user_profile.user.first_name }},
+                        <p class="text-white mt-0 mb-5">
+                            This is your profile page.
+                            You can see the progress you've made
+                            with your work and manage your personal informations.
+                        </p>
                     </h1>
                 </div>
             </div>
         </div>
     </div>
+    
     <!-- Page content -->
     <div class="container-fluid" style="margin-top: -17rem">
         <div class="row">
-
-            <!-- Profile Picture Card -->
             <div class="col-xl-4 order-xl-1">
+                <!-- Profile Picture Card -->
                 <div class="card card-profile">
-                <div class="row mx-0 my-3">
-                    <div class="col text-right">
-                        <a class="btn btn-sm btn-neutral" href="{% url 'edit_profile' %}"><i class="fas fa-cog"></i></a>
+                    <div class="row mx-0 my-3">
+                        <div class="col text-right">
+                            <a class="btn btn-sm btn-neutral" href="{% url 'edit_profile' %}"><i class="fas fa-cog"></i></a>
+                        </div>
                     </div>
-                </div>
-                <div class="row justify-content-center mt-5 pt-5">
+                    <div class="row justify-content-center mt-5 pt-5">
                         <div class="col-lg-12">
                             <div class="card-profile-image"
                                  style="background-color: #adb5bd00">
@@ -52,189 +56,192 @@
                         </div>
                     </div>
                     <div class="card-body pt-3">
-                        <div class="row">
-                            <div class="col">
-                                <div class="card-profile-stats d-flex justify-content-center mt-6 pb-2">
-                                    <div class="pb-2">
-                                    {% if user_profile.user.username|check_group:'admin' %}
-                                        <small class="badge badge-md badge-danger">Admin</small>
-                                    {% endif %}
-                                    {% if user_profile.user.username|check_group:'collaborator' %}
-                                        <small class="badge badge-md badge-info">Collaborator</small>
-                                    {% else %}
-                                        <small class="badge badge-md badge-primary">External</small>
-                                    {% endif %}
-                                    {% if user_profile.user.username|check_group:'finance' %}
-                                        <small class="badge badge-md badge-warning">Financial</small>
-                                    {% endif %}
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card-profile-stats d-flex justify-content-center mt-6 pb-2">
+                                        <div class="pb-2">
+                                        {% if user_profile.user.username|check_group:'admin' %}
+                                            <small class="badge badge-md badge-danger">Admin</small>
+                                        {% endif %}
+                                        {% if user_profile.user.username|check_group:'collaborator' %}
+                                            <small class="badge badge-md badge-info">Collaborator</small>
+                                        {% else %}
+                                            <small class="badge badge-md badge-primary">External</small>
+                                        {% endif %}
+                                        {% if user_profile.user.username|check_group:'finance' %}
+                                            <small class="badge badge-md badge-warning">Financial</small>
+                                        {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="text-center">
-                            <h5 class="h3 title py-3">
-                                <span>{{ user_profile.user.get_full_name }}</span>
-                                <small class="d-block h5 font-weight-light text-muted">{{ user_profile.position|default:'' }}</small>
-                            </h5>
-                            <div class="h5 mt-2">
-                                {{ user_profile.user.username }}
-                            </div>
-                            {% if user_profile.phone %}
-                                <div class="h5 font-weight-300 mt--2 pb-2">
-                                    {{ user_profile.phone }}
+                            <div class="text-center">
+                                <h5 class="h3 title py-3">
+                                    <span>{{ user_profile.user.get_full_name }}</span>
+                                    <small class="d-block h5 font-weight-light text-muted">{{ user_profile.position|default:'' }}</small>
+                                </h5>
+                                <div class="h5 mt-2">
+                                    {{ user_profile.user.username }}
                                 </div>
-                            {% endif %}
-                            <div class="h5 font-weight-400">
-                                {% if user_profile.street != '' and user_profile.city != '' and user_profile.state != '' and user_profile.country != '' %}
-                                    <div><i class="fas fa-map-marker-alt mr-1 text-black-50"></i>
-                                        {{ user_profile.street }}, {{ user_profile.street_number }}
-                                        - {{ user_profile.city }}, {{ user_profile.state }}, {{ user_profile.country }}
+                                {% if user_profile.phone %}
+                                    <div class="h5 font-weight-300 mt--2 pb-2">
+                                        {{ user_profile.phone }}
                                     </div>
                                 {% endif %}
-                            </div>
-                            {% if user_profile.about != '' %}
-                                <div class="h4 font-weight-500 my-3 mb-3 py-4">
-                                    <i>"{{ user_profile.about }}"</i>
+                                <div class="h5 font-weight-400">
+                                    {% if user_profile.street != '' and user_profile.city != '' and user_profile.state != '' and user_profile.country != '' %}
+                                        <div><i class="fas fa-map-marker-alt mr-1 text-black-50"></i>
+                                            {{ user_profile.street }}, {{ user_profile.street_number }}
+                                            - {{ user_profile.city }}, {{ user_profile.state }}, {{ user_profile.country }}
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            {% else %}
-                                <div class="py-3"></div>
-                            {% endif %}
-
-                            {#                            <div class="row justify-content-center" style="position: absolute; bottom:3rem; width: calc(100% - 11px - 2.5rem);">#}
-                            {#                                <div class="col-1 px-0 mx-1">#}
-                            {#                                    <a href="" target="_blank" data-toggle="tooltip" data-original-title="Facebook">#}
-                            {#                                        <i class="fab fa-facebook-square"></i>#}
-                            {#                                    </a>#}
-                            {#                                </div>#}
-                            {#                                <div class="col-1 px-0 mx-1">#}
-                            {#                                    <a href="" target="_blank" data-toggle="tooltip" data-original-title="Twitter">#}
-                            {#                                        <i class="fab fa-twitter-square"></i>#}
-                            {#                                    </a>#}
-                            {#                                </div>#}
-                            {#                                <div class="col-1 px-0 mx-1">#}
-                            {#                                    <a href="" target="_blank" data-toggle="tooltip" data-original-title="Instagram">#}
-                            {#                                        <i class="fab fa-instagram"></i>#}
-                            {#                                    </a>#}
-                            {#                                </div>#}
-                            {#                                <div class="col-1 px-0 mx-1">#}
-                            {#                                    <a href="" target="_blank" data-toggle="tooltip" data-original-title="LinkedIn">#}
-                            {#                                        <i class="fab fa-linkedin"></i>#}
-                            {#                                    </a>#}
-                            {#                                </div>#}
-                            {#                            </div>#}
-
+                                {% if user_profile.about != '' %}
+                                    <div class="h4 font-weight-500 my-3 mb-3 py-4">
+                                        <i>"{{ user_profile.about }}"</i>
+                                    </div>
+                                {% else %}
+                                    <div class="py-3"></div>
+                                {% endif %}
+    
+                                {#                            <div class="row justify-content-center" style="position: absolute; bottom:3rem; width: calc(100% - 11px - 2.5rem);">#}
+                                {#                                <div class="col-1 px-0 mx-1">#}
+                                {#                                    <a href="" target="_blank" data-toggle="tooltip" data-original-title="Facebook">#}
+                                {#                                        <i class="fab fa-facebook-square"></i>#}
+                                {#                                    </a>#}
+                                {#                                </div>#}
+                                {#                                <div class="col-1 px-0 mx-1">#}
+                                {#                                    <a href="" target="_blank" data-toggle="tooltip" data-original-title="Twitter">#}
+                                {#                                        <i class="fab fa-twitter-square"></i>#}
+                                {#                                    </a>#}
+                                {#                                </div>#}
+                                {#                                <div class="col-1 px-0 mx-1">#}
+                                {#                                    <a href="" target="_blank" data-toggle="tooltip" data-original-title="Instagram">#}
+                                {#                                        <i class="fab fa-instagram"></i>#}
+                                {#                                    </a>#}
+                                {#                                </div>#}
+                                {#                                <div class="col-1 px-0 mx-1">#}
+                                {#                                    <a href="" target="_blank" data-toggle="tooltip" data-original-title="LinkedIn">#}
+                                {#                                        <i class="fab fa-linkedin"></i>#}
+                                {#                                    </a>#}
+                                {#                                </div>#}
+                                {#                            </div>#}
+    
+                            </div>
+                    </div>
+                </div>
+                <!-- Documents Card -->
+                <div class="card shadow">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Documents</h3>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <div class="table-responsive" style="height: 12rem; overflow-y: auto">
+                        <table class="table align-items-center table-flush">
+                            <tbody>
+                            {% for document in shared_documents %}
+                                <tr>
+                                    <th scope="row" class="p-2 align-items-center">
+                                        <a class="align-items-center" style="display: flex"
+                                           data-target="#watchDocumentModal{{ document.id }}" data-toggle="modal"
+                                           href="">
+                                            <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                 alt="{{ document.name }}" class="px-3" style="height: 18px">
+                                            <span class="text-black-50">{{ document.name|truncatechars:38 }}</span>
+                                        </a>
+                                    </th>
+                                    <td class="text-right pr-4 align-items-center">
+                                        <a href="{% url 'download_collaborator_document' document.id %}">
+                                            <i class="fas fa-download text-success" style="font-size: 0.7125rem"></i>
+                                        </a>
+                                    </td>
+                                </tr>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="mb-0 text-capitalize">Progress track</h3>
-                    </div>
-                    <div class="card-body p-0 pb-2">
-                        <ul class="list-group list-group-flush list" style="max-height: 360px; overflow: auto">
-                            {% for project in user_profile.user.assigned_projects.all %}
-                                <li class="list-group-item border-top-0 px-4 mx-2">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto p-0">
-                                            <a href="" class="avatar rounded-circle">
-                                                <img alt=""
-                                                     src="../../assets/img/small-logos/logo-jira.svg">
-                                            </a>
+                                <!-- Watch File Modal -->
+                                <div aria-hidden="true"
+                                 aria-labelledby="watchDocumentModalLabel{{ document.id }}"
+                                 class="modal fade" id="watchDocumentModal{{ document.id }}"
+                                 role="dialog"
+                                 tabindex="-1">
+                                <div class="modal-dialog my-6" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header mt-2 mb--1">
+                                            <h5 class="modal-title my-1"
+                                                style="margin-left: auto">
+                                                <i></i>
+                                            </h5>
+                                            <span class="ml-3 my-1"
+                                                  id="newPageModalLabel{{ document.id }}"
+                                                  style="margin-right: auto; font-size: 1.2rem"></span>
+                                            <button aria-label="Close" class="close mt--4"
+                                                    data-dismiss="modal"
+                                                    style="margin-left: -30px"
+                                                    type="button">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
                                         </div>
-                                        <div class="col">
-                                            <a href="" class="text-muted"><h5>{{ project.title }} - Nice</h5></a>
-                                            <div class="progress progress-xs mb-0">
-                                                <div class="progress-bar bg-success" role="progressbar" aria-valuenow="90"
-                                                     aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div>
+                                        <div class="modal-body py-0"
+                                             style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                            <div class="form-group mt--1"
+                                                 style="display: flex; justify-content: center">
+                                                <img alt="New File" id="filePreviewModal{{ document.id }}"
+                                                     src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                     style="height: 130px"/>
+                                            </div>
+                                            <div class="form-group form-control-label justify-content-center" style="display: flex">
+                                                <span class="h5 mb-0 text-muted font-weight-light">
+                                                    uploaded: {{ document.uploaded_by.first_name }}
+                                                    {% if document.uploaded_by %}-{% endif %}
+                                                    {{ document.uploaded_at|date:'d/m/Y' }}
+                                                </span>
+                                            </div>
+                                            <div class="form-group form-control-label">
+                                                <label for="fileName{{ document.id }}"
+                                                       style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                <input class="form-control" id="fileName{{ document.id }}" disabled
+                                                       type="text" value="{{ document.name }}" name="name">
+                                            </div>
+                                            <div class="form-group form-control-label">
+                                                <label for="fileDescription{{ document.id }}"
+                                                       style="font-size:0.8125rem; font-weight:600">Description</label>
+                                                <textarea class="form-control" name="description" disabled
+                                                          id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
-                                <li class="list-group-item border-top-0 px-4 mx-2">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto p-0">
-                                            <a href="" class="avatar rounded-circle">
-                                                <img alt=""
-                                                     src="../../assets/img/small-logos/logo-jira.svg">
+                                        <div class="modal-footer">
+                                            <button class="btn btn-secondary" data-dismiss="modal"
+                                                    type="button">Cancel
+                                            </button>
+                                            <a class="btn btn-success" data-toggle="tooltip" data-original-title="Download"
+                                               href="{% url 'download_collaborator_document' document.id %}">
+                                                Download
                                             </a>
                                         </div>
-                                        <div class="col">
-                                            <a href="" class="text-muted"><h5>{{ project.title }} - Good</h5></a>
-                                            <div class="progress progress-xs mb-0">
-                                                <div class="progress-bar bg-yellow" role="progressbar" aria-valuenow="90"
-                                                     aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
-                                            </div>
-                                        </div>
                                     </div>
-                                </li>
-                                <li class="list-group-item border-top-0 px-4 mx-2">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto p-0">
-                                            <a href="" class="avatar rounded-circle">
-                                                <img alt=""
-                                                     src="../../assets/img/small-logos/logo-jira.svg">
-                                            </a>
-                                        </div>
-                                        <div class="col">
-                                            <a href="" class="text-muted"><h5>{{ project.title }} - Ok</h5></a>
-                                            <div class="progress progress-xs mb-0">
-                                                <div class="progress-bar bg-info" role="progressbar" aria-valuenow="90"
-                                                     aria-valuemin="0" aria-valuemax="100" style="width: 30%;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="list-group-item border-top-0 px-4 mx-2">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto p-0">
-                                            <a href="" class="avatar rounded-circle">
-                                                <img alt=""
-                                                     src="../../assets/img/small-logos/logo-jira.svg">
-                                            </a>
-                                        </div>
-                                        <div class="col">
-                                            <a href="" class="text-muted"><h5>{{ project.title }} - Bad</h5></a>
-                                            <div class="progress progress-xs mb-0">
-                                                <div class="progress-bar bg-red" role="progressbar" aria-valuenow="90"
-                                                     aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="list-group-item border-top-0 px-4 mx-2">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto p-0">
-                                            <a href="" class="avatar rounded-circle">
-                                                <img alt=""
-                                                     src="../../assets/img/small-logos/logo-jira.svg">
-                                            </a>
-                                        </div>
-                                        <div class="col">
-                                            <a href="" class="text-muted"><h5>{{ project.title }} - Bad</h5></a>
-                                            <div class="progress progress-xs mb-0">
-                                                <div class="progress-bar bg-red" role="progressbar" aria-valuenow="90"
-                                                     aria-valuemin="0" aria-valuemax="100" style="width: 90%;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
+                                </div>
+                            </div>
+
                             {% endfor %}
-                        </ul>
+                            </tbody>
+                        </table>
                     </div>
+                    <div class="card-footer py-1" style="border-top: 0 !important"></div>
                 </div>
-            
             </div>
+        
             <div class="col-xl-8 order-xl-1">
                 <!-- Info Cards -->
                 <div class="row">
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <div class="card bg-gradient-default" style="height: 85%; min-width: 0">
                             <div class="card-body p-4">
                                 <h5 class="card-title text-uppercase text-muted mb-0 text-white">
                                     Completed tasks
                                 </h5>
-                                <span class="h2 font-weight-bold mb-0 text-white">{{ completed_tasks }}/{{ user_profile.user.created_tasks.all.count }}</span>
+                                <span class="h2 font-weight-bold mb-0 text-white">{{ completed_tasks }}/{{ user_profile.user.user_tasks.all.count }}</span>
                                 <div class="progress progress-xs mt-4 mb-0 text-sm">
                                     <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ completed_tasks_percentage }}"
                                          aria-valuemin="0" aria-valuemax="100" style="width: {{ completed_tasks_percentage }}%;"></div>
@@ -242,26 +249,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="card" style="height: 85%; min-width: 0; background: linear-gradient(87deg, #539dff 0, #1160ef 100%) !important">
-                            <div class="card-body p-4">
-                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">Completed Projects</h5>
-                                <span class="h2 font-weight-bold mb-0 text-white">- /{{ user_profile.user.assigned_projects.all.count }}</span>
-                                <div class="progress progress-xs mt-4 mb-0 text-sm">
-                                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ completed_tasks_percentage }}"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: {{ completed_tasks_percentage }}%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <div class="card bg-gradient-blue" style="height: 85%; min-width: 0">
                             <div class="card-body p-4">
-                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">Project Files</h5>
-                                <span class="h2 font-weight-bold mb-0 text-white">{{ project_files }}/{{ user_profile.user.uploaded_files.all.count }}</span>
+                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">Completed Projects</h5>
+                                <span class="h2 font-weight-bold mb-0 text-white">{{ completed_projects }}/{{ user_profile.user.assigned_projects.all.count }}</span>
                                 <div class="progress progress-xs mt-4 mb-0 text-sm">
-                                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ project_files_percentage }}"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: {{ project_files_percentage }}%;"></div>
+                                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ completed_projects_percentage }}"
+                                         aria-valuemin="0" aria-valuemax="100" style="width: {{ completed_projects_percentage }}%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -306,7 +301,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <!-- Watch File Modal -->
                                 <div class="modal fade" id="watchFileModal{{ uploaded_file.pk }}"
                                      tabindex="-1" role="dialog"
@@ -352,6 +346,31 @@
                                                                disabled>
                                                     </div>
                                                     <div class="row">
+                                                        <div class="form-group form-control-label col-sm-4">
+                                                            <label for="fileType"
+                                                                   style="font-size:0.8125rem; font-weight:600">Category</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="fileType"
+                                                                   value="{{ uploaded_file.category|refformatted_category }}"
+                                                                   disabled>
+                                                        </div>
+                                                        <div class="form-group form-control-label col-sm-4">
+                                                            <label for="fileUploadDate"
+                                                                   style="font-size:0.8125rem; font-weight:600">Date</label>
+                                                            <input type="date" class="form-control"
+                                                                   id="fileUploadDate"
+                                                                   value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
+                                                                   disabled>
+                                                        </div>
+                                                        <div class="form-group form-control-label col-sm-4">
+                                                            <label for="fileSize"
+                                                                   style="font-size:0.8125rem; font-weight:600">Size</label>
+                                                            <input type="text" class="form-control" id="fileSize"
+                                                                   value="{{ uploaded_file.file.size|filesizeformat }}"
+                                                                   disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
                                                         <div class="form-group form-control-label col-lg-6">
                                                             <label for="fileUploadUser"
                                                                    style="font-size:0.8125rem; font-weight:600">Project</label>
@@ -368,24 +387,6 @@
                                                                    id="fileValue"
                                                                    value="{{ uploaded_file.project.client }}"
                                                                    placeholder="$ 0.00"
-                                                                   disabled>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group form-control-label col-lg-6">
-                                                            <label for="fileType"
-                                                                   style="font-size:0.8125rem; font-weight:600">Category</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="fileType"
-                                                                   value="{{ uploaded_file.category|refformatted_category }}"
-                                                                   disabled>
-                                                        </div>
-                                                        <div class="form-group form-control-label col-lg-6">
-                                                            <label for="fileUploadDate"
-                                                                   style="font-size:0.8125rem; font-weight:600">Date</label>
-                                                            <input type="date" class="form-control"
-                                                                   id="fileUploadDate"
-                                                                   value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
                                                                    disabled>
                                                         </div>
                                                     </div>
@@ -413,7 +414,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <!-- Delete Confirm Modal -->
                                 <div class="modal fade" id="deleteConfirm{{ uploaded_file.pk }}"
                                      tabindex="-1" role="dialog"
@@ -441,7 +441,7 @@
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                 <form method="post"
                                                       id="deleteConfirmForm{{ uploaded_file.pk }}"
-                                                      action="">
+                                                      action="{% url 'delete_file_from_profile' uploaded_file.pk %}">
                                                     {% csrf_token %}
                                                     <div class="form-group mt-4"
                                                          style="display: flex; justify-content: center">
@@ -479,28 +479,58 @@
                     </div>
                 </div>
                 <div class="row">
+                    <!-- Projects Card -->
+                    <div class="col-md">
+                        <div class="card shadow">
+                            <div class="card-header">
+                                <h3 class="mb-0 text-capitalize">Projects</h3>
+                            </div>
+                            <div class="card-body p-0 pb-2">
+                                <ul class="list-group list-group-flush list" 
+                                    style="min-height: 20.5rem; max-height: 28.5rem; overflow: auto">
+                                    {% for project in projects %}
+                                        <li class="list-group-item border-top-0 px-4 mx-2 py-3">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto p-0 align-items-center" style="display: flex">
+                                                    <a href="" class="avatar rounded-circle">
+                                                        <img alt="" src="{{ project.img.url|slice:"5:" }}"
+                                                             style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;">
+                                                    </a>
+                                                </div>
+                                                <div class="col">
+                                                    <a href="{% url 'project_details' project.id %}" class="text-muted"><h5 class="mb-0">{{ project.title }}</h5></a>
+                                                    <a href="{% url 'project_details' project.id %}" class="text-muted"><h6 class="font-weight-light">{{ project.client.name|default:project.client_str }}</h6></a>
+                                                    <div class="progress progress-xs mb-0">
+                                                        <div class="progress-bar {% if project.completition >= 80 and project.deadline|time_to_date > 0 %}bg-success{% elif project.completition >= 40 and project.deadline|time_to_date > 0 %}bg-info{% elif project.completition >= 10 and project.deadline|time_to_date > 0 %}bg-yellow{% else %}bg-red{% endif %}" role="progressbar"
+                                                             aria-valuenow="{{ project.completition }}"
+                                                             aria-valuemin="0" aria-valuemax="100"
+                                                             style="width: {{ project.completition }}%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Tasks Card -->
-                    <div class="col">
+                    <div class="col-md">
                         <div class="card shadow">
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col">
                                         <h3 class="mb-0">Tasks</h3>
                                     </div>
-{#                                    <div class="col text-right">#}
-{#                                        <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
-{#                                           data-target="#newTaskModal">#}
-{#                                            <i class="fas fa-plus"></i>#}
-{#                                        </a>#}
-{#                                    </div>#}
                                 </div>
                             </div>
-                            <div class="card-body p-0" style="height: 14rem; overflow-y: auto;">
-                                <ul class="list-group list-group-flush" data-toggle="checklist">
-                                    {% for task in user_profile.user.created_tasks.all %}
-                                        <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4">
+                            <div class="card-body p-0 pb-2">
+                                <ul class="list-group list-group-flush px-2" data-toggle="checklist" 
+                                    style="min-height: 20.5rem; max-height: 28.5rem; overflow-y: auto;">
+                                    {% for task in tasks %}
+                                        <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-3 border-top-0">
                                             <div class="checklist-item checklist-item-{% if task.priority == 1 %}success{% elif task.priority == 2 %}medium{% elif task.priority == 3 %}danger{% else %}info{% endif %} {% if task.completed %}checklist-item-checked{% endif %}">
-                                                <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}" style="max-width: 85%">
+                                                <a href="{% url 'project_details' task.project.id %}#task{{ task.id }}">
                                                     <div class="checklist-info">
                                                         <h5 class="checklist-title mb-0">{{ task.title }}</h5>
                                                         <small class="text-{% if task.priority == 1 %}success{% elif task.priority == 2 %}medium{% elif task.priority == 3 %}danger{% else %}info{% endif %}">
@@ -512,505 +542,22 @@
                                                         <i>({{ task.project.title }})</i>{% endif %} </small>
                                                     </div>
                                                 </a>
-                                                <div class="ml-auto pl-0 custom-control custom-checkbox custom-checkbox-{% if task.priority == 1 %}success{% elif task.priority == 2 %}medium{% elif task.priority == 3 %}danger{% else %}info{% endif %}">
-                                                    <form method="post" id="changeStatusTask{{ task.id }}"
-                                                          action="{% url 'change_task_status' task.project.id task.id %}">
-                                                        {% csrf_token %}
-                                                        <label class="custom-control custom-checkbox">
-                                                            <input class="custom-control-input"
-                                                                   id="chk-todo-task-{{ task.id }}"
-                                                                   type="checkbox"
-                                                                   {% if task.completed %}checked{% endif %}
-                                                                   onchange="submitCheckboxForm('changeStatusTask{{ task.id }}')">
-                                                            <label class="custom-control-label"
-                                                                   for="chk-todo-task-{{ task.id }}"></label>
-                                                        </label>
-                                                    </form>
-                                                </div>
                                             </div>
                                         </li>
                                     {% endfor %}
                                 </ul>
                             </div>
-                            <div class="card-footer py-2" style="border-top: 0 !important"></div>
                         </div>
                     </div>
-                    {% if perms.home.view_document %}
-                        <!-- Documents Card -->
-                        <div class="col">
-                            <div class="card shadow">
-                                <div class="card-header">
-                                    <div class="row align-items-center">
-                                        <div class="col">
-                                            <h3 class="mb-0">Documents</h3>
-                                        </div>
-{#                                        <div class="col text-right">#}
-{#                                            <a class="btn btn-sm {% if sorted_by is None %}btn-neutral{% else %}btn-primary{% endif %}"#}
-{#                                               data-target="#sortDocumentModal" data-toggle="modal" href="#">#}
-{#                                                {% if sort_type == 'desc' %}#}
-{#                                                    <i class="fas fa-caret-down mr-0"></i>{% elif sort_type == 'asc' %}#}
-{#                                                    <i class="fas fa-caret-up mr-0"></i>{% endif %}#}
-{#                                                {% if sorted_by is not None %}#}
-{#                                                    <span>{{ sorted_by|capfirst }}</span>{% else %}#}
-{#                                                    <i class="fas fa-sort"></i>{% endif %}#}
-{#                                            </a>#}
-{#                                            <a class="btn btn-sm {% if filters is None %}btn-neutral{% else %}btn-primary{% endif %}"#}
-{#                                               data-target="#filterDocumentModal" data-toggle="modal" href="#">#}
-{#                                                <i class="fas fa-filter {% if filters is None %}{% else %}mr-0{% endif %}"></i>#}
-{#                                                {% if filters is not None %}#}
-{#                                                    {% load filters %}#}
-{#                                                    {% with filters_list=filters|split:'&' %}#}
-{#                                                        {% if filters|both_from_to %}#}
-{#                                                            <span>Date</span>#}
-{#                                                        {% endif %}#}
-{#                                                        {% for filter_item in filters_list %}#}
-{#                                                            {% if 'from=' in filter_item or 'to=' in filter_item %}#}
-{#                                                                {% if filters|xor_from_to %}#}
-{#                                                                    <span>Date</span>#}
-{#                                                                {% endif %}#}
-{#                                                            {% elif 'category=' in filter_item %}#}
-{#                                                                <span>{% if not filters|first_filter:'category' %} | {% endif %}#}
-{#                                                                    Category</span>#}
-{#                                                            {% endif %}#}
-{#                                                        {% endfor %}#}
-{#                                                    {% endwith %}#}
-{#                                                {% endif %}#}
-{#                                            </a>#}
-{#                                            <a class="btn btn-sm btn-neutral" data-target="#newDocumentModal"#}
-{#                                               data-toggle="modal"#}
-{#                                               href="#">#}
-{#                                                <i class="fas fa-plus"></i>#}
-{#                                            </a>#}
-{#                                        </div>#}
-                                    </div>
-                                </div>
-                                <div class="table-responsive" style="min-height: 14.4rem; max-height: 28rem; overflow-y: auto">
-                                    <table class="table align-items-center table-flush">
-                                        <thead class="thead-light">
-                                        <tr>
-                                            <th scope="col" style="width: 0"></th>
-                                            <th scope="col" class="py-2 pl-0" style="width: 75%">Name
-                                                {% if sorted_by == 'name' and sort_type == 'desc' %}
-                                                    <i class="fas fa-caret-down ml-1"></i>
-                                                {% elif sorted_by == 'name' and sort_type == 'asc' %}
-                                                    <i class="fas fa-caret-up ml-1"></i>
-                                                {% endif %}
-                                            </th>
-                                            <th scope="col" class="py-2" style="width: 25%">Category
-                                                {% if sorted_by == 'category' and sort_type == 'desc' %}
-                                                    <i class="fas fa-caret-down ml-1"></i>
-                                                {% elif sorted_by == 'category' and sort_type == 'asc' %}
-                                                    <i class="fas fa-caret-up ml-1"></i>
-                                                {% endif %}
-                                            </th>
-                                            <th scope="col" class="py-2" style="width: 0">Expiration
-                                                {% if sorted_by == 'expiration' and sort_type == 'desc' %}
-                                                    <i class="fas fa-caret-down ml-1"></i>
-                                                {% elif sorted_by == 'expiration' and sort_type == 'asc' %}
-                                                    <i class="fas fa-caret-up ml-1"></i>
-                                                {% endif %}
-                                            </th>
-                                            <th scope="col" style="width: 0"></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {% for document in collaborator_documents %}
-                                            <tr>
-                                                <th scope="row" class="py-2 px-3">
-                                                    <a class="align-items-center" style="display: flex"
-                                                       data-target="#watchDocumentModal{{ document.id }}" data-toggle="modal"
-                                                       href="">
-                                                        <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                             alt="{{ document.name }}" style="height: 18px">
-                                                    </a>
-                                                </th>
-                                                <th scope="row" class="py-2 pl-0">
-                                                    <a class="align-items-center" style="display: flex"
-                                                       data-target="#watchDocumentModal{{ document.id }}" data-toggle="modal"
-                                                       href="">
-                                                        <span class="text-black-50">{{ document.name|truncatechars:44 }}</span>
-                                                    </a>
-                                                </th>
-                                                <td class="py-2">{% if document.category != 'none' %}
-                                                    {{ document.category|default:'-' }}{% else %}-{% endif %}</td>
-                                                <td class="py-2 {% if document.expired %}text-danger{% elif document.expiration|time_to_date <= 30 %}text-warning{% endif %}">{{ document.expiration|date:'d/m/Y' }} ({{ document.expiration|time_to_date }} days)</td>
-                                                <td class="text-right p-2">
-                                                    <div class="dropdown">
-                                                        <a aria-expanded="false" aria-haspopup="true"
-                                                           class="btn btn-sm btn-icon-only text-light"
-                                                           data-toggle="dropdown" href="#" role="button">
-                                                            <i class="fas fa-ellipsis-v"></i>
-                                                        </a>
-                                                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                            <a class="dropdown-item"
-                                                               data-target="#watchDocumentModal{{ document.id }}"
-                                                               data-toggle="modal"
-                                                               href="">Open</a>
-                                                            <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item text-success"
-                                                               href="{% url 'download_collaborator_document' document.id %}">
-                                                                Download
-                                                            </a>
-                                                            <a class="dropdown-item text-danger"
-                                                               data-target="#deleteConfirmDocument{{ document.id }}"
-                                                               data-toggle="modal"
-                                                               href="">Delete</a>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-            
-                                            <!-- Watch File Modal -->
-                                            <div aria-hidden="true"
-                                                 aria-labelledby="watchDocumentModalLabel{{ document.id }}"
-                                                 class="modal fade" id="watchDocumentModal{{ document.id }}"
-                                                 role="dialog"
-                                                 tabindex="-1">
-                                                <div class="modal-dialog my-6" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header mt-2 mb--1">
-                                                            <h5 class="modal-title my-1"
-                                                                style="margin-left: auto">
-                                                                <i></i>
-                                                            </h5>
-                                                            <span class="ml-3 my-1"
-                                                                  id="newPageModalLabel{{ document.id }}"
-                                                                  style="margin-right: auto; font-size: 1.2rem"></span>
-                                                            <button aria-label="Close" class="close mt--4"
-                                                                    data-dismiss="modal"
-                                                                    style="margin-left: -30px"
-                                                                    type="button">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body py-0"
-                                                             style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                            <form action=""
-                                                                  id="downloadFile{{ document.id }}"
-                                                                  method="post">
-                                                                {% csrf_token %}
-                                                                {% load filters %}
-                                                                <div class="form-group mt--1"
-                                                                     style="display: flex; justify-content: center">
-                                                                    <img
-                                                                            alt="New File"
-                                                                            id="filePreviewModal{{ document.id }}"
-                                                                            src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                                            style="height: 130px"/>
-                                                                </div>
-                                                                <div class="row">
-                                                                    <div class="col-8 form-group form-control-label">
-                                                                        <label for="fileName{{ document.id }}"
-                                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                                        <input class="form-control" disabled
-                                                                               id="fileName{{ document.id }}"
-                                                                               type="text"
-                                                                               value="{{ document.name }}">
-                                                                    </div>
-                                                                    <div class="col-4 form-group form-control-label col">
-                                                                        <label for="fileUploadUser{{ document.id }}"
-                                                                               style="font-size:0.8125rem; font-weight:600">Category</label>
-                                                                        <input class="form-control" disabled
-                                                                               id="fileUploadUser{{ document.id }}"
-                                                                               type="text"
-                                                                               value="{{ document.category }}">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row">
-                                                                    <div class="form-group form-control-label col-lg-6">
-                                                                        <label for="fileType{{ document.id }}"
-                                                                               style="font-size:0.8125rem; font-weight:600">Expiration</label>
-                                                                        <input class="form-control" disabled
-                                                                               id="fileType{{ document.id }}"
-                                                                               type="text"
-                                                                               value="{{ document.expiration|date:'d/m/Y' }}">
-                                                                    </div>
-                                                                    <div class="form-group form-control-label col-lg-6">
-                                                                        <label for="fileValue{{ document.id }}"
-                                                                               style="font-size:0.8125rem; font-weight:600">Uploaded
-                                                                            at</label>
-                                                                        <input class="form-control"
-                                                                               disabled
-                                                                               id="fileValue{{ document.id }}"
-                                                                               inputmode="decimal"
-                                                                               value="{{ document.uploaded_at|date:'d/m/Y' }}">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="form-group form-control-label">
-                                                                    <label for="fileDescription{{ document.id }}"
-                                                                           style="font-size:0.8125rem; font-weight:600">Description</label>
-                                                                    <textarea class="form-control"
-                                                                              disabled
-                                                                              id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button class="btn btn-secondary" data-dismiss="modal"
-                                                                    type="button">Cancel
-                                                            </button>
-                                                            <button class="btn btn-danger text-white"
-                                                                    data-dismiss="modal"
-                                                                    data-target="#deleteConfirmDocument{{ document.id }}"
-                                                                    data-toggle="modal">
-                                                                Delete
-                                                            </button>
-                                                            <a class="btn btn-success"
-                                                               href="{% url 'download_collaborator_document' document.id %}">Download</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-            
-                                            <!-- Delete Confirm Modal -->
-                                            <div aria-hidden="true"
-                                                 aria-labelledby="deleteConfirmDocumentLabel{{ document.id }}"
-                                                 class="modal fade" id="deleteConfirmDocument{{ document.id }}"
-                                                 role="dialog"
-                                                 tabindex="-1">
-                                                <div class="modal-dialog my-6" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header mt-2">
-                                                            <h5 class="modal-title my-1"
-                                                                style="margin-left: auto">
-                                                                <i class="ni ni-fat-delete text-blue"
-                                                                   style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                            </h5>
-                                                            <span class="ml-3 my-1"
-                                                                  id="deleteConfirmModalLabel"
-                                                                  style="margin-right: auto; font-size: 1.2rem">Are you sure?</span>
-                                                            <button aria-label="Close" class="close mt--4"
-                                                                    data-dismiss="modal"
-                                                                    style="margin-left: -30px"
-                                                                    type="button">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body py-0"
-                                                             style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                            <form action="{% url 'delete_document' collaborator.slug document.id %}"
-                                                                  id="deleteConfirmDocumentForm{{ document.id }}"
-                                                                  method="post">
-                                                                {% csrf_token %}
-                                                                <div class="form-group mt-4"
-                                                                     style="display: flex; justify-content: center">
-                                                                    <img
-                                                                            alt="New File"
-                                                                            id="filePreviewModal"
-                                                                            src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                                            style="height: 130px"/>
-                                                                </div>
-                                                                <div class="form-group form-control-label">
-                                                                    <label for="fileName{{ document.id }}"
-                                                                           style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                                    <input class="form-control" disabled
-                                                                           id="fileName{{ document.id }}"
-                                                                           type="text"
-                                                                           value="{{ document.name|file_name_only_with_extension }}">
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button class="btn btn-secondary" data-dismiss="modal"
-                                                                    type="button">Cancel
-                                                            </button>
-                                                            <button class="btn btn-danger"
-                                                                    form="deleteConfirmDocumentForm{{ document.id }}"
-                                                                    type="submit">Delete
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-            
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="card-footer py-1" style="border-top: 0 !important"></div>
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
-
         </div>
-
-        {% include "includes/footer.html" %}
-
     </div>
-
-    {#    <form action="" id="edit-form"#}
-    {#                                  method="post">#}
-    {#                                {% csrf_token %}#}
-    {#                                <div class="px-lg-4">#}
-    {#                                    <div class="row">#}
-    {#                                        <div class="col-6">#}
-    {#                                            <div class="form-group">#}
-    {#                                                <label class="form-control-label" for="input-first-name">First#}
-    {#                                                    name</label>#}
-    {#                                                <input class="form-control"#}
-    {#                                                       {% if edit_mode %}{% else %}disabled{% endif %}#}
-    {#                                                       id="input-first-name" name="first_name"#}
-    {#                                                       placeholder="First name"#}
-    {#                                                       type="text" value="{{ user_profile.user.first_name }}">#}
-    {#                                            </div>#}
-    {#                                        </div>#}
-    {#                                        <div class="col-6">#}
-    {#                                            <div class="form-group">#}
-    {#                                                <label class="form-control-label" for="input-last-name">Last#}
-    {#                                                    name</label>#}
-    {#                                                <input class="form-control"#}
-    {#                                                       {% if edit_mode %}{% else %}disabled{% endif %}#}
-    {#                                                       id="input-last-name" name="last_name" placeholder="Last name"#}
-    {#                                                       type="text" value="{{ user_profile.user.last_name }}">#}
-    {#                                            </div>#}
-    {#                                        </div>#}
-    {#                                    </div>#}
-    {#                                </div>#}
-    {##}
-    {#                                <div class="px-lg-4">#}
-    {#                                    <div class="row">#}
-    {#                                        <div class="form-group col-lg-8">#}
-    {#                                            <label class="form-control-label" for="input-address">Address</label>#}
-    {#                                            <input class="form-control"#}
-    {#                                                   {% if edit_mode %}{% else %}disabled{% endif %}#}
-    {#                                                   id="input-address" name="address" placeholder="Home Address"#}
-    {#                                                   type="text" value="{{ user_profile.address }}">#}
-    {#                                        </div>#}
-    {#                                        <div class="form-group col-lg-4">#}
-    {#                                            <label class="form-control-label" for="input-postal-code">Postal#}
-    {#                                                code</label>#}
-    {#                                            <input class="form-control"#}
-    {#                                                   {% if edit_mode %}{% else %}disabled{% endif %}#}
-    {#                                                   id="input-postal-code" name="postal_code"#}
-    {#                                                   placeholder="Postal code"#}
-    {#                                                   type="text" value="{{ user_profile.postal_code }}">#}
-    {#                                        </div>#}
-    {#                                    </div>#}
-    {#                                    <div class="row">#}
-    {#                                        <div class="col-lg-4">#}
-    {#                                            <div class="form-group">#}
-    {#                                                <label class="form-control-label" for="input-city">City</label>#}
-    {#                                                <input class="form-control"#}
-    {#                                                       {% if edit_mode %}{% else %}disabled{% endif %}#}
-    {#                                                       id="input-city" name="city" placeholder="City"#}
-    {#                                                       type="text" value="{{ user_profile.city }}">#}
-    {#                                            </div>#}
-    {#                                        </div>#}
-    {#                                        <div class="col-lg-4">#}
-    {#                                            <div class="form-group">#}
-    {#                                                <label class="form-control-label" for="input-state">State</label>#}
-    {#                                                <input class="form-control"#}
-    {#                                                       {% if edit_mode %}{% else %}disabled{% endif %}#}
-    {#                                                       id="input-state" name="state" placeholder="State"#}
-    {#                                                       type="text" value="{{ user_profile.state }}">#}
-    {#                                            </div>#}
-    {#                                        </div>#}
-    {#                                        <div class="col-lg-4">#}
-    {#                                            <div class="form-group">#}
-    {#                                                <label class="form-control-label"#}
-    {#                                                       for="input-country">Country</label>#}
-    {#                                                <input class="form-control"#}
-    {#                                                       {% if edit_mode %}{% else %}disabled{% endif %}#}
-    {#                                                       id="input-country" name="country" placeholder="Country"#}
-    {#                                                       type="text" value="{{ user_profile.country }}">#}
-    {#                                            </div>#}
-    {#                                        </div>#}
-    {#                                    </div>#}
-    {#                                </div>#}
-    {##}
-    {#                                <div class="px-lg-4">#}
-    {#                                    <div class="form-group">#}
-    {#                                        <label class="form-control-label" for="about-user">About</label>#}
-    {#                                        <textarea class="form-control"#}
-    {#                                                  {% if edit_mode %}{% else %}disabled{% endif %}#}
-    {#                                                  id="about-user" name="about"#}
-    {#                                                  placeholder="A few words about you ..."#}
-    {#                                                  rows="4">{{ user_profile.about }}</textarea>#}
-    {#                                    </div>#}
-    {#                                </div>#}
-    {#                            </form>#}
-
-    <!-- Profile Settings Modal -->
-{#    <div class="modal fade" id="profileSettings" tabindex="-1" role="dialog"#}
-{#         aria-labelledby="profileSettingsLabel" aria-hidden="true">#}
-{#        <div class="modal-dialog my-6" role="document">#}
-{#            <div class="modal-content">#}
-{#                <div class="modal-header mt-2">#}
-{#                    <h5 class="modal-title" style="margin-left: auto">#}
-{#                        <i class="ni ni-circle-08 text-blue pt-1"#}
-{#                           style="font-size: 1.85rem"></i>#}
-{#                    </h5>#}
-{#                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"#}
-{#                          id="profileSettingsLabel">{{ user_profile.user.get_full_name }}</span>#}
-{#                    <button type="button" class="close mt--4" style="margin-left: -30px"#}
-{#                            data-dismiss="modal" aria-label="Close">#}
-{#                        <span aria-hidden="true">&times;</span>#}
-{#                    </button>#}
-{#                </div>#}
-{#                <div class="modal-body py-0"#}
-{#                     style="padding-left: 2.5rem; padding-right: 2.5rem">#}
-{#                    <form id="profileSettingsForm" method="post" action="{% url 'profile' %}">#}
-{#                        {% csrf_token %}#}
-{#                        <div class="row mt-3">#}
-{#                            <div class="form-group form-control-label col-lg-8">#}
-{#                                <label for="address">Address</label>#}
-{#                                <input type="text" class="form-control" id="address"#}
-{#                                       name="address"#}
-{#                                       placeholder="Home Address"#}
-{#                                       value="{{ user_profile.address }}">#}
-{#                            </div>#}
-{#                            <div class="form-group form-control-label col-lg-4">#}
-{#                                <label for="postal-code">Postal code</label>#}
-{#                                <input type="number" id="postal-code" name="postal-code"#}
-{#                                       class="form-control"#}
-{#                                       placeholder="Postal code"#}
-{#                                       value="{{ user_profile.postal_code }}">#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        <div class="row">#}
-{#                            <div class="form-group form-control-label col">#}
-{#                                <label for="city">City</label>#}
-{#                                <input type="text" class="form-control" id="city"#}
-{#                                       name="city"#}
-{#                                       placeholder="City"#}
-{#                                       value="{{ user_profile.city }}">#}
-{#                            </div>#}
-{#                            <div class="form-group form-control-label col">#}
-{#                                <label for="state">State</label>#}
-{#                                <input type="text" class="form-control" id="state"#}
-{#                                       name="state"#}
-{#                                       placeholder="State"#}
-{#                                       value="{{ user_profile.state }}">#}
-{#                            </div>#}
-{#                            <div class="form-group form-control-label col">#}
-{#                                <label for="country">Country</label>#}
-{#                                <input type="text" class="form-control" id="country"#}
-{#                                       name="country"#}
-{#                                       placeholder="Country"#}
-{#                                       value="{{ user_profile.country }}">#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        <div class="form-group form-control-label">#}
-{#                            <label for="about">About Me</label>#}
-{#                            <textarea rows="4" class="form-control" id="about" name="about-user"#}
-{#                                      placeholder="A few words about you ...">{{ user_profile.about }}</textarea>#}
-{#                        </div>#}
-{#                    </form>#}
-{#                </div>#}
-{#                <div class="modal-footer">#}
-{#                    <button type="button" class="btn btn-secondary" data-dismiss="modal">#}
-{#                        Cancel#}
-{#                    </button>#}
-{#                    <button type="submit" class="btn btn-success" id="saveButton"#}
-{#                            form="profileSettingsForm">#}
-{#                        Save#}
-{#                    </button>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
+    
+    <!-- Footer -->
+    <div class="container-fluid">
+        {% include "includes/footer.html" %}
+    </div>
 
     <!-- Profile Picture Modal -->
     <div class="modal fade" id="profilePictureModal" tabindex="-1" role="dialog"
@@ -1107,5 +654,5 @@
         }
 
     </script>
-
+    
 {% endblock javascripts %}

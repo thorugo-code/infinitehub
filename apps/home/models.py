@@ -481,6 +481,7 @@ class Document(models.Model):
 
     # Boolean Fields
     expired = models.BooleanField(default=False)
+    shared = models.BooleanField(default=False)
 
     # File Fields
     file = models.FileField(upload_to=custom_upload_path_documents, max_length=500, blank=True, null=True)
