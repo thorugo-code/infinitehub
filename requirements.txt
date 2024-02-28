@@ -1,7 +1,7 @@
 asgiref==3.7.2
 autopep8==2.0.4
 dj-database-url==2.1.0
-Django==4.2.9
+Django==4.2.10
 gunicorn==21.2.0
 pycodestyle==2.11.1
 python-decouple==3.8
