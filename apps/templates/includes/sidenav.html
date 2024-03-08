@@ -13,7 +13,7 @@
             <ul class="navbar-nav mt-2" id="principalNavList">
                 <!-- Projects items -->
                 <li class="nav-item">
-                    <a class="nav-link collapsed" id="collapse-projects"
+                    <a class="nav-link collapsed {% if 'projects' in segment %}active{% endif %}" id="collapse-projects"
                        href="#navbar-projects" data-toggle="collapse" role="button" aria-expanded="false"
                        aria-controls="navbar-projects">
                         <i class="ni ni-app text-gray"></i>
@@ -57,7 +57,7 @@
                 </li>
                 <!-- Administratives items -->
                 <li class="nav-item">
-                    <a class="nav-link collapsed" id="collapse-clients"
+                    <a class="nav-link collapsed {% if 'administrative' in segment %}active{% endif %}" id="collapse-clients"
                        href="#navbar-administrative" data-toggle="collapse" role="button" aria-expanded="false"
                        aria-controls="navbar-administrative">
                         <i class="ni ni-briefcase-24 text-green"></i>

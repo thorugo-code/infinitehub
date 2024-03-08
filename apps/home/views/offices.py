@@ -32,6 +32,7 @@ def home(request, order_by=None):
     context = {
         'user_profile': Profile.objects.get(user=request.user),
         'offices': offices,
+        'segment': 'administrative',
     }
 
     return render(request, 'home/offices_home.html', context)

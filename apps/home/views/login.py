@@ -5,6 +5,8 @@ from django.template import loader
 from django.urls import reverse
 from apps.home.models import Profile
 
+from django.conf import settings
+
 
 @login_required(login_url="/login/")
 def index(request):

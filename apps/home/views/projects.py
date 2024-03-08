@@ -62,6 +62,7 @@ def page_list(request, situation=None):
         'clients': sorted(Client.objects.all(), key=lambda x: x.name),
         'collaborators': Profile.objects.filter(user__username__endswith='@infinitefoundry.com').exclude(
             user__username__startswith='admin'),
+        'segment': 'projects',
     }
 
     return render(request, "home/projectsList.html", context)
@@ -147,6 +148,7 @@ def details(request, id):
             user__username__startswith='admin'),
         'edit_mode': edit_mode,
         'clients': Client.objects.all(),
+        'segment': 'projects'
     }
 
     return render(request, 'home/project.html', context)

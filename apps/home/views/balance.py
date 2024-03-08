@@ -205,6 +205,7 @@ def home(request, sorted_by=None, sort_type=None, filters=None):
         'max_value': str(Bill.objects.all().order_by('-total').first().total).replace(
             '$' if currency == 'USD' else 'R$' if currency == 'BRL' else '€', '').replace(',',
                                                                                           '') if Bill.objects.all().count() > 0 else 0,
+        'segment': 'administrative',
     }
 
     context.update({'bills': sort_bill_objects(all_bills, sorted_by, sort_type), 'max_id': max_id})
