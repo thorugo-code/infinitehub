@@ -17,7 +17,9 @@ class Command(BaseCommand):
         tables = [
             ('home_uploadedfile', 'file', 'uploads/', ''),
             ('home_profile', 'avatar', 'apps/static/assets/uploads/', ''),
-            ('home_project', 'img', 'apps/static/assets/uploads/', 'project_pics/')
+            ('home_project', 'img', 'apps/static/assets/uploads/', 'project_pics/'),
+            ('home_document', 'file', 'uploads/', ''),
+            ('home_bill', 'proof', 'uploads/', ''),
         ]
 
         for table in tables:
@@ -41,5 +43,5 @@ class Command(BaseCommand):
             cursor.execute(f'UPDATE {table[0]} SET {table[1]} = ? WHERE {table[1]} LIKE ?',
                            ('placeholder.webp', '%placeholder.webp'))
 
-        connection.commit()
+        # connection.commit()
         connection.close()
