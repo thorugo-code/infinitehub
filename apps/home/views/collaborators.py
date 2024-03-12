@@ -182,7 +182,7 @@ def download_document(request, document_id):
     document_name = document.file.name
     file_content = default_storage.open(document_name).read()
     response = HttpResponse(file_content, content_type='application/octet-stream')
-    response['Content-Disposition'] = f'attachment; filename="{file_name.split("/")[-1]}"'
+    response['Content-Disposition'] = f'attachment; filename="{document_name.split("/")[-1]}"'
     return response
 
 
