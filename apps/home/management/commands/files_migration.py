@@ -43,5 +43,5 @@ class Command(BaseCommand):
             cursor.execute(f'UPDATE {table[0]} SET {table[1]} = ? WHERE {table[1]} LIKE ?',
                            ('placeholder.webp', '%placeholder.webp'))
 
-        # connection.commit()
+        connection.commit()
         connection.close()
