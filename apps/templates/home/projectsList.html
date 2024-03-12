@@ -86,7 +86,7 @@
                                                 <img
                                                         style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
                                                         alt="Image placeholder"
-                                                        src="{{ project.img.url|slice:"5:" }}">
+                                                        src="{{ project.img.url }}">
                                             </div>
                                             <div class="media-body">
                                                 <span class="name mb-0 ml-2 text-sm"
@@ -130,7 +130,7 @@
                                                            data-toggle="tooltip" data-original-title="{{ collaborator.get_full_name }}">
                                                             <div class="avatar avatar-sm rounded-circle">
                                                                 <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
-                                                                     alt="Image placeholder" src="{{ collaborator.profile.avatar.url|slice:"5:" }}">
+                                                                     alt="Image placeholder" src="{{ collaborator.profile.avatar.url }}">
                                                             </div>
                                                         </a>
                                                     {% else %}
@@ -139,7 +139,7 @@
                                                            data-toggle="tooltip" data-original-title="{{ collaborator.get_full_name }}">
                                                             <div class="avatar avatar-sm rounded-circle">
                                                                 <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
-                                                                     alt="Image placeholder" src="{{ collaborator.profile.avatar.url|slice:"5:" }}">
+                                                                     alt="Image placeholder" src="{{ collaborator.profile.avatar.url }}">
                                                             </div>
                                                         </a>
                                                     {% endif %}
@@ -235,7 +235,7 @@
                                                                     class="rounded-circle"
                                                                     style="max-width: 100%; height: 100%; object-fit: cover;"
                                                                     alt="Image placeholder"
-                                                                    src="{{ project.img.url|slice:"5:" }}">
+                                                                    src="{{ project.img.url }}">
                                                         </div>
                                                     </div>
                                                     <span class="mb-2 text-center" style="font-size: 1.1rem"

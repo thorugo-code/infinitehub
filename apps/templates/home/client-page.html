@@ -50,7 +50,7 @@
                             <a href="#" data-toggle="modal" data-target="#profilePictureModal">
                                 <img class="rounded-circle"
                                      style="min-width: 110px; height: 110px; object-fit: cover; background-color: #fff; z-index: 1"
-                                     src="{{ client.avatar.url|slice:"5:" }}" alt="{{ client.name }}">
+                                     src="{{ client.avatar.url }}" alt="{{ client.name }}">
                             </a>
                         </div>
                         <div class="col-md align-items-center" style="display: flex;">
@@ -235,7 +235,7 @@
                                 <div class="row align-items-center">
                                     <div class="col-auto p-0 align-items-center" style="display: flex">
                                         <a href="" class="avatar rounded-circle">
-                                            <img alt="" src="{{ project.img.url|slice:"5:" }}"
+                                            <img alt="" src="{{ project.img.url }}"
                                                  style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;">
                                         </a>
                                     </div>

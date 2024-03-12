@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from apps.home.models import Profile, Office, Document
+from django.core.files.storage import default_storage
 from django.http import HttpResponse, Http404
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -153,9 +154,9 @@ def change_status(request, collab_id):
 
 def delete_document(request, slug, document_id):
     document = get_object_or_404(Document, id=document_id)
-    document_path = document.file.path if document.file else None
-    if document_path and os.path.exists(document_path):
-        os.remove(document_path)
+    document_path = document.file
+    if document_path:
+        document_path.delete(save=False)
 
     document.delete()
 
@@ -178,15 +179,11 @@ def edit_document(request, slug, document_id):
 def download_document(request, document_id):
     document = get_object_or_404(Document, id=document_id)
 
-    document_path = document.file.path
-
-    if os.path.exists(document_path):
-        with open(document_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type='application/force-download')
-            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(document_path)
-            return response
-
-    raise Http404
+    document_name = document.file.name
+    file_content = default_storage.open(document_name).read()
+    response = HttpResponse(file_content, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{file_name.split("/")[-1]}"'
+    return response
 
 
 def sort_docs(request, slug):

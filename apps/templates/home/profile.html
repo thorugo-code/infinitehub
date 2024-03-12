@@ -49,7 +49,7 @@
                                 <a href="#" data-toggle="modal" data-target="#profilePictureModal">
                                     <img class="rounded-circle"
                                          style="min-width: 180px; height: 180px; object-fit: cover; background-color: #fff; z-index: 1"
-                                         src="{{ user_profile.avatar.url|slice:"5:" }}"
+                                         src="{{ user_profile.avatar.url }}"
                                          alt="{{ user_profile.user.first_name }}">
                                 </a>
                             </div>
@@ -493,7 +493,7 @@
                                             <div class="row align-items-center">
                                                 <div class="col-auto p-0 align-items-center" style="display: flex">
                                                     <a href="" class="avatar rounded-circle">
-                                                        <img alt="" src="{{ project.img.url|slice:"5:" }}"
+                                                        <img alt="" src="{{ project.img.url }}"
                                                              style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;">
                                                     </a>
                                                 </div>
@@ -591,7 +591,7 @@
                                         class="rounded-circle mt-7"
                                         style="max-width: 100%; height: 100%; object-fit: cover;"
                                         alt="Image placeholder"
-                                        src="{{ user_profile.avatar.url|slice:"5:" }}">
+                                        src="{{ user_profile.avatar.url }}">
                             </div>
                         </div>
                         <div class="form-group form-control-label">

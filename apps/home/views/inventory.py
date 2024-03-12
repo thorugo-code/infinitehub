@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from apps.home.models import Profile, Equipments
 from django.core.paginator import Paginator
+from django.core.files.storage import default_storage
 
 
 def get_paginated_equipments(request):
@@ -54,15 +55,17 @@ def inventory_list(request):
 
 def download_qrcode_inventory(request, equipment_id):
     equipment = get_object_or_404(Equipments, pk=equipment_id)
-    qrcode_path = equipment.qrcode
-    with open(qrcode_path, 'rb') as file:
-        response = HttpResponse(file.read(), content_type='application/octet-stream')
-        response['Content-Disposition'] = f'attachment; filename="{equipment.qrcode.split("/")[-1]}"'
-        return response
+    qrcode_name = equipment.qrcode.name
+    file_content = default_storage.open(qrcode_name).read()
+    response = HttpResponse(file_content, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{qrcode_name.split("/")[-1]}"'
+    return response
 
 
 def delete_equipment(request, id):
     equipment = Equipments.objects.get(id=id)
+    qrcode_path = equipment.qrcode
+    qrcode_path.delete(save=False)
     equipment.delete()
 
     return redirect('inventory_list')

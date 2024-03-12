@@ -89,10 +89,8 @@ def edit(request):
 
 def delete_file(request, file_id):
     uploaded_file = UploadedFile.objects.get(id=file_id)
-    file_path = uploaded_file.file.path
-    if os.path.exists(file_path):
-        os.remove(file_path)
-
+    file_path = uploaded_file.file
+    file_path.delete(save=False)
     uploaded_file.value = 0
     uploaded_file.save()
 

@@ -163,3 +163,5 @@ cython_debug/
 # Add paths that you wish to ignore here, relative to the root of the repository
 uploads/
 ./db.sqlite3
+/core/static
+/core/media

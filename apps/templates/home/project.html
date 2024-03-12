@@ -30,7 +30,7 @@
                        style="z-index: 1; min-width: 120px; min-height: 120px; background-color: #adb5bd00">
                         <img class="rounded-circle mt-7"
                              style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff"
-                             alt="Image placeholder" src="{{ project.img.url|slice:'5:' }}">
+                             alt="Image placeholder" src="{{ project.img.url }}">
                     </a>
                     <div class="col-md-7 pl-5">
                         <h1 class="text-white pt-2 mb-0" style="font-size: 2.5rem">
@@ -138,7 +138,7 @@
                                                 <div class="avatar avatar-sm rounded-circle">
                                                     <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
                                                          alt="Image placeholder"
-                                                         src="{{ collaborator.profile.avatar.url|slice:"5:" }}">
+                                                         src="{{ collaborator.profile.avatar.url }}">
                                                 </div>
                                             </a>
                                         {% endfor %}
@@ -882,7 +882,7 @@
                                         class="rounded-circle mt-7"
                                         style="max-width: 100%; height: 100%; object-fit: cover;"
                                         alt="Image placeholder"
-                                        src="{{ project.img.url|slice:"5:" }}">
+                                        src="{{ project.img.url }}">
                             </div>
                         </div>
                         <div class="form-group form-control-label">

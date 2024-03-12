@@ -4,9 +4,9 @@ from django.views.decorators.http import require_POST
 from apps.home.models import Project, UploadedFile, Profile, Task, Client, Link
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-import os
 from datetime import datetime
 from django.db.models import Q
+from django.core.files.storage import default_storage
 
 
 def archive(request, id, situation_page=None):
@@ -234,13 +234,10 @@ def upload_file(request, id):
 @require_POST
 def delete_file(request, project_id, file_id):
     uploaded_file = get_object_or_404(UploadedFile, pk=file_id)
-    file_path = uploaded_file.file.path
-    if os.path.exists(file_path):
-        os.remove(file_path)
-
+    file_path = uploaded_file.file
+    file_path.delete(save=False)
     uploaded_file.value = 0
     uploaded_file.save()
-
     uploaded_file.delete()
 
     return redirect('project_details', id=project_id)
@@ -248,11 +245,11 @@ def delete_file(request, project_id, file_id):
 
 def download_file(request, file_id):
     uploaded_file = get_object_or_404(UploadedFile, pk=file_id)
-    file_path = uploaded_file.file.path
-    with open(file_path, 'rb') as file:
-        response = HttpResponse(file.read(), content_type='application/octet-stream')
-        response['Content-Disposition'] = f'attachment; filename="{uploaded_file.file.name.split("/")[-1]}"'
-        return response
+    file_name = uploaded_file.file.name
+    file_content = default_storage.open(file_name).read()
+    response = HttpResponse(file_content, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{file_name.split("/")[-1]}"'
+    return response
 
 
 def submit_task(request, project_id):

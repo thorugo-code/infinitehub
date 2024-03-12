@@ -1,4 +1,5 @@
 import os
+from django.core.files.storage import default_storage
 from datetime import datetime
 from django.db.models import Q
 from django.http import HttpResponse
@@ -286,7 +287,8 @@ def delete_bill(request, bill_id):
     if request.method == 'POST':
         bill = Bill.objects.get(id=bill_id)
         if bill.proof:
-            os.remove(bill.proof.path)
+            file_path = bill.proof
+            file_path.delete(save=False)
 
         bill.delete()
 
@@ -418,11 +420,11 @@ def download_bill(request, bill_id):
         return render(request, 'home/page-404.html', context)
 
     bill = Bill.objects.get(id=bill_id)
-    file_path = bill.proof.path
-    with open(file_path, 'rb') as file:
-        response = HttpResponse(file.read(), content_type='application/octet-stream')
-        response['Content-Disposition'] = f'attachment; filename="{bill.proof.name.split("/")[-1]}"'
-        return response
+    file_name = bill.proof.name
+    file_content = default_storage.open(file_name).read()
+    response = HttpResponse(file_content, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{file_name.split("/")[-1]}"'
+    return response
 
 
 def edit_bill(request, bill_id):

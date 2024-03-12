@@ -1,16 +1,18 @@
-import os
 import qrcode
 import random
 import string
-from datetime import datetime
-from django.db import models
-from django.contrib.auth.models import User, Group
-from djmoney.models.fields import MoneyField
-from django.utils.text import slugify
-from djmoney.money import Money
 import requests
+from io import BytesIO
+from django.db import models
 from bs4 import BeautifulSoup
+from datetime import datetime
 from urllib.parse import urljoin
+from django.core.files import File
+from djmoney.money import Money
+from django.utils.text import slugify
+from djmoney.models.fields import MoneyField
+from django.contrib.auth.models import User, Group
+from apps.home.storage_backends import PublicMediaStorage, PrivateMediaStorage
 
 
 def get_favicon(url):
@@ -59,24 +61,25 @@ def unmask_money(value, currency):
 
 
 def custom_upload_path_projects(instance, filename):
-    client = instance.project.client.replace(" ", "_")
-    project_name = instance.project.title.replace(" ", "_")
+    proj_inst = instance.project
+    client = proj_inst.client.name.replace(" ", "_") if proj_inst.client else proj_inst.client_str.replace(" ", "_")
+    project_name = proj_inst.title.replace(" ", "_")
     year = datetime.now().strftime('%Y')
     month = datetime.now().strftime('%m')
-    return f'uploads/projects/{client}/{project_name}/{year}/{month}/{filename}'
+    return f'projects/{client}/{project_name}/{year}/{month}/{filename}'
 
 
 def upload_path_bills(instance, filename):
     office = instance.office.name.replace(" ", "_") if instance.office else 'none'
     year = datetime.now().strftime('%Y')
     month = datetime.now().strftime('%m')
-    return f'uploads/proofs/bills/{office}/{year}/{month}/{filename}'
+    return f'proofs/bills/{office}/{year}/{month}/{filename}'
 
 
 def custom_upload_path_documents(instance, filename):
     collab_name = instance.user.get_full_name().replace(" ", "_")
     category = instance.category.replace(" ", "_")
-    return f'uploads/documents/{collab_name}/{category}/{filename}'
+    return f'documents/{collab_name}/{category}/{filename}'
 
 
 class Equipments(models.Model):
@@ -86,8 +89,9 @@ class Equipments(models.Model):
     supplier = models.CharField(max_length=100, default='')
     price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
     description = models.TextField(default='')
-    qrcode = models.TextField(default='')
     custom_id = models.CharField(max_length=100, default='')
+    qrcode = models.ImageField(upload_to=f'qrcodes/equipments/{datetime.now().strftime("%Y")}/',
+                               default='placeholder.webp')
 
     def __str__(self):
         return self.name
@@ -110,18 +114,13 @@ class Equipments(models.Model):
 
         img = qr.make_image(fill_color="black", back_color="white")
 
-        img_name = f'{self.name}_{self.id}.png'
+        temp_file = BytesIO()
+        img.save(temp_file, format='PNG')
+        temp_file.seek(0)
 
-        image_dir = f'apps/static/assets/uploads/qrcodes/equipments/{self.acquisition_date.strftime("%Y")}/' \
-                    f'{self.acquisition_date.strftime("%m")}/{self.name}/'
+        self.qrcode.save(f'{self.custom_id}_{self.name.lower()}.png', File(temp_file))
 
-        os.makedirs(image_dir, exist_ok=True)
-
-        image_path = os.path.join(image_dir, img_name)
-
-        img.save(image_path)
-
-        return image_path
+        self.save()
 
     def generate_custom_id(self):
         return f'{self.acquisition_date.strftime("%Y%m")}{self.id:03d}'
@@ -133,11 +132,11 @@ class Equipments(models.Model):
         if self.series == '':
             self.series = 'N/A'
 
-        if not self.qrcode or self.qrcode == '':
-            self.qrcode = self.generate_qrcode()
-
         if not self.custom_id or self.custom_id == '':
             self.custom_id = self.generate_custom_id()
+
+        if self.qrcode.name == 'placeholder.webp':
+            self.generate_qrcode()
 
         super(Equipments, self).save(*args, **kwargs)
 
@@ -167,8 +166,8 @@ class Project(models.Model):
     budget = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
 
     # Image Fields
-    img = models.ImageField(upload_to=f'apps/static/assets/uploads/',
-                            default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+    img = models.ImageField(upload_to=f'project_pics',
+                            default='placeholder.webp')
 
     # Integer Fields
     completition = models.IntegerField(default=0)
@@ -194,8 +193,9 @@ class Profile(models.Model):
     office = models.ForeignKey('Office', related_name="collaborators", on_delete=models.SET_NULL, null=True)
 
     # File Fields
-    avatar = models.ImageField(upload_to='apps/static/assets/uploads/profile_pics',
-                               default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+    avatar = models.ImageField(upload_to='profile_pics',
+                               default='placeholder.webp',
+                               storage=PublicMediaStorage())
 
     # Char Fields
     cpf = models.CharField(max_length=20, default='')
@@ -334,7 +334,7 @@ class Task(models.Model):
 
 class Office(models.Model):
     avatar = models.ImageField(upload_to='uploads/offices/avatar',
-                               default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+                               default='placeholder.webp')
     name = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
@@ -344,7 +344,7 @@ class Office(models.Model):
 class Client(models.Model):
     slug = models.SlugField(max_length=100, default='')
     avatar = models.ImageField(upload_to='uploads/clients/avatar',
-                               default='apps/static/assets/img/icons/custom/1x/placeholder.webp')
+                               default='placeholder.webp')
 
     # Foreign Keys and Relationships
     office = models.ForeignKey(Office, related_name='clients', on_delete=models.SET_NULL, null=True)

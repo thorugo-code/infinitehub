@@ -152,7 +152,7 @@
                                                                 class="mt-2"
                                                                 style="max-width: 100%; height: 100%; object-fit: cover"
                                                                 alt="Image placeholder"
-                                                                src="{{ equip.qrcode|slice:'4:' }}"
+                                                                src="{{ equip.qrcode.url }}"
                                                         >
                                                     </div>
                                                 </div>
@@ -188,7 +188,7 @@
                                                                 id="imagePreviewModal"
                                                                 style="max-width: 100%; height: 100%; object-fit: cover"
                                                                 alt="Image placeholder"
-                                                                src="{{ equip.qrcode|slice:'4:' }}"
+                                                                src="{{ equip.qrcode.url }}"
                                                         >
                                                     </div>
                                                 </div>
