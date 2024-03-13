@@ -166,9 +166,11 @@ def delete_document(request, slug, document_id):
 def edit_document(request, slug, document_id):
     document = Document.objects.get(id=document_id)
     if request.method == 'POST':
+        expiration = request.POST.get('expiration', document.expiration)
+
         document.category = request.POST.get('category', document.category)
         document.description = request.POST.get('description', document.description)
-        document.expiration = request.POST.get('expiration', document.expiration)
+        document.expiration = expiration if expiration != '' else None
         document.name = request.POST.get('name', document.name)
         document.shared = True if request.POST.get('shared', False) else False
         document.save()
