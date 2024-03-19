@@ -18,9 +18,39 @@
                         <div class="text-center text-muted mb-4">
 
                             {% if msg %}
-                                <p>{{ msg | safe }}</p>
+                                <p>{{ msg }}</p>
+                            {% elif messages %}
+                                {% for message in messages %}
+                                    {% if message.tags %}
+                                        <span class="badge badge-dot mb-2">
+                                            {% if message.tags == 'error' %}
+                                                <i class="bg-danger"></i>
+                                            {% else %}
+                                                <i class="bg-{{ message.tags }}"></i>
+                                            {% endif %}
+                                            <span class="status h4 font-weight-light">{{ message }}</span>
+                                            {% if 'confirm your email.' in message.message %}
+                                                <form id="resend_email" method="POST" action="{% url 'resend_confirmation' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="email" value="{{ form.username.value }}">
+
+                                                    <span class="d-block status h4 font-weight-light">
+                                                        <a href="#" {% if form.username.value %}onclick="submit()"{% else %}{% endif %} class="text-blue">Resend</a> it if needed.
+                                                    </span>
+
+                                                </form>
+                                            {% endif %}
+                                        </span>
+                                    {% else %}
+                                        <span class="font-weight-light">
+                                            {{ message }}
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
                             {% else %}
-                                <p class="pb-3">Add your credentials</p>
+                                <p>
+                                    Add your credentials
+                                </p>
                             {% endif %}
 
                         </div>

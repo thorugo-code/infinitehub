@@ -123,9 +123,14 @@ def register_user(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
             username = form.cleaned_data.get("username")
             raw_password = form.cleaned_data.get("password1")
+
+            if username.endswith('@infinitefoundry.com'):
+                form.save()
+            else:
+                messages.error(request, 'Only collaborators can register.')
+                return redirect('register')
 
             user = authenticate(username=username, password=raw_password)
 
