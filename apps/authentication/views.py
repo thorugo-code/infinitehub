@@ -354,8 +354,6 @@ def reset_password_page(request):
         token = request.session['reset_password'].get('token')
         username = request.session['reset_password'].get('username')
 
-        print(f'TOKEN: {token} | USERNAME: {username}')
-
         if not token:
             messages.error(request, 'Invalid session. Try to open the link again.')
             return redirect('home')
@@ -367,10 +365,8 @@ def reset_password_page(request):
             return redirect('home')
 
         form = PasswordResetForm(user=user)
-        print('P1')
         del request.session['reset_password']['token']
         request.session.modified = True
-        print('P2')
 
         try:
             PasswordReset.objects.get(user=user)
