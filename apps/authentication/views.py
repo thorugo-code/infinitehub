@@ -31,7 +31,7 @@ def confirm_register_email(email, auth_token):
     subject = 'Register confirmation'
 
     message = (f'Hello! Please click the link below to confirm your email.\n\n'
-               f'{config('WEBSITE_URL')}/validate/{auth_token}\n\n'
+               f'{config("WEBSITE_URL")}/validate/{auth_token}\n\n'
                f'If you did not request this, please ignore this email.\n\n'
                f'Thanks, Infinite Foundry.')
 
@@ -44,7 +44,7 @@ def reset_password_email(username, token):
     subject = 'Password reset'
 
     message = (f'Hello! Please click the link below to reset your password.\n\n'
-               f'{config('WEBSITE_URL')}/reset-password/{token}\n\n'
+               f'{config("WEBSITE_URL")}/reset-password/{token}\n\n'
                f'If you did not request this, please ignore this email.\n\n'
                f'Thanks, Infinite Foundry.')
 
