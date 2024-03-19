@@ -13,6 +13,7 @@ from django.utils.text import slugify
 from djmoney.models.fields import MoneyField
 from django.contrib.auth.models import User, Group
 from apps.home.storage_backends import PublicMediaStorage, PrivateMediaStorage
+from apps.authentication.models import AuthEmail
 
 
 def get_favicon(url):
@@ -191,6 +192,7 @@ class Profile(models.Model):
     # Foreign Keys and Relationships
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     office = models.ForeignKey('Office', related_name="collaborators", on_delete=models.SET_NULL, null=True)
+    authentication = models.ForeignKey(AuthEmail, related_name='profile', on_delete=models.CASCADE, null=True)
 
     # File Fields
     avatar = models.ImageField(upload_to='profile_pics',

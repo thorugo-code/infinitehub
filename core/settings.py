@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.home',
+    'apps.authentication',
     'storages'
 ]
 
@@ -131,10 +132,18 @@ else:
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
     os.path.join(CORE_DIR, 'apps/static'),
 )
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST', default=None)
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='YOUR-SES-USERNAME')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='YOUR-SES-PASSWORD')
+#############################################################
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

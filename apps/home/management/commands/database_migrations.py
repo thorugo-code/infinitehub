@@ -43,5 +43,15 @@ class Command(BaseCommand):
             cursor.execute(f'UPDATE {table[0]} SET {table[1]} = ? WHERE {table[1]} LIKE ?',
                            ('placeholder.webp', '%placeholder.webp'))
 
+        # Migrate values with simple changes
+        # EG: tables [(table_name, column_name, old_value, new_value)]
+        tables = [
+            ('auth_user', 'is_active', '1', '0'),
+        ]
+
+        for table in tables:
+            cursor.execute(f'UPDATE {table[0]} SET {table[1]} = ? WHERE {table[1]} = ?',
+                           (table[3], table[2]))
+
         connection.commit()
         connection.close()

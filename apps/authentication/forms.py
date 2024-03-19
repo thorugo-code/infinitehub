@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth.models import User
 
 
@@ -49,3 +49,24 @@ class SignUpForm(UserCreationForm):
         model = User
         # fields = ('first_name', 'last_name', 'username', 'email', 'password1', 'password2')
         fields = ('username', 'password1', 'password2')
+
+
+class PasswordResetForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "New password",
+                "class": "form-control"
+            }
+        ))
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "New password confirmation",
+                "class": "form-control"
+            }
+        ))
+
+    class Meta:
+        model = User
+        fields = ('new_password1', 'new_password2')

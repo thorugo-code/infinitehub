@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from apps.home.models import Profile
+from apps.authentication.models import AuthEmail
+import django.db.utils
+from cryptography.fernet import Fernet
 
 
 class Command(BaseCommand):
@@ -9,9 +11,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         for user in User.objects.all():
-            profile, created = Profile.objects.get_or_create(user=user)
+            if not user.is_superuser:
+                user.is_active = False
+                user.save()
+
+            auth_email, created = AuthEmail.objects.get_or_create(user=user)
+
             if created:
-                self.stdout.write(f'Profile created for user: {self.style.SUCCESS(user.username)}')
-            elif not profile.slug:
-                profile.save(slug=True)
-                self.stdout.write(f'Profile slug created for user: {self.style.SUCCESS(user.username)}')
+                auth_email.is_confirmed = False
+                key = Fernet.generate_key()
+                cipher_suite = Fernet(key)
+                token = cipher_suite.encrypt(user.username.encode())
+                auth_email.auth_token = token.decode()
+                auth_email.auth_key = key.decode()
+                auth_email.save()
+
+            self.stdout.write(self.style.SUCCESS(f'User {user.username} has been initialized.'))

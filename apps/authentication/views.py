@@ -1,10 +1,70 @@
 import json
+import pytz
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from .forms import LoginForm, SignUpForm
+from .forms import LoginForm, SignUpForm, PasswordResetForm
 from apps.home.models import Profile, Office
 from django.contrib.auth.models import User, Permission
-from core.settings import CORE_DIR
+from core.settings import CORE_DIR, EMAIL_HOST_USER
+from django.core.mail import send_mail
+from cryptography.fernet import Fernet
+from apps.authentication.models import AuthEmail, PasswordReset
+from datetime import datetime, timedelta
+from decouple import config
+from django.contrib import messages
+from django.contrib.auth.hashers import check_password
+
+
+def encrypt_tag(key, message):
+    f = Fernet(key)
+    token = f.encrypt(str(message).encode())
+    return token
+
+
+def decrypt_tag(key, token):
+    f = Fernet(key.encode())
+    decrypted = f.decrypt(token.encode())
+    return decrypted
+
+
+def confirm_register_email(email, auth_token):
+    subject = 'Register confirmation'
+
+    message = (f'Hello! Please click the link below to confirm your email.\n\n'
+               f'{config('WEBSITE_URL')}/validate/{auth_token}\n\n'
+               f'If you did not request this, please ignore this email.\n\n'
+               f'Thanks, Infinite Foundry.')
+
+    email_from = EMAIL_HOST_USER
+    to_email = [email]
+    send_mail(subject, message, email_from, to_email)
+
+
+def reset_password_email(username, token):
+    subject = 'Password reset'
+
+    message = (f'Hello! Please click the link below to reset your password.\n\n'
+               f'{config('WEBSITE_URL')}/reset-password/{token}\n\n'
+               f'If you did not request this, please ignore this email.\n\n'
+               f'Thanks, Infinite Foundry.')
+
+    email_from = EMAIL_HOST_USER
+    to_email = [username]
+    send_mail(subject, message, email_from, to_email)
+
+
+def reset_password_confirmation_email(username):
+    subject = 'Password changed'
+
+    date = datetime.now(tz=pytz.utc).strftime("%d/%m/%Y %H:%M:%S")
+
+    message = (f'Hello! Your password has been changed at {date} UTC.\n\n'
+               f'If you did not request this, please contact us.\n\n'
+               f'Thanks, Infinite Foundry.')
+
+    email_from = EMAIL_HOST_USER
+    to_email = [username]
+    send_mail(subject, message, email_from, to_email)
 
 
 def login_view(request):
@@ -18,6 +78,7 @@ def login_view(request):
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
             user = authenticate(username=username, password=password)
+
             if user is not None:
                 login(request, user)
                 check_profile = Profile.objects.filter(user=user)
@@ -39,7 +100,16 @@ def login_view(request):
                 return redirect("fill_profile")
 
             else:
-                msg = 'Invalid credentials'
+                try:
+                    user = User.objects.get(username=username)
+                    auth = AuthEmail.objects.get(user=user)
+
+                    if not user.is_active and not auth.is_confirmed and check_password(password, user.password):
+                        messages.error(request, 'User has not been activated, confirm your email.')
+                    else:
+                        msg = 'Invalid credentials'
+                except User.DoesNotExist:
+                    msg = 'Invalid credentials'
         else:
             msg = 'Error validating the form'
 
@@ -72,9 +142,21 @@ def register_user(request):
 
             if '@infinitefoundry.com' in user.username:
                 user.user_permissions.set(collaborators_permissions)
-                user.save()
 
-            return redirect('fill_profile')
+            user.is_active = False
+            user.save()
+
+            key = Fernet.generate_key()
+            auth_object = AuthEmail(
+                user=user,
+                auth_token=encrypt_tag(key, username).decode(),
+                auth_key=key.decode(),
+            )
+            auth_object.save()
+
+            confirm_register_email(username, auth_object.auth_token)
+            messages.success(request, 'User created! Please confirm your email to login.')
+            return redirect('home')
         else:
             msg = 'Form is not valid'
     else:
@@ -152,3 +234,152 @@ def fill_profile(request):
         }
 
         return render(request, "home/profile-wizard.html", context)
+
+
+def validate_email(request, auth_token):
+    try:
+        auth_object = AuthEmail.objects.get(auth_token=auth_token)
+    except AuthEmail.DoesNotExist:
+        messages.error(request, 'Invalid token')
+        return redirect('home')
+
+    if auth_object:
+        decrypted_token = decrypt_tag(auth_object.auth_key, auth_token).decode()
+        expired = datetime.now(tz=pytz.utc) - auth_object.created_at > timedelta(hours=24)
+        if (decrypted_token == auth_object.user.username
+                and not auth_object.is_confirmed
+                and not expired):
+            auth_object.is_confirmed = True
+            auth_object.confirmed_at = datetime.now()
+            auth_object.save()
+            user = User.objects.get(username=auth_object.user.username)
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Email confirmed! You can now login.')
+            return redirect('login')
+        elif not auth_object.is_confirmed and expired:
+            user = User.objects.get(username=auth_object.user.username)
+            auth_object.delete()
+            user.delete()
+            messages.error(request, 'Token expired! Try to register again.')
+            return redirect('home')
+        elif auth_object.is_confirmed:
+            messages.info(request, 'Email already confirmed')
+            return redirect('home')
+        else:
+            messages.error(request, 'Invalid token')
+            return redirect('home')
+
+
+def reconfirm_email(request):
+    user = User.objects.get(username=request.POST.get('email'))
+    key = Fernet.generate_key()
+    auth_object = AuthEmail.objects.get(user=user)
+    auth_object.auth_token = encrypt_tag(key, user.username).decode()
+    auth_object.auth_key = key.decode()
+    auth_object.save()
+
+    confirm_register_email(user.username, auth_object.auth_token)
+    messages.success(request, 'Email sent! Please confirm your email to login.')
+    return redirect('home')
+
+
+def request_reset_password(request):
+    if request.method == 'POST':
+        username = request.POST.get('email')
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            messages.error(request, 'User not found')
+            return redirect('home')
+
+        key = Fernet.generate_key()
+        pass_reset_object, created = PasswordReset.objects.get_or_create(user=user)
+        pass_reset_object.token = encrypt_tag(key, user.username).decode()
+        pass_reset_object.key = key.decode()
+        pass_reset_object.used = False
+        pass_reset_object.created_at = datetime.now(tz=pytz.utc)
+        pass_reset_object.save()
+
+        reset_password_email(username, pass_reset_object.token)
+        messages.success(request, 'Email sent! Check your email to password reset.')
+        return redirect('home')
+
+    else:
+        return redirect('home', {'msg': 'Request error'})
+
+
+def reset_password_validation(request, token):
+    try:
+        pass_reset_object = PasswordReset.objects.get(token=token)
+        decrypted_token = decrypt_tag(pass_reset_object.key, token).decode()
+        expired = datetime.now(tz=pytz.utc) - pass_reset_object.created_at > timedelta(hours=24)
+        if decrypted_token != pass_reset_object.user.username:
+            messages.error(request, 'Invalid token')
+        elif expired:
+            messages.error(request, 'Token expired, try again')
+        else:
+            request.session['reset_password'] = {
+                'username': pass_reset_object.user.username,
+                'token': token,
+            }
+            return redirect('reset_password_page')
+
+        pass_reset_object.delete()
+
+    except PasswordReset.DoesNotExist:
+        messages.error(request, 'Invalid token')
+
+    return redirect('home')
+
+
+def reset_password_page(request):
+    if request.method == 'POST':
+        user = User.objects.get(username=request.session['reset_password']['username'])
+        form = PasswordResetForm(user=user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Password changed! You can now login.')
+            del request.session['reset_password']
+            PasswordReset.objects.get(user=user).delete()
+            reset_password_confirmation_email(user.username)
+            return redirect('login')
+        else:
+            messages.error(request, 'Form is not valid')
+            context = {
+                'form': form,
+            }
+
+    else:
+        token = request.session['reset_password'].get('token')
+        username = request.session['reset_password'].get('username')
+
+        print(f'TOKEN: {token} | USERNAME: {username}')
+
+        if not token:
+            messages.error(request, 'Invalid session. Try to open the link again.')
+            return redirect('home')
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            messages.error(request, 'User not found')
+            return redirect('home')
+
+        form = PasswordResetForm(user=user)
+        print('P1')
+        del request.session['reset_password']['token']
+        request.session.modified = True
+        print('P2')
+
+        try:
+            PasswordReset.objects.get(user=user)
+        except PasswordReset.DoesNotExist:
+            messages.error(request, 'Invalid token')
+            return redirect('home')
+
+        context = {
+            'form': form,
+        }
+
+    return render(request, 'accounts/reset_password.html', context)

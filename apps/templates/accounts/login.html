@@ -9,67 +9,147 @@
 
     <!-- Page content -->
     <div class="container mt--8 pb-5">
-      <div class="row justify-content-center">
-        <div class="col-lg-5 col-md-7">
-          <div class="auth-card bg-secondary shadow border-0">
-            <div class="card-body px-lg-5 pb-4">
-              <div class="text-center text-muted mb-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+                <div class="auth-card bg-secondary shadow border-0">
+                    <div class="card-body px-lg-5 pb-4">
+                        <div class="text-center text-muted mb-4">
 
-                {% if msg %}
-                  <p>{{ msg }}</p>
-                {% else %}
-                  <p>
-                    Sign in with your credentials
-                  </p>
-                {% endif %}  
+                            {% if msg %}
+                                <p>{{ msg }}</p>
+                            {% elif messages %}
+                                {% for message in messages %}
+                                    {% if message.tags %}
+                                        <span class="badge badge-dot mb-2">
+                                            {% if message.tags == 'error' %}
+                                                <i class="bg-danger"></i>
+                                            {% else %}
+                                                <i class="bg-{{ message.tags }}"></i>
+                                            {% endif %}
+                                            <span class="status h4 font-weight-light">{{ message }}</span>
+                                            {% if 'confirm your email.' in message.message %}
+                                                <form id="resend_email" method="POST" action="{% url 'resend_confirmation' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="email" value="{{ form.username.value }}">
 
-              </div>
+                                                    <span class="d-block status h4 font-weight-light">
+                                                        <a href="#" {% if form.username.value %}onclick="submit()"{% else %}{% endif %} class="text-blue">Resend</a> it if needed.
+                                                    </span>
 
-              <form method="POST">
+                                                </form>
+                                            {% endif %}
+                                        </span>
+                                    {% else %}
+                                        <span class="font-weight-light">
+                                            {{ message }}
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <p>
+                                    Sign in with your credentials
+                                </p>
+                            {% endif %}
 
-                {% csrf_token %}
+                        </div>
 
-                <div class="form-group mb-3">
-                  <div class="input-group input-group-alternative">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                        <form method="POST">
+
+                            {% csrf_token %}
+
+                            <div class="form-group mb-3">
+                                <div class="input-group input-group-alternative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                                    </div>
+                                    {{ form.username }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group input-group-alternative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                                    </div>
+                                    {{ form.password }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="custom-control custom-control-alternative custom-checkbox">
+                                        <input class="custom-control-input" id=" customCheckLogin" type="checkbox">
+                                        <label class="custom-control-label" for=" customCheckLogin">
+                                            <span class="text-muted">Remember me</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <a href="#" data-toggle="modal" data-target="#resetPassword" class="font-weight-light" style="font-size: 0.8125rem">
+                                        <i>Forgot Password?</i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary my-4">Sign in</button>
+                            </div>
+                        </form>
                     </div>
-                    {{ form.username }}
-                  </div>
                 </div>
-                <div class="form-group">
-                  <div class="input-group input-group-alternative">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <a href="{% url 'register' %}" class="text-light"><small>Register</small></a>
                     </div>
-                    {{ form.password }}
-                  </div>
+                    <div class="col-6 text-right">
+                        <a href="https://https://infinitefoundry.com/frequently-asked-questions/" class="text-light">
+                            <small>Get Support</small>
+                        </a>
+                    </div>
                 </div>
-                <div class="custom-control custom-control-alternative custom-checkbox">
-                  <input class="custom-control-input" id=" customCheckLogin" type="checkbox">
-                  <label class="custom-control-label" for=" customCheckLogin">
-                    <span class="text-muted">Remember me</span>
-                  </label>
-                </div>
-                <div class="text-center">
-                  <button type="submit" class="btn btn-primary my-4">Sign in</button>
-                </div>
-              </form>
             </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-6">
-              <a href="{% url 'register' %}" class="text-light"><small>Register</small></a>
-            </div>
-            <div class="col-6 text-right">
-              <a href="https://https://infinitefoundry.com/frequently-asked-questions/" class="text-light"><small>Get Support</small></a>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
+    
+    <!-- Reset Password Modal -->
+    <div class="modal fade" id="resetPassword" tabindex="-1" role="dialog" aria-labelledby="resetPassword" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 480px" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetPassword">Reset Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Enter your email address and we will send you a link to reset your password.
+                    </p>
+                    <form method="POST" action="{% url 'reset_password' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="input-group input-group-alternative">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                                </div>
+                                <input type="email" name="email" class="form-control" placeholder="Email">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary my-4">Send Reset Link</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
 {% endblock content %}
 
-<!-- Specific JS goes HERE --> 
-{% block javascripts %}{% endblock javascripts %}
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+    <script>
+        function submit() {
+            document.getElementById('resend_email').submit();
+        }
+    </script>
+
+{% endblock javascripts %}
