@@ -265,7 +265,6 @@ def validate_email(request, auth_token):
         elif not auth_object.is_confirmed and expired:
             user = User.objects.get(username=auth_object.user.username)
             auth_object.delete()
-            user.delete()
             messages.error(request, 'Token expired! Try to register again.')
             return redirect('home')
         elif auth_object.is_confirmed:
