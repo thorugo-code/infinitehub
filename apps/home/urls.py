@@ -66,9 +66,9 @@ balance_urls = [
 
     path('balance/', balance.home, name='balance_page'),
 
-    path('balance/new', balance.new_bill, name='new_bill'),
-    path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
-    path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
+    # path('balance/new', balance.new_bill, name='new_bill'),
+    # path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
+    # path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
     path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
 
     path('balance/order', balance.sort_and_filter_bills, name='sort_bills'),
@@ -105,9 +105,16 @@ clients_list_urls = [
 client_page_urls = [
 
     path('clients/<slug:slug>', clients.details, name='client_details'),
-
     path('clients/<slug:slug>/edit', clients.details, name='edit_client'),
+    path('clients/<slug:slug>/delete', clients.delete, name='delete_client'),
 
+    path('clients/<slug:slug>/new-doc', clients.new_document, name='new_client_document'),
+    path('clients/<slug:slug>/documents', clients.documents_page, name='client_documents'),
+
+    path('clients/<slug:slug>/balance', clients.balance_page, name='client_balance'),
+    path('clients/<slug:slug>/balance/new', clients.new_bill, name='new_bill'),
+    path('clients/<slug:slug>/edit=<int:bill_id>/', clients.edit_bill, name='edit_bill'),
+    path('clients/<slug:slug>/balance/delete/<int:bill_id>', clients.delete_bill, name='delete_bill'),
 ]
 
 collaborators_page_urls = [

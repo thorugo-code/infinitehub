@@ -7,6 +7,118 @@ from django.shortcuts import render, redirect
 from apps.home.models import Project, Profile, Office, Bill, Client, unmask_money
 
 
+INCOME_CATEGORIES = [
+    ############ Receita Bruta ###########
+    'Juros Obtidos',
+    'Integralização de capital',
+    'Rendimentos de aplicações financeiras',
+    'Vendas de mercadorias',
+    'Vendas de equipamentos',
+    'Prestação de serviços',
+    'Royalties',
+    'Outros não operacionais',
+]
+
+EXPENSE_CATEGORIES = [
+    ######### Deduções de impostos ########
+    'COFINS',
+    'CSLL',
+    'ICMS',
+    'IPI',
+    'IRPJ',
+    'PIS',
+    'ISS',
+    'Simples nacional',
+    'IRPJ trimestral',
+    'CSLL trimestral',
+    ############ Custos diretos ###########
+    'Custos diretos',
+    ########## Despesas comerciais ########
+    'Endomarketing',
+    'Taxa de propaganda e publicidade',
+    ### Despesas administrativas/gerais ###
+    'Agua',
+    'Aluguel',
+    'Aluguel de máquinas',
+    'Associações/Convênios',
+    'Cartorio/Documentos',
+    'Cetificado Digital',
+    'Combustível/Estacionamento',
+    'Condomínio',
+    'Consultoria',
+    'Contabilidade',
+    'Energia elétrica',
+    'Jurídico',
+    'Marketing e publicidade',
+    'Material de escritório',
+    'Monitoramento e segurança',
+    'Multas gerais',
+    'Reembolso geral',
+    'Seguro',
+    'Software/Sistemas',
+    'Suporte TI',
+    'Telefone/Internet/TV',
+    'Transporte/Uber',
+    'Uso interno',
+    'Viagem/Hospedagem',
+    'Depreciação e amortização',
+    ######## Despesas com ocupação #######
+    'Estadual',
+    'IPTU',
+    'Licenças/Alvarás',
+    'Municipal',
+    'Prefeitura',
+    'Sindicato patronal',
+    ########## Despesas pessoal ##########
+    'Adiantamento salarial',
+    'Alimentação',
+    'Contribuição sindical',
+    'FGTS',
+    'Imposto de renda IRPF',
+    'INSS',
+    'Medicina do trabalho',
+    'Premiação/Bonificação/Confraternização',
+    'Provisão 13',
+    'Provisão férias',
+    'Rescisão',
+    'Salário',
+    'Terceirização de pessoal',
+    'Treinamento',
+    'Uniforme/EPI',
+    'Vale transporte',
+    ###### Despesas de provisionados ######
+    'Amortização de empréstimo',
+    'FGTS 13',
+    'INSS 13',
+    'Pagamento 13',
+    'Pagamento férias',
+    ####### Despesas com manutenção #######
+    'Manutenção de veículos',
+    'Manutenção de equipamentos',
+    'Material de limpeza e higiene',
+    'Reparos/Obras',
+    'Utensílios',
+    ######### Despesas com banco ##########
+    'Tarifas bancárias',
+    ######### Despesas financeiras ########
+    'Cartão pré-pago',
+    'IOF/IR sobre aplicações',
+    'Juros e multa (atraso)',
+    'Juros empréstimos',
+    ############ Investimentos ############
+    'Aplicações financeiras',
+    'Equipamentos',
+    'Cotas outras empresas',
+    'Colaboradores',
+    'Veículos',
+    'Obras',
+    # Imposto de renda e contribuição social #
+    'Imposto de renda e contribuição social',
+]
+
+BALANCE_CATEGORIES = INCOME_CATEGORIES + EXPENSE_CATEGORIES
+
+
 def get_permission(request, permission_type, model='bill'):
     return request.user.has_perm(f'home.{permission_type}_{model}')
 
@@ -85,12 +197,7 @@ def filter_bill_objects(filters):
                 bills = bills.filter(client__id=client)
 
             if category != 'all':
-                if category == 'income':
-                    bills = bills.filter(income=True)
-                elif category == 'expense':
-                    bills = bills.filter(income=False)
-                else:
-                    bills = bills.filter(category=category)
+                bills = bills.filter(category=category)
 
             if late == 'false':
                 bills = bills.filter(late=False)
@@ -147,28 +254,28 @@ def home(request, sorted_by=None, sort_type=None, filters=None):
 
     all_bills, max_id = filter_bill_objects(filters)
 
-    bills_to_receive = all_bills.filter(income=True)
-    bills_received = all_bills.filter(income=True, paid=True)
-    bills_to_pay = all_bills.filter(income=False)
-    bills_paid = all_bills.filter(income=False, paid=True)
+    # bills_to_receive = all_bills.filter(income=True)
+    # bills_received = all_bills.filter(income=True, paid=True)
+    # bills_to_pay = all_bills.filter(income=False)
+    # bills_paid = all_bills.filter(income=False, paid=True)
     bills_pending = all_bills.filter(paid=False)
     bills_late = all_bills.filter(late=True)
 
-    bills_to_receive_total = sum([bill.total for bill in bills_to_receive])
-    bills_to_receive_pending_total = sum([bill.total for bill in bills_to_receive if not bill.paid])
-    bills_to_receive_late_total = sum([bill.total for bill in bills_to_receive if bill.late])
-    bills_received_total = sum([bill.total for bill in bills_received])
-    bills_to_pay_total = sum([bill.total for bill in bills_to_pay])
-    bills_to_pay_pending_total = sum([bill.total for bill in bills_to_pay if not bill.paid])
-    bills_to_pay_late_total = sum([bill.total for bill in bills_to_pay if bill.late])
-    bills_paid_total = sum([bill.total for bill in bills_paid])
+    # bills_to_receive_total = sum([bill.total for bill in bills_to_receive])
+    # bills_to_receive_pending_total = sum([bill.total for bill in bills_to_receive if not bill.paid])
+    # bills_to_receive_late_total = sum([bill.total for bill in bills_to_receive if bill.late])
+    # bills_received_total = sum([bill.total for bill in bills_received])
+    # bills_to_pay_total = sum([bill.total for bill in bills_to_pay])
+    # bills_to_pay_pending_total = sum([bill.total for bill in bills_to_pay if not bill.paid])
+    # bills_to_pay_late_total = sum([bill.total for bill in bills_to_pay if bill.late])
+    # bills_paid_total = sum([bill.total for bill in bills_paid])
     bills_pending_total = sum([bill.total for bill in bills_pending])
     bills_late_total = sum([bill.total for bill in bills_late])
 
-    bills_to_receive_count = bills_to_receive.count()
-    bills_received_count = bills_received.count()
-    bills_to_pay_count = bills_to_pay.count()
-    bills_paid_count = bills_paid.count()
+    # bills_to_receive_count = bills_to_receive.count()
+    # bills_received_count = bills_received.count()
+    # bills_to_pay_count = bills_to_pay.count()
+    # bills_paid_count = bills_paid.count()
     bills_pending_count = bills_pending.count()
     bills_late_count = bills_late.count()
 
@@ -176,20 +283,20 @@ def home(request, sorted_by=None, sort_type=None, filters=None):
         'user_profile': Profile.objects.get(user=request.user),
         'offices': Office.objects.all(),
         'clients': Client.objects.all(),
-        'bills_to_receive': bills_to_receive,
-        'bills_to_pay': bills_to_pay,
-        'received': bills_received_count,
-        'received_value': bills_received_total,
-        'paid': bills_paid_count,
-        'paid_value': bills_paid_total,
-        'to_receive': bills_to_receive_count,
-        'to_receive_value': bills_to_receive_total,
-        'to_receive_late_value': bills_to_receive_late_total,
-        'to_receive_pending_value': bills_to_receive_pending_total,
-        'to_pay': bills_to_pay_count,
-        'to_pay_value': bills_to_pay_total,
-        'to_pay_late_value': bills_to_pay_late_total,
-        'to_pay_pending_value': bills_to_pay_pending_total,
+        # 'bills_to_receive': bills_to_receive,
+        # 'bills_to_pay': bills_to_pay,
+        # 'received': bills_received_count,
+        # 'received_value': bills_received_total,
+        # 'paid': bills_paid_count,
+        # 'paid_value': bills_paid_total,
+        # 'to_receive': bills_to_receive_count,
+        # 'to_receive_value': bills_to_receive_total,
+        # 'to_receive_late_value': bills_to_receive_late_total,
+        # 'to_receive_pending_value': bills_to_receive_pending_total,
+        # 'to_pay': bills_to_pay_count,
+        # 'to_pay_value': bills_to_pay_total,
+        # 'to_pay_late_value': bills_to_pay_late_total,
+        # 'to_pay_pending_value': bills_to_pay_pending_total,
         'pending': bills_pending_count,
         'pending_value': bills_pending_total,
         'late': bills_late_count,
@@ -212,69 +319,6 @@ def home(request, sorted_by=None, sort_type=None, filters=None):
     context.update({'bills': sort_bill_objects(all_bills, sorted_by, sort_type), 'max_id': max_id})
 
     return render(request, 'home/bills.html', context)
-
-
-def new_bill(request):
-    if not get_permission(request, 'add', 'bill'):
-        context = {
-            'user_profile': Profile.objects.get(user=request.user),
-        }
-        return render(request, 'home/page-404.html', context)
-
-    if request.method == 'POST':
-        currency = request.POST.get('currency', 'USD')
-        bill = Bill(
-            # Foreign Keys
-            project=Project.objects.get(id=request.POST['project_id']) if request.POST.get('project_id',
-                                                                                           '') != '' else None,
-            client=Client.objects.get(id=request.POST['client_id']) if request.POST.get('client_id',
-                                                                                        '') != '' else None,
-            office=Office.objects.get(id=request.POST['office_id']) if request.POST.get('office_id',
-                                                                                        '') != '' else None,
-            created_by=request.user,
-
-            # Char Fields
-            title=request.POST.get('title', ''),
-            category=filter_options(request.POST.get('category', '')),
-            subcategory=request.POST.get('subcategory', None),
-            method=filter_options(request.POST.get('method', '')),
-
-            # Date Fields
-            due_date=request.POST.get('due_date', None) if request.POST.get('due_date', None) != '' else None,
-
-            # Text Fields
-            description=request.POST.get('description', ''),
-
-            # Money Fields
-            installments_value=unmask_money(request.POST.get('installments_value', ''), currency),
-            fees=unmask_money(request.POST.get('fees', ''), currency),
-            discount=unmask_money(request.POST.get('discount', ''), currency),
-            total=unmask_money(request.POST.get('total', ''), currency),
-
-            # Boolean Fields
-            income=True if request.POST['income'] == 'true' else False,
-
-            # Integer Fields
-            installments=request.POST.get('installments', 0),
-
-            # File Fields
-            proof=request.FILES.get('proof', None),
-        )
-
-        bill.save()
-
-    sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
-    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
-    filters = request.POST.get('filters', 'None')
-
-    if sorted_by != '' and sorted_by != 'None' and filters != 'None':
-        return redirect('sorted_filtered_bills', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    elif sorted_by != '' and sorted_by != 'None':
-        return redirect('sorted_bills', sorted_by=sorted_by, sort_type=sort_type)
-    elif filters != 'None':
-        return redirect('filtered_bills', filters=filters)
-    else:
-        return redirect('balance_page')
 
 
 def delete_bill(request, bill_id):

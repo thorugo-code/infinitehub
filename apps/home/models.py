@@ -12,7 +12,7 @@ from djmoney.money import Money
 from django.utils.text import slugify
 from djmoney.models.fields import MoneyField
 from django.contrib.auth.models import User, Group
-from apps.home.storage_backends import PublicMediaStorage, PrivateMediaStorage
+from apps.home.storage_backends import PublicMediaStorage
 from apps.authentication.models import AuthEmail
 
 
@@ -78,9 +78,17 @@ def upload_path_bills(instance, filename):
 
 
 def custom_upload_path_documents(instance, filename):
-    collab_name = instance.user.get_full_name().replace(" ", "_")
-    category = instance.category.replace(" ", "_")
-    return f'documents/{collab_name}/{category}/{filename}'
+    if instance.user:
+        collab_name = instance.user.get_full_name().replace(" ", "_")
+        category = instance.category.replace(" ", "_")
+        return f'documents/{collab_name}/{category}/{filename}'
+    elif instance.client:
+        client_name = instance.client.name.replace(" ", "_")
+        category = instance.category.replace(" ", "_")
+        return f'documents/{client_name}/{category}/{filename}'
+    else:
+        category = instance.category.replace(" ", "_")
+        return f'documents/others/{category}/{filename}'
 
 
 class Equipments(models.Model):
@@ -388,38 +396,33 @@ class Client(models.Model):
 # Add currency
 class Bill(models.Model):
     # Foreign Keys and Relationships
-    project = models.ForeignKey(Project, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
     client = models.ForeignKey(Client, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
     office = models.ForeignKey(Office, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_bills', on_delete=models.SET_NULL, null=True)
 
     # Char Fields
     title = models.CharField(max_length=100)
-    category = models.CharField(max_length=100, default='others')
-    subcategory = models.CharField(max_length=100, null=True, blank=True)
-    method = models.CharField(max_length=100, default='others')
+    method = models.CharField(max_length=100, null=True, blank=True)
+    origin = models.CharField(max_length=100, null=True, blank=True)
+    category = models.CharField(max_length=100, null=True, blank=True)
+    # payer = models.CharField(max_length=100, null=True, blank=True) # ???
 
     # Date Fields
     created_at = models.DateField(auto_now_add=True)
     due_date = models.DateField(blank=True, null=True)
     paid_at = models.DateField(blank=True, null=True)
 
-    # Text Fields
-    description = models.TextField()
-
     # Money Fields
-    installments_value = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
-    fees = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
-    discount = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
     total = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
 
     # Boolean Fields
+    reconciled = models.BooleanField(default=False)
     paid = models.BooleanField(default=False)
     late = models.BooleanField(default=False)
-    income = models.BooleanField(default=False)
 
     # Integer Fields
-    installments = models.IntegerField(default=0)
+    installments_number = models.IntegerField(default=0)
+    # code = models.IntegerField(default=0) # ???
 
     # File Fields
     proof = models.FileField(upload_to=upload_path_bills, null=True, blank=True)
@@ -427,39 +430,34 @@ class Bill(models.Model):
     def __str__(self):
         return self.title
 
-    def select_subcategory(self):
-        correlation = {
-            'Bank': ['Bank fees'],
-            'Financial': ['Loan interest', 'Fines for late payment', 'IOF/IR on applications'],
-            'Maintenance': ['Equipments', 'Cleaning and hygiene', 'Repairs and work', 'Utensils'],
-            'Public fees': ['IPTU', 'State tax', 'Municipal tax', 'City hall fees', "Employers' union",
-                            'Business license'],
-            'Staff': ['Salary', 'Union contribution', 'Confraternization', 'Bonus', 'Salary', 'FGTS', 'INSS',
-                      'Uniforms', 'Transportation voucher', 'Individual protection equipment', 'Training',
-                      'Occupational medicine', 'Food'],
-        }
+    def save(self, *args, **kwargs):
+        if self.due_date:
+            check_late = datetime.strptime(str(self.due_date), '%Y-%m-%d').date() < datetime.now().date()
+            if check_late and not self.paid:
+                self.late = True
 
-        for key, value in correlation.items():
-            if self.subcategory in value:
-                return key
+        super().save()
 
-        return 'Others'
+
+class BillInstallment(models.Model):
+    # Foreign Keys and Relationships
+    bill = models.ForeignKey(Bill, related_name='installments', on_delete=models.CASCADE)
+
+    # Date Fields
+    due_date = models.DateField(null=True, blank=True)
+    paid_at = models.DateField(null=True, blank=True)
+
+    # Boolean Fields
+    paid = models.BooleanField(default=False)
+
+    # Numerical Fields
+    partial_id = models.IntegerField(default=0)
+    value = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
+
+    def __str__(self):
+        return f'[{self.partial_id}/{self.bill.installments}] {self.bill.title} - {self.due_date}'
 
     def save(self, *args, **kwargs):
-
-        if kwargs.get('paid'):
-            self.paid_at = datetime.now()
-            self.late = False
-        elif not kwargs.get('paid'):
-            self.paid_at = None
-
-        if self.due_date and datetime.strptime(str(self.due_date),
-                                               '%Y-%m-%d').date() < datetime.now().date() and not self.paid:
-            self.late = True
-
-        if not self.income and self.subcategory is None:
-            self.subcategory = self.select_subcategory()
-
         super().save()
 
 
