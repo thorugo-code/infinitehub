@@ -131,13 +131,13 @@
         <!-- Card stats -->
         <div class="row">
             <div class="col-xl-3 col-md-6">
-                <div class="card bg-gradient-green border-0">
-                    <div class="card-body">
+                <div class="card bg-gradient-green border-0" style="height: calc(100% - 30px)">
+                    <div class="card-body py-4">
                         <div class="row">
                             <div class="col">
                                 <h5 class="card-title text-uppercase text-muted mb-0 text-white">Received</h5>
-                                <span class="h2 font-weight-bold mb-0 text-white">
-                                {{ received_value|default:'0.00' }} / {{ to_receive_value|default:'0.00' }}
+                                <span class="h3 font-weight-bold mb-0 text-white">
+                                {{ received|default:'0.00' }} / {{ income|default:'0.00' }}
                             </span>
                             </div>
                         </div>
@@ -145,13 +145,13 @@
                 </div>
             </div>
             <div class="col-xl-3 col-md-6">
-                <div class="card bg-gradient-red border-0">
-                    <div class="card-body">
+                <div class="card bg-gradient-red border-0" style="height: calc(100% - 30px)">
+                    <div class="card-body py-4">
                         <div class="row">
                             <div class="col">
                                 <h5 class="card-title text-uppercase text-muted mb-0 text-white">Paid</h5>
-                                <span class="h2 font-weight-bold mb-0 text-white">
-                                {{ paid_value|default:'0.00' }} / {{ to_pay_value|default:'0.00' }}
+                                <span class="h3 font-weight-bold mb-0 text-white">
+                                {{ paid|default:'0.00' }} / {{ expense|default:'0.00' }}
                             </span>
                             </div>
                         </div>
@@ -159,16 +159,16 @@
                 </div>
             </div>
             <div class="col-xl-3 col-md-6">
-                <div class="card bg-gradient-info border-0">
-                    <div class="card-body">
+                <div class="card bg-gradient-info border-0" style="height: calc(100% - 30px)">
+                    <div class="card-body py-4">
                         <div class="row">
                             <div class="col">
                                 <h5 class="card-title text-uppercase text-muted mb-0 text-white">Pending</h5>
-                                <span class="h2 font-weight-bold mb-0 text-white"><i
+                                <span class="h3 font-weight-bold mb-0 text-white"><i
                                         class="fas fa-arrow-up mr-1"></i>
-                                {{ to_receive_pending_value|default:'0.00' }}
+                                {{ pending_income|default:'0.00' }}
                                 <i class="fas fa-arrow-down ml-2 mr-1"></i>
-                                {{ to_pay_pending_value|default:'0.00' }}
+                                {{ pending_expense|default:'0.00' }}
                             </span>
                             </div>
                         </div>
@@ -176,16 +176,16 @@
                 </div>
             </div>
             <div class="col-xl-3 col-md-6">
-                <div class="card bg-gradient-default border-0">
-                    <div class="card-body">
+                <div class="card bg-gradient-default border-0" style="height: calc(100% - 30px)">
+                    <div class="card-body py-4">
                         <div class="row">
                             <div class="col">
                                 <h5 class="card-title text-uppercase text-muted mb-0 text-white">Late</h5>
-                                <span class="h2 font-weight-bold mb-0 text-white"><i
+                                <span class="h3 font-weight-bold mb-0 text-white"><i
                                         class="fas fa-arrow-up mr-1"></i>
-                                {{ to_receive_late_value|default:'0.00' }}
+                                {{ late_income|default:'0.00' }}
                                 <i class="fas fa-arrow-down ml-2 mr-1"></i>
-                                {{ to_pay_late_value|default:'0.00' }}
+                                {{ late_expense|default:'0.00' }}
                             </span>
                             </div>
                         </div>
@@ -203,7 +203,7 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col align-items-center">
-                                    <span class="h5 font-weight-light mb-0 mr-sm-1">({{ client.bills.all.count }})</span>
+                                    <span class="h5 font-weight-light mb-0 mr-sm-1">({{ bills.all.count }})</span>
                                     <span class="h3 mb-0">Bills</span>
                                 </div>
                                 <div class="col text-right">
@@ -266,7 +266,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {% for bill in client.bills.all %}
+                                {% for bill in bills.all %}
                                     <tr>
                                         <td class="p-0 pl-4">
                                             {% if bill.category in income_categories %}
@@ -432,9 +432,9 @@
                                                         </div> {# OFFICE / METHOD #}
                                                         <div class="row">
                                                             <div class="col form-group form-control-label">
-                                                                <label for="billReceiveTotalInputDetails{{ bill.id }}">Total</label>
+                                                                <label for="valueInputDetails{{ bill.id }}">Total</label>
                                                                 <input inputmode="decimal" class="form-control"
-                                                                       id="billReceiveTotalInputDetails{{ bill.id }}"
+                                                                       id="valueInputDetails{{ bill.id }}"
                                                                        name="total" placeholder="" value="{{ bill.total|without_currency }}" {% if not perms.home.change_bill %}disabled{% endif %}>
                                                             </div>
                                                             <div class="col form-group form-control-label mb-3"
@@ -616,47 +616,47 @@
 
     </div>
     
-{#    <div class="container-fluid mt-2">#}
-{#        <div class="row">#}
-{#            <div class="col">#}
-{#                <div class="accordion">#}
-{#                    <div class="card shadow my-0">#}
-{#                        <div class="card-header" id="heading1" role="button" data-toggle="collapse"#}
-{#                             data-target="#collapse1" aria-expanded="true" aria-controls="collapse1">#}
-{#                            <h5 class="mb-0">#}
-{#                                <span class="heading">Accordion Item 1</span>#}
-{#                            </h5>#}
-{#                        </div>#}
-{#                        #}
-{#                        <div id="collapse1" class="collapse show" aria-labelledby="heading1" data-parent=".accordion">#}
-{#                            <div class="card-body">#}
-{#                                Content for Accordion Item 1#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{##}
-{#                    <div class="card my-0 border-top" style="box-shadow: 0 0 0 0">#}
-{#                        <div class="card-header" id="heading2" role="button" data-toggle="collapse"#}
-{#                             data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">#}
-{#                            <h5 class="mb-0">#}
-{#                                <span class="heading">Accordion Item 2</span>#}
-{#                            </h5>#}
-{#                        </div>#}
-{##}
-{#                        <div id="collapse2" class="collapse" aria-labelledby="heading2" data-parent=".accordion">#}
-{#                            <div class="card-body">#}
-{#                                Content for Accordion Item 2#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{##}
-{#                    <!-- Add more accordion items as needed -->#}
-{##}
-{#                </div>#}
-{##}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
+    <div class="container-fluid mt-2">
+        <div class="row">
+            <div class="col">
+                <div class="accordion">
+                    <div class="card shadow my-0">
+                        <div class="card-header" id="heading1" role="button" data-toggle="collapse"
+                             data-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                            <h5 class="mb-0">
+                                <span class="heading">Accordion Item 1</span>
+                            </h5>
+                        </div>
+
+                        <div id="collapse1" class="collapse show" aria-labelledby="heading1" data-parent=".accordion">
+                            <div class="card-body">
+                                Content for Accordion Item 1
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card my-0 border-top" style="box-shadow: 0 0 0 0">
+                        <div class="card-header" id="heading2" role="button" data-toggle="collapse"
+                             data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                            <h5 class="mb-0">
+                                <span class="heading">Accordion Item 2</span>
+                            </h5>
+                        </div>
+
+                        <div id="collapse2" class="collapse" aria-labelledby="heading2" data-parent=".accordion">
+                            <div class="card-body">
+                                Content for Accordion Item 2
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add more accordion items as needed -->
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <div class="container-fluid">
@@ -989,7 +989,7 @@
 
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
-
+    
     <script src="/static/assets/vendor/clipboard/dist/clipboard.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
@@ -1081,7 +1081,7 @@
             }
         }
         
-        for (let i = 1; i <= {{ client.bills.last.id }}; i++) {
+        for (let i = 1; i <= {{ bills.last.id }}; i++) {
             try {
                 document.getElementById(`documentChangeInput${i}`).addEventListener('change', () => updateFileName(event, i));
             } catch (e) {}
@@ -1109,10 +1109,10 @@
             setupInput($("#valueInput"));
             setupInput($("#billInstallmentsValueInput"));
 
-            {#for (let i = 1; i <= {{ max_id }}; i++) {#}
-            {#    setupInput($("#valueInputDetails" + i));#}
-            {#    setupInput($("#billInstallmentsValueInputDetails" + i));#}
-            {# }#}
+            for (let i = 1; i <= {{ bills.last.id }}; i++) {
+                setupInput($("#valueInputDetails" + i));
+                setupInput($("#billInstallmentsValueInputDetails" + i));
+            }
         });
     </script>
 

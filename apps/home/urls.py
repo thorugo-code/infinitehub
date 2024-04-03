@@ -110,6 +110,7 @@ client_page_urls = [
 
     path('clients/<slug:slug>/new-doc', clients.new_document, name='new_client_document'),
     path('clients/<slug:slug>/documents', clients.documents_page, name='client_documents'),
+    path('clients/<slug:slug>/download=<int:document_id>', clients.download_document, name='download_client_document'),
 
     path('clients/<slug:slug>/balance', clients.balance_page, name='client_balance'),
     path('clients/<slug:slug>/balance/new', clients.new_bill, name='new_bill'),

@@ -1,9 +1,11 @@
 import datetime
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from apps.home.models import Profile, Client, Office, Document, Bill, BillInstallment
 from django.contrib.auth.models import User
-from apps.home.views.balance import INCOME_CATEGORIES, EXPENSE_CATEGORIES, unmask_money
+from apps.home.views.balance import INCOME_CATEGORIES, EXPENSE_CATEGORIES, unmask_money, check_late_bills
+from django.core.files.storage import default_storage
+from django.http import HttpResponse
 
 
 def check_expired_documents():
@@ -227,15 +229,42 @@ def new_document(request, slug):
     return redirect(redirect_to, slug=client.slug)
 
 
+def download_document(request, slug, document_id):
+    if not get_permission(request, 'view', 'document'):
+        return render(request, 'home/page-404.html')
+
+    document = get_object_or_404(Document, id=document_id)
+
+    document_name = document.file.name
+    file_content = default_storage.open(document_name).read()
+    response = HttpResponse(file_content, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{document_name.split("/")[-1]}"'
+    return response
+
+
 def balance_page(request, slug):
     if not get_permission(request, 'view', 'document'):
         return render(request, 'home/page-404.html')
 
+    check_late_bills()
+
     client = Client.objects.get(slug=slug)
+    bills = Bill.objects.filter(client=client)
+    income_bills = bills.filter(category__in=INCOME_CATEGORIES)
+    expense_bills = bills.filter(category__in=EXPENSE_CATEGORIES)
 
     context = {
         'user_profile': Profile.objects.get(user=request.user),
         'client': client,
+        'bills': bills,
+        'received': sum([bill.total for bill in income_bills if bill.paid]),
+        'income': sum([bill.total for bill in income_bills]),
+        'pending_income': sum([bill.total for bill in income_bills if not bill.paid]),
+        'late_income': sum([bill.total for bill in income_bills if bill.late]),
+        'paid': sum([bill.total for bill in expense_bills if bill.paid]),
+        'expense': sum([bill.total for bill in expense_bills]),
+        'pending_expense': sum([bill.total for bill in expense_bills if not bill.paid]),
+        'late_expense': sum([bill.total for bill in expense_bills if bill.late]),
         'documents': Bill.objects.filter(client=client),
         'income_categories': sorted(INCOME_CATEGORIES),
         'expense_categories': sorted(EXPENSE_CATEGORIES),

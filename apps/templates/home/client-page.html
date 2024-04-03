@@ -40,7 +40,7 @@
 </div>
 
 <!-- Page content -->
-<div class="container-fluid mt--6">
+<div class="container-fluid mt--6" style="min-height: 720px">
 
     <!-- Client Infos Row -->
     <div class="row">
@@ -121,48 +121,55 @@
     </div>
 
     <!-- Client Data Row -->
-    <div class="row">
-        <!-- Card Stats Column -->
+    <div class="row flex-row-reverse flex-wrap-reverse">
+        <!-- Balance + Documents Column -->
         <div class="col-md-4">
-            <div class="card bg-gradient-blue" style="min-width: 0">
-                <div class="card-body p-4">
-                    <div class="row">
-                        <div class="col">
-                            <h5 class="card-title text-uppercase text-muted mb-0 text-white">Projects</h5>
-                            <span class="h2 font-weight-bold mb-0 text-white">{{ client.projects.all.count }}</span>
+            <div class="card bg-gradient-default">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <div class="text-light text-sm text-uppercase">Balance</div>
+                        <div class="mt-2">
+                            <sup class="{% if balance > 0 %}text-success{% elif balance < 0 %}text-danger{% else %}text-white{% endif %}">
+                                {{ currency|default:'$' }}
+                            </sup>
+                            <span class="h2 {% if balance > 0 %}text-success{% elif balance < 0 %}text-danger{% else %}text-white{% endif %}">
+                                {{ balance|default:'0.00' }}
+                            </span>
                         </div>
-                        <div class="col-auto">
-                            <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#newProjectModal">New</a>
-                                <hr class="my-1">
-                                <a class="dropdown-item" href="{% url 'project_list' %}">See all</a>
+                        <div class="text-sm">
+                            {% if last_month_balance_percentage > 0 %}
+                                <span class="text-success font-weight-600">+ {{ last_month_balance_percentage }}%</span>
+                            {% elif last_month_balance_percentage < 0 %}
+                                <span class="text-danger font-weight-600">- {{ last_month_balance_percentage }}%</span>
+                            {% else %}
+                                <span class="text-light font-weight-600">0%</span>
+                            {% endif %}
+                            <span class="text-light">({{ last_month_balance|default:'0' }})</span>
+                            <small class="text-light font-weight-light">Last month</small>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <small class="text-light">Income: {{ income_percentage|default:0 }}%</small>
+                            <div class="progress progress-xs my-2">
+                                <div class="progress-bar bg-success" style="width: {{ income_percentage|default:50 }}%"></div>
+                            </div>
+                        </div>
+                        <div class="col"><small class="text-light">Expense: {{ income_percentage|default:0 }}%</small>
+                            <div class="progress progress-xs my-2">
+                                <div class="progress-bar bg-danger" style="width: {{ income_percentage|default:50 }}%"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <span class="badge badge-dot pr-2">
-                        <i class="bg-success"></i>
-                        <span class="text-nowrap text-white pr-1">{{ finished_projects|default:0 }}</span>
-                        <span class="text-nowrap text-white font-weight-light">Finished</span>
-                        </span>
-                        <span class="badge badge-dot">
-                            <i class="bg-info"></i>
-                            <span class="text-nowrap text-white pr-1">{{ working_projects|default:0 }}</span>
-                            <span class="text-nowrap text-white font-weight-light">Working</span>
-                        </span>
-                    </div>
+                    <a class="btn btn-sm btn-block btn-neutral mt-3" href="{% url 'client_balance' client.slug %}">Manage</a>
                 </div>
             </div>
-            <div class="card bg-gradient-default" style="min-width: 0">
-                <div class="card-body p-4">
-                    <div class="row">
-                        <div class="col">
-                            <h5 class="card-title text-uppercase text-muted mb-0 text-white">Documents</h5>
-                            <span class="h2 font-weight-bold mb-0 text-white">{{ client.documents.all.count }}</span>
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col align-items-center">
+                            <span class="h5 font-weight-light mb-0">({{ client.documents.all.count }})</span>
+                            <span class="h3 mb-0">Documents</span>
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"
@@ -176,65 +183,288 @@
                             </div>
                         </div>
                     </div>
-                    <p class="mt-3 mb-0 text-sm">
-                        <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3</span>
-                        <span class="text-nowrap text-white">Since last month</span>
-                    </p>
                 </div>
-            </div>
-            <div class="card bg-gradient-{% if client.balance > 0 %}success{% elif client.balance < 0 %}danger{% else %}gray-dark{% endif %}" style="min-width: 0">
-                <div class="card-body p-4">
-                    <div class="row">
-                        <div class="col">
-                            <h5 class="card-title text-uppercase text-muted mb-0 text-white">Balance</h5>
-                            <span class="h2 font-weight-bold mb-0 text-white">{{ client.balance|default:0 }}</span>
-                        </div>
-                        <div class="col-auto">
-                            <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#newBillModal">New Bill</a>
-                                <hr class="my-1">
-                                <a class="dropdown-item" href="{% url 'client_balance' client.slug %}">See all</a>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="mt-3 mb-0 text-sm">
-                        {% if client.balance > 0 %}
-                            <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> {{ last_month_balance }}</span>
-                            <span class="text-nowrap text-white">Since last month</span>
-                        {% elif client.balance < 0 %}
-                            <span class="text-danger mr-2"><i class="fa fa-arrow-down"></i> {{ last_month_balance|default:0 }}</span>
-                            <span class="text-nowrap text-white">Since last month</span>
-                        {% else %}
-                            <span class="text-white mr-2">{{ last_month_balance|default:0 }}</span>
-                            <span class="text-nowrap text-white">Since last month</span>
-                        {% endif %}
-                    </p>
+                <div class="table-responsive" style="max-height: 19.65rem; overflow-y: auto">
+                    <table class="table align-items-center table-flush">
+                        <tbody>
+                            {% for document in client.documents.all %}
+
+                                <tr>
+                                    <th scope="row" class="p-2 align-items-center">
+                                        <a class="align-items-center" style="display: flex"
+                                           data-target="#watchDocumentModal{{ document.id }}"
+                                           data-toggle="modal" href="">
+                                            <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}" alt="{{ document.name }}" class="px-3"
+                                                 style="height: 18px">
+                                            <span class="font-weight-normal {% if document.expired %}text-danger{% elif document.expiration|time_to_date <= 30 %}text-warning{% else %}text-black-50{% endif %}">
+                                                {{ document.name }}
+                                            </span>
+                                        </a>
+                                    </th>
+                                    <td class="text-right pr-4 align-items-center">
+                                        <a href="{% url 'download_client_document' client.slug document.id %}">
+                                            <i class="fas fa-download text-success" style="font-size: 0.7125rem"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                <!-- Watch File Modal -->
+                                <div aria-hidden="true"
+                                     aria-labelledby="watchDocumentModalLabel{{ document.id }}"
+                                     class="modal fade" id="watchDocumentModal{{ document.id }}"
+                                     role="dialog"
+                                     tabindex="-1">
+                                    <div class="modal-dialog my-6" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2 mb--1">
+                                                <h5 class="modal-title my-1"
+                                                    style="margin-left: auto">
+                                                    <i></i>
+                                                </h5>
+                                                <span class="ml-3 my-1"
+                                                      id="newPageModalLabel{{ document.id }}"
+                                                      style="margin-right: auto; font-size: 1.2rem"></span>
+                                                <button aria-label="Close" class="close mt--4"
+                                                        data-dismiss="modal"
+                                                        style="margin-left: -30px"
+                                                        type="button">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body py-0"
+                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <form action=""
+                                                      id="downloadFile{{ document.id }}"
+                                                      method="post">
+                                                    {% csrf_token %}
+                                                    {% load filters %}
+                                                    <div class="form-group mt--1"
+                                                         style="display: flex; justify-content: center">
+                                                        <img
+                                                                alt="New File"
+                                                                id="filePreviewModal{{ document.id }}"
+                                                                src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                                style="height: 130px"/>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-8 form-group form-control-label">
+                                                            <label for="fileName{{ document.id }}"
+                                                                   style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                            <input class="form-control" disabled
+                                                                   id="fileName{{ document.id }}"
+                                                                   type="text"
+                                                                   value="{{ document.name }}">
+                                                        </div>
+                                                        <div class="col-4 form-group form-control-label col">
+                                                            <label for="fileUploadUser{{ document.id }}"
+                                                                   style="font-size:0.8125rem; font-weight:600">Category</label>
+                                                            <input class="form-control" disabled
+                                                                   id="fileUploadUser{{ document.id }}"
+                                                                   type="text"
+                                                                   value="{{ document.category }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="form-group form-control-label col-lg-6">
+                                                            <label for="fileType{{ document.id }}"
+                                                                   style="font-size:0.8125rem; font-weight:600">Expiration</label>
+                                                            <input class="form-control" disabled
+                                                                   id="fileType{{ document.id }}"
+                                                                   type="text"
+                                                                   value="{{ document.expiration|date:'d/m/Y' }}">
+                                                        </div>
+                                                        <div class="form-group form-control-label col-lg-6">
+                                                            <label for="fileValue{{ document.id }}"
+                                                                   style="font-size:0.8125rem; font-weight:600">Uploaded
+                                                                at</label>
+                                                            <input class="form-control"
+                                                                   disabled
+                                                                   id="fileValue{{ document.id }}"
+                                                                   inputmode="decimal"
+                                                                   value="{{ document.uploaded_at|date:'d/m/Y' }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileDescription{{ document.id }}"
+                                                               style="font-size:0.8125rem; font-weight:600">Description</label>
+                                                        <textarea class="form-control"
+                                                                  disabled
+                                                                  id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" data-dismiss="modal"
+                                                        type="button">Cancel
+                                                </button>
+                                                <button class="btn btn-danger text-white"
+                                                        data-dismiss="modal"
+                                                        data-target="#deleteConfirmDocument{{ document.id }}"
+                                                        data-toggle="modal">
+                                                    Delete
+                                                </button>
+                                                <a class="btn btn-success"
+                                                   href="">Download</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Confirm Modal -->
+                                <div aria-hidden="true"
+                                     aria-labelledby="deleteConfirmDocumentLabel{{ document.id }}"
+                                     class="modal fade" id="deleteConfirmDocument{{ document.id }}"
+                                     role="dialog"
+                                     tabindex="-1">
+                                    <div class="modal-dialog my-6" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2">
+                                                <h5 class="modal-title my-1"
+                                                    style="margin-left: auto">
+                                                    <i class="ni ni-fat-delete text-blue"
+                                                       style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                </h5>
+                                                <span class="ml-3 my-1"
+                                                      id="deleteConfirmModalLabel"
+                                                      style="margin-right: auto; font-size: 1.2rem">Are you sure?</span>
+                                                <button aria-label="Close" class="close mt--4"
+                                                        data-dismiss="modal"
+                                                        style="margin-left: -30px"
+                                                        type="button">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body py-0"
+                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <form action=""
+                                                      id="deleteConfirmDocumentForm{{ document.id }}"
+                                                      method="post">
+                                                    {% csrf_token %}
+                                                    <div class="form-group mt-4"
+                                                         style="display: flex; justify-content: center">
+                                                        <img
+                                                                alt="New File"
+                                                                id="filePreviewModal"
+                                                                src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                                style="height: 130px"/>
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileName{{ document.id }}"
+                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                        <input class="form-control" disabled
+                                                               id="fileName{{ document.id }}"
+                                                               type="text"
+                                                               value="{{ document.name|file_name_only_with_extension }}">
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" data-dismiss="modal"
+                                                        type="button">Cancel
+                                                </button>
+                                                <button class="btn btn-danger"
+                                                        form="deleteConfirmDocumentForm{{ document.id }}"
+                                                        type="submit">Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer align-items-center justify-content-center d-flex py-1
+                            {% if client.documents.all.count <= 6 %}border-top-0{% endif %}">
+                    {% if client.documents.all.count > 6 %}
+                        <i class="fas fa-ellipsis-h text-muted"></i>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        <!-- Projects Card -->
+        <!-- Stats + Links Column -->
         <div class="col-md-8">
-            <div class="card shadow" style="height: calc(100% - 30px)">
+            <!-- Stats Row -->
+            <div class="card-deck">
+                <div class="card bg-gradient-blue" style="min-width: 0; height: 140px">
+                    <div class="card-body p-4 ml-2">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">Projects</h5>
+                                <span class="h2 font-weight-bold mb-0 text-white">{{ client.projects.all.count }}</span>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#newProjectModal">New</a>
+                                    <hr class="my-1">
+                                    <a class="dropdown-item" href="{% url 'project_list' %}">See all</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge badge-dot pr-2">
+                            <i class="bg-success"></i>
+                            <span class="text-nowrap text-white pr-1">{{ finished_projects|default:0 }}</span>
+                            <span class="text-nowrap text-white font-weight-light">Finished</span>
+                            </span>
+                            <span class="badge badge-dot">
+                                <i class="bg-info"></i>
+                                <span class="text-nowrap text-white pr-1">{{ working_projects|default:0 }}</span>
+                                <span class="text-nowrap text-white font-weight-light">Working</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card {% if requests_to_attend > 0 %}bg-gradient-danger{% else %}bg-gradient-success{% endif %}" style="min-width: 0; height: 140px !important">
+                    <div class="card-body p-4 ml-2">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">Requests</h5>
+                                <span class="h2 font-weight-bold mb-0 text-white">{{ requests_to_attend|default:0 }}</span>
+                                <span class="h3 font-weight-normal mb-0 text-white">to attend</span>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" href="">See all</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="text-nowrap text-sm text-white font-weight-light">
+                                Total: {{ client.requests.all.count|default:0 }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Links Card -->
+            <div class="card shadow" style="min-height: 20rem"> {# height: calc(100% - 200px) #}
                 <div class="card-header">
                     <div class="row">
                         <div class="col align-items-center">
                             <span class="h5 font-weight-light mb-0 mr-sm-1">(0)</span>
-                            <span class="h3 mb-0">???</span>
+                            <span class="h3 mb-0">"Links"</span>
                         </div>
                         <div class="col-auto">
-                            <a class="btn btn-sm btn-neutral" href="">Button</a>
+                            <a class="btn btn-sm btn-neutral" href="">?</a>
                         </div>
                     </div>
                 </div>
                 <div class="card-body p-0 pb-2">
                     <ul class="list-group list-group-flush list" 
-                        style="height: 24.8rem; overflow: auto">
+                        style="overflow: auto">
                     </ul>
                 </div>
+                <div class="card-footer border-top-0 py-1"></div>
             </div>
         </div>
     </div>
