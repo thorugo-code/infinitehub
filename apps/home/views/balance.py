@@ -259,10 +259,10 @@ def home(request, sorted_by=None, sort_type=None, filters=None):
 
     all_bills, max_id = filter_bill_objects(filters)
 
-    bills_to_receive = all_bills.filter(income=True)
-    bills_received = all_bills.filter(income=True, paid=True)
-    bills_to_pay = all_bills.filter(income=False)
-    bills_paid = all_bills.filter(income=False, paid=True)
+    bills_to_receive = all_bills.filter(category__in=INCOME_CATEGORIES)
+    bills_received = all_bills.filter(category__in=INCOME_CATEGORIES, paid=True)
+    bills_to_pay = all_bills.filter(category__in=EXPENSE_CATEGORIES)
+    bills_paid = all_bills.filter(category__in=EXPENSE_CATEGORIES, paid=True)
     bills_pending = all_bills.filter(paid=False)
     bills_late = all_bills.filter(late=True)
 
@@ -362,9 +362,6 @@ def new_bill(request):
             fees=unmask_money(request.POST.get('fees', ''), currency),
             discount=unmask_money(request.POST.get('discount', ''), currency),
             total=unmask_money(request.POST.get('total', ''), currency),
-
-            # Boolean Fields
-            income=True if request.POST['income'] == 'true' else False,
 
             # Integer Fields
             installments=request.POST.get('installments', 0),
