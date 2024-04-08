@@ -198,9 +198,9 @@ def filter_bill_objects(filters):
 
             if category != 'all':
                 if category == 'income':
-                    bills = bills.filter(income=True)
+                    bills = bills.filter(category__in=INCOME_CATEGORIES)
                 elif category == 'expense':
-                    bills = bills.filter(income=False)
+                    bills = bills.filter(category__in=EXPENSE_CATEGORIES)
                 else:
                     bills = bills.filter(category=category)
 
