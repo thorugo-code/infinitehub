@@ -877,6 +877,48 @@
         </div>
     </div>
 
+    {#    <div class="container-fluid mt-2">#}
+    {#        <div class="row">#}
+    {#            <div class="col">#}
+    {#                <div class="accordion">#}
+    {#                    <div class="card shadow my-0">#}
+    {#                        <div class="card-header" id="heading1" role="button" data-toggle="collapse"#}
+    {#                             data-target="#collapse1" aria-expanded="true" aria-controls="collapse1">#}
+    {#                            <h5 class="mb-0">#}
+    {#                                <span class="heading">Accordion Item 1</span>#}
+    {#                            </h5>#}
+    {#                        </div>#}
+    {##}
+    {#                        <div id="collapse1" class="collapse show" aria-labelledby="heading1" data-parent=".accordion">#}
+    {#                            <div class="card-body">#}
+    {#                                Content for Accordion Item 1#}
+    {#                            </div>#}
+    {#                        </div>#}
+    {#                    </div>#}
+    {##}
+    {#                    <div class="card my-0 border-top" style="box-shadow: 0 0 0 0">#}
+    {#                        <div class="card-header" id="heading2" role="button" data-toggle="collapse"#}
+    {#                             data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">#}
+    {#                            <h5 class="mb-0">#}
+    {#                                <span class="heading">Accordion Item 2</span>#}
+    {#                            </h5>#}
+    {#                        </div>#}
+    {##}
+    {#                        <div id="collapse2" class="collapse" aria-labelledby="heading2" data-parent=".accordion">#}
+    {#                            <div class="card-body">#}
+    {#                                Content for Accordion Item 2#}
+    {#                            </div>#}
+    {#                        </div>#}
+    {#                    </div>#}
+    {##}
+    {#                    <!-- Add more accordion items as needed -->#}
+    {##}
+    {#                </div>#}
+    {##}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
+
     <div class="container-fluid">
         {% include "includes/footer.html" %}
     </div>
@@ -911,7 +953,7 @@
                         </div>
                     </div>
                     <div id="bills-to-receive" class="tabcontent">
-                        <form id="newBillReceiveForm" method="post" action="" {# {% url 'new_bill' %} #}
+                        <form id="newBillReceiveForm" method="post" action="{% url 'new_bill' %}"
                               enctype="multipart/form-data"
                               onsubmit=blockSubmit(event,'submitReceiveButton')>
                             {% csrf_token %}
@@ -1051,7 +1093,7 @@
                         </div>
                     </div>
                     <div id="bills-to-pay" class="tabcontent">
-                        <form id="newBillPayForm" method="post" action="" {# {% url 'new_bill' %} #}
+                        <form id="newBillPayForm" method="post" action="{% url 'new_bill' %}"
                               enctype="multipart/form-data" onsubmit=blockSubmit(event,'submitBillPayButton')>
                             {% csrf_token %}
                             <input type="hidden" name="income" value="false">
@@ -1180,7 +1222,7 @@
     <!-- Filter Modal -->
     <div class="modal fade" id="filterModal" tabindex="-1" role="dialog"
          aria-labelledby="filterModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog my-6" role="document">
             <div class="modal-content">
                 <div class="modal-header mt-2 align-items-center">
                     <h5 class="modal-title" style="margin-left: auto">
@@ -1569,12 +1611,20 @@
                 });
             }
 
-            setupInput($("#valueInput"));
+            setupInput($("#billValueInput"));
+            setupInput($("#billFeesInput"));
+            setupInput($("#billDiscountInput"));
+            setupInput($("#billReceiveTotalInput"));
             setupInput($("#billInstallmentsValueInput"));
+            setupInput($("#billPayValueInput"));
 
             for (let i = 1; i <= {{ max_id }}; i++) {
-                setupInput($("#inputValueDetails" + i));
+                setupInput($("#billValueInputDetails" + i));
+                setupInput($("#billFeesInputDetails" + i));
+                setupInput($("#billDiscountInputDetails" + i));
+                setupInput($("#billReceiveTotalInputDetails" + i));
                 setupInput($("#billInstallmentsValueInputDetails" + i));
+                setupInput($("#billPayValueInputDetails" + i));
             }
         });
     </script>
