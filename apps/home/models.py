@@ -71,24 +71,30 @@ def custom_upload_path_projects(instance, filename):
 
 
 def upload_path_bills(instance, filename):
-    office = instance.office.name.replace(" ", "_") if instance.office else 'none'
+    if instance.client:
+        path = instance.client.name.replace(" ", "_")
+    elif instance.office:
+        path = instance.office.name.replace(" ", "_")
+    else:
+        path = 'others'
+
     year = datetime.now().strftime('%Y')
     month = datetime.now().strftime('%m')
-    return f'proofs/bills/{office}/{year}/{month}/{filename}'
+    return f'proofs/bills/{path}/{year}/{month}/{filename}'
 
 
 def custom_upload_path_documents(instance, filename):
     if instance.user:
         collab_name = instance.user.get_full_name().replace(" ", "_")
-        category = instance.category.replace(" ", "_")
-        return f'documents/{collab_name}/{category}/{filename}'
+        path = f'collaborators/{collab_name}'
     elif instance.client:
         client_name = instance.client.name.replace(" ", "_")
-        category = instance.category.replace(" ", "_")
-        return f'documents/{client_name}/{category}/{filename}'
+        path = f'clients/{client_name}'
     else:
-        category = instance.category.replace(" ", "_")
-        return f'documents/others/{category}/{filename}'
+        path = 'others'
+
+    category = instance.category.replace(" ", "_") if instance.category else 'others'
+    return f'documents/{path}/{category}/{filename}'
 
 
 class Equipments(models.Model):
@@ -353,7 +359,7 @@ class Office(models.Model):
 
 class Client(models.Model):
     slug = models.SlugField(max_length=100, default='')
-    avatar = models.ImageField(upload_to='uploads/clients/avatar',
+    avatar = models.ImageField(upload_to='client_pics',
                                default='placeholder.webp')
 
     # Foreign Keys and Relationships

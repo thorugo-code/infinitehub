@@ -69,7 +69,7 @@ balance_urls = [
     # path('balance/new', balance.new_bill, name='new_bill'),
     # path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
     # path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
-    path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
+    # path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
 
     path('balance/order', balance.sort_and_filter_bills, name='sort_bills'),
     path('balance/filter', balance.filter_bills, name='filter_bills'),
@@ -78,8 +78,6 @@ balance_urls = [
     path('balance/filters:<str:filters>', balance.home, name='filtered_bills'),
     path('balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', balance.home,
          name='sorted_filtered_bills'),
-
-    path('balance/download-bill=<int:bill_id>', balance.download_bill, name='download_proof'),
 ]
 
 clients_list_urls = [
@@ -87,17 +85,12 @@ clients_list_urls = [
     path('clients/', clients.home, name='clients_home'),
 
     path('clients/new', clients.create, name='create_client'),
-
-    path('clients/delete=<int:client_id>', clients.delete, name='delete_client'),
+    path('clients/<slug:slug>/delete', clients.delete, name='delete_client'),
 
     path('clients/order', clients.sort, name='sort_clients'),
-
     path('clients/order:<str:sorted_by>-<str:sort_type>', clients.home, name='sorted_clients'),
-
     path('clients/filter', clients.filter_clients, name='filter_clients'),
-
     path('clients/filters:<str:filters>', clients.home, name='filtered_clients'),
-
     path('clients/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', clients.home,
          name='sorted_filtered_clients'),
 ]
@@ -106,16 +99,48 @@ client_page_urls = [
 
     path('clients/<slug:slug>', clients.details, name='client_details'),
     path('clients/<slug:slug>/edit', clients.details, name='edit_client'),
-    path('clients/<slug:slug>/delete', clients.delete, name='delete_client'),
+    path('clients/<slug:slug>/picture', clients.change_picture, name='change_client_picture'),
 
-    path('clients/<slug:slug>/new-doc', clients.new_document, name='new_client_document'),
-    path('clients/<slug:slug>/documents', clients.documents_page, name='client_documents'),
-    path('clients/<slug:slug>/download=<int:document_id>', clients.download_document, name='download_client_document'),
+]
+
+client_balance_urls = [
 
     path('clients/<slug:slug>/balance', clients.balance_page, name='client_balance'),
-    path('clients/<slug:slug>/balance/new', clients.new_bill, name='new_bill'),
-    path('clients/<slug:slug>/edit=<int:bill_id>/', clients.edit_bill, name='edit_bill'),
-    path('clients/<slug:slug>/balance/delete/<int:bill_id>', clients.delete_bill, name='delete_bill'),
+    path('clients/<slug:slug>/balance/new', clients.new_bill, name='new_client_bill'),
+    path('clients/<slug:slug>/edit=<int:bill_id>/', clients.edit_bill, name='edit_client_bill'),
+    path('clients/<slug:slug>/balance/change-status=<int:bill_id>', clients.change_status,
+         name='change_client_bill_status'),
+    path('clients/<slug:slug>/balance/delete/<int:bill_id>', clients.delete_bill, name='delete_client_bill'),
+    path('clients/<slug:slug>/balance/download-bill=<int:bill_id>', clients.download_bill, name='download_client_proof'),
+
+    path('clients/<slug:slug>/balance/order', clients.sort_and_filter_bills, name='sort_client_balance'),
+    path('clients/<slug:slug>/balance/filter', clients.filter_bills, name='filter_client_balance'),
+
+    path('clients/<slug:slug>/balance/order:<str:sorted_by>-<str:sort_type>', clients.balance_page,
+         name='sorted_client_balance'),
+    path('clients/<slug:slug>/balance/filters:<str:filters>', clients.balance_page, name='filtered_client_balance'),
+    path('clients/<slug:slug>/balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', clients.balance_page,
+         name='sorted_filtered_client_balance'),
+]
+
+client_documents_urls = [
+
+    path('clients/<slug:slug>/new-doc', clients.new_document, name='new_client_document'),
+    path('clients/<slug:slug>/edit-doc=<int:doc_id>', clients.new_document, name='edit_client_document'),
+    path('clients/<slug:slug>/delete-doc=<int:document_id>', clients.delete_document, name='delete_client_document'),
+    path('clients/<slug:slug>/documents', clients.documents_page, name='client_documents'),
+    path('clients/<slug:slug>/documents/download=<int:document_id>', clients.download_document,
+         name='download_client_document'),
+
+    path('clients/<slug:slug>/documents/order', clients.sort_and_filter_documents, name='sort_client_documents'),
+    path('clients/<slug:slug>/documents/filter', clients.filter_documents, name='filter_client_documents'),
+
+    path('clients/<slug:slug>/documents/order:<str:sorted_by>-<str:sort_type>', clients.documents_page,
+         name='sorted_client_documents'),
+    path('clients/<slug:slug>/documents/filters:<str:filters>', clients.documents_page, name='filtered_client_documents'),
+    path('clients/<slug:slug>/documents/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>',
+         clients.documents_page, name='sorted_filtered_client_documents'),
+
 ]
 
 collaborators_page_urls = [
@@ -209,9 +234,11 @@ base_urls = [
     re_path(r'^.*\.*', login.pages, name='pages'),
 ]
 
-urlpatterns = projects_list_urls + projects_page_urls + assets_urls + collaborators_page_urls + collaborators_list_urls
-urlpatterns += balance_urls + inventory_urls + profile_urls + clients_list_urls + offices_urls + client_page_urls
-urlpatterns += base_urls
+urlpatterns = [
+    *projects_list_urls, *projects_page_urls, *assets_urls, *collaborators_page_urls, *collaborators_list_urls,
+    *balance_urls, *inventory_urls, *profile_urls, *clients_list_urls, *offices_urls, *client_page_urls,
+    *client_balance_urls, *client_documents_urls, *base_urls
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

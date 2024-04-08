@@ -39,6 +39,11 @@ def change_picture(request):
 
     if request.method == 'POST':
         file = request.FILES['profilePicture']
+        previous_file = user_profile.avatar
+
+        if 'placeholder' not in previous_file.name and file:
+            previous_file.delete(save=False)
+
         user_profile.avatar = file
         user_profile.save()
 

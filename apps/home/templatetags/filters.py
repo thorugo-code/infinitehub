@@ -274,3 +274,8 @@ def check_group(value, group):
 
     elif group == 'collaborator':
         return value.endswith('@infinitefoundry.com')
+
+
+@register.filter(name='absolute')
+def absolute(value):
+    return abs(value)

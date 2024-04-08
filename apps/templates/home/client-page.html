@@ -50,9 +50,9 @@
                 <div class="card-body align-items-center py-5 py-lg-4" style="display: flex">
                     <div class="row px-md-4">
                         <div class="col-md-auto align-items-center mb-md-0 mb-3 justify-content-center" style="display: flex;">
-                            <a href="#" data-toggle="modal" data-target="#profilePictureModal">
+                            <a href="#" data-toggle="modal" data-target="#pictureModal">
                                 <img class="rounded-circle"
-                                     style="min-width: 110px; height: 110px; object-fit: cover; background-color: #fff; z-index: 1"
+                                     style="width: 110px; height: 110px; object-fit: cover; background-color: #fff; z-index: 1"
                                      src="{{ client.avatar.url }}" alt="{{ client.name }}">
                             </a>
                         </div>
@@ -130,38 +130,45 @@
                         <div class="text-light text-sm text-uppercase">Balance</div>
                         <div class="mt-2">
                             <sup class="{% if balance > 0 %}text-success{% elif balance < 0 %}text-danger{% else %}text-white{% endif %}">
-                                {{ currency|default:'$' }}
+                                {% if currency == 'BRL' %}
+                                    R$
+                                {% else %}
+                                    $
+                                {% endif %}
                             </sup>
                             <span class="h2 {% if balance > 0 %}text-success{% elif balance < 0 %}text-danger{% else %}text-white{% endif %}">
-                                {{ balance|default:'0.00' }}
+                                {{ balance|without_currency|default:'0.00' }}
                             </span>
                         </div>
-                        <div class="text-sm">
+                        <div class="text-sm mt-2">
                             {% if last_month_balance_percentage > 0 %}
                                 <span class="text-success font-weight-600">+ {{ last_month_balance_percentage }}%</span>
+                                <span class="text-light font-weight-light">|</span>
                             {% elif last_month_balance_percentage < 0 %}
-                                <span class="text-danger font-weight-600">- {{ last_month_balance_percentage }}%</span>
-                            {% else %}
-                                <span class="text-light font-weight-600">0%</span>
+                                <span class="text-danger font-weight-600">- {{ last_month_balance_percentage|absolute }}%</span>
+                                <span class="text-light font-weight-light">|</span>
                             {% endif %}
-                            <span class="text-light">({{ last_month_balance|default:'0' }})</span>
+                            <span class="text-light">{{ last_month_balance|default:'0' }}</span>
                             <small class="text-light font-weight-light">Last month</small>
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div class="col">
+                        <div class="col-xl">
                             <small class="text-light">Income: {{ income_percentage|default:0 }}%</small>
                             <div class="progress progress-xs my-2">
-                                <div class="progress-bar bg-success" style="width: {{ income_percentage|default:50 }}%"></div>
+                                <div class="progress-bar bg-success" style="width: {{ income_percentage }}%"></div>
                             </div>
                         </div>
-                        <div class="col"><small class="text-light">Expense: {{ income_percentage|default:0 }}%</small>
+                        <div class="col-xl">
+                            <small class="text-light">Expense: {{ expense_percentage|default:0 }}%</small>
                             <div class="progress progress-xs my-2">
-                                <div class="progress-bar bg-danger" style="width: {{ income_percentage|default:50 }}%"></div>
+                                <div class="progress-bar bg-danger" style="width: {{ expense_percentage }}%"></div>
                             </div>
                         </div>
                     </div>
-                    <a class="btn btn-sm btn-block btn-neutral mt-3" href="{% url 'client_balance' client.slug %}">Manage</a>
+                    <a class="btn btn-sm btn-block btn-primary mt-3" href="{% url 'client_balance' client.slug %}">
+                        Manage
+                    </a>
                 </div>
             </div>
             <div class="card">
@@ -184,7 +191,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive" style="max-height: 19.65rem; overflow-y: auto">
+                <div class="table-responsive" style="min-height: 4.3rem; max-height: 19.65rem; overflow-y: auto">
                     <table class="table align-items-center table-flush">
                         <tbody>
                             {% for document in client.documents.all %}
@@ -196,8 +203,8 @@
                                            data-toggle="modal" href="">
                                             <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}" alt="{{ document.name }}" class="px-3"
                                                  style="height: 18px">
-                                            <span class="font-weight-normal {% if document.expired %}text-danger{% elif document.expiration|time_to_date <= 30 %}text-warning{% else %}text-black-50{% endif %}">
-                                                {{ document.name }}
+                                            <span class="font-weight-normal {% if document.expired %}text-danger{% elif document.expiration|time_to_date <= 30 %}text-warning{% else %}text-dark{% endif %}">
+                                                {{ document.name|truncatechars:40 }}
                                             </span>
                                         </a>
                                     </th>
@@ -214,7 +221,7 @@
                                      class="modal fade" id="watchDocumentModal{{ document.id }}"
                                      role="dialog"
                                      tabindex="-1">
-                                    <div class="modal-dialog my-6" role="document">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header mt-2 mb--1">
                                                 <h5 class="modal-title my-1"
@@ -233,62 +240,55 @@
                                             </div>
                                             <div class="modal-body py-0"
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <form action=""
-                                                      id="downloadFile{{ document.id }}"
+                                                <form action="{% url 'edit_client_document' client.slug document.id %}"
+                                                      id="editFile{{ document.id }}"
                                                       method="post">
                                                     {% csrf_token %}
                                                     {% load filters %}
                                                     <div class="form-group mt--1"
                                                          style="display: flex; justify-content: center">
-                                                        <img
-                                                                alt="New File"
-                                                                id="filePreviewModal{{ document.id }}"
-                                                                src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                                style="height: 130px"/>
+                                                        <img alt="New File" id="filePreviewModal{{ document.id }}"
+                                                             src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                             style="height: 130px"/>
+                                                    </div>
+                                                    <div class="form-group form-control-label justify-content-center" style="display: flex">
+                                                        <span class="h5 mb-0 text-muted font-weight-light">
+                                                            uploaded: {{ document.uploaded_by.first_name }}
+                                                            {% if document.uploaded_by %}-{% endif %}
+                                                            {{ document.uploaded_at|date:'d/m/Y' }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileName{{ document.id }}"
+                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                        <input class="form-control" id="fileName{{ document.id }}"
+                                                               type="text" value="{{ document.name }}" name="name">
                                                     </div>
                                                     <div class="row">
-                                                        <div class="col-8 form-group form-control-label">
-                                                            <label for="fileName{{ document.id }}"
-                                                                   style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                            <input class="form-control" disabled
-                                                                   id="fileName{{ document.id }}"
-                                                                   type="text"
-                                                                   value="{{ document.name }}">
-                                                        </div>
-                                                        <div class="col-4 form-group form-control-label col">
-                                                            <label for="fileUploadUser{{ document.id }}"
-                                                                   style="font-size:0.8125rem; font-weight:600">Category</label>
-                                                            <input class="form-control" disabled
-                                                                   id="fileUploadUser{{ document.id }}"
-                                                                   type="text"
-                                                                   value="{{ document.category }}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group form-control-label col-lg-6">
+                                                        <div class="form-group form-control-label col-sm-6">
                                                             <label for="fileType{{ document.id }}"
                                                                    style="font-size:0.8125rem; font-weight:600">Expiration</label>
-                                                            <input class="form-control" disabled
-                                                                   id="fileType{{ document.id }}"
-                                                                   type="text"
-                                                                   value="{{ document.expiration|date:'d/m/Y' }}">
+                                                            <input class="form-control" id="fileType{{ document.id }}"
+                                                                   type="date" name="expiration"
+                                                                   value="{{ document.expiration|date:'Y-m-d' }}">
                                                         </div>
-                                                        <div class="form-group form-control-label col-lg-6">
-                                                            <label for="fileValue{{ document.id }}"
-                                                                   style="font-size:0.8125rem; font-weight:600">Uploaded
-                                                                at</label>
-                                                            <input class="form-control"
-                                                                   disabled
-                                                                   id="fileValue{{ document.id }}"
-                                                                   inputmode="decimal"
-                                                                   value="{{ document.uploaded_at|date:'d/m/Y' }}">
+                                                        <div class="col-sm-6 form-group form-control-label col">
+                                                            <label for="fileUploadUser{{ document.id }}"
+                                                                   style="font-size:0.8125rem; font-weight:600">Category</label>
+                                                            <select class="form-control" name="category"
+                                                                    id="fileUploadUser{{ document.id }}">
+                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>--Select--</option>
+                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>Category 1</option>
+                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>Category 2</option>
+                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>Category 3</option>
+                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>Category 4</option>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div class="form-group form-control-label">
                                                         <label for="fileDescription{{ document.id }}"
                                                                style="font-size:0.8125rem; font-weight:600">Description</label>
-                                                        <textarea class="form-control"
-                                                                  disabled
+                                                        <textarea class="form-control" name="description"
                                                                   id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
                                                     </div>
                                                 </form>
@@ -304,7 +304,12 @@
                                                     Delete
                                                 </button>
                                                 <a class="btn btn-success"
-                                                   href="">Download</a>
+                                                   href="{% url 'download_client_document' client.slug document.id %}">Download</a>
+                                                <button class="btn btn-primary text-white"
+                                                        type="submit"
+                                                        form="editFile{{ document.id }}">
+                                                    Save
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -336,17 +341,16 @@
                                             </div>
                                             <div class="modal-body py-0"
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <form action=""
+                                                <form action="{% url 'delete_client_document' client.slug document.id %}"
                                                       id="deleteConfirmDocumentForm{{ document.id }}"
                                                       method="post">
                                                     {% csrf_token %}
+                                                    <input type="hidden" name="redirect_to" value="client_details">
                                                     <div class="form-group mt-4"
                                                          style="display: flex; justify-content: center">
-                                                        <img
-                                                                alt="New File"
-                                                                id="filePreviewModal"
-                                                                src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                                style="height: 130px"/>
+                                                        <img alt="New File" id="filePreviewModal" style="height: 130px"
+                                                             src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                        />
                                                     </div>
                                                     <div class="form-group form-control-label">
                                                         <label for="fileName{{ document.id }}"
@@ -400,7 +404,7 @@
                                     <i class="fas fa-ellipsis-h"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#newProjectModal">New</a>
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#newPageModal">New</a>
                                     <hr class="my-1">
                                     <a class="dropdown-item" href="{% url 'project_list' %}">See all</a>
                                 </div>
@@ -428,15 +432,15 @@
                                 <span class="h2 font-weight-bold mb-0 text-white">{{ requests_to_attend|default:0 }}</span>
                                 <span class="h3 font-weight-normal mb-0 text-white">to attend</span>
                             </div>
-                            <div class="col-auto">
-                                <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="">See all</a>
-                                </div>
-                            </div>
+{#                            <div class="col-auto">#}
+{#                                <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"#}
+{#                                        aria-haspopup="true" aria-expanded="false">#}
+{#                                    <i class="fas fa-ellipsis-h"></i>#}
+{#                                </button>#}
+{#                                <div class="dropdown-menu dropdown-menu-right">#}
+{#                                    <a class="dropdown-item" href="">See all</a>#}
+{#                                </div>#}
+{#                            </div>#}
                         </div>
                         <div class="mt-3">
                             <span class="text-nowrap text-sm text-white font-weight-light">
@@ -451,11 +455,11 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col align-items-center">
-                            <span class="h5 font-weight-light mb-0 mr-sm-1">(0)</span>
-                            <span class="h3 mb-0">"Links"</span>
+                            <span class="h5 font-weight-light mb-0 mr-sm-1"></span>
+                            <span class="h3 mb-0"></span>
                         </div>
                         <div class="col-auto">
-                            <a class="btn btn-sm btn-neutral" href="">?</a>
+{#                            <a class="btn btn-sm btn-neutral" href=""></a>#}
                         </div>
                     </div>
                 </div>
@@ -473,9 +477,86 @@
     
 <!-- Footer -->
 <div class="container-fluid">
-
     {% include "includes/footer.html" %}
+</div>
 
+<!-- New Project Modal -->
+<div class="modal fade" id="newPageModal" tabindex="-1" role="dialog"
+         aria-labelledby="newPageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header mt-2">
+                <h5 class="modal-title" style="margin-left: auto">
+                    <i class="ni ni-bulb-61 text-blue" style="font-size: 2rem"></i>
+                </h5>
+                <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
+                      id="newPageModalLabel">New Project</span>
+                <button type="button" class="close mt--4" style="margin-left: -30px"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                <form id="newPageForm" method="post" action="{% url 'create_project' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="client" value="{{ client.id }}">
+                    <div class="row">
+                        <div class="col-sm-8 form-group form-control-label mb-3">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                   placeholder="">
+                        </div>
+                        <div class="col-sm-4 form-group form-control-label mb-3">
+                            <label for="country">Country</label>
+                            <select class="form-control" id="country" name="country">
+                                <option value="br">Brazil</option>
+                                <option value="pt">Portugal</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-control-label mb-3">
+                        <label for="choices-collaborators">
+                            Collaborators
+                        </label>
+                        <select id="choices-collaborators" name="collaborators-choice" multiple>
+                            {% for collaborator in collaborators %}
+                                <option value="{{ collaborator.id }}">{{ collaborator.user.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group form-control-label">
+                                <label for="start-date">Start</label>
+                                <input type="date" id="start-date" name="start_date"
+                                       class="form-control" required="" autofocus="">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group form-control-label">
+                                <label for="deadline-date">Deadline</label>
+                                <input type="date" id="deadline-date" name="deadline"
+                                       class="form-control" required="" autofocus="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-control-label">
+                        <label for="about">About</label>
+                        <textarea rows="4" class="form-control" id="about" name="about"
+                                  placeholder="A few words about the project ..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="createButton" form="newPageForm">
+                    Create
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
     
 <!-- New Document Modal -->
@@ -641,11 +722,73 @@
         </div>
     </div>
 </div>
+    
+<!-- Change Picture Modal -->
+<div class="modal fade" id="pictureModal" tabindex="-1" role="dialog"
+     aria-labelledby="pictureModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
+        <div class="modal-content">
+            <div class="modal-header mt-2">
+                <button type="button" class="close ml-auto mt--4" style="margin-left: -30px"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body py-0"
+                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                <form id="pictureForm" method="post"
+                      action="{% url 'change_client_picture' client.slug %}"
+                      enctype="multipart/form-data"
+                      onsubmit="disableButtons()">
+                    {% csrf_token %}
+                    <div class="form-group my-5 mb-0"
+                         style="display: flex; justify-content: center">
+                        <div class="card-profile-image align-items-center justify-content-center"
+                             style="background-color: #adb5bd00; height: 180px; display: flex">
+                            <input type="file" id="pictureInput" style="display: none"
+                                   accept="image/*" name="avatar" required>
+                            <label for="pictureInput">
+                                <img class="rounded-circle pointer-hover"
+                                     style="min-width: 230px; height: 230px; object-fit: cover; background-color: #fff; z-index: 1"
+                                     id="pictureAvatar"
+                                     src="{{ client.avatar.url|default:'/static/assets/img/icons/placeholder.webp' }}"
+                                     alt="Picture">
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        id="cancelButton">Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" form="pictureForm"
+                        id="uploadButton">Upload
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock content %}
 
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let tagsInput = document.getElementById('choices-collaborators');
+
+            let choices = new Choices(tagsInput, {
+                removeItemButton: true,
+                maxItemCount: 20,
+            });
+        });
+    </script>
 
     <script>
 
@@ -825,6 +968,25 @@
         }
 
         document.getElementById('documentInput').addEventListener('change', updateFileName);
+
+    </script>
+
+    <script>
+    
+        document.getElementById('pictureInput').addEventListener('change', function (event) {
+            const fileInput = event.target;
+            const previewImage = document.getElementById('pictureAvatar');
+
+            const file = fileInput.files[0];
+            if (file) {
+                // Read the selected file as a data URL and set it as the source of the image
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
     </script>
 

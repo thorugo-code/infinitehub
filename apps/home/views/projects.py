@@ -175,6 +175,11 @@ def change_picture(request, id):
 
     if request.method == 'POST':
         file = request.FILES['projectPicture']
+        previous_file = project.img
+
+        if 'placeholder' not in previous_file.name and file:
+            previous_file.delete(save=False)
+
         project.img = file
         project.save()
 
