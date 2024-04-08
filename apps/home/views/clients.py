@@ -277,7 +277,7 @@ def documents_page(request, slug, sorted_by=None, sort_type=None, filters=None):
     client = Client.objects.get(slug=slug)
     documents = filter_documents_objects(filters, slug)[0]
     if sorted_by is not None:
-        documents = documents.order_by(f'{"-" if sort_type == 'desc' else ""}{sorted_by}')
+        documents = documents.order_by(f'{"-" if sort_type == "desc" else ""}{sorted_by}')
 
     context = {
         'user_profile': Profile.objects.get(user=request.user),
@@ -488,7 +488,7 @@ def balance_page(request, slug, sorted_by=None, sort_type=None, filters=None):
         else:
             sort_string = sorted_by
 
-        bills = bills.order_by(f'{"-" if sort_type == 'desc' else ""}{sort_string}')
+        bills = bills.order_by(f'{"-" if sort_type == "desc" else ""}{sort_string}')
 
     income_bills = bills.filter(category__in=INCOME_CATEGORIES)
     expense_bills = bills.filter(category__in=EXPENSE_CATEGORIES)
