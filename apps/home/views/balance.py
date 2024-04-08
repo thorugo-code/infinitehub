@@ -7,6 +7,118 @@ from django.shortcuts import render, redirect
 from apps.home.models import Project, Profile, Office, Bill, Client, unmask_money
 
 
+INCOME_CATEGORIES = [
+    ############ Receita Bruta ###########
+    'Juros Obtidos',
+    'Integralização de capital',
+    'Rendimentos de aplicações financeiras',
+    'Vendas de mercadorias',
+    'Vendas de equipamentos',
+    'Prestação de serviços',
+    'Royalties',
+    'Outros não operacionais',
+]
+
+EXPENSE_CATEGORIES = [
+    ######### Deduções de impostos ########
+    'COFINS',
+    'CSLL',
+    'ICMS',
+    'IPI',
+    'IRPJ',
+    'PIS',
+    'ISS',
+    'Simples nacional',
+    'IRPJ trimestral',
+    'CSLL trimestral',
+    ############ Custos diretos ###########
+    'Custos diretos',
+    ########## Despesas comerciais ########
+    'Endomarketing',
+    'Taxa de propaganda e publicidade',
+    ### Despesas administrativas/gerais ###
+    'Agua',
+    'Aluguel',
+    'Aluguel de máquinas',
+    'Associações/Convênios',
+    'Cartorio/Documentos',
+    'Cetificado Digital',
+    'Combustível/Estacionamento',
+    'Condomínio',
+    'Consultoria',
+    'Contabilidade',
+    'Energia elétrica',
+    'Jurídico',
+    'Marketing e publicidade',
+    'Material de escritório',
+    'Monitoramento e segurança',
+    'Multas gerais',
+    'Reembolso geral',
+    'Seguro',
+    'Software/Sistemas',
+    'Suporte TI',
+    'Telefone/Internet/TV',
+    'Transporte/Uber',
+    'Uso interno',
+    'Viagem/Hospedagem',
+    'Depreciação e amortização',
+    ######## Despesas com ocupação #######
+    'Estadual',
+    'IPTU',
+    'Licenças/Alvarás',
+    'Municipal',
+    'Prefeitura',
+    'Sindicato patronal',
+    ########## Despesas pessoal ##########
+    'Adiantamento salarial',
+    'Alimentação',
+    'Contribuição sindical',
+    'FGTS',
+    'Imposto de renda IRPF',
+    'INSS',
+    'Medicina do trabalho',
+    'Premiação/Bonificação/Confraternização',
+    'Provisão 13',
+    'Provisão férias',
+    'Rescisão',
+    'Salário',
+    'Terceirização de pessoal',
+    'Treinamento',
+    'Uniforme/EPI',
+    'Vale transporte',
+    ###### Despesas de provisionados ######
+    'Amortização de empréstimo',
+    'FGTS 13',
+    'INSS 13',
+    'Pagamento 13',
+    'Pagamento férias',
+    ####### Despesas com manutenção #######
+    'Manutenção de veículos',
+    'Manutenção de equipamentos',
+    'Material de limpeza e higiene',
+    'Reparos/Obras',
+    'Utensílios',
+    ######### Despesas com banco ##########
+    'Tarifas bancárias',
+    ######### Despesas financeiras ########
+    'Cartão pré-pago',
+    'IOF/IR sobre aplicações',
+    'Juros e multa (atraso)',
+    'Juros empréstimos',
+    ############ Investimentos ############
+    'Aplicações financeiras',
+    'Equipamentos',
+    'Cotas outras empresas',
+    'Colaboradores',
+    'Veículos',
+    'Obras',
+    # Imposto de renda e contribuição social #
+    'Imposto de renda e contribuição social',
+]
+
+BALANCE_CATEGORIES = INCOME_CATEGORIES + EXPENSE_CATEGORIES
+
+
 def get_permission(request, permission_type, model='bill'):
     return request.user.has_perm(f'home.{permission_type}_{model}')
 
