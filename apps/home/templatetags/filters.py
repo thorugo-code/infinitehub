@@ -131,6 +131,10 @@ def office_name(value):
 def extract_from_key(value, key):
     key_pairs = value.split('&')
     extracted_value = [val for val in key_pairs if val.startswith(key)][0].split('=')[1]
+    if key == 'collaborators':
+        extracted_value = extracted_value.split('-')
+        return [int(val) for val in extracted_value]
+
     if extracted_value.isdigit():
         return int(extracted_value)
     elif '.' in extracted_value:

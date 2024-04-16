@@ -281,7 +281,7 @@
                             <!-- Collaborator Modal -->
                             <div class="modal fade" id="collaboratorModal{{ collab.id }}" tabindex="-1" role="dialog"
                                  aria-labelledby="filterModalLabel" aria-hidden="true">
-                                <div class="modal-dialog my-4" role="document" style="max-width: 500px">
+                                <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
                                 <div class="modal-content">
                                     <div class="modal-header mt-2 align-items-center">
                                         <button type="button" class="close mt--4 ml-auto"
@@ -370,7 +370,7 @@
                             <!-- Collaborator Fill Infos Modal -->
                             <div class="modal fade" id="collaboratorFillInfosModal{{ collab.id }}" tabindex="-1" role="dialog"
                                  aria-labelledby="filterModalLabel" aria-hidden="true">
-                                <div class="modal-dialog my-4" role="document" style="max-width: 500px">
+                                <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
                                     <div class="modal-content">
                                         <div class="modal-header mt-2 align-items-center">
                                             <h5 class="modal-title" style="margin-left: auto">
@@ -671,6 +671,20 @@
             element.addEventListener('input', function (event) {
                 formatCPF(event.target);
             });
+        });
+    </script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get the task ID from the fragment identifier in the URL
+            let collabId = window.location.hash.substring(1); // Assuming 'task' has length 12
+    
+            // If the task ID is not empty, trigger the modal
+            if (collabId) {
+                let modal = document.getElementById('collaboratorModal' + collabId);
+                let bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+            }
         });
     </script>
     

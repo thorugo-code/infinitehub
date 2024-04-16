@@ -172,6 +172,7 @@ class Project(models.Model):
     # Boolean Fields
     working = models.BooleanField(default=True)
     finished = models.BooleanField(default=False)
+    archive = models.BooleanField(default=False)
 
     # Date Fields
     start_date = models.DateField()
@@ -196,6 +197,10 @@ class Project(models.Model):
             completed_tasks = self.tasks.filter(completed=True).count()
 
             self.completition = int((completed_tasks / total_tasks) * 100)
+
+        if self.client:
+            if 'placeholder' in self.img.name and not 'placeholder' in self.client.avatar.name:
+                self.img = self.client.avatar
 
         super().save()
 

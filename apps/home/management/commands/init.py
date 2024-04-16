@@ -1,8 +1,5 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
-from apps.authentication.models import AuthEmail
-import django.db.utils
-from cryptography.fernet import Fernet
+from apps.home.models import Project
 
 
 class Command(BaseCommand):
@@ -10,20 +7,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        for user in User.objects.all():
-            if not user.is_superuser:
-                user.is_active = False
-                user.save()
+        for project in Project.objects.all():
+            if 'placeholder' in project.img.name:
+                project.save()
+                self.stdout.write(f'Project {self.style.SUCCESS(project.title)} picture was updated')
 
-            auth_email, created = AuthEmail.objects.get_or_create(user=user)
+            if not project.working:
+                project.archive = True
+                project.save()
+                self.stdout.write(f'Project {self.style.SUCCESS(project.title)} was archived')
 
-            if created:
-                auth_email.is_confirmed = False
-                key = Fernet.generate_key()
-                cipher_suite = Fernet(key)
-                token = cipher_suite.encrypt(user.username.encode())
-                auth_email.auth_token = token.decode()
-                auth_email.auth_key = key.decode()
-                auth_email.save()
-
-            self.stdout.write(self.style.SUCCESS(f'User {user.username} has been initialized.'))
+            if project.finished:
+                project.working = False
+                project.save()
+                self.stdout.write(f'Project {self.style.SUCCESS(project.title)} was set as not working')

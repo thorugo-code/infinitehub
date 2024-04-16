@@ -6,23 +6,26 @@ from apps.home.views import assets, collaborators, inventory, login, profile, pr
 projects_list_urls = [
 
     path('projects/create', projects.create_project, name='create_project'),
-
     path('projects/id=<int:id>/', projects.details, name='project_details'),
 
     path("projects/", projects.page_list, name="project_list"),
-
     path("projects/<str:situation>/", projects.page_list, name="project_list"),
 
     path('projects/id=<int:id>/delete', projects.delete, name='delete_project'),
-
-    path('projects/working/archive=<int:id>/redirect-to=<str:situation_page>', projects.archive,
+    path('projects/working/archive=<int:id>/redirect-to=<str:situation_page>', projects.change_archive,
          name='archive_project'),
-
-    path('projects/archive/unarchive=<int:id>/redirect-to=<str:situation_page>', projects.unarchive,
+    path('projects/archive/unarchive=<int:id>/redirect-to=<str:situation_page>', projects.change_archive,
          name='unarchive_project'),
-
     path('projects/change-status=<int:project_id>/redirect-to=<str:situation_page>', projects.change_project_status,
          name='change_project_status'),
+
+    path('projects/order', projects.sort_and_filter_projects, name='sort_projects'),
+    path('projects/filter', projects.filter_projects, name='filter_projects'),
+
+    path('projects/order:<str:sorted_by>-<str:sort_type>', projects.page_list, name='sorted_projects'),
+    path('projects/filters:<str:filters>', projects.page_list, name='filtered_projects'),
+    path('projects/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', projects.page_list,
+         name='sorted_filtered_projects'),
 ]
 
 projects_page_urls = [
