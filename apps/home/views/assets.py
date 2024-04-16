@@ -1,7 +1,7 @@
 from django.db.models import Sum, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
-from apps.home.models import UploadedFile, Profile
+from apps.home.models import UploadedFile, Profile, Client
 from django.core.paginator import Paginator
 import os
 
@@ -73,7 +73,8 @@ def assets_hub(request):
         'scripts_value': values_scripts if values_scripts is not None else 0,
         'unity_value': values_unity if values_unity is not None else 0,
         'others_value': values_others if values_others is not None else 0,
-        'user_profile': user_profile
+        'user_profile': user_profile,
+        # 'clients': Client.objects.all()
     }
 
     return render(request, "home/assetsPage.html", context)

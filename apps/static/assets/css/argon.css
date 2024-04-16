@@ -25875,3 +25875,7 @@ input.datetimepicker[data-color="yellow"] + .bootstrap-datetimepicker-widget but
     border: 0 !important;
     padding: .5rem .5rem .5rem !important;
 }
+
+.pointer-hover:hover {
+    cursor: pointer;
+}

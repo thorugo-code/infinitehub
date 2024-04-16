@@ -31,38 +31,39 @@
                 <div class="card">
                     <!-- Card header -->
                     <div class="card-header border-0">
-                        <h3 class="mb-0">{{ title }}</h3>
+                        <div class="row">
+                            <div class="col align-items-center d-flex">
+                                <small class="text-muted mb-0 mr-1">({{ files_list|length }})</small>
+                                <span class="h3 mb-0">{{ title }}</span>
+                            </div>
+                        </div>
                     </div>
                     <!-- Light table -->
                     <div class="table-responsive" style="min-height: 531.61px">
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
-                            <tr>
-                                <th scope="col" class="sort" data-sort="name" style="width: 40%">File</th>
-                                <th scope="col" class="sort" data-sort="client" style="width: 25%">Project</th>
-                                <th scope="col" class="sort" data-sort="area" style="width: 25%">Client</th>
-                                <th scope="col" class="sort" data-sort="value" style="width: 10%">Size</th>
-                                <th scope="col" style="width: 90px"></th>
-                            </tr>
+                                <tr>
+                                    <th scope="col" class="px-4" style="width: 0"></th>
+                                    <th scope="col" class="sort pl-0" data-sort="name" style="width: 30%">File</th>
+                                    <th scope="col" style="width: 20%">By</th>
+                                    <th scope="col" style="width: 14%">Category</th>
+                                    <th scope="col" class="sort" data-sort="client" style="width: 14%">Project</th>
+                                    <th scope="col" class="sort" data-sort="area" style="width: 14%">Client</th>
+                                    <th scope="col" class="sort" data-sort="value" style="width: 8%">Size</th>
+                                    <th scope="col" style="width: 0"></th>
+                                </tr>
                             </thead>
-
                             <tbody class="list">
+                            {% load filters %}
                             {% for file in files_list %}
                                 <tr>
-                                    <th scope="row">
+                                    <th scope="row" class="px-4">
                                         <a href="#" data-toggle="modal" data-target="#watchFileModal{{ file.pk }}"
                                            class="media align-items-center">
-                                            <div class="avatar mr-3">
-                                                <img
-                                                        style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
-                                                        alt="Image placeholder"
-                                                        src="/static/assets/img/icons/extensions/1x/{{ file.file.name|file_extension_icon }}">
-                                            </div>
-                                            <div class="media-body">
-                                                <span class="name mb-0 ml-2 text-sm"
-                                                      style="font-weight: 400; color: #525f7f">
-                                                    {{ file|file_name_only_with_extension|file_name_only|truncatechars:50 }}
-                                                </span>
+                                            <div class="avatar">
+                                                <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
+                                                     alt="Image placeholder"
+                                                     src="/static/assets/img/icons/extensions/1x/{{ file.file.name|file_extension_icon }}">
                                             </div>
                                         </a>
 
@@ -70,7 +71,7 @@
                                              tabindex="-1" role="dialog"
                                              aria-labelledby="watchFileModalLabel{{ file.pk }}"
                                              aria-hidden="true">
-                                            <div class="modal-dialog my-6" role="document">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header mt-2 mb--1">
                                                         <h5 class="modal-title my-1" style="margin-left: auto">
@@ -162,12 +163,11 @@
                                             </div>
                                         </div>
 
-
                                         <div class="modal fade" id="deleteConfirm{{ file.pk }}"
                                              tabindex="-1" role="dialog"
                                              aria-labelledby="deleteConfirmLabel{{ file.pk }}"
                                              aria-hidden="true">
-                                            <div class="modal-dialog my-6" role="document">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header mt-2">
                                                         <h5 class="modal-title my-1" style="margin-left: auto">
@@ -187,7 +187,7 @@
                                                          style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                         <form method="post"
                                                               id="deleteConfirmForm{{ file.pk }}"
-                                                              action="{% url 'delete_file_from_storage_with_category' category file.pk %}">
+                                                              action="{% url 'delete_file_from_storage' file.pk %}">
                                                             {% csrf_token %}
                                                             <div class="form-group mt-4"
                                                                  style="display: flex; justify-content: center">
@@ -222,8 +222,30 @@
                                         </div>
 
                                     </th>
+                                    <th scope="row" class="pl-0">
+                                        <a href="#" data-toggle="modal" data-target="#watchFileModal{{ file.pk }}"
+                                           class="media align-items-center">
+                                            <span class="name mb-0 text-sm"
+                                                  style="font-weight: 400; color: #525f7f">
+                                                {% if file.file.name|file_extension_icon == 'default.png' %}
+                                                    {{ file|truncatechars:50 }}
+                                                {% else %}
+                                                    {{ file|file_name_only|truncatechars:50 }}
+                                                {% endif %}
+                                            </span>
+                                        </a>
+                                    </th>
+                                    <td>
+                                        <span>{{ file.uploaded_by.get_full_name|truncatechars:30 }}</span>
+                                        <br>
+                                        <span class="text-muted">{{ file.uploaded_at|date:'d/m/y' }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ file.category|title }}</span>
+                                    </td>
                                     <td>
                                         {{ file.project.title|truncatechars:30 }}
+                                    </td>
                                     <td>
                                         {{ file.project.client.name|default:file.project.client_str|truncatechars:30 }}
                                     </td>
@@ -231,8 +253,6 @@
                                         {{ file.file.size|filesizeformat }}
                                     </td>
                                     <td class="text-right">
-
-
                                         <div class="dropdown">
                                             <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -240,7 +260,7 @@
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                                 {% if file.project %}
-                                                    <a class="dropdown-item" href="/projects/id={{ file.project.id }}/">Go to
+                                                    <a class="dropdown-item" href="{% url 'project_details' file.project.id %}">Go to
                                                         project</a>
                                                     <div class="dropdown-divider"></div>
                                                 {% endif %}
