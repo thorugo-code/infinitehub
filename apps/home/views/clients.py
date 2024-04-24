@@ -1,21 +1,24 @@
-import datetime
+import json
+from datetime import datetime, timedelta
 from django.db.models import Q, Sum, F
 from django.shortcuts import render, redirect, get_object_or_404
-from apps.home.models import Profile, Client, Office, Document, Bill, BillInstallment
+from apps.home.models import Profile, Client, Office, Document, Bill, BillInstallment, Branch
 from django.contrib.auth.models import User
 from apps.home.views.balance import INCOME_CATEGORIES, EXPENSE_CATEGORIES, unmask_money, check_late_bills
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
+from core.settings import CORE_DIR
+from django.core.serializers import serialize
 
 
 def check_expired_documents():
-    expired_documents = Document.objects.filter(Q(expiration__lt=datetime.datetime.now().date()) & Q(expired=False))
+    expired_documents = Document.objects.filter(Q(expiration__lt=datetime.now().date()) & Q(expired=False))
     for doc in expired_documents:
         doc.expired = True
         doc.save()
 
     unexpected_expired_documents = Document.objects.filter(
-        Q(expiration__gt=datetime.datetime.now().date()) & Q(expired=True))
+        Q(expiration__gt=datetime.now().date()) & Q(expired=True))
     for doc in unexpected_expired_documents:
         doc.expired = False
         doc.save()
@@ -203,7 +206,7 @@ def details(request, slug):
     total_expense = sum([bill.total for bill in expense_bills])
 
     last_month_bills = client_bills.filter(
-        paid_at__gte=datetime.datetime.now().date() - datetime.timedelta(days=30)
+        paid_at__gte=datetime.now().date() - timedelta(days=30)
     )
 
     last_month_bills_income = last_month_bills.filter(category__in=INCOME_CATEGORIES)
@@ -230,6 +233,10 @@ def details(request, slug):
     else:
         last_month_percentage = 0
 
+    bills_in_progress = Bill.objects.filter(
+        client=client, paid=False, due_date__lt=datetime.now().date() + timedelta(days=40)
+    ).order_by('due_date')
+
     context = {
         'currency': 'BRL',  # TODO: Change to currency variable when implemented
         'user_profile': Profile.objects.get(user=request.user),
@@ -241,6 +248,13 @@ def details(request, slug):
         'expense_percentage': round(expense_percentage),
         'last_month_balance': last_month_balance,
         'last_month_balance_percentage': round(last_month_percentage, 1),
+        'income_categories': INCOME_CATEGORIES,
+        'expense_categories': EXPENSE_CATEGORIES,
+        'bills_in_progress': bills_in_progress,
+        'bills_in_progress_max_id': bills_in_progress.order_by('-id').first().id if bills_in_progress.count() > 0 else 0,
+        'offices': Office.objects.all(),
+        'world': json.load(open(f'{CORE_DIR}/apps/static/assets/world.json', 'r', encoding='utf-8')),
+        'highlight_documents': Document.objects.filter(client=client).order_by('-id')[:5],
     }
 
     return render(request, 'home/client-page.html', context)
@@ -265,6 +279,59 @@ def change_picture(request, slug):
     return redirect('client_details', slug=client.slug)
 
 
+def new_branch(request, slug):
+    if not get_permission(request, 'add', 'branch'):
+        return render(request, 'home/page-404.html')
+
+    client = Client.objects.get(slug=slug)
+
+    if request.method == 'POST':
+        branch = Branch(
+            client=client,
+            name=request.POST.get('name', ''),
+            country=request.POST.get('country', ''),
+            state=request.POST.get('state', ''),
+            city=request.POST.get('city', ''),
+            address=request.POST.get('address', ''),
+        )
+
+        branch.save()
+
+        return redirect('client_details', slug=client.slug)
+
+    return redirect('client_details', slug=client.slug)
+
+
+def edit_branch(request, slug, branch_id):
+    if not get_permission(request, 'change', 'branch'):
+        return render(request, 'home/page-404.html')
+
+    branch = Branch.objects.get(id=branch_id)
+
+    if request.method == 'POST':
+        branch.name = request.POST.get('name', branch.name)
+        branch.country = request.POST.get('country', branch.country)
+        branch.state = request.POST.get('state', branch.state)
+        branch.city = request.POST.get('city', branch.city)
+        branch.address = request.POST.get('address', branch.address)
+
+        branch.save()
+
+        return redirect('client_details', slug=slug)
+
+    return redirect('client_details', slug=slug)
+
+
+def delete_branch(request, slug, branch_id):
+    if not get_permission(request, 'delete', 'branch'):
+        return render(request, 'home/page-404.html')
+
+    branch = Branch.objects.get(id=branch_id)
+    branch.delete()
+
+    return redirect('client_details', slug=slug)
+
+
 ############################################
 
 
@@ -276,8 +343,10 @@ def documents_page(request, slug, sorted_by=None, sort_type=None, filters=None):
 
     client = Client.objects.get(slug=slug)
     documents = filter_documents_objects(filters, slug)[0]
-    if sorted_by is not None:
+    if sorted_by is not None and sorted_by != 'regional':
         documents = documents.order_by(f'{"-" if sort_type == "desc" else ""}{sorted_by}')
+    elif sorted_by is not None and sorted_by == 'regional':
+        documents = documents.order_by(f'{"-" if sort_type == "desc" else ""}branch__name')
 
     context = {
         'user_profile': Profile.objects.get(user=request.user),
@@ -304,6 +373,7 @@ def new_document(request, slug, doc_id=None):
         if not doc_id:
             document = Document(
                 client=client,
+                branch=Branch.objects.get(id=request.POST['branch_id']) if request.POST.get('branch_id') else None,
                 uploaded_by=User.objects.get(username=request.user.username),
                 name=request.POST.get('name', ''),
                 expiration=expiration if expiration else None,
@@ -313,6 +383,7 @@ def new_document(request, slug, doc_id=None):
             )
         else:
             document = Document.objects.get(id=doc_id)
+            document.branch = Branch.objects.get(id=request.POST['branch_id']) if request.POST.get('branch_id') else document.branch
             document.name = request.POST.get('name', document.name)
             document.expiration = expiration if expiration else None
             document.category = request.POST.get('category', document.category)
@@ -405,13 +476,14 @@ def filter_documents_objects(filters, slug):
     if filters is not None:
         filters_list = filters.split('&')
 
-        category = 'all'
+        category, regional = 'all', 'all'
         from_date, to_date = False, False
 
         for item in filters_list:
-            from_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('from') else from_date
-            to_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('to') else to_date
+            from_date = datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('from') else from_date
+            to_date = datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('to') else to_date
             category = item.split('=')[1] if item.startswith('category') else category
+            regional = item.split('=')[1] if item.startswith('regional') else regional
 
             if from_date and to_date and from_date < to_date:
                 documents = documents.filter(expiration__gte=from_date)
@@ -424,6 +496,9 @@ def filter_documents_objects(filters, slug):
             if category != 'all':
                 documents = documents.filter(category=category)
 
+            if regional != 'all':
+                documents = documents.filter(branch__id=regional)
+
     return documents, documents.order_by('-id').first().id if documents.count() > 0 else 0
 
 
@@ -431,11 +506,13 @@ def filter_documents(request, slug):
     from_date = request.POST['from']
     to_date = request.POST['to']
     category = request.POST['category']
+    regional = request.POST['regional']
 
     filter_list = [
         f'from={from_date}' if from_date != '' and from_date != to_date else '%',
         f'to={to_date}' if to_date != '' and from_date != to_date else '%',
         f'category={category}' if category != 'all' else '%',
+        f'regional={regional}' if regional != 'all' else '%',
     ]
 
     # Convert the list to a string with appropriate format, avoiding empty values
@@ -485,10 +562,15 @@ def balance_page(request, slug, sorted_by=None, sort_type=None, filters=None):
             sort_string = sorted_by
         elif sorted_by == 'office':
             sort_string = 'office__name'
+        elif sorted_by == 'payer':
+            sort_string = 'payer__name'
         else:
             sort_string = sorted_by
 
-        bills = bills.order_by(f'{"-" if sort_type == "desc" else ""}{sort_string}')
+        if sorted_by == 'code':
+            bills = bills.order_by(f'{"-" if sort_type == "desc" else ""}code', f'{"-" if sort_type == "desc" else ""}link')
+        else:
+            bills = bills.order_by(f'{"-" if sort_type == "desc" else ""}{sort_string}')
 
     income_bills = bills.filter(category__in=INCOME_CATEGORIES)
     expense_bills = bills.filter(category__in=EXPENSE_CATEGORIES)
@@ -505,13 +587,14 @@ def balance_page(request, slug, sorted_by=None, sort_type=None, filters=None):
         'expense': sum([bill.total for bill in expense_bills]),
         'pending_expense': sum([bill.total for bill in expense_bills if not bill.paid]),
         'late_expense': sum([bill.total for bill in expense_bills if bill.late]),
-        'documents': Bill.objects.filter(client=client),
         'income_categories': sorted(INCOME_CATEGORIES),
         'expense_categories': sorted(EXPENSE_CATEGORIES),
         'offices': Office.objects.all(),
         'sorted_by': sorted_by,
         'sort_type': sort_type,
         'filters': filters,
+        'min_value': str(bills.order_by('total').first().total)[2:].replace(',', '') if bills.count() > 0 else 0,
+        'max_value': str(bills.order_by('-total').first().total)[2:].replace(',', '') if bills.count() > 0 else 0,
     }
 
     return render(request, 'home/client-balance.html', context)
@@ -529,6 +612,7 @@ def new_bill(request, slug):
         bill = Bill(
             # Foreign Keys
             client=Client.objects.get(slug=slug),
+            payer=Branch.objects.get(id=request.POST['payer_id']) if request.POST.get('payer_id') != '' else None,
             office=Office.objects.get(id=request.POST['office_id']) if request.POST.get('office_id') != '' else None,
             created_by=request.user,
             # Char Fields
@@ -536,6 +620,7 @@ def new_bill(request, slug):
             category=request.POST.get('category', ''),
             method=request.POST.get('method', ''),
             origin=request.POST.get('origin', ''),
+            code=request.POST.get('code', ''),
             # Date Fields
             due_date=request.POST.get('due_date', None) if request.POST.get('due_date', None) != '' else None,
             # Money Fields
@@ -544,12 +629,14 @@ def new_bill(request, slug):
             installments_number=request.POST.get('installments', 0),
             # File Fields
             proof=request.FILES.get('proof', None),
+            # URL Fields
+            link=request.POST.get('link', None),
         )
 
         status = request.POST.get('status', 'Pending')
         if 'Paid' in status:
             bill.paid = True
-            bill.paid_at = datetime.datetime.now()
+            bill.paid_at = datetime.now()
 
         if 'reconciled' in status:
             bill.reconciled = True
@@ -601,6 +688,9 @@ def delete_bill(request, slug, bill_id):
 
     bill.delete()
 
+    if request.POST.get('client_page', False):
+        return redirect('client_details', slug=slug)
+
     sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
     filters = request.POST.get('filters', 'None')
@@ -628,13 +718,18 @@ def edit_bill(request, slug, bill_id):
         due_date = request.POST.get('due_date', bill.due_date)
         currency = request.POST.get('currency', 'USD')
         bill.client = Client.objects.get(slug=request.POST['client_slug'])
+        bill.payer = Branch.objects.get(id=request.POST['payer_id']) if request.POST.get(
+            'payer_id') else bill.payer if request.POST.get('payer_id') != '' else None
         bill.office = Office.objects.get(id=request.POST['office_id']) if request.POST.get(
             'office_id') else bill.office if request.POST.get('office_id') != '' else None
         bill.title = request.POST.get('title', bill.title)
         bill.category = request.POST.get('category', bill.category)
         bill.method = request.POST.get('method', bill.method)
+        bill.origin = request.POST.get('origin', bill.origin)
         bill.due_date = due_date if due_date != '' else None
         bill.total = unmask_money(request.POST['total'], currency) if request.POST.get('total') else bill.total
+        bill.code = request.POST.get('code', bill.code)
+        bill.link = request.POST.get('link', bill.link)
 
         installments_number_from_form = int(request.POST.get('installments', 0))
         installments_value_from_form = unmask_money(request.POST.get('installments_value', ''), currency)
@@ -666,6 +761,9 @@ def edit_bill(request, slug, bill_id):
             bill.proof = request.FILES.get('proof', bill.proof)
 
         bill.save()
+
+        if request.POST.get('client_page', False):
+            return redirect('client_details', slug=slug)
 
     sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
@@ -704,7 +802,7 @@ def change_status(request, slug, bill_id):
     reconcile = request.POST.get('reconcile', False)
 
     if not bill.paid:
-        bill.paid_at = datetime.datetime.now()
+        bill.paid_at = request.POST.get('bill_paid_at', datetime.now())
     else:
         bill.paid_at = None
 
@@ -714,6 +812,9 @@ def change_status(request, slug, bill_id):
         bill.reconciled = True
 
     bill.save()
+
+    if request.POST.get('client_page', False):
+        return redirect('client_details', slug=slug)
 
     sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
@@ -752,63 +853,71 @@ def filter_bill_objects(filters, slug):
     if filters is not None:
         filters_list = filters.split('&')
 
-        office, method, category, client = 'all', 'all', 'all', 'all'
-        from_date, to_date = False, False
-        late, paid, pending = True, True, True
-        min_value, max_value = None, None
+        office, method, category, payer, origin, installments, code = ['all'] * 7
+        from_date, to_date = [False] * 2
+        late, paid, pending = [True] * 3
+        min_value, max_value = [None] * 2
 
         for item in filters_list:
+            payer = item.split('=')[1] if item.startswith('payer') else payer
             office = item.split('=')[1] if item.startswith('office') else office
-            from_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('from') else from_date
-            to_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('to') else to_date
+            from_date = datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('from') else from_date
+            to_date = datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('to') else to_date
             method = item.split('=')[1] if item.startswith('method') else method
-            client = item.split('=')[1] if item.startswith('client') else client
             category = item.split('=')[1] if item.startswith('category') else category
+            origin = item.split('=')[1] if item.startswith('origin') else origin
+            installments = item.split('=')[1] if item.startswith('installments') else installments
+            code = item.split('=')[1] if item.startswith('code') else code
             late = item.split('=')[1] if item.startswith('late') else late
             paid = item.split('=')[1] if item.startswith('paid') else paid
             pending = item.split('=')[1] if item.startswith('pending') else pending
             min_value = item.split('=')[1] if item.startswith('value_min') else min_value
             max_value = item.split('=')[1] if item.startswith('value_max') else max_value
 
-            if office != 'all':
-                bills = bills.filter(office__id=int(office))
+        if payer != 'all':
+            bills = bills.filter(payer__id=int(payer))
 
-            if from_date and to_date and from_date < to_date:
-                bills = bills.filter(due_date__gte=from_date)
-                bills = bills.filter(due_date__lte=to_date)
-            elif from_date:
-                bills = bills.filter(due_date__gte=from_date)
-            elif to_date:
-                bills = bills.filter(due_date__lte=to_date)
+        if office != 'all':
+            bills = bills.filter(office__id=int(office))
 
-            if method != 'all':
-                bills = bills.filter(method=method)
+        if from_date and to_date and from_date < to_date:
+            bills = bills.filter(due_date__gte=from_date)
+            bills = bills.filter(due_date__lte=to_date)
+        elif from_date:
+            bills = bills.filter(due_date__gte=from_date)
+        elif to_date:
+            bills = bills.filter(due_date__lte=to_date)
 
-            if client != 'all':
-                bills = bills.filter(client__id=client)
+        if method != 'all':
+            bills = bills.filter(method=method.replace('-', ' ').capitalize())
 
-            if category != 'all':
+        if category != 'all':
+            if category == 'income':
+                bills = bills.filter(category__in=INCOME_CATEGORIES)
+            elif category == 'expense':
+                bills = bills.filter(category__in=EXPENSE_CATEGORIES)
+            else:
                 bills = bills.filter(category=category)
 
-            if late == 'false':
-                bills = bills.filter(late=False)
+        if late == 'false':
+            bills = bills.filter(late=False)
 
-            if paid == 'false':
-                bills = bills.filter(paid=False)
+        if paid == 'false':
+            bills = bills.filter(paid=False)
 
-            if pending == 'false':
-                bills = bills.filter(Q(paid=True, late=False) | Q(paid=False, late=True))
+        if pending == 'false':
+            bills = bills.filter(Q(paid=True, late=False) | Q(paid=False, late=True))
 
-            if min_value:
-                bills = bills.filter(total__gte=min_value)
+        if min_value:
+            bills = bills.filter(total__gte=min_value)
 
-            if max_value:
-                bills = bills.filter(total__lte=max_value)
+        if max_value:
+            bills = bills.filter(total__lte=max_value)
 
     return bills, bills.order_by('-id').first().id if bills.count() > 0 else 0
 
 
-def filter_bills(request):
+def filter_bills(request, slug):
     universal_min_value = str(Bill.objects.all().order_by('total').first().total).replace(
         '$' if request.POST.get('currency', 'BRL') == 'USD' else 'R$' if request.POST.get('currency',
                                                                                           'BRL') == 'BRL' else '€',
@@ -818,12 +927,15 @@ def filter_bills(request):
                                                                                           'BRL') == 'BRL' else '€',
         '').replace(',', '') if Bill.objects.all().count() > 0 else 0
 
+    payer = request.POST['payer']
     office = request.POST['office']
-    from_date = request.POST['start_date']
-    to_date = request.POST['end_date']
-    method = request.POST['method']
-    client = request.POST['client']
+    from_date = request.POST['from']
+    to_date = request.POST['to']
     category = request.POST['category']
+    origin = request.POST['origin']
+    method = request.POST['method']
+    installments = request.POST['installments']
+    code = request.POST['code']
     late = request.POST.get('late_filter', 'false')
     paid = request.POST.get('paid_filter', 'false')
     pending = request.POST.get('pending_filter', 'false')
@@ -831,17 +943,20 @@ def filter_bills(request):
     max_value = request.POST['range_value_high']
 
     filter_list = [
-        f'office={office}' if office != 'all' else '%',
-        f'from={from_date}' if from_date != '' and from_date != to_date else '%',
-        f'to={to_date}' if to_date != '' and from_date != to_date else '%',
-        f'method={method}' if method != 'all' else '%',
-        f'client={client}' if client != 'all' else '%',
-        f'category={category}' if category != 'all' else '%',
+        f'payer={payer}' if payer else '%',
+        f'office={office}' if office else '%',
+        f'from={from_date}' if from_date and from_date != to_date else '%',
+        f'to={to_date}' if to_date and from_date != to_date else '%',
+        f'method={method}' if method else '%',
+        f'category={category}' if category else '%',
+        f'origin={origin}' if origin else '%',
+        f'installments={installments}' if installments else '%',
+        f'code={code}' if code else '%',
         f'late={late}' if late == 'false' else '%',
         f'paid={paid}' if paid == 'false' else '%',
         f'pending={pending}' if pending == 'false' else '%',
-        f'value_min={min_value}' if min_value != '' and min_value != universal_min_value else '%',
-        f'value_max={max_value}' if max_value != '' and max_value != universal_max_value else '%',
+        f'value_min={min_value}' if min_value and min_value != universal_min_value else '%',
+        f'value_max={max_value}' if max_value and max_value != universal_max_value else '%',
     ]
 
     # Convert the list to a string with appropriate format, avoiding empty values
@@ -859,12 +974,12 @@ def filter_bills(request):
         return redirect('sorted_filtered_client_balance',
                         sorted_by=request.POST['sort_by'].replace('_', '-'),
                         sort_type=request.POST['sort_type'],
-                        filters=filter_string)
+                        filters=filter_string, slug=slug)
     elif filter_string == '%' and request.POST['sort_by'] != 'None':
         return redirect('sorted_client_balance',
                         sorted_by=request.POST['sort_by'].replace('_', '-'),
-                        sort_type=request.POST['sort_type'])
+                        sort_type=request.POST['sort_type'], slug=slug)
     elif filter_string == '%':
-        return redirect('client_balance')
+        return redirect('client_balance', slug=slug)
     else:
-        return redirect('filtered_client_balance', filters=filter_string)
+        return redirect('filtered_client_balance', filters=filter_string, slug=slug)

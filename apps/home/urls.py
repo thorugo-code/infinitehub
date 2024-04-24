@@ -67,22 +67,22 @@ assets_urls = [
 
 balance_urls = [
 
-    path('balance/', balance.home, name='balance_page'),
-
-    path('balance/new', balance.new_bill, name='new_bill'),
-    path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
-    path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
-    path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
-
-    path('balance/order', balance.sort_and_filter_bills, name='sort_bills'),
-    path('balance/filter', balance.filter_bills, name='filter_bills'),
-
-    path('balance/order:<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
-    path('balance/filters:<str:filters>', balance.home, name='filtered_bills'),
-    path('balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', balance.home,
-         name='sorted_filtered_bills'),
-
-    path('balance/download-bill=<int:bill_id>', balance.download_bill, name='download_proof'),
+    # path('balance/', balance.home, name='balance_page'),
+    #
+    # path('balance/new', balance.new_bill, name='new_bill'),
+    # path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
+    # path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
+    # path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
+    #
+    # path('balance/order', balance.sort_and_filter_bills, name='sort_bills'),
+    # path('balance/filter', balance.filter_bills, name='filter_bills'),
+    #
+    # path('balance/order:<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
+    # path('balance/filters:<str:filters>', balance.home, name='filtered_bills'),
+    # path('balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', balance.home,
+    #      name='sorted_filtered_bills'),
+    #
+    # path('balance/download-bill=<int:bill_id>', balance.download_bill, name='download_proof'),
 ]
 
 clients_list_urls = [
@@ -105,6 +105,10 @@ client_page_urls = [
     path('clients/<slug:slug>', clients.details, name='client_details'),
     path('clients/<slug:slug>/edit', clients.details, name='edit_client'),
     path('clients/<slug:slug>/picture', clients.change_picture, name='change_client_picture'),
+
+    path('clients/<slug:slug>/new-branch', clients.new_branch, name='new_client_branch'),
+    path('clients/<slug:slug>/edit-branch=<int:branch_id>', clients.edit_branch, name='edit_client_branch'),
+    path('clients/<slug:slug>/delete-branch=<int:branch_id>', clients.delete_branch, name='delete_client_branch'),
 
 ]
 

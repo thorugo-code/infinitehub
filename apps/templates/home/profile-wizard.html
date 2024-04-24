@@ -332,28 +332,23 @@
     </script>
 
     <script>
-        // Wait for the DOM to be ready
+
         document.addEventListener("DOMContentLoaded", function () {
-            // Get the user's saved country, state, and city
             const userCountry = '{{ user.country }}';
             const userState = '{{ user.state }}';
             const userCity = '{{ user.city }}';
 
-            // Set the user's country in the dropdown
             countryDropdown.value = userCountry;
 
-            // Load states based on the user's country
             loadStates();
 
-            // Set the user's state in the dropdown
             stateDropdown.value = userState;
 
-            // Load cities based on the user's state
             loadCities();
 
-            // Set the user's city in the dropdown
             cityDropdown.value = userCity;
         });
+        
     </script>
 
 {% endblock javascript %}

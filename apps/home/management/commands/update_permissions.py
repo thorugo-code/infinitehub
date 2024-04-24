@@ -39,12 +39,15 @@ class Command(BaseCommand):
             'change_office',
             'delete_office',
             'view_office',
+            'add_branch',
+            'change_branch',
+            'delete_branch',
+            'view_branch',
         ]
 
         collaborators_permissions_list = [
             'view_client',
             'view_office',
-            'view_client',
         ]
 
         staff_permissions_list = [

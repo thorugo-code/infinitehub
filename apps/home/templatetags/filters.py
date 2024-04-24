@@ -1,6 +1,6 @@
 from django import template
 from django.template.defaultfilters import stringfilter
-from apps.home.models import Office
+from apps.home.models import Office, Branch
 from datetime import datetime
 
 register = template.Library()
@@ -283,3 +283,27 @@ def check_group(value, group):
 @register.filter(name='absolute')
 def absolute(value):
     return abs(value)
+
+
+@register.filter(name='get_states')
+def get_states(value):
+    try:
+        return {branch.id: branch.state for branch in value}
+    except ValueError:
+        return None
+
+
+@register.filter(name='get_cities')
+def get_cities(value):
+    try:
+        return {branch.id: branch.city for branch in value}
+    except ValueError:
+        return None
+
+
+@register.filter(name='add_string')
+def add_string(value, arg):
+    try:
+        return str(value) + str(arg)
+    except ValueError:
+        return ""

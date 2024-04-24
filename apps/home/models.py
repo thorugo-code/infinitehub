@@ -404,10 +404,26 @@ class Client(models.Model):
             pass
 
 
-# Add currency
+class Branch(models.Model):
+    # Foreign Keys and Relationships
+    client = models.ForeignKey(Client, related_name='branches', on_delete=models.CASCADE)
+
+    # Char Fields
+    name = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    address = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f'{self.name} ({self.client.name})'
+
+
+# TODO: Add currency
 class Bill(models.Model):
     # Foreign Keys and Relationships
     client = models.ForeignKey(Client, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
+    payer = models.ForeignKey(Branch, related_name='bills', on_delete=models.SET_NULL, null=True)
     office = models.ForeignKey(Office, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_bills', on_delete=models.SET_NULL, null=True)
 
@@ -416,7 +432,7 @@ class Bill(models.Model):
     method = models.CharField(max_length=100, null=True, blank=True)
     origin = models.CharField(max_length=100, null=True, blank=True)
     category = models.CharField(max_length=100, null=True, blank=True)
-    # payer = models.CharField(max_length=100, null=True, blank=True) # ???
+    code = models.CharField(max_length=100, null=True, blank=True)
 
     # Date Fields
     created_at = models.DateField(auto_now_add=True)
@@ -433,10 +449,12 @@ class Bill(models.Model):
 
     # Integer Fields
     installments_number = models.IntegerField(default=0)
-    # code = models.IntegerField(default=0) # ???
 
     # File Fields
     proof = models.FileField(upload_to=upload_path_bills, null=True, blank=True)
+
+    # URL Fields
+    link = models.URLField(null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -476,6 +494,7 @@ class Document(models.Model):
     # Foreign Keys and Relationships
     user = models.ForeignKey(User, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
     client = models.ForeignKey(Client, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
+    branch = models.ForeignKey(Branch, related_name='documents', on_delete=models.SET_NULL, null=True, default=None)
     uploaded_by = models.ForeignKey(User, related_name='uploaded_documents', on_delete=models.SET_NULL, null=True,
                                     default=None)
 

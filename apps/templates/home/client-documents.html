@@ -177,10 +177,17 @@
                             <thead class="thead-light">
                             <tr>
                                 <th scope="col" style="width: 0"></th>
-                                <th scope="col" class="py-2 pl-0" style="width: 75%">Name
+                                <th scope="col" class="py-2 pl-0" style="width: 50%">Name
                                     {% if sorted_by == 'name' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
                                     {% elif sorted_by == 'name' and sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up ml-1"></i>
+                                    {% endif %}
+                                </th>
+                                <th scope="col" class="py-2" style="width: 25%">Regional
+                                    {% if sorted_by == 'regional' and sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down ml-1"></i>
+                                    {% elif sorted_by == 'regional' and sort_type == 'asc' %}
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
@@ -219,13 +226,19 @@
                                             <span class="text-black-50">{{ document.name|truncatechars:44 }}</span>
                                         </a>
                                     </th>
-                                    <td class="py-2">{% if document.category != 'none' %}
-                                        {{ document.category|default:'-' }}{% else %}-{% endif %}
-                                    </td>
+                                    <td>{{ document.branch.name|default:'-' }}</td>
+                                    <td>{{ document.category|default:'-' }}</td>
                                     {% if document.expiration %}
                                         <td class="py-2">
                                             <span>{{ document.expiration|date:'d/m/Y' }}</span>
-                                            <span class="{% if document.expired %}text-danger{% elif document.expiration|time_to_date <= 30 %}text-warning{% endif %}">({{ document.expiration|time_to_date }} days)</span>
+                                            <br>
+                                        {% if document.expired %}
+                                            <span class="text-danger">({{ document.expiration|time_to_date|absolute }} days expired)</span>
+                                        {% elif document.expiration|time_to_date <= 30 %}
+                                            <span class="text-warning">({{ document.expiration|time_to_date }} days to expire)</span>
+                                        {% else %}
+                                            <span class="text-muted">({{ document.expiration|time_to_date }} days to expire)</span>
+                                        {% endif %}
                                         </td>
                                     {% else %}
                                         <td class="py-2">-</td>
@@ -296,37 +309,62 @@
                                                              src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
                                                              style="height: 130px"/>
                                                     </div>
+                                                    <div class="justify-content-center d-flex">
+                                                        <span class="h5 mb-0 text-muted font-weight-light text-center">
+                                                            {% if 'default' in document.file.name|file_extension_icon %}
+                                                                {{ document.file.name|file_name_only_with_extension }}
+                                                            {% else %}
+                                                                {{ document.file.name|file_name_only }}
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
                                                     <div class="form-group form-control-label justify-content-center" style="display: flex">
-                                                        <span class="h5 mb-0 text-muted font-weight-light">
+                                                        <span class="h5 mb-0 text-muted font-weight-light text-center">
                                                             uploaded: {{ document.uploaded_by.first_name }}
                                                             {% if document.uploaded_by %}-{% endif %}
                                                             {{ document.uploaded_at|date:'d/m/Y' }}
                                                         </span>
                                                     </div>
-                                                    <div class="form-group form-control-label">
-                                                        <label for="fileName{{ document.id }}"
-                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                        <input class="form-control" id="fileName{{ document.id }}"
-                                                               type="text" value="{{ document.name }}" name="name">
-                                                    </div>
                                                     <div class="row">
-                                                        <div class="form-group form-control-label col-sm-6">
+                                                        <div class="col-sm-7 form-group form-control-label">
+                                                            <label for="fileName{{ document.id }}"
+                                                                   style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                            <input class="form-control" id="fileName{{ document.id }}"
+                                                                   type="text" value="{{ document.name }}" name="name">
+                                                        </div>
+                                                        <div class="col-sm-5 form-group form-control-label">
                                                             <label for="fileType{{ document.id }}"
                                                                    style="font-size:0.8125rem; font-weight:600">Expiration</label>
                                                             <input class="form-control" id="fileType{{ document.id }}"
                                                                    type="date" name="expiration"
                                                                    value="{{ document.expiration|date:'Y-m-d' }}">
                                                         </div>
-                                                        <div class="col-sm-6 form-group form-control-label col">
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-sm form-group form-control-label">
+                                                            <label for="documentBranchInput">Regional</label>
+                                                            <select class="form-control" id="documentBranchInput"
+                                                                    name="branch_id">
+                                                                <option value=""></option>
+                                                                {% for branch in client.branches.all %}
+                                                                    <option value="{{ branch.id }}" {% if branch == document.branch %}selected{% endif %}>{{ branch.name }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm form-group form-control-label col">
                                                             <label for="fileUploadUser{{ document.id }}"
                                                                    style="font-size:0.8125rem; font-weight:600">Category</label>
                                                             <select class="form-control" name="category"
                                                                     id="fileUploadUser{{ document.id }}">
-                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>--Select--</option>
-                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>Category 1</option>
-                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>Category 2</option>
-                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>Category 3</option>
-                                                                <option value="none" {% if document.category == '' %}selected{% endif %}>Category 4</option>
+                                                                <option value=""></option>
+                                                                <option value="Invoice" {% if document.category == 'Invoice' %}selected{% endif %}>Invoice</option>
+                                                                <option value="Lending contract" {% if document.category == 'Lending contract' %}selected{% endif %}>Lending contract</option>
+                                                                <option value="Lending invoice" {% if document.category == 'Lending invoice' %}selected{% endif %}>Lending invoice</option>
+                                                                <option value="Receipt" {% if document.category == 'Receipt' %}selected{% endif %}>Receipt</option>
+                                                                <option value="Sales invoice" {% if document.category == 'Sales invoice' %}selected{% endif %}>Sales invoice</option>
+                                                                <option value="Service contract" {% if document.category == 'Service contract' %}selected{% endif %}>Service contract</option>
+                                                                <option value="Service invoice" {% if document.category == 'Service invoice' %}selected{% endif %}>Service invoice</option>
+                                                                <option value="Others" {% if document.category == 'Others' %}selected{% endif %}>Others</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -400,13 +438,39 @@
                                                              src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
                                                         />
                                                     </div>
-                                                    <div class="form-group form-control-label">
-                                                        <label for="fileName{{ document.id }}"
-                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                        <input class="form-control" disabled
-                                                               id="fileName{{ document.id }}"
-                                                               type="text"
-                                                               value="{{ document.name|file_name_only_with_extension }}">
+                                                    <div class="justify-content-center d-flex">
+                                                        <span class="h5 mb-0 text-muted font-weight-light text-center">
+                                                            {% if 'default' in document.file.name|file_extension_icon %}
+                                                                {{ document.file.name|file_name_only_with_extension }}
+                                                            {% else %}
+                                                                {{ document.file.name|file_name_only }}
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
+                                                    <div class="form-group form-control-label justify-content-center" style="display: flex">
+                                                        <span class="h5 mb-0 text-muted font-weight-light text-center">
+                                                            uploaded: {{ document.uploaded_by.first_name }}
+                                                            {% if document.uploaded_by %}-{% endif %}
+                                                            {{ document.uploaded_at|date:'d/m/Y' }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-sm-7 form-group form-control-label">
+                                                            <label for="fileName{{ document.id }}"
+                                                                   style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                            <input class="form-control" disabled
+                                                                   id="fileName{{ document.id }}"
+                                                                   type="text"
+                                                                   value="{{ document.name|file_name_only_with_extension }}">
+                                                        </div>
+                                                        <div class="col-sm-5 form-group form-control-label">
+                                                            <label for="fileExpiration{{ document.id }}"
+                                                                   style="font-size:0.8125rem; font-weight:600">Expiration</label>
+                                                            <input class="form-control" disabled
+                                                                   id="fileExpiration{{ document.id }}"
+                                                                   type="text"
+                                                                   value="{{ document.expiration|date:'d/m/Y' }}">
+                                                        </div>
                                                     </div>
                                                 </form>
                                             </div>
@@ -477,25 +541,40 @@
                             <i>No file selected</i>
                         </span>
                     </div>
-                    <div class="form-group form-control-label">
-                        <label for="documentNameInput">Name</label>
-                        <input class="form-control" id="documentNameInput"
-                               name="name"
-                               placeholder="" type="text">
-                    </div>
                     <div class="row">
-                        <div class="col form-group form-control-label mb-3">
+                        <div class="col-sm-7 form-group form-control-label">
+                            <label for="documentNameInput">Name</label>
+                            <input class="form-control" id="documentNameInput"
+                                   name="name"
+                                   placeholder="" type="text">
+                        </div>
+                        <div class="col-sm-5 form-group form-control-label mb-3">
                             <label for="expiration">Expiration</label>
                             <input class="form-control" id="expiration" name="expiration" type="date">
                         </div>
-                        <div class="col form-group form-control-label">
+                    </div>
+                    <div class="row">
+                        <div class="col-sm form-group form-control-label">
+                            <label for="documentBranchInput">Regional</label>
+                            <select class="form-control" id="documentBranchInput" name="branch_id">
+                                <option value=""></option>
+                                {% for branch in client.branches.all %}
+                                    <option value="{{ branch.id }}">{{ branch.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm form-group form-control-label">
                             <label for="documentCategoryInput">Category</label>
                             <select class="form-control" id="documentCategoryInput" name="category">
-                                <option value="none">--Select--</option>
-                                <option value="none">Category 1</option>
-                                <option value="none">Category 2</option>
-                                <option value="none">Category 3</option>
-                                <option value="none">Category 4</option>
+                                <option value=""></option>
+                                <option value="Invoice">Invoice</option>
+                                <option value="Lending contract">Lending contract</option>
+                                <option value="Lending invoice">Lending invoice</option>
+                                <option value="Receipt">Receipt</option>
+                                <option value="Sales invoice">Sales invoice</option>
+                                <option value="Service contract">Service contract</option>
+                                <option value="Service invoice">Service invoice</option>
+                                <option value="Others">Others</option>
                             </select>
                         </div>
                     </div>
@@ -547,15 +626,32 @@
                     {% csrf_token %}
                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
                     <input type="hidden" value="{{ sort_type }}" name="sort_type">
-                    <div class="form-group form-control-label">
-                        <label for="documentCategoryInput">Category</label>
-                        <select class="form-control" id="documentCategoryInput" name="category">
-                            <option value="all"></option>
-                            <option value="none" {% if filters|extract_from_key:'category' == '' %}selected{% endif %}>Category 1</option>
-                            <option value="none" {% if filters|extract_from_key:'category' == '' %}selected{% endif %}>Category 2</option>
-                            <option value="none" {% if filters|extract_from_key:'category' == '' %}selected{% endif %}>Category 3</option>
-                            <option value="none" {% if filters|extract_from_key:'category' == '' %}selected{% endif %}>Category 4</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-sm-7 form-group form-control-label">
+                            <label for="documentRegionalInput">Regional</label>
+                            <select class="form-control" id="documentRegionalInput" name="regional">
+                                <option value="all"></option>
+                                {% for regional in client.branches.all %}
+                                    <option value="{{ regional.id }}" {% if filters|extract_from_key:'regional' == regional.id %}selected{% endif %}>
+                                        {{ regional.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-5 form-group form-control-label">
+                            <label for="documentCategoryInput">Category</label>
+                            <select class="form-control" id="documentCategoryInput" name="category">
+                                <option value="all"></option>
+                                <option value="Invoice" {% if filters|extract_from_key:'category' == 'Invoice' %}selected{% endif %}>Invoice</option>
+                                <option value="Lending contract" {% if filters|extract_from_key:'category' == 'Lending contract' %}selected{% endif %}>Lending contract</option>
+                                <option value="Lending invoice" {% if filters|extract_from_key:'category' == 'Lending invoice' %}selected{% endif %}>Lending invoice</option>
+                                <option value="Receipt" {% if filters|extract_from_key:'category' == 'Receipt' %}selected{% endif %}>Receipt</option>
+                                <option value="Sales invoice" {% if filters|extract_from_key:'category' == 'Sales invoice' %}selected{% endif %}>Sales invoice</option>
+                                <option value="Service contract" {% if filters|extract_from_key:'category' == 'Service contract' %}selected{% endif %}>Service contract</option>
+                                <option value="Service invoice" {% if filters|extract_from_key:'category' == 'Service invoice' %}selected{% endif %}>Service invoice</option>
+                                <option value="Others" {% if filters|extract_from_key:'category' == 'Others' %}selected{% endif %}>Others</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col form-group form-control-label">
@@ -637,6 +733,9 @@
                                 </option>
                                 <option value="name" {% if sorted_by == 'name' %} selected {% endif %}>
                                     Name
+                                </option>
+                                <option value="regional" {% if sorted_by == 'regional' %} selected {% endif %}>
+                                    Regional
                                 </option>
                             </select>
                         </div>
