@@ -444,7 +444,7 @@
                                                 <br>
                                                 This action cannot be undone.
                                             <form method="post" id="deleteConfirmForm{{ client.id }}"
-                                                  action="{% url 'delete_client' client.id %}">
+                                                  action="{% url 'delete_client' client.slug %}">
                                                 {% csrf_token %}
                                             </form>
                                         </div>
