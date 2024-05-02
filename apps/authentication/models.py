@@ -3,10 +3,10 @@ from django.contrib.auth.models import User
 
 
 class AuthEmail(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='auth_email', null=True, blank=True)
 
-    auth_token = models.CharField(max_length=100, unique=True)
-    auth_key = models.CharField(max_length=44, unique=True)
+    token = models.CharField(max_length=100, unique=True)
+    key = models.CharField(max_length=44, unique=True)
 
     is_confirmed = models.BooleanField(default=False)
 
@@ -18,7 +18,7 @@ class AuthEmail(models.Model):
 
 
 class PasswordReset(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     token = models.CharField(max_length=100, unique=True)
     key = models.CharField(max_length=44, unique=True)

@@ -12,7 +12,7 @@ urlpatterns = [
     path('profile/create/', fill_profile, name="fill_profile"),
     path('profile/create/send', fill_profile, name="send_profile_infos"),
 
-    path('validate/<str:auth_token>', validate_email, name='confirm_email'),
+    path('validate/<str:token>', validate_email, name='confirm_email'),
     path('resend-confirmation/', reconfirm_email, name='resend_confirmation'),
 
     path('logout/', LogoutView.as_view(), name="logout"),

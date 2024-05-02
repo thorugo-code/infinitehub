@@ -1,18 +1,86 @@
 import json
 import pytz
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from .forms import LoginForm, SignUpForm, PasswordResetForm
-from apps.home.models import Profile, Office
-from django.contrib.auth.models import User, Permission
-from core.settings import CORE_DIR, EMAIL_HOST_USER
-from django.core.mail import send_mail
-from cryptography.fernet import Fernet
-from apps.authentication.models import AuthEmail, PasswordReset
-from datetime import datetime, timedelta
 from decouple import config
+from core.settings import CORE_DIR
 from django.contrib import messages
+from cryptography.fernet import Fernet
+from datetime import datetime, timedelta
+from .models import AuthEmail, PasswordReset
+from apps.home.models import Profile, Office
+from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import User, Permission
+from django.contrib.auth import authenticate, login, logout
+from .forms import LoginForm, SignUpForm, PasswordResetForm
+from .tasks import confirm_register_email, reset_password_email, reset_password_confirmation_email
+
+
+admin_group = config('ADMIN_USERS', 'admin').split(',')
+
+staff_group = config('STAFF_USERS', 'admin').split(',')
+
+collaborators_key = config('COLLABORATORS_KEY', 'collaborator')
+
+collaborators_permissions_list = [
+    'view_client',
+    'view_office',
+]
+
+admin_permissions_list = [
+                             'add_bill',
+                             'change_bill',
+                             'delete_bill',
+                             'view_bill',
+                             'add_client',
+                             'change_client',
+                             'delete_client',
+                             'change_collaborator',
+                             'delete_collaborator',
+                             'add_document',
+                             'change_document',
+                             'delete_document',
+                             'view_document',
+                             'add_office',
+                             'change_office',
+                             'delete_office',
+                             'add_branch',
+                             'change_branch',
+                             'delete_branch',
+                             'view_branch',
+                         ] + collaborators_permissions_list
+
+staff_permissions_list = [
+                             'add_logentry',
+                             'change_logentry',
+                             'delete_logentry',
+                             'view_logentry',
+                             'add_group',
+                             'change_group',
+                             'delete_group',
+                             'view_group',
+                             'add_permission',
+                             'change_permission',
+                             'delete_permission',
+                             'view_permission',
+                             'add_user',
+                             'change_user',
+                             'delete_user',
+                             'view_user',
+                             'add_contenttype',
+                             'change_contenttype',
+                             'delete_contenttype',
+                             'view_contenttype',
+                             'add_session',
+                             'change_session',
+                             'delete_session',
+                             'view_session',
+                         ] + collaborators_permissions_list
+
+admin_permissions = Permission.objects.filter(codename__in=admin_permissions_list)
+
+collaborators_permissions = Permission.objects.filter(codename__in=collaborators_permissions_list)
+
+staff_permissions = Permission.objects.filter(codename__in=staff_permissions_list)
 
 
 def encrypt_tag(key, message):
@@ -27,46 +95,6 @@ def decrypt_tag(key, token):
     return decrypted
 
 
-def confirm_register_email(email, auth_token):
-    subject = 'Register confirmation'
-
-    message = (f'Hello! Please click the link below to confirm your email.\n\n'
-               f'{config("WEBSITE_URL")}/validate/{auth_token}\n\n'
-               f'If you did not request this, please ignore this email.\n\n'
-               f'Thanks, Infinite Foundry.')
-
-    email_from = EMAIL_HOST_USER
-    to_email = [email]
-    send_mail(subject, message, email_from, to_email)
-
-
-def reset_password_email(username, token):
-    subject = 'Password reset'
-
-    message = (f'Hello! Please click the link below to reset your password.\n\n'
-               f'{config("WEBSITE_URL")}/reset-password/{token}\n\n'
-               f'If you did not request this, please ignore this email.\n\n'
-               f'Thanks, Infinite Foundry.')
-
-    email_from = EMAIL_HOST_USER
-    to_email = [username]
-    send_mail(subject, message, email_from, to_email)
-
-
-def reset_password_confirmation_email(username):
-    subject = 'Password changed'
-
-    date = datetime.now(tz=pytz.utc).strftime("%d/%m/%Y %H:%M:%S")
-
-    message = (f'Hello! Your password has been changed at {date} UTC.\n\n'
-               f'If you did not request this, please contact us.\n\n'
-               f'Thanks, Infinite Foundry.')
-
-    email_from = EMAIL_HOST_USER
-    to_email = [username]
-    send_mail(subject, message, email_from, to_email)
-
-
 def login_view(request):
     form = LoginForm(request.POST or None)
 
@@ -78,38 +106,50 @@ def login_view(request):
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
             user = authenticate(username=username, password=password)
+            try:
+                auth = AuthEmail.objects.get(user__username=username).is_confirmed
+            except AuthEmail.DoesNotExist:
+                auth = None
 
-            if user is not None:
+            if user and auth:
                 login(request, user)
-                check_profile = Profile.objects.filter(user=user)
-                check_profile = check_profile[0] if check_profile else None
-                if check_profile:
-                    if not check_profile.first_access:
-                        return redirect("home")
-                    else:
-                        request.session['registration_data'] = {
-                            'username': check_profile.user.username,
-                            'logged': 'true',
-                        }
+                profile, created = Profile.objects.get_or_create(user=user)
+                if created or profile.first_access:
+                    return redirect("fill_profile")
                 else:
-                    request.session['registration_data'] = {
-                        'username': user.username,
-                        'logged': 'true',
-                    }
-
-                return redirect("fill_profile")
+                    return redirect("home")
 
             else:
+                logout(request)
                 try:
                     user = User.objects.get(username=username)
-                    auth = AuthEmail.objects.get(user=user)
-
-                    if not user.is_active and not auth.is_confirmed and check_password(password, user.password):
-                        messages.error(request, 'User has not been activated, confirm your email.')
-                    else:
+                    valid_password = check_password(password, user.password)
+                    if not valid_password:
                         msg = 'Invalid credentials'
+
                 except User.DoesNotExist:
+                    valid_password = False
                     msg = 'Invalid credentials'
+
+                if valid_password:
+                    if auth is None:
+                        f_key = Fernet.generate_key()
+                        auth_object = AuthEmail(
+                            user=user,
+                            token=encrypt_tag(f_key, username).decode(),
+                            key=f_key.decode(),
+                        )
+                        auth_object.save()
+
+                        confirm_register_email.delay(username, auth_object.token)
+                        messages.error(request, f"Authentication key created, check your email.")
+
+                    elif not auth:
+                        messages.error(request, 'User has not been activated')
+
+                    else:
+                        messages.error(request, 'User blocked')
+
         else:
             msg = 'Error validating the form'
 
@@ -133,33 +173,18 @@ def register_user(request):
                 return redirect('register')
 
             user = authenticate(username=username, password=raw_password)
-
-            request.session['registration_data'] = {
-                'username': username,
-            }
-
-            collaborators_permissions_list = [
-                'view_client',
-                'view_office',
-            ]
-
-            collaborators_permissions = Permission.objects.filter(codename__in=collaborators_permissions_list)
-
-            if '@infinitefoundry.com' in user.username:
-                user.user_permissions.set(collaborators_permissions)
-
             user.is_active = False
             user.save()
 
-            key = Fernet.generate_key()
-            auth_object = AuthEmail(
+            f_key = Fernet.generate_key()
+            auth = AuthEmail(
                 user=user,
-                auth_token=encrypt_tag(key, username).decode(),
-                auth_key=key.decode(),
+                token=encrypt_tag(f_key, username).decode(),
+                key=f_key.decode(),
             )
-            auth_object.save()
+            auth.save()
 
-            confirm_register_email(username, auth_object.auth_token)
+            confirm_register_email.delay(username, auth.token)
             messages.success(request, 'User created! Please confirm your email to login.')
             return redirect('home')
         else:
@@ -170,121 +195,63 @@ def register_user(request):
     return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success})
 
 
-def fill_profile(request):
-    if request.method == "POST":
-        success = True
-
-        user_object = User.objects.get(username=request.session['registration_data']['username'])
-
-        user_object.first_name = request.POST['first_name'].title()
-        user_object.last_name = request.POST['last_name'].title()
-        user_object.email = request.session['registration_data']['username']
-
-        # Check if user already exists
-        if Profile.objects.filter(user__username=request.session['registration_data']['username']).exists():
-            profile = Profile.objects.get(user__username=request.session['registration_data']['username'])
-            profile.office = Office.objects.get(id=request.POST['office']) if request.POST.get(
-                'office') else profile.office
-            profile.street = request.POST.get('street', profile.street)
-            profile.street_number = request.POST.get('street_number', profile.street_number)
-            profile.city = request.POST.get('city', profile.city)
-            profile.state = request.POST.get('state', profile.state)
-            profile.country = request.POST.get('country', profile.country)
-            profile.about = request.POST.get('about', profile.about)
-            profile.first_access = False
-            profile.avatar = request.FILES.get('avatar', profile.avatar)
-            profile.phone = request.POST.get('phone', profile.phone)
-            profile.birthday = request.POST.get('birthday', profile.birthday)
-            profile.position = request.POST.get('position', profile.position)
-
-        else:
-            profile = Profile(
-                user=user_object,
-                office=Office.objects.get(id=request.POST['office']) if request.POST.get('office') else None,
-                street=request.POST['street'],
-                street_number=request.POST['street_number'],
-                city=request.POST['city'],
-                state=request.POST['state'],
-                country=request.POST['country'],
-                about=request.POST['about'],
-                first_access=False,
-                phone=request.POST['phone'],
-                birthday=request.POST['birthday'],
-                position=request.POST['position'],
-            )
-
-            profile.avatar = request.FILES.get('avatar', profile.avatar)
-
-        user_object.save()
-        profile.save()
-
-        msg = 'User created! You can now <a href="/login/">login</a>'
-
-        if 'logged' in request.session['registration_data']:
-            del request.session['registration_data']
-            return redirect("profile")
-        else:
-            del request.session['registration_data']
-            return redirect("/login/", {"msg": msg, "success": success})
-
-    else:
-        user_profile = Profile.objects.filter(user__username=request.session['registration_data']['username']) if \
-            request.session.get('registration_data') else None
-        user_profile = user_profile[0] if user_profile else None
-
-        context = {
-            "world": json.load(open(f'{CORE_DIR}/apps/static/assets/world.json', 'r', encoding='utf-8')),
-            "offices": Office.objects.all(),
-            "user": user_profile,
-        }
-
-        return render(request, "home/profile-wizard.html", context)
-
-
-def validate_email(request, auth_token):
-    try:
-        auth_object = AuthEmail.objects.get(auth_token=auth_token)
-    except AuthEmail.DoesNotExist:
-        messages.error(request, 'Invalid token')
-        return redirect('home')
-
-    if auth_object:
-        decrypted_token = decrypt_tag(auth_object.auth_key, auth_token).decode()
-        expired = datetime.now(tz=pytz.utc) - auth_object.created_at > timedelta(hours=24)
-        if (decrypted_token == auth_object.user.username
-                and not auth_object.is_confirmed
-                and not expired):
-            auth_object.is_confirmed = True
-            auth_object.confirmed_at = datetime.now()
-            auth_object.save()
-            user = User.objects.get(username=auth_object.user.username)
-            user.is_active = True
-            user.save()
-            messages.success(request, 'Email confirmed! You can now login.')
-            return redirect('home')
-        elif not auth_object.is_confirmed and expired:
-            user = User.objects.get(username=auth_object.user.username)
-            auth_object.delete()
-            messages.error(request, 'Token expired! Try to register again.')
-            return redirect('home')
-        elif auth_object.is_confirmed:
-            messages.info(request, 'Email already confirmed')
-            return redirect('home')
-        else:
-            messages.error(request, 'Invalid token')
-            return redirect('home')
-
-
 def reconfirm_email(request):
     user = User.objects.get(username=request.POST.get('email'))
     key = Fernet.generate_key()
     auth_object = AuthEmail.objects.get(user=user)
-    auth_object.auth_token = encrypt_tag(key, user.username).decode()
-    auth_object.auth_key = key.decode()
+    auth_object.token = encrypt_tag(key, user.username).decode()
+    auth_object.key = key.decode()
     auth_object.save()
 
-    confirm_register_email(user.username, auth_object.auth_token)
+    confirm_register_email.delay(user.username, auth_object.token)
     messages.success(request, 'Email sent! Please confirm your email to login.')
+    return redirect('home')
+
+
+def validate_email(request, token):
+    try:
+        auth_object = AuthEmail.objects.get(token=token)
+    except AuthEmail.DoesNotExist:
+        messages.error(request, 'Invalid registration token')
+        return redirect('home')
+
+    decrypted_token = decrypt_tag(auth_object.key, token).decode()
+    valid_token = decrypted_token == auth_object.user.username
+    expired = datetime.now(tz=pytz.utc) - auth_object.created_at > timedelta(hours=24)
+    expired = False if valid_token and auth_object.is_confirmed else expired
+
+    if not valid_token:
+        messages.error(request, 'Invalid token')
+
+    elif valid_token and not auth_object.is_confirmed and not expired:
+        auth_object.is_confirmed = True
+        auth_object.confirmed_at = datetime.now()
+        auth_object.save()
+        auth_object.user.is_active = True
+
+        if auth_object.user.username in admin_group:
+            auth_object.user.user_permissions.set(admin_permissions)
+        elif auth_object.user.username in staff_group:
+            auth_object.user.user_permissions.set(staff_permissions)
+        elif collaborators_key in auth_object.user.username:
+            auth_object.user.user_permissions.set(collaborators_permissions)
+        else:
+            pass
+
+        auth_object.user.save()
+
+        messages.success(request, 'Email confirmed! You can now login.')
+
+    elif not auth_object.is_confirmed and expired:
+        auth_object.delete()
+        messages.error(request, 'Token expired!')
+
+    elif auth_object.is_confirmed:
+        messages.info(request, 'Email already confirmed')
+
+    else:
+        messages.error(request, 'Invalid token')
+
     return redirect('home')
 
 
@@ -301,40 +268,15 @@ def request_reset_password(request):
         pass_reset_object, created = PasswordReset.objects.get_or_create(user=user)
         pass_reset_object.token = encrypt_tag(key, user.username).decode()
         pass_reset_object.key = key.decode()
-        pass_reset_object.used = False
         pass_reset_object.created_at = datetime.now(tz=pytz.utc)
         pass_reset_object.save()
 
-        reset_password_email(username, pass_reset_object.token)
+        reset_password_email.delay(username, pass_reset_object.token)
         messages.success(request, 'Email sent! Check your email to password reset.')
         return redirect('home')
 
     else:
         return redirect('home', {'msg': 'Request error'})
-
-
-def reset_password_validation(request, token):
-    try:
-        pass_reset_object = PasswordReset.objects.get(token=token)
-        decrypted_token = decrypt_tag(pass_reset_object.key, token).decode()
-        expired = datetime.now(tz=pytz.utc) - pass_reset_object.created_at > timedelta(hours=24)
-        if decrypted_token != pass_reset_object.user.username:
-            messages.error(request, 'Invalid token')
-        elif expired:
-            messages.error(request, 'Token expired, try again')
-        else:
-            request.session['reset_password'] = {
-                'username': pass_reset_object.user.username,
-                'token': token,
-            }
-            return redirect('reset_password_page')
-
-        pass_reset_object.delete()
-
-    except PasswordReset.DoesNotExist:
-        messages.error(request, 'Invalid token')
-
-    return redirect('home')
 
 
 def reset_password_page(request):
@@ -343,11 +285,13 @@ def reset_password_page(request):
         form = PasswordResetForm(user=user, data=request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Password changed! You can now login.')
-            del request.session['reset_password']
             PasswordReset.objects.get(user=user).delete()
-            reset_password_confirmation_email(user.username)
+            del request.session['reset_password']
+
+            reset_password_confirmation_email.delay(user.username)
+            messages.success(request, 'Password changed! You can now login.')
             return redirect('login')
+
         else:
             messages.error(request, 'Form is not valid')
             context = {
@@ -383,3 +327,72 @@ def reset_password_page(request):
         }
 
     return render(request, 'accounts/reset_password.html', context)
+
+
+def reset_password_validation(request, token):
+    try:
+        pass_reset_object = PasswordReset.objects.get(token=token)
+        decrypted_token = decrypt_tag(pass_reset_object.key, token).decode()
+        valid_token = decrypted_token == pass_reset_object.user.username
+        expired = datetime.now(tz=pytz.utc) - pass_reset_object.created_at > timedelta(hours=24)
+
+        if not valid_token:
+            messages.error(request, 'Invalid token')
+        elif expired:
+            messages.error(request, 'Token expired, request a new one')
+        else:
+            request.session['reset_password'] = {
+                'username': pass_reset_object.user.username,
+                'token': token,
+            }
+            return redirect('reset_password_page')
+
+        pass_reset_object.delete()
+
+    except PasswordReset.DoesNotExist:
+        messages.error(request, 'Invalid password reset token')
+
+    return redirect('home')
+
+
+def fill_profile(request):
+    if request.method == "POST":
+        user_object = request.user
+        profile, created = Profile.objects.get_or_create(user=user_object)
+
+        user_object.first_name = request.POST['first_name'].title()
+        user_object.last_name = request.POST['last_name'].title()
+        user_object.email = user_object.username
+
+        profile.office = Office.objects.get(id=request.POST['office']) if request.POST.get(
+            'office') else profile.office
+        profile.street = request.POST.get('street', profile.street)
+        profile.street_number = request.POST.get('street_number', profile.street_number)
+        profile.city = request.POST.get('city', profile.city)
+        profile.state = request.POST.get('state', profile.state)
+        profile.country = request.POST.get('country', profile.country)
+        profile.about = request.POST.get('about', profile.about)
+        profile.first_access = False
+        profile.avatar = request.FILES.get('avatar', profile.avatar)
+        profile.phone = request.POST.get('phone', profile.phone)
+        profile.birthday = request.POST.get('birthday', profile.birthday)
+        profile.position = request.POST.get('position', profile.position)
+
+        user_object.save()
+        profile.save()
+
+        return redirect("profile")
+
+    else:
+        try:
+            user_profile = Profile.objects.get(user=request.user)
+        except Profile.DoesNotExist:
+            user_profile = None
+
+        context = {
+            "world": json.load(open(f'{CORE_DIR}/apps/static/assets/world.json', 'r', encoding='utf-8')),
+            "offices": Office.objects.all(),
+            "user": user_profile,
+        }
+
+        return render(request, "home/profile-wizard.html", context)

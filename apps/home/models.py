@@ -256,7 +256,7 @@ class Profile(models.Model):
         elif self.slug != slugify(self.user.get_full_name() + '-' + str(self.user.id)) or kwargs.get('slug'):
             self.slug = slugify(self.user.get_full_name() + '-' + str(self.user.id))
             self.save()
-        elif self.user.get_full_name() == '':
+        elif self.user.get_full_name() == '' and not self.slug:
             self.slug = slugify(str(self.user.id))
             self.save()
         elif self.slug.endswith('none'):

@@ -27,7 +27,8 @@
                                                 <i class="bg-{{ message.tags }}"></i>
                                             {% endif %}
                                             <span class="status h4 font-weight-light">{{ message }}</span>
-                                            {% if 'confirm your email.' in message.message %}
+{#                                            {% if 'confirm your email.' in message.message %}#}
+                                            {% if 'User has not been activated' in message.message %}
                                                 <form id="resend_email" method="POST" action="{% url 'resend_confirmation' %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="email" value="{{ form.username.value }}">

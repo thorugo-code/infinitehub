@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.home',
     'apps.authentication',
-    'storages'
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -41,6 +41,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.middleware.SessionExpiredMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -143,6 +144,14 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='YOUR-SES-USERNAME')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='YOUR-SES-PASSWORD')
+#############################################################
+
+# Celery settings
+CELERY_BROKER_URL = config('BROKER_URL', default='amqp://guest@localhost:5672//')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+
 #############################################################
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

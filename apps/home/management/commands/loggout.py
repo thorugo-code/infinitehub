@@ -7,7 +7,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(f'Deleting sessions...', ending=' ')
-        print(f'\n\n{Session.objects.all()}\n')
         for session in Session.objects.all():
             session.delete()
         else:

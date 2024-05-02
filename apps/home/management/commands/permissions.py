@@ -1,6 +1,6 @@
-from django.db.models import Q
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User, Permission
+from decouple import config
 
 
 class Command(BaseCommand):
@@ -8,16 +8,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        admin_group = [
-            'admin@infinitefoundry.com',
-            'agodinholuz@infinitefoundry.com',
-            'brunoeisinger@infinitefoundry.com',
-            'dieynieleandrade@infinitefoundry.com',
-            'joaoeisinger@infinitefoundry.com',
-        ]
+        admin_group = config('ADMIN_USERS', 'admin').split(',')
 
-        staff_group = [
-            'vitorhugo@infinitefoundry.com',
+        staff_group = config('STAFF_USERS', 'admin').split(',')
+
+        collaborators_key = config('COLLABORATORS_KEY', 'collaborator')
+
+        collaborators_permissions_list = [
+            'view_client',
+            'view_office',
         ]
 
         admin_permissions_list = [
@@ -28,7 +27,6 @@ class Command(BaseCommand):
             'add_client',
             'change_client',
             'delete_client',
-            'view_client',
             'change_collaborator',
             'delete_collaborator',
             'add_document',
@@ -38,17 +36,11 @@ class Command(BaseCommand):
             'add_office',
             'change_office',
             'delete_office',
-            'view_office',
             'add_branch',
             'change_branch',
             'delete_branch',
             'view_branch',
-        ]
-
-        collaborators_permissions_list = [
-            'view_client',
-            'view_office',
-        ]
+        ] + collaborators_permissions_list
 
         staff_permissions_list = [
             'add_logentry',
@@ -75,9 +67,7 @@ class Command(BaseCommand):
             'change_session',
             'delete_session',
             'view_session',
-        ]
-
-        collaborators_requirement = '@infinitefoundry.com'
+        ] + collaborators_permissions_list
 
         admin_permissions = Permission.objects.filter(codename__in=admin_permissions_list)
 
@@ -89,9 +79,9 @@ class Command(BaseCommand):
             if user.username in admin_group:
                 user.user_permissions.set(admin_permissions)
                 self.stdout.write(f'Administrator permissions added to user: {self.style.SUCCESS(user.username)}')
-            elif collaborators_requirement in user.username:
+            elif collaborators_key in user.username:
                 if user.username in staff_group:
-                    user.user_permissions.set(collaborators_permissions | staff_permissions)
+                    user.user_permissions.set(staff_permissions)
                     self.stdout.write(f'Staff permissions added to user: {self.style.SUCCESS(user.username)}')
                 else:
                     user.user_permissions.set(collaborators_permissions)
