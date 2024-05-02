@@ -54,35 +54,35 @@ projects_page_urls = [
 
 assets_urls = [
 
-    path('assets/', assets.assets_hub, name='assets_hub'),
+    path('inventory/assets/', assets.assets_hub, name='assets_hub'),
 
-    path('assets/<str:category>/', assets.assets_list, name='assets_list'),
+    path('inventory/assets/<str:category>/', assets.assets_list, name='assets_list'),
 
-    path('assets/<str:category>/delete=<int:file_id>', assets.delete_file_from_storage_with_category,
+    path('inventory/assets/<str:category>/delete=<int:file_id>', assets.delete_file_from_storage_with_category,
          name='delete_file_from_storage_with_category'),
 
-    path('assets/delete=<int:file_id>', assets.delete_file_from_storage,
+    path('inventory/assets/delete=<int:file_id>', assets.delete_file_from_storage,
          name='delete_file_from_storage'),
 ]
 
 balance_urls = [
 
-    # path('balance/', balance.home, name='balance_page'),
-    #
-    # path('balance/new', balance.new_bill, name='new_bill'),
-    # path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
-    # path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
-    # path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
-    #
-    # path('balance/order', balance.sort_and_filter_bills, name='sort_bills'),
-    # path('balance/filter', balance.filter_bills, name='filter_bills'),
-    #
-    # path('balance/order:<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
-    # path('balance/filters:<str:filters>', balance.home, name='filtered_bills'),
-    # path('balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', balance.home,
-    #      name='sorted_filtered_bills'),
-    #
-    # path('balance/download-bill=<int:bill_id>', balance.download_bill, name='download_proof'),
+    path('balance/', balance.home, name='balance_page'),
+
+    path('balance/new', balance.new_bill, name='new_bill'),
+    path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
+    path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
+    path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
+
+    path('balance/order', balance.sort_and_filter_bills, name='sort_bills'),
+    path('balance/filter', balance.filter_bills, name='filter_bills'),
+
+    path('balance/order:<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
+    path('balance/filters:<str:filters>', balance.home, name='filtered_bills'),
+    path('balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', balance.home,
+         name='sorted_filtered_bills'),
+
+    path('balance/download-bill=<int:bill_id>', balance.download_bill, name='download_proof'),
 ]
 
 clients_list_urls = [
@@ -102,13 +102,13 @@ clients_list_urls = [
 
 client_page_urls = [
 
-    path('clients/<slug:slug>', clients.details, name='client_details'),
-    path('clients/<slug:slug>/edit', clients.details, name='edit_client'),
-    path('clients/<slug:slug>/picture', clients.change_picture, name='change_client_picture'),
-
-    path('clients/<slug:slug>/new-branch', clients.new_branch, name='new_client_branch'),
-    path('clients/<slug:slug>/edit-branch=<int:branch_id>', clients.edit_branch, name='edit_client_branch'),
-    path('clients/<slug:slug>/delete-branch=<int:branch_id>', clients.delete_branch, name='delete_client_branch'),
+    # path('clients/<slug:slug>', clients.details, name='client_details'),
+    # path('clients/<slug:slug>/edit', clients.details, name='edit_client'),
+    # path('clients/<slug:slug>/picture', clients.change_picture, name='change_client_picture'),
+    #
+    # path('clients/<slug:slug>/new-branch', clients.new_branch, name='new_client_branch'),
+    # path('clients/<slug:slug>/edit-branch=<int:branch_id>', clients.edit_branch, name='edit_client_branch'),
+    # path('clients/<slug:slug>/delete-branch=<int:branch_id>', clients.delete_branch, name='delete_client_branch'),
 
 ]
 
@@ -203,15 +203,15 @@ collaborators_list_urls = [
 
 inventory_urls = [
 
-    path('inventory/', inventory.inventory_list, name='inventory_list'),
+    path('inventory/equipments/', inventory.inventory_list, name='inventory_list'),
 
-    path('inventory/new', inventory.inventory_list, name='new_equipment'),
+    path('inventory/equipments/new', inventory.inventory_list, name='new_equipment'),
 
-    path('inventory/id=<int:id>', inventory.inventory_list, name='equipment_details'),
+    path('inventory/equipments/id=<int:id>', inventory.inventory_list, name='equipment_details'),
 
-    path('inventory/delete=<int:id>', inventory.delete_equipment, name='delete_equipment'),
+    path('inventory/equipments/delete=<int:id>', inventory.delete_equipment, name='delete_equipment'),
 
-    path('inventory/download/qrcode=<int:equipment_id>', inventory.download_qrcode_inventory,
+    path('inventory/equipments/download/qrcode=<int:equipment_id>', inventory.download_qrcode_inventory,
          name='download_file_from_inventory'),
 ]
 

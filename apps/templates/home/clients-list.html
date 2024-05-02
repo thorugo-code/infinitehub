@@ -160,10 +160,14 @@
                                            href="" data-dismiss="modal" data-toggle="modal"
                                            data-target="#detailsClientModal{{ client.id }}"
                                        {% elif perms.home.change_client and client.contact_email and client.office %}
-                                           href="{% url 'client_details' client.slug %}"
-                                       {% else %}
+{#                                           href="{% url 'client_details' client.slug %}"#}
                                            href="" data-dismiss="modal" data-toggle="modal"
-                                           data-target="#fillClientModal{{ client.id }}"
+                                           data-target="#detailsClientModal{{ client.id }}"
+                                       {% else %}
+{#                                           href="" data-dismiss="modal" data-toggle="modal"#}
+{#                                           data-target="#fillClientModal{{ client.id }}"#}
+                                           href="" data-dismiss="modal" data-toggle="modal"
+                                           data-target="#detailsClientModal{{ client.id }}"
                                        {% endif %}
                                     class="media align-items-center">
                                         <div class="avatar rounded-circle">
@@ -179,10 +183,14 @@
                                            href="" data-dismiss="modal" data-toggle="modal"
                                            data-target="#detailsClientModal{{ client.id }}"
                                        {% elif perms.home.change_client and client.contact_email and client.office %}
-                                           href="{% url 'client_details' client.slug %}"
-                                       {% else %}
+{#                                           href="{% url 'client_details' client.slug %}"#}
                                            href="" data-dismiss="modal" data-toggle="modal"
-                                           data-target="#fillClientModal{{ client.id }}"
+                                           data-target="#detailsClientModal{{ client.id }}"
+                                       {% else %}
+{#                                           href="" data-dismiss="modal" data-toggle="modal"#}
+{#                                           data-target="#fillClientModal{{ client.id }}"#}
+                                           href="" data-dismiss="modal" data-toggle="modal"
+                                           data-target="#detailsClientModal{{ client.id }}"
                                        {% endif %}
                                     class="media align-items-center">
                                         <div class="media-body">
@@ -229,10 +237,14 @@
                                                    href="" data-dismiss="modal" data-toggle="modal"
                                                    data-target="#detailsClientModal{{ client.id }}"
                                                {% elif perms.home.change_client and client.contact_email and client.office %}
-                                                   href="{% url 'client_details' client.slug %}"
-                                               {% else %}
+{#                                                   href="{% url 'client_details' client.slug %}"#}
                                                    href="" data-dismiss="modal" data-toggle="modal"
-                                                   data-target="#fillClientModal{{ client.id }}"
+                                                   data-target="#detailsClientModal{{ client.id }}"
+                                               {% else %}
+{#                                                   href="" data-dismiss="modal" data-toggle="modal"#}
+{#                                                   data-target="#fillClientModal{{ client.id }}"#}
+                                                   href="" data-dismiss="modal" data-toggle="modal"
+                                                   data-target="#detailsClientModal{{ client.id }}"
                                                {% endif %}
                                             class="dropdown-item">
                                                 Open
@@ -266,7 +278,7 @@
                                             </button>
                                         </div>
                                         <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form id="editClientForm{{ client.id }}" method="post" action="{% url 'edit_client' client.id %}">
+                                            <form id="editClientForm{{ client.id }}" method="post" action=""> {# {% url 'edit_client' client.id %} #}
                                                 {% csrf_token %}
                                                 <div class="row">
                                                     <div class="col-7 form-group form-control-label mb-3">
@@ -312,7 +324,8 @@
                                             </form>
                                         </div>
                                         <div class="modal-footer pt-1">
-                                            {% if perms.home.change_client %}
+{#                                            {% if perms.home.change_client %}#}
+                                            {% if user.is_superuser %}
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                                                 Cancel
                                             </button>
@@ -344,7 +357,7 @@
                                             </button>
                                         </div>
                                         <div class="modal-body py-2" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form id="fillClientForm{{ client.id }}" method="post" action="{% url 'edit_client' client.slug %}">
+                                            <form id="fillClientForm{{ client.id }}" method="post" action=""> {# {% url 'edit_client' client.slug %} #}
                                                 {% csrf_token %}
                                                 <div class="row pt-2">
                                                     <div class="col-7 form-group form-control-label">

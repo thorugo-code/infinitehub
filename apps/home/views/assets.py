@@ -74,6 +74,7 @@ def assets_hub(request):
         'unity_value': values_unity if values_unity is not None else 0,
         'others_value': values_others if values_others is not None else 0,
         'user_profile': user_profile,
+        'segment': 'inventory',
         # 'clients': Client.objects.all()
     }
 

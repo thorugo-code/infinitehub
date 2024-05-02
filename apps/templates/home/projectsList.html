@@ -255,7 +255,7 @@
                                             <span class="completion mr-2">{{ project.completition }}%</span>
                                             <div>
                                                 <div class="progress">
-                                                    <div class="progress-bar {% if project.finished %}bg-success{% else %}bg-info{% endif %}"
+                                                    <div class="progress-bar {% if project.finished %}bg-success{% elif project.deadline|time_to_date < 0 %}bg-danger{% else %}bg-info{% endif %}"
                                                          role="progressbar"
                                                          aria-valuenow="{{ project.completition }}" aria-valuemin="0" aria-valuemax="100"
                                                          style="width: {{ project.completition }}%;"></div>

@@ -47,7 +47,7 @@ def inventory_list(request):
     context = {
         'equipment_list': equipments,
         'user_profile': user_profile,
-        'segment': 'administrative',
+        'segment': 'inventory',
     }
 
     return render(request, 'home/inventory.html', context)
