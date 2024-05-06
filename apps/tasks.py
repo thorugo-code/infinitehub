@@ -2,14 +2,14 @@ import pytz
 from decouple import config
 from datetime import datetime
 from celery import shared_task
-from django.core.mail import send_mail
 from core.settings import EMAIL_HOST_USER
+from django.core.mail import send_mail
 # TODO: Implement email templates
 
 
 @shared_task(bind=True)
-def send_celery_task(self, subject, message, author, recipient_list):
-    send_mail(subject, message, author, recipient_list, fail_silently=True)
+def send_mail_celery(self, subject, message, author, recipient_list, html=None):
+    send_mail(subject, message, author, recipient_list, fail_silently=True, html_message=html)
     return 'Done!'
 
 
@@ -24,7 +24,7 @@ def confirm_register_email(self, email, token):
 
     email_from = EMAIL_HOST_USER
     to_email = [email]
-    send_celery_task.delay(subject, message, email_from, to_email)
+    send_mail_celery.delay(subject, message, email_from, to_email)
 
 
 @shared_task(bind=True)
@@ -38,7 +38,7 @@ def reset_password_email(self, username, token):
 
     email_from = EMAIL_HOST_USER
     to_email = [username]
-    send_celery_task.delay(subject, message, email_from, to_email)
+    send_mail_celery.delay(subject, message, email_from, to_email)
 
 
 @shared_task(bind=True)
@@ -53,4 +53,4 @@ def reset_password_confirmation_email(self, username):
 
     email_from = EMAIL_HOST_USER
     to_email = [username]
-    send_celery_task.delay(subject, message, email_from, to_email)
+    send_mail_celery.delay(subject, message, email_from, to_email)

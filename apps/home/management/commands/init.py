@@ -2,12 +2,20 @@ from django.core.management.base import BaseCommand
 from apps.home.models import Project, Client
 from apps.authentication.models import AuthEmail
 from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
 
 
 class Command(BaseCommand):
     help = 'Init database with custom commands'
 
     def handle(self, *args, **options):
+
+        # Delete all sessions
+        self.stdout.write(f'Deleting sessions...', ending=' ')
+        for session in Session.objects.all():
+            session.delete()
+        else:
+            self.stdout.write(self.style.SUCCESS('OK'))
 
         # Update clients slugs
         for client in Client.objects.all():
@@ -36,7 +44,7 @@ class Command(BaseCommand):
 
         # Delete unconfirmed AuthEmails
         for auth in AuthEmail.objects.all():
-            if not auth.is_confirmed:
+            if not auth.is_confirmed or not auth.user.is_active:
                 auth.delete()
                 self.stdout.write(f'AuthEmail {self.style.SUCCESS(auth)} was deleted')
 

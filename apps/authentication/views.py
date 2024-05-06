@@ -12,7 +12,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User, Permission
 from django.contrib.auth import authenticate, login, logout
 from .forms import LoginForm, SignUpForm, PasswordResetForm
-from .tasks import confirm_register_email, reset_password_email, reset_password_confirmation_email
+from apps.tasks import confirm_register_email, reset_password_email, reset_password_confirmation_email
 
 
 admin_group = config('ADMIN_USERS', 'admin').split(',')
