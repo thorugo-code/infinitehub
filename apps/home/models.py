@@ -589,3 +589,4 @@ class Link(models.Model):
         if not self.title:
             self.title = self.path.split('//')[-1]
             self.save()
+
