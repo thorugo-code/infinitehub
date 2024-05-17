@@ -1,7 +1,9 @@
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 
 
+@csrf_exempt
 def receive(request):
     messages.info(request, 'You have successfully created a meeting')
     print(request)
