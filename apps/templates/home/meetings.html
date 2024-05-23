@@ -1,0 +1,280 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Assets Hub {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="header bg-primary pb-5" xmlns="http://www.w3.org/1999/html">
+        <div class="container-fluid">
+            <div class="header-body">
+                <div class="row align-items-center py-4">
+                    <div class="col-lg-6 col-7">
+                        <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                                <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                                <li class="breadcrumb-item active">Meetings</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="container-fluid mt--5">
+
+        <!-- Meetings card -->
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header border-0">
+                <div class="row">
+                    <div class="col align-items-center d-flex">
+                        <small class="text-muted mb-0 mr-1">({{ meetings_list|length }})</small>
+                        <span class="h3 mb-0">Meetings</span>
+                    </div>
+                    {# <div class="col-auto text-right">#}
+                    {#         <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+                    {#            data-target="#sortModal">#}
+                    {#             <i class="fas fa-sort"></i>#}
+                    {#         </a>#}
+                    {#         <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"#}
+                    {#            data-target="#filterModal">#}
+                    {#             <i class="fas fa-filter"></i>#}
+                    {#         </a>#}
+                    {# </div>#}
+                </div>
+            </div>
+            <!-- Light table -->
+            <div class="table-responsive" style="min-height: 531.61px">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                    <tr>
+                        <th scope="col" style="width: 40%">Info</th>
+                        <th scope="col" style="width: 15%">Project</th>
+                        <th scope="col" style="width: 15%">Members</th>
+                        <th scope="col" style="width: 18%">Date</th>
+                        <th scope="col" style="width: 12%">URL</th>
+                        <th scope="col" style="width: 0"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="list">
+                    {% load filters %}
+                    {% for meeting in meetings_list %}
+                        <tr>
+                            <th scope="row">
+                                <a href="{% url 'meeting_details' meeting.id %}" class="align-items-center">
+                                    <span class="text-sm"
+                                          style="color: #525f7f">
+                                        {{ meeting.title|truncatechars:50 }}
+                                    </span><br>
+                                </a>
+                                <span class="name mb-0 font-weight-light"
+                                      style="font-weight: 400; color: #525f7f">
+                                    {{ meeting.summary|truncatechars:80 }}
+                                </span>
+                            </th>
+                            <td>
+                                {% if meeting.project %}
+                                    <a href="{% url 'project_details' meeting.project.id %}"
+                                       class="align-items-center">
+                                        <span class="h5 font-weight-normal mb-0"
+                                              style="color: #525f7f">
+                                            {{ meeting.project.title|truncatechars:30 }}
+                                        </span>
+                                        <small class="d-block name mb-0 font-weight-light"
+                                              style="font-weight: 400; color: #525f7f">
+                                            {{ meeting.project.client.name|default:meeting.project.client_str|truncatechars:30 }}
+                                        </small>
+                                    </a>
+                                {% else %}
+                                    <span class="text-sm">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-items-center py-0">
+                                <div class="avatar-group">
+                                    {% for collaborator in meeting.participants.all|slice:':4' %}
+                                        {% if meeting.participants.all.count >= 4 and collaborator == meeting.participants.all.first %}
+                                            <a href="{% url 'meeting_details' meeting.id %}" data-toggle="tooltip"
+                                               data-original-title="See all">
+                                                <span class="mr--2">...</span>
+                                            </a>
+                                            <a href="{% url 'collaborators_list' %}#{{ collaborator.id }}"
+                                               class="avatar avatar-sm rounded-circle border-0"
+                                               style="background-color: #fff;"
+                                               data-toggle="tooltip"
+                                               data-original-title="{{ collaborator.get_full_name }}">
+                                                <div class="avatar avatar-sm rounded-circle">
+                                                    <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
+                                                         alt="Image placeholder"
+                                                         src="{{ collaborator.profile.avatar.url }}">
+                                                </div>
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'collaborators_list' %}#{{ collaborator.id }}"
+                                               class="avatar avatar-sm rounded-circle border-0"
+                                               style="background-color: #fff;"
+                                               data-toggle="tooltip"
+                                               data-original-title="{{ collaborator.get_full_name }}">
+                                                <div class="avatar avatar-sm rounded-circle">
+                                                    <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
+                                                         alt="Image placeholder"
+                                                         src="{{ collaborator.profile.avatar.url }}">
+                                                </div>
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td>
+                                <span>{{ meeting.start|date:"d/m/Y" }}</span>
+                                <br>
+                                <span style="font-size: 0.75rem">{{ meeting.start|date:"H:i:s T" }}</span>
+                            </td>
+                            <td>
+                                <a href="{{ meeting.url }}">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>Read.ai</span>
+                                </a>
+                            </td>
+                            <td class="text-right">
+                                <div class="dropdown">
+                                    <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
+                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                        <a class="dropdown-item" href="{% url 'meeting_details' meeting.id %}">
+                                            Open
+                                        </a>
+                                        {% if meeting.project %}
+                                            <a class="dropdown-item" href="{% url 'project_details' meeting.project.id %}">
+                                                Go to project
+                                            </a>
+                                        {% endif %}
+{#                                        <div class="dropdown-divider"></div>#}
+{#                                        <a class="dropdown-item text-danger" href="" data-dismiss="modal"#}
+{#                                           data-toggle="modal"#}
+{#                                           data-target="#deleteConfirm{{ meeting.id }}">#}
+{#                                            Hide#}
+{#                                        </a>#}
+{#                                        <a class="dropdown-item text-danger" href="" data-dismiss="modal"#}
+{#                                           data-toggle="modal"#}
+{#                                           data-target="#deleteConfirm{{ meeting.id }}">#}
+{#                                            Delete#}
+{#                                        </a>#}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Card footer -->
+            <div class="card-footer py-4">
+                <nav aria-label="...">
+                    <ul class="pagination justify-content-end mb-0">
+                        {% if meetings_list.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ meetings_list.previous_page_number }}">
+                                    <i class="fas fa-angle-left"></i>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">
+                                    <i class="fas fa-angle-left"></i>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for page_num in meetings_list.paginator.page_range %}
+                            {% if meetings_list.number == page_num %}
+                                <li class="page-item active">
+                                    <a class="page-link" href="#">{{ page_num }}</a>
+                                </li>
+                            {% elif page_num > meetings_list.number|add:"-2" and page_num < meetings_list.number|add:"2" %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                                </li>
+                            {% elif page_num == meetings_list.paginator.num_pages or page_num == 1 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                {% if page_num == meetings_list.number|add:"-2" or page_num == meetings_list.number|add:"2" %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1">...</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if meetings_list.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ meetings_list.next_page_number }}">
+                                    <i class="fas fa-angle-right"></i>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">
+                                    <i class="fas fa-angle-right"></i>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="container-fluid mt-4">
+        {% include "includes/footer.html" %}
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+    <script>
+
+        function changeAscDesc(event) {
+            let chkAsc = document.getElementById("chk-asc");
+            let chkDesc = document.getElementById("chk-desc");
+
+            if (event.target.id === "chk-asc" && chkAsc.checked) {
+                chkDesc.checked = false;
+            } else if (event.target.id === "chk-desc" && chkDesc.checked) {
+                chkAsc.checked = false;
+            }
+        }
+
+        function clearChks(selectObject) {
+            let chkAsc = document.getElementById("chk-asc");
+            let chkDesc = document.getElementById("chk-desc");
+            let optionValue = selectObject.value
+
+            if (optionValue === '') {
+                chkAsc.checked = false;
+                chkDesc.checked = false;
+            } else if (chkAsc.checked === false && chkDesc.checked === false) {
+                chkDesc.checked = true;
+            }
+        }
+
+    </script>
+
+{% endblock javascripts %}

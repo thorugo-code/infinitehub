@@ -484,7 +484,7 @@ def details(request, id):
         return redirect('project_details', id=project.id)
 
     user_profile = Profile.objects.get(user=request.user)
-    tasks = sorted(Task.objects.filter(project=project), key=lambda x: x.deadline)
+    tasks = sorted(Task.objects.filter(project=project), key=lambda x: x.deadline if x.deadline else datetime.max.date())
     edit_mode = request.GET.get('edit')
 
     if edit_mode is not None:
@@ -618,9 +618,10 @@ def edit_task(request, project_id, task_id):
     project = Project.objects.get(id=project_id)
 
     if request.method == 'POST':
+        post_deadline = request.POST.get('taskDeadlineEdit')
         task.title = request.POST.get('taskTitleEdit', task.title)
         task.description = request.POST.get('taskDescriptionEdit', task.description)
-        task.deadline = request.POST.get('taskDeadlineEdit', task.deadline)
+        task.deadline = post_deadline if post_deadline else task.deadline
         task.priority = int(request.POST.get('taskPriorityEdit', task.priority))
         task.owner = User.objects.get(id=request.POST['taskOwnerEdit']) if request.POST.get('taskOwnerEdit') else task.owner
         task.save()

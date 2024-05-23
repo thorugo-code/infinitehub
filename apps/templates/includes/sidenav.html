@@ -102,8 +102,8 @@
                 
                     <!-- Meetings items -->
                     <li class="nav-item">
-                        <a class="nav-link" href="">
-                            <i class="fas fa-comments text-gray-dark" style="opacity: 90%"></i>
+                        <a class="nav-link {% if 'meetings' in segment %}active{% endif %}" href="{% url 'meetings_home' %}">
+                            <i class="fas fa-comments text-purple" style="opacity: 90%"></i>
                             <span class="nav-link-text">Meetings</span>
                         </a>
                     </li>
@@ -113,7 +113,7 @@
             <!-- Down items -->
             <ul class="navbar-nav flex-column" style="background: #fff; position: absolute; bottom: 15px">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'profile' %}">
+                    <a class="nav-link {% if 'profile' in segment %}active{% endif %}" href="{% url 'profile' %}">
                         <i class="ni ni-single-02"></i>
                         <span class="nav-link-text">Profile</span>
                     </a>

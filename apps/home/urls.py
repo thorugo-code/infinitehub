@@ -237,6 +237,19 @@ offices_urls = [
     path('offices/delete=<int:office_id>', offices.delete, name='offices_delete'),
 ]
 
+meetings_urls = [
+
+    path('meetings/', meetings.home, name='meetings_home'),
+
+    path('meetings/id=<int:meeting_id>', meetings.details, name='meeting_details'),
+    path('meetings/edit=<int:meeting_id>', meetings.details, name='meeting_edit'),
+
+    path('meetings/id=<int:meeting_id>/edit-task=<int:task_id>', meetings.edit_task, name='meeting_edit_task'),
+    path('meetings/id=<int:meeting_id>/delete-task=<int:task_id>', meetings.delete_task,
+         name='meeting_delete_task'),
+
+]
+
 base_urls = [
     path('', login.index, name='home'),
     # Matches any html file
@@ -246,7 +259,7 @@ base_urls = [
 urlpatterns = [
     *projects_list_urls, *projects_page_urls, *assets_urls, *collaborators_page_urls, *collaborators_list_urls,
     *balance_urls, *inventory_urls, *profile_urls, *clients_list_urls, *offices_urls, *client_page_urls,
-    *client_balance_urls, *client_documents_urls, *base_urls
+    *client_balance_urls, *client_documents_urls, *meetings_urls, *base_urls
 ]
 
 if settings.DEBUG:

@@ -29,6 +29,7 @@ def details(request):
         'completed_tasks_percentage': (tasks_completed.count() / all_tasks.count()) * 100 if all_tasks.count() > 0 else 0,
         'completed_projects': projects_completed.count(),
         'completed_projects_percentage': (projects_completed.count() / all_projects.count()) * 100 if all_projects.count() > 0 else 0,
+        'segment': 'profile',
     }
 
     return render(request, 'home/profile.html', context)

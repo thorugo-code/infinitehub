@@ -14,6 +14,7 @@ from djmoney.models.fields import MoneyField
 from django.contrib.auth.models import User, Group
 from apps.home.storage_backends import PublicMediaStorage
 from apps.authentication.models import AuthEmail
+from picklefield.fields import PickledObjectField
 
 
 def get_favicon(url):
@@ -323,10 +324,12 @@ class UploadedFile(models.Model):
 
 
 class Task(models.Model):
-    project = models.ForeignKey(Project, related_name='tasks', on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name='tasks', on_delete=models.CASCADE, null=True, blank=True)
+    meeting = models.ForeignKey('Meeting', related_name='tasks', on_delete=models.SET_NULL, null=True, blank=True)
+
     title = models.CharField(max_length=100)
     description = models.TextField()
-    deadline = models.DateField()
+    deadline = models.DateField(null=True, blank=True)
     priority = models.IntegerField(default=0)
 
     completed = models.BooleanField(default=False)
@@ -345,12 +348,11 @@ class Task(models.Model):
     def save(self, *arg, **kwargs):
         super().save()
 
-        project = self.project
-        total_tasks = project.tasks.count()
-        completed_tasks = project.tasks.filter(completed=True).count()
-
-        project.completition = int((completed_tasks / total_tasks) * 100)
-        project.save()
+        if self.project:
+            total_tasks = self.project.tasks.count()
+            completed_tasks = self.project.tasks.filter(completed=True).count()
+            self.project.completition = int((completed_tasks / total_tasks) * 100)
+            self.project.save()
 
 
 class Office(models.Model):
@@ -590,3 +592,24 @@ class Link(models.Model):
             self.title = self.path.split('//')[-1]
             self.save()
 
+
+class Meeting(models.Model):
+    project = models.ForeignKey(Project, related_name='meetings', on_delete=models.SET_NULL, null=True)
+    client = models.ForeignKey(Client, related_name='meetings', on_delete=models.SET_NULL, null=True)
+    participants = models.ManyToManyField(User, related_name='meetings')
+    owner = models.ForeignKey(User, related_name='owned_meetings', on_delete=models.SET_NULL, null=True)
+
+    external_owner = models.CharField(max_length=100, default='')
+    title = models.CharField(max_length=100)
+
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+
+    questions = PickledObjectField(default=list)
+    topics = PickledObjectField(default=list)
+    external_participants = PickledObjectField(default=list)
+    invited_participants = PickledObjectField(default=list)
+
+    summary = models.TextField(default='')
+
+    url = models.URLField()

@@ -12,21 +12,20 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if DEBUG:
             users = User.objects.filter(username__in=config('STAFF_USERS', 'admin').split(','))
-            subject = 'Atualização / Update (TEST)'
+            subject = 'Manutenção / Maintenance (TEST)'
 
         else:
             users = User.objects.filter(is_active=True)
-            # users = User.objects.all()
-            subject = 'Atualização / Update'
+            subject = 'Manutenção / Maintenance'
 
         from_email = EMAIL_HOST_USER
 
         for user in users:
-            topics = config('UPDATE_TOPICS', 'Sua mensagem de atualização').split(';')
-            topics_eng = config('ENG_UPDATE_TOPICS', 'Your update message').split(';')
+            topics = config('MAINTENANCE_TOPICS', 'Sua mensagem de aviso sobre manutenção').split(';')
+            topics_eng = config('ENG_MAINTENANCE_TOPICS', 'Your maintenance notice').split(';')
 
             html_message = render_to_string(
-                f'{TEMPLATE_DIR}/mail/update.html',
+                f'{TEMPLATE_DIR}/mail/maintenance.html',
                 {'user': user, 'topics': topics, 'topics_eng': topics_eng}
             )
 
@@ -38,4 +37,4 @@ class Command(BaseCommand):
                 html=html_message
             )
 
-            self.stdout.write(f"Successfully sent update message to {self.style.SUCCESS(user.username)}.")
+            self.stdout.write(f"Successfully sent maintenance message to {self.style.SUCCESS(user.username)}.")
