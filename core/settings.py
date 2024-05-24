@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'apps.home',
     'apps.authentication',
     'apps.api',
+    'apps.members',
     'storages',
 ]
 

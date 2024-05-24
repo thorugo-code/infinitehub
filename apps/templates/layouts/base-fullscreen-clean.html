@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>
+        InfiniteHub
+    </title>
+
+    <link rel="icon" href="/static/assets/img/brand/icon.ico" type="image/ico">
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+    <!-- Icons -->
+    <link rel="stylesheet" href="/static/assets/vendor/nucleo/css/nucleo.css" type="text/css">
+    <link rel="stylesheet" href="/static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
+    <!-- Argon CSS -->
+    <link rel="stylesheet" href="/static/assets/css/argon.css?v=1.2.0" type="text/css">
+
+    <!-- Specific CSS goes HERE -->
+    {% block stylesheets %}{% endblock stylesheets %}
+
+</head>
+
+<body class="background-svg">
+
+<div class="main-content">
+
+    <!-- Header -->
+    <div class="header pt-8 pt-lg-9">
+    </div>
+
+    {% block content %}{% endblock content %}
+
+    {% include "includes/footer-fullscreen.html" %}
+
+</div>
+
+{% include "includes/scripts.html" %}
+
+<!-- Specific JS goes HERE -->
+{% block javascript %}{% endblock javascript %}
+
+<script src="/static/assets/js/argon.js?v=1.2.0"></script>
+
+</body>
+
+</html>
