@@ -10,8 +10,13 @@ class SessionExpiredMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
 
+        in_api = resolve(request.path).func.__module__.startswith('apps.api.views')
+        in_members = resolve(request.path).func.__module__.startswith('apps.members.views')
         in_auth = resolve(request.path).func.__module__.startswith('apps.authentication.views')
-        if not DEBUG and not request.user.is_authenticated and not in_auth:
+
+        if in_members or in_api:
+            return response
+        elif not DEBUG and not request.user.is_authenticated and not in_auth:
             return redirect(reverse('login'))
         elif request.user.is_authenticated and in_auth:
             return redirect(reverse('home'))
