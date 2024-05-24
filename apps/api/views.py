@@ -48,17 +48,17 @@ def receive(request):
 
             collaborators = [
                 collaborator['email'] for collaborator in body_data.get('participants') if
-                collaborator['email'].endswith('@infinitefoundry.com')
+                str(collaborator['email']).endswith('@infinitefoundry.com')
             ]
 
             external = [
                 collaborator['email'] for collaborator in body_data.get('participants') if not
-                collaborator['email'].endswith('@infinitefoundry.com') and collaborator['email'] != 'None'
+                str(collaborator['email']).endswith('@infinitefoundry.com') and collaborator['email'] is not None
             ]
 
             invited = [
                 collaborator['name'] for collaborator in body_data.get('participants') if
-                collaborator['email'] == 'None'
+                collaborator['email'] is None
             ]
 
             meeting = Meeting.objects.create(
