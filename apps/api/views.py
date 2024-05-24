@@ -29,8 +29,15 @@ def receive(request):
 
         if all(validations):
 
-            start = datetime.strptime(body_data['start_time'], '%Y-%m-%dT%H:%M:%S%z')
-            end = datetime.strptime(body_data['end_time'], '%Y-%m-%dT%H:%M:%S%z')
+            try:
+                start = datetime.strptime(body_data['start_time'], '%Y-%m-%dT%H:%M:%S%z')
+                end = datetime.strptime(body_data['end_time'], '%Y-%m-%dT%H:%M:%S%z')
+            except ValueError:
+                try:
+                    start = datetime.strptime(body_data['start_time'], '%Y-%m-%dT%H:%M:%S.%f%z')
+                    end = datetime.strptime(body_data['end_time'], '%Y-%m-%dT%H:%M:%S.%f%z')
+                except ValueError:
+                    start, end = None, None
 
             try:
                 owner = User.objects.get(username=body_data['owner']['email'])
@@ -41,17 +48,17 @@ def receive(request):
 
             collaborators = [
                 collaborator['email'] for collaborator in body_data.get('participants') if
-                collaborator['email'].endswith('@infinitefoundry.com')
+                str(collaborator['email']).endswith('@infinitefoundry.com')
             ]
 
             external = [
                 collaborator['email'] for collaborator in body_data.get('participants') if not
-                collaborator['email'].endswith('@infinitefoundry.com') and collaborator['email'] != 'None'
+                str(collaborator['email']).endswith('@infinitefoundry.com') and collaborator['email'] is not None
             ]
 
             invited = [
                 collaborator['name'] for collaborator in body_data.get('participants') if
-                collaborator['email'] == 'None'
+                collaborator['email'] is None
             ]
 
             meeting = Meeting.objects.create(
