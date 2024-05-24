@@ -16,7 +16,7 @@ Pillow==10.3.0
 django-money==3.4.1
 djangorestframework==3.14.0
 qrcode==7.4.2
-requests==2.31.0
+requests==2.32.0
 bs4==0.0.2
 beautifulsoup4==4.12.3
 setuptools==69.0.3
