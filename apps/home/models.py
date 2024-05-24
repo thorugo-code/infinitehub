@@ -602,8 +602,8 @@ class Meeting(models.Model):
     external_owner = models.CharField(max_length=100, default='')
     title = models.CharField(max_length=100)
 
-    start = models.DateTimeField()
-    end = models.DateTimeField()
+    start = models.DateTimeField(null=True, blank=True)
+    end = models.DateTimeField(null=True, blank=True)
 
     questions = PickledObjectField(default=list)
     topics = PickledObjectField(default=list)

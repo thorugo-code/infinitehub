@@ -29,8 +29,15 @@ def receive(request):
 
         if all(validations):
 
-            start = datetime.strptime(body_data['start_time'], '%Y-%m-%dT%H:%M:%S%z')
-            end = datetime.strptime(body_data['end_time'], '%Y-%m-%dT%H:%M:%S%z')
+            try:
+                start = datetime.strptime(body_data['start_time'], '%Y-%m-%dT%H:%M:%S%z')
+                end = datetime.strptime(body_data['end_time'], '%Y-%m-%dT%H:%M:%S%z')
+            except ValueError:
+                try:
+                    start = datetime.strptime(body_data['start_time'], '%Y-%m-%dT%H:%M:%S.%f%z')
+                    end = datetime.strptime(body_data['end_time'], '%Y-%m-%dT%H:%M:%S.%f%z')
+                except ValueError:
+                    start, end = None, None
 
             try:
                 owner = User.objects.get(username=body_data['owner']['email'])
