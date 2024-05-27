@@ -102,13 +102,13 @@ clients_list_urls = [
 
 client_page_urls = [
 
-    # path('clients/<slug:slug>', clients.details, name='client_details'),
-    # path('clients/<slug:slug>/edit', clients.details, name='edit_client'),
-    # path('clients/<slug:slug>/picture', clients.change_picture, name='change_client_picture'),
-    #
-    # path('clients/<slug:slug>/new-branch', clients.new_branch, name='new_client_branch'),
-    # path('clients/<slug:slug>/edit-branch=<int:branch_id>', clients.edit_branch, name='edit_client_branch'),
-    # path('clients/<slug:slug>/delete-branch=<int:branch_id>', clients.delete_branch, name='delete_client_branch'),
+    path('clients/<slug:slug>', clients.details, name='client_details'),
+    path('clients/<slug:slug>/edit', clients.details, name='edit_client'),
+    path('clients/<slug:slug>/picture', clients.change_picture, name='change_client_picture'),
+
+    path('clients/<slug:slug>/new-branch', clients.new_branch, name='new_client_branch'),
+    path('clients/<slug:slug>/edit-branch=<int:branch_id>', clients.edit_branch, name='edit_client_branch'),
+    path('clients/<slug:slug>/delete-branch=<int:branch_id>', clients.delete_branch, name='delete_client_branch'),
 
 ]
 

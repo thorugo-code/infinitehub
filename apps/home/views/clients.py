@@ -91,8 +91,6 @@ def sort(request):
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
     filters = request.POST.get('filters', 'None')
 
-    print(f'sorted_by: {sorted_by} | sort_type: {sort_type} | filters: {filters}')
-
     if sorted_by != '' and filters != 'None':
         return redirect('sorted_filtered_clients', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
     elif sorted_by != '':
