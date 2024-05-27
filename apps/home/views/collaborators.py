@@ -188,6 +188,17 @@ def download_document(request, document_id):
     return response
 
 
+def download_collaborator_qrcode(request, slug):
+    collaborator = get_object_or_404(Profile, slug=slug)
+    qr = collaborator.qrcode
+
+    file_name = qr.name
+    file_content = default_storage.open(file_name).read()
+    response = HttpResponse(file_content, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{file_name.split("/")[-1]}"'
+    return response
+
+
 def sort_docs(request, slug):
     sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'

@@ -34,9 +34,19 @@
         <div class="col-xl-4 order-xl-1">
             <div class="card card-profile" style="height: 96%">
                 <div class="row mx-0 my-3">
-                    <div class="col text-right">
-                        <a class="btn btn-sm btn-neutral" href="#" data-toggle="modal" data-target="#collaboratorEditInfosModal"><i class="fas fa-cog"></i></a>
+                    <div class="col-auto text-right">
+                        <a class="btn btn-sm btn-neutral" href="#" data-toggle="modal" data-target="#collaboratorEditInfosModal">
+                            <i class="fas fa-cog"></i>
+                        </a>
                     </div>
+                    {% if collaborator.qrcode %}
+                        <div class="col text-right">
+                            <a class="btn btn-sm btn-neutral" href="#"
+                               data-toggle="modal" data-target="#qrcode">
+                                <i class="fas fa-share-alt"></i>
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="row justify-content-center mt-5 pt-5">
                     <div class="col-lg-12">
@@ -67,6 +77,13 @@
                                     {% endif %}
                                     {% if collaborator.user.username|check_group:'finance' %}
                                         <small class="badge badge-md badge-warning">Financial</small>
+                                    {% endif %}
+                                    {% if collaborator.qrcode %}
+                                        <a href="" data-dismiss="modal" data-toggle="modal"
+                                           data-target="#qrcode"
+                                           class="badge badge-md badge-secondary">
+                                            <i class="fas fa-qrcode"></i>
+                                        </a>
                                     {% endif %}
                                 </div>
                             </div>
@@ -111,10 +128,50 @@
                             {% endif %}
                         </div>
                         {% if collaborator.about != '' %}
-                            <div class="h4 font-weight-500 mt-4 pt-2">
+                            <div class="h4 font-weight-500 my-3 mb-3 py-4">
                                 <i>"{{ collaborator.about }}"</i>
                             </div>
+                        {% else %}
+                            <div class="py-3"></div>
                         {% endif %}
+
+                        <div class="row justify-content-center" style="width: 108%;">
+                            {% if collaborator.website %}
+                                <div class="col-1 px-0 mx-1">
+                                    <a href="{{ collaborator.website }}" target="_blank" data-toggle="tooltip" data-original-title="Website">
+                                        <i class="fas fa-globe"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if collaborator.facebook %}
+                                <div class="col-1 px-0 mx-1">
+                                    <a href="{{ collaborator.facebook }}" target="_blank" data-toggle="tooltip" data-original-title="Facebook">
+                                        <i class="fab fa-facebook-square"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if collaborator.twitter %}
+                                <div class="col-1 px-0 mx-1">
+                                    <a href="{{ collaborator.twitter }}" target="_blank" data-toggle="tooltip" data-original-title="Twitter">
+                                        <i class="fab fa-twitter-square"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if collaborator.instagram %}
+                                <div class="col-1 px-0 mx-1">
+                                    <a href="{{ collaborator.instagram }}" target="_blank" data-toggle="tooltip" data-original-title="Instagram">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if collaborator.linkedin %}
+                                <div class="col-1 px-0 mx-1">
+                                    <a href="{{ collaborator.linkedin }}" target="_blank" data-toggle="tooltip" data-original-title="LinkedIn">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
 
                     </div>
                 </div>
@@ -826,6 +883,50 @@
         </div>
     </div>
 </div>
+                            
+<!-- QRCode Modal -->
+{% if collaborator.qrcode %}
+    <div class="modal fade" id="qrcode" tabindex="-1" role="dialog"
+         aria-labelledby="qrcodeLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px"
+             role="document">
+            <div class="modal-content">
+                <div class="modal-header align-items-center">
+                    <h5 class="modal-title my-1" style="margin-left: auto">
+                        <i class="fas fa-qrcode text-blue" style="font-size: 1.5rem"></i>
+                    </h5>
+                    <h5 class="modal-title ml-3 my-1"
+                        style="margin-right: auto; font-size: 1.2rem"
+                        id="qrcodeLabel">{{ collaborator.user.get_full_name }}</h5>
+                    <button type="button" class="close mt--4" style="margin-left: -30px"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body py-0"
+                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                    <div class="form-group mt-4 mb-0"
+                         style="display: flex; justify-content: center">
+                        <div style="z-index: 1; width: 250px; height: 250px; background-color: #adb5bd00">
+                            <img
+                                    id="imagePreviewModal"
+                                    class=""
+                                    style="max-width: 100%; height: 100%; object-fit: cover;"
+                                    alt="Image placeholder"
+                                    src="{{ collaborator.qrcode.url }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{% url 'download_qrcode_collaborator' collaborator.slug %}" class="btn btn-success">
+                        <i class="fas fa-download text-white"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 
 <!-- Footer -->
 <div class="container-fluid mt-4">

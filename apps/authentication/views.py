@@ -381,6 +381,9 @@ def fill_profile(request):
         user_object.save()
         profile.save()
 
+        if not profile.qrcode:
+            profile.generate_qrcode()
+
         return redirect("profile")
 
     else:

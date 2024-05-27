@@ -1,4 +1,4 @@
-{% extends 'layouts/base-fullscreen-nologo.html' %}
+{% extends 'layouts/base-fullscreen-clean.html' %}
 
 {% block title %} Profile {% endblock title %}
 
@@ -13,7 +13,7 @@
 
 {% block content %}
 
-    <div class="content mb-6">
+    <div class="content mb-6 mt--6">
         <div class="container-fluid">
             <div class="col-md-8 col-12 mr-auto ml-auto">
                 <div class="wizard-container">
@@ -33,23 +33,30 @@
                             </div>
                             <div class="wizard-navigation mx-lg-8 mx-sm-5 mx-5">
                                 <ul class="nav nav-pills">
-                                    <li class="nav-item" style="width: 33.33333%">
+                                    <li class="nav-item" style="width: 25%">
                                         <a class="nav-link text-center active" href="#info" data-toggle="tab"
                                            role="tab" aria-selected="false" disabled>
                                             Basic Info
                                         </a>
                                     </li>
-                                    <li class="nav-item" style="width: 33.33333%">
+                                    <li class="nav-item" style="width: 25%">
                                         <a class="nav-link text-center" href="#address" data-toggle="tab" role="tab"
                                            disabled>
                                             Address
                                         </a>
                                     </li>
-                                    <li class="nav-item" style="width: 33.33333%">
+                                    <li class="nav-item" style="width: 25%">
                                         <a class="nav-link text-center" href="#professional" data-toggle="tab"
                                            role="tab"
                                            aria-selected="true" disabled>
                                             Professional
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" style="width: 25%">
+                                        <a class="nav-link text-center" href="#social" data-toggle="tab"
+                                           role="tab"
+                                           aria-selected="true" disabled>
+                                            Social
                                         </a>
                                     </li>
                                 </ul>
@@ -179,9 +186,61 @@
                                         <div class="px-lg-4 col-sm-10">
                                             <div class="form-group form-control-label">
                                                 <label for="about">About</label>
-                                                <textarea rows="6" class="form-control" id="about"
+                                                <textarea rows="3" class="form-control" id="about"
                                                           name="about"
                                                           placeholder="A few words about you...">{{ user.about }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="social">
+                                    <div class="row justify-content-center py-0 py-lg-5 py-sm-3">
+                                        <div class="px-lg-4 col-sm-10">
+                                            <div class="form-group form-control-label mb-2">
+                                                <label for="website">Links</label>
+                                                <div class="input-group input-group-merge">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                                    </div>
+                                                    <input class="form-control" id="website" name="website" 
+                                                           placeholder="Your website" type="url" value="{{ user.website|default:"" }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <div class="input-group input-group-merge">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
+                                                    </div>
+                                                    <input class="form-control" id="linkedin" name="linkedin" 
+                                                           placeholder="Linkedin" type="url" value="{{ user.linkedin|default:"" }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <div class="input-group input-group-merge">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fab fa-facebook-square"></i></span>
+                                                    </div>
+                                                    <input class="form-control" id="facebook" name="facebook" 
+                                                           placeholder="Facebook" type="url" value="{{ user.facebook|default:"" }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <div class="input-group input-group-merge">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fab fa-instagram"></i></span>
+                                                    </div>
+                                                    <input class="form-control" id="instagram" name="instagram" 
+                                                           placeholder="Instagram" type="url" value="{{ user.instagram|default:"" }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <div class="input-group input-group-merge">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fab fa-twitter-square"></i></span>
+                                                    </div>
+                                                    <input class="form-control" id="twitter" name="twitter" 
+                                                           placeholder="Twitter" type="url" value="{{ user.twitter|default:"" }}">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

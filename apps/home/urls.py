@@ -199,6 +199,9 @@ collaborators_list_urls = [
          name='sorted_filtered_collaborators'),
 
     path('collaborators/fill=<str:slug>', collaborators.fill_collaborator_initial_infos, name='fill_collaborator'),
+
+    path('collaborators/qr-code=<str:slug>', collaborators.download_collaborator_qrcode,
+         name='download_qrcode_collaborator'),
 ]
 
 inventory_urls = [
@@ -226,6 +229,8 @@ profile_urls = [
     path('profile/save', profile.edit, name='send_edit_profile'),
 
     path('profile/delete-file=<int:file_id>', profile.delete_file, name='delete_file_from_profile'),
+
+    path('profile/qrcode', profile.download_qrcode, name='profile_download_qrcode'),
 ]
 
 offices_urls = [

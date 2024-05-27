@@ -203,7 +203,12 @@
                                     </a>
                                 </th>
                                 <td>
-                                    <span>{{ collab.user.username|email_tag }}</span>
+                                    {% if collab.qrcode %}
+                                        <a href="" data-toggle="modal" data-target="#qrcode{{ collab.id }}">
+                                            <i class="fas fa-qrcode pr-1"></i>
+                                        </a>
+                                    {% endif %}
+                                    <span class="h5 font-weight-normal">{{ collab.user.username|email_tag }}</span>
                                     <span class="d-block font-weight-light" style="font-size: 90%">{{ collab.phone|default:'' }}</span>
                                 </td>
                                 <td>
@@ -282,89 +287,140 @@
                             <div class="modal fade" id="collaboratorModal{{ collab.id }}" tabindex="-1" role="dialog"
                                  aria-labelledby="filterModalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
-                                <div class="modal-content">
-                                    <div class="modal-header mt-2 align-items-center">
-                                        <button type="button" class="close mt--4 ml-auto"
-                                                data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="row justify-content-center mt-6 pt-3">
-                                        <div class="col-lg-12">
-                                            <div class="card-profile-image"
-                                                 style="background-color: #adb5bd00">
-                                                <a href="#" data-toggle="modal" data-target="#profilePictureModal">
-                                                    <img class="rounded-circle"
-                                                         style="min-width: 180px; height: 180px; object-fit: cover; background-color: #fff; z-index: 1"
-                                                         src="{{ collab.avatar.url }}"
-                                                         alt="{{ collab.user.first_name }}">
-                                                </a>
+                                    <div class="modal-content">
+                                        <div class="modal-header mt-2 align-items-center">
+                                            <button type="button" class="close mt--4 ml-auto"
+                                                    data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="row justify-content-center mt-6 pt-3">
+                                            <div class="col-lg-12">
+                                                <div class="card-profile-image"
+                                                     style="background-color: #adb5bd00">
+                                                    <a href="#" data-toggle="modal" data-target="#profilePictureModal">
+                                                        <img class="rounded-circle"
+                                                             style="min-width: 180px; height: 180px; object-fit: cover; background-color: #fff; z-index: 1"
+                                                             src="{{ collab.avatar.url }}"
+                                                             alt="{{ collab.user.first_name }}">
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="modal-body pt-3">
-                                        <div class="row">
-                                            <div class="col">
-                                                <div class="card-profile-stats d-flex justify-content-center mt-6 pb-2">
-                                                    <div class="py-3">
-                                                        <small class="badge badge-md {% if collab.user.is_active %}badge-success">
-                                                            Active{% else %}badge-danger">Disabled{% endif %}
-                                                        </small>
-                                                        {% if collab.user.username|check_group:'admin' %}
-                                                            <small class="badge badge-md badge-danger">Admin</small>
-                                                        {% endif %}
-                                                        {% if collab.user.username|check_group:'collaborator' %}
-                                                            <small class="badge badge-md badge-info">Collaborator</small>
-                                                        {% else %}
-                                                            <small class="badge badge-md badge-primary">External</small>
-                                                        {% endif %}
-                                                        {% if collab.user.username|check_group:'finance' %}
-                                                            <small class="badge badge-md badge-warning">Financial</small>
-                                                        {% endif %}
+                                        <div class="modal-body pt-3">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="card-profile-stats d-flex justify-content-center mt-6 pb-2">
+                                                        <div class="py-3">
+                                                            <small class="badge badge-md {% if collab.user.is_active %}badge-success">
+                                                                Active{% else %}badge-danger">Disabled{% endif %}
+                                                            </small>
+                                                            {% if collab.user.username|check_group:'admin' %}
+                                                                <small class="badge badge-md badge-danger">Admin</small>
+                                                            {% endif %}
+                                                            {% if collab.user.username|check_group:'collaborator' %}
+                                                                <small class="badge badge-md badge-info">Collaborator</small>
+                                                            {% else %}
+                                                                <small class="badge badge-md badge-primary">External</small>
+                                                            {% endif %}
+                                                            {% if collab.user.username|check_group:'finance' %}
+                                                                <small class="badge badge-md badge-warning">Financial</small>
+                                                            {% endif %}
+                                                            {% if collab.qrcode %}
+                                                                <a href="" data-dismiss="modal" data-toggle="modal" 
+                                                                   data-target="#qrcode{{ collab.id }}" 
+                                                                   class="badge badge-md badge-secondary">
+                                                                    <i class="fas fa-qrcode"></i>
+                                                                </a>
+                                                            {% endif %}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="text-center">
-                                            <h5 class="h3 title py-1">
-                                                {% if collab.identification and user_profile.user.username|check_group:'collaborator' %}
-                                                    <span class="h5 font-weight-light text-muted">({{ collab.identification }})</span>
+                                            <div class="text-center">
+                                                <h5 class="h3 title py-1">
+                                                    {% if collab.identification and user_profile.user.username|check_group:'collaborator' %}
+                                                        <span class="h5 font-weight-light text-muted">({{ collab.identification }})</span>
+                                                    {% endif %}
+                                                    <span>{{ collab.user.get_full_name }}</span>
+                                                    <small class="d-block h5 font-weight-light text-muted">{{ collab.position|default:'' }}</small>
+                                                </h5>
+                                                {% if collaborator.admission %}
+                                                    <div class="mt-3">
+                                                        Admission: {{ collab.admission|date:'d/m/Y' }}
+                                                    </div>
                                                 {% endif %}
-                                                <span>{{ collab.user.get_full_name }}</span>
-                                                <small class="d-block h5 font-weight-light text-muted">{{ collab.position|default:'' }}</small>
-                                            </h5>
-                                            {% if collaborator.admission %}
-                                                <div class="mt-3">
-                                                    Admission: {{ collab.admission|date:'d/m/Y' }}
+                                                <div class="h5 mt-3">
+                                                    {{ collab.user.username }}
                                                 </div>
-                                            {% endif %}
-                                            <div class="h5 mt-3">
-                                                {{ collab.user.username }}
-                                            </div>
-                                            {% if collab.phone %}
-                                                <div class="h5 font-weight-300 mt--2 pb-2">
-                                                    {{ collab.phone }}
-                                                </div>
-                                            {% endif %}
-                                            {% if user_profile.user.username|check_group:'collaborator' %}
-                                                <div class="h5 font-weight-400 {% if not collab.about %}pb-5{% endif %}">
-                                                    {% if collab.street != '' and collab.city != '' and collab.state != '' and collab.country != '' %}
-                                                        <div><i class="fas fa-map-marker-alt mr-1 text-black-50"></i>
-                                                            {{ collab.street }}, {{ collab.street_number }}
-                                                            - {{ collab.city }}, {{ collab.state }}, {{ collab.country }}
+                                                {% if collab.phone %}
+                                                    <div class="h5 font-weight-300 mt--2 pb-2">
+                                                        {{ collab.phone }}
+                                                    </div>
+                                                {% endif %}
+                                                {% if user_profile.user.username|check_group:'collaborator' %}
+                                                    <div class="h5 font-weight-400 {% if not collab.about %}pb-5{% endif %}">
+                                                        {% if collab.street != '' and collab.city != '' and collab.state != '' and collab.country != '' %}
+                                                            <div><i class="fas fa-map-marker-alt mr-1 text-black-50"></i>
+                                                                {{ collab.street }}, {{ collab.street_number }}
+                                                                - {{ collab.city }}, {{ collab.state }}, {{ collab.country }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                                {% if collab.about != '' %}
+                                                    <div class="h4 font-weight-500 mt-4 pt-2 pb-5">
+                                                        <i>"{{ collab.about }}"</i>
+                                                    </div>
+                                                {% endif %}
+
+                                                <div class="row justify-content-center mt--4 mb-3" style="width: 108%;">
+                                                    {% if collab.website %}
+                                                        <div class="col-1 px-0 mx-1">
+                                                            <a href="{{ collab.website }}" target="_blank"
+                                                               data-toggle="tooltip" data-original-title="Website">
+                                                                <i class="fas fa-globe"></i>
+                                                            </a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if collab.facebook %}
+                                                        <div class="col-1 px-0 mx-1">
+                                                            <a href="{{ collab.facebook }}" target="_blank"
+                                                               data-toggle="tooltip" data-original-title="Facebook">
+                                                                <i class="fab fa-facebook-square"></i>
+                                                            </a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if collab.twitter %}
+                                                        <div class="col-1 px-0 mx-1">
+                                                            <a href="{{ collab.twitter }}" target="_blank"
+                                                               data-toggle="tooltip" data-original-title="Twitter">
+                                                                <i class="fab fa-twitter-square"></i>
+                                                            </a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if collab.instagram %}
+                                                        <div class="col-1 px-0 mx-1">
+                                                            <a href="{{ collab.instagram }}" target="_blank"
+                                                               data-toggle="tooltip" data-original-title="Instagram">
+                                                                <i class="fab fa-instagram"></i>
+                                                            </a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if collab.linkedin %}
+                                                        <div class="col-1 px-0 mx-1">
+                                                            <a href="{{ collab.linkedin }}" target="_blank"
+                                                               data-toggle="tooltip" data-original-title="LinkedIn">
+                                                                <i class="fab fa-linkedin"></i>
+                                                            </a>
                                                         </div>
                                                     {% endif %}
                                                 </div>
-                                            {% endif %}
-                                            {% if collab.about != '' %}
-                                                <div class="h4 font-weight-500 mt-4 pt-2 pb-5">
-                                                    <i>"{{ collab.about }}"</i>
-                                                </div>
-                                            {% endif %}
+
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             </div>
                             
                             <!-- Collaborator Fill Infos Modal -->
@@ -418,6 +474,49 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- QRCode Modal -->
+                            {% if collab.qrcode %}
+                                <div class="modal fade" id="qrcode{{ collab.id }}" tabindex="-1" role="dialog"
+                                     aria-labelledby="qrcode{{ collab.id }}Label" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px"
+                                         role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header align-items-center">
+                                                <h5 class="modal-title my-1" style="margin-left: auto">
+                                                    <i class="fas fa-qrcode text-blue" style="font-size: 1.5rem"></i>
+                                                </h5>
+                                                <h5 class="modal-title ml-3 my-1"
+                                                    style="margin-right: auto; font-size: 1.2rem"
+                                                    id="qrcode{{ collab.id }}Label">{{ collab.user.get_full_name }}</h5>
+                                                <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                        data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body py-0"
+                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <div class="form-group mt-4 mb-0"
+                                                     style="display: flex; justify-content: center">
+                                                    <div style="z-index: 1; width: 250px; height: 250px; background-color: #adb5bd00">
+                                                        <img
+                                                                id="imagePreviewModal"
+                                                                class=""
+                                                                style="max-width: 100%; height: 100%; object-fit: cover;"
+                                                                alt="Image placeholder"
+                                                                src="{{ collab.qrcode.url }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a href="{% url 'download_qrcode_collaborator' collab.slug %}" class="btn btn-success">
+                                                    <i class="fas fa-download text-white"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
 
                         {% endfor %}
                         </tbody>

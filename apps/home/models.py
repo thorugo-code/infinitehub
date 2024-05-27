@@ -218,6 +218,9 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to='profile_pics',
                                default='placeholder.webp',
                                storage=PublicMediaStorage())
+    qrcode = models.ImageField(upload_to=f'qrcodes/members/',
+                               storage=PublicMediaStorage(),
+                               null=True, blank=True)
 
     # Char Fields
     cpf = models.CharField(max_length=20, default='')
@@ -245,8 +248,38 @@ class Profile(models.Model):
     # Boolean Fields
     first_access = models.BooleanField(default=True)
 
+    # URL Fields
+    website = models.URLField(null=True, blank=True)
+    linkedin = models.URLField(null=True, blank=True)
+    facebook = models.URLField(null=True, blank=True)
+    instagram = models.URLField(null=True, blank=True)
+    twitter = models.URLField(null=True, blank=True)
+
     def __str__(self):
         return self.user.username
+
+    def generate_qrcode(self):
+        info = "https://hub.infinitefoundry.com/members/" + self.user.username.split('@')[0]
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+
+        qr.add_data(info)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        temp_file = BytesIO()
+        img.save(temp_file, format='PNG')
+        temp_file.seek(0)
+
+        self.qrcode.save(f'{slugify(self.user.get_full_name())}_{self.id}.png', File(temp_file))
+
+        self.save()
 
     def save(self, *args, **kwargs):
         super().save()

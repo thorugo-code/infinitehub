@@ -1,9 +1,12 @@
-from django.shortcuts import render, redirect
-from apps.home.models import Profile, Task, Office, Document, UploadedFile
-from django.contrib.auth.models import User
-from core.settings import CORE_DIR
-import json
 import os
+import json
+from core.settings import CORE_DIR
+from django.contrib import messages
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from django.core.files.storage import default_storage
+from apps.home.models import Profile, Task, Office, Document, UploadedFile
 
 
 def details(request):
@@ -75,6 +78,12 @@ def edit(request):
         profile.birthday = request.POST.get('birthday', profile.birthday)
         profile.position = request.POST.get('position', profile.position)
 
+        profile.website = request.POST.get('website', profile.website)
+        profile.linkedin = request.POST.get('linkedin', profile.linkedin)
+        profile.twitter = request.POST.get('twitter', profile.twitter)
+        profile.facebook = request.POST.get('facebook', profile.facebook)
+        profile.instagram = request.POST.get('instagram', profile.instagram)
+
         user_object.save()
         profile.save()
 
@@ -101,6 +110,23 @@ def delete_file(request, file_id):
     uploaded_file.save()
 
     uploaded_file.delete()
+
+    return redirect('profile')
+
+
+def download_qrcode(request):
+    user = request.user
+    profile = Profile.objects.get(user=user)
+    qrcode = profile.qrcode
+
+    if qrcode:
+        file_name = qrcode.name
+        file_content = default_storage.open(file_name).read()
+        response = HttpResponse(file_content, content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{file_name.split("/")[-1]}"'
+        return response
+    else:
+        messages.error(request, 'QR Code not found.')
 
     return redirect('profile')
 
