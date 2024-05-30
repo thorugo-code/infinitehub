@@ -71,7 +71,7 @@ def create(request):
 
         client.save()
 
-        return redirect('client_details', slug=client.slug)
+        # return redirect('client_details', slug=client.slug)
 
     return redirect('clients_home')
 
