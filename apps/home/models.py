@@ -6,15 +6,15 @@ from io import BytesIO
 from django.db import models
 from bs4 import BeautifulSoup
 from datetime import datetime
+from djmoney.money import Money
 from urllib.parse import urljoin
 from django.core.files import File
-from djmoney.money import Money
 from django.utils.text import slugify
 from djmoney.models.fields import MoneyField
-from django.contrib.auth.models import User, Group
-from apps.home.storage_backends import PublicMediaStorage
 from apps.authentication.models import AuthEmail
 from picklefield.fields import PickledObjectField
+from django.contrib.auth.models import User, Group
+from apps.home.storage_backends import PublicMediaStorage
 
 
 def get_favicon(url):
@@ -476,6 +476,7 @@ class Bill(models.Model):
 
     # Money Fields
     total = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
+    partial = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
 
     # Boolean Fields
     reconciled = models.BooleanField(default=False)
@@ -484,12 +485,16 @@ class Bill(models.Model):
 
     # Integer Fields
     installments_number = models.IntegerField(default=0)
+    installments_frequency = models.IntegerField(default=0)
 
     # File Fields
     proof = models.FileField(upload_to=upload_path_bills, null=True, blank=True)
 
     # URL Fields
     link = models.URLField(null=True, blank=True)
+
+    # Text Fields
+    payment_info = models.TextField(default='')
 
     def __str__(self):
         return self.title
@@ -499,8 +504,25 @@ class Bill(models.Model):
             check_late = datetime.strptime(str(self.due_date), '%Y-%m-%d').date() < datetime.now().date()
             if check_late and not self.paid:
                 self.late = True
+        else:
+            self.late = False
 
-        super().save()
+        super().save(*args, **kwargs)
+
+        if self.paid:
+            self.late = False
+            if self.installments_number > 1:
+                self.partial = sum([installment.value for installment in self.installments.filter(paid=True)])
+            else:
+                self.partial = self.total
+
+        else:
+            if int(self.installments_number) > 1 and self.installments.exists():
+                self.partial = sum([installment.value for installment in self.installments.filter(paid=True)])
+            else:
+                self.partial = 0
+
+        super().save(*args, **kwargs)
 
 
 class BillInstallment(models.Model):
@@ -518,11 +540,15 @@ class BillInstallment(models.Model):
     partial_id = models.IntegerField(default=0)
     value = MoneyField(max_digits=14, decimal_places=2, default_currency='BRL', default=0)
 
+    # Text Fields
+    payment_info = models.TextField(default='')
+
     def __str__(self):
         return f'[{self.partial_id}/{self.bill.installments}] {self.bill.title} - {self.due_date}'
 
     def save(self, *args, **kwargs):
         super().save()
+        self.bill.save()
 
 
 class Document(models.Model):

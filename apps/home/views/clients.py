@@ -8,7 +8,7 @@ from apps.home.views.balance import INCOME_CATEGORIES, EXPENSE_CATEGORIES, unmas
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from core.settings import CORE_DIR
-from django.core.serializers import serialize
+from djmoney.money import Money
 
 
 def check_expired_documents():
@@ -71,7 +71,7 @@ def create(request):
 
         client.save()
 
-        # return redirect('client_details', slug=client.slug)
+        return redirect('client_details', slug=client.slug)
 
     return redirect('clients_home')
 
@@ -196,21 +196,24 @@ def details(request, slug):
 
         return redirect('client_details', slug=client.slug)
 
-    client_bills = Bill.objects.filter(client=client, paid=True)
+    query = Q(client=client) & (Q(paid=True) | Q(installments__paid=True))
+
+    client_bills = Bill.objects.filter(query).distinct()
 
     income_bills = client_bills.filter(category__in=INCOME_CATEGORIES)
     expense_bills = client_bills.filter(category__in=EXPENSE_CATEGORIES)
-    total_income = sum([bill.total for bill in income_bills])
-    total_expense = sum([bill.total for bill in expense_bills])
+    total_income = sum([bill.partial for bill in income_bills])
+    total_expense = sum([bill.partial for bill in expense_bills])
 
     last_month_bills = client_bills.filter(
-        paid_at__gte=datetime.now().date() - timedelta(days=30)
+        Q(paid_at__gte=datetime.now().date() - timedelta(days=30)) |
+        Q(installments__paid_at__gte=datetime.now().date() - timedelta(days=30))
     )
 
     last_month_bills_income = last_month_bills.filter(category__in=INCOME_CATEGORIES)
     last_month_bills_expense = last_month_bills.filter(category__in=EXPENSE_CATEGORIES)
-    total_last_month_income = sum([bill.total for bill in last_month_bills_income])
-    total_last_month_expense = sum([bill.total for bill in last_month_bills_expense])
+    total_last_month_income = sum([bill.partial for bill in last_month_bills_income])
+    total_last_month_expense = sum([bill.partial for bill in last_month_bills_expense])
 
     if total_income + total_expense != 0 and total_income != 0:
         income_percentage = total_income / (total_income + total_expense) * 100
@@ -235,6 +238,11 @@ def details(request, slug):
         client=client, paid=False, due_date__lt=datetime.now().date() + timedelta(days=40)
     ).order_by('due_date')
 
+    if bills_in_progress.count() < 6:
+        bills_in_progress = Bill.objects.filter(
+            client=client, paid=False
+        ).order_by('due_date')[:6]
+
     context = {
         'currency': 'BRL',  # TODO: Change to currency variable when implemented
         'user_profile': Profile.objects.get(user=request.user),
@@ -249,7 +257,6 @@ def details(request, slug):
         'income_categories': INCOME_CATEGORIES,
         'expense_categories': EXPENSE_CATEGORIES,
         'bills_in_progress': bills_in_progress,
-        'bills_in_progress_max_id': bills_in_progress.order_by('-id').first().id if bills_in_progress.count() > 0 else 0,
         'offices': Office.objects.all(),
         'world': json.load(open(f'{CORE_DIR}/apps/static/assets/world.json', 'r', encoding='utf-8')),
         'highlight_documents': Document.objects.filter(client=client).order_by('-id')[:5],
@@ -567,24 +574,36 @@ def balance_page(request, slug, sorted_by=None, sort_type=None, filters=None):
 
         if sorted_by == 'code':
             bills = bills.order_by(f'{"-" if sort_type == "desc" else ""}code', f'{"-" if sort_type == "desc" else ""}link')
-        else:
+        elif sorted_by != 'None':
             bills = bills.order_by(f'{"-" if sort_type == "desc" else ""}{sort_string}')
 
     income_bills = bills.filter(category__in=INCOME_CATEGORIES)
     expense_bills = bills.filter(category__in=EXPENSE_CATEGORIES)
 
+    pending_income = sum([bill.total - bill.partial for bill in income_bills])
+    late_income = sum([sum([
+        installment.value for installment in bill.installments.filter(
+            due_date__lte=datetime.now().date()) if not installment.paid
+    ]) if bill.late and bill.installments_number > 1 else bill.total if bill.late else 0 for bill in income_bills])
+
+    pending_expense = sum([bill.total - bill.partial for bill in expense_bills])
+    late_expense = sum([sum([
+        installment.value for installment in bill.installments.filter(
+            due_date__lte=datetime.now().date()) if not installment.paid
+    ]) if bill.late and bill.installments_number > 1 else bill.total if bill.late else 0 for bill in expense_bills])
+
     context = {
         'user_profile': Profile.objects.get(user=request.user),
         'client': client,
         'bills': bills,
-        'received': sum([bill.total for bill in income_bills if bill.paid]),
+        'received': sum([bill.partial for bill in income_bills]),
         'income': sum([bill.total for bill in income_bills]),
-        'pending_income': sum([bill.total for bill in income_bills if not bill.paid]),
-        'late_income': sum([bill.total for bill in income_bills if bill.late]),
-        'paid': sum([bill.total for bill in expense_bills if bill.paid]),
+        'pending_income': pending_income,
+        'late_income': late_income,
+        'paid': sum([bill.partial for bill in expense_bills]),
         'expense': sum([bill.total for bill in expense_bills]),
-        'pending_expense': sum([bill.total for bill in expense_bills if not bill.paid]),
-        'late_expense': sum([bill.total for bill in expense_bills if bill.late]),
+        'pending_expense': pending_expense,
+        'late_expense': late_expense,
         'income_categories': sorted(INCOME_CATEGORIES),
         'expense_categories': sorted(EXPENSE_CATEGORIES),
         'offices': Office.objects.all(),
@@ -641,22 +660,33 @@ def new_bill(request, slug):
 
         bill.save()
 
-        if request.POST.get('installments') and request.POST.get('installments_value'):
+        if int(request.POST.get('installments', 1)) > 1 and request.POST.get('installments_value'):
             installments = request.POST.get('installments')
             installments_value = unmask_money(request.POST.get('installments_value', ''), currency)
-            # installments_date = request.POST.get('installments_date', None)
+            bill.installments_frequency = request.POST.get('installments_frequency', 0)
+            if bill.installments_frequency == '':
+                bill.installments_frequency = 0
 
             for i in range(1, int(installments) + 1):
                 installment = BillInstallment(
                     bill=bill,
                     partial_id=i,
                     value=installments_value,
-                    # due_date=installments_date,
+                    due_date=datetime.strptime(
+                        str(bill.due_date), "%Y-%m-%d"
+                    ) + timedelta(days=int(bill.installments_frequency) * (i - 1)) if bill.due_date else None,
                 )
                 installment.save()
 
+            bill.save()
+
+        else:
+            bill.installments_number = 0
+            bill.installments_frequency = 0
+            bill.save()
+
         sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-        sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
+        sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
         filters = request.POST.get('filters', 'None')
 
         if sorted_by != '' and filters != 'None':
@@ -690,7 +720,7 @@ def delete_bill(request, slug, bill_id):
         return redirect('client_details', slug=slug)
 
     sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
+    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
     filters = request.POST.get('filters', 'None')
 
     if sorted_by != '' and filters != 'None':
@@ -728,10 +758,38 @@ def edit_bill(request, slug, bill_id):
         bill.total = unmask_money(request.POST['total'], currency) if request.POST.get('total') else bill.total
         bill.code = request.POST.get('code', bill.code)
         bill.link = request.POST.get('link', bill.link)
+        bill.payment_info = request.POST.get('payment_info', bill.payment_info)
 
         installments_number_from_form = int(request.POST.get('installments', 0))
         installments_value_from_form = unmask_money(request.POST.get('installments_value', ''), currency)
-        if installments_number_from_form != bill.installments_number and installments_number_from_form > 1:
+        installments_frequency_from_form = request.POST.get('installments_frequency', 30)
+
+        num_change = [
+            installments_number_from_form != bill.installments_number,
+            installments_number_from_form > 1,
+            installments_value_from_form > 0,
+        ]
+
+        val_change = [
+            installments_value_from_form != bill.installments.filter(paid=False).first(
+            ).value if bill.installments.filter(paid=False) else False,
+            installments_value_from_form > 0,
+        ]
+
+        freq_change = [
+            installments_frequency_from_form != bill.installments_frequency,
+            installments_value_from_form > 0,
+        ]
+
+        if all(freq_change) and bill.due_date is not None:
+            bill.installments_frequency = installments_frequency_from_form
+            for installment in bill.installments.all():
+                installment.due_date = datetime.strptime(
+                    str(bill.due_date), "%Y-%m-%d"
+                ) + timedelta(days=int(installments_frequency_from_form) * (installment.partial_id - 1))
+                installment.save()
+
+        if all(num_change):
             installments = BillInstallment.objects.filter(bill=bill)
             installments.delete()
             bill.installments_number = installments_number_from_form
@@ -740,11 +798,19 @@ def edit_bill(request, slug, bill_id):
                     bill=bill,
                     partial_id=i,
                     value=installments_value_from_form,
-                    # due_date=request.POST.get('installments_date', None),
+                    due_date=datetime.strptime(
+                        str(bill.due_date), "%Y-%m-%d"
+                    ) + timedelta(days=int(bill.installments_frequency) * (i - 1)) if bill.due_date else None,
                 )
                 installment.save()
 
-        elif installments_number_from_form == bill.installments_number and installments_value_from_form != bill.installments.first().value:
+        elif num_change[0] and not num_change[1]:
+            installments = BillInstallment.objects.filter(bill=bill)
+            installments.delete()
+            bill.installments_number = 0
+            bill.installments_frequency = 0
+
+        elif not num_change[0] and all(val_change):
             installments = BillInstallment.objects.filter(bill=bill)
             for installment in installments:
                 installment.value = installments_value_from_form
@@ -764,7 +830,7 @@ def edit_bill(request, slug, bill_id):
             return redirect('client_details', slug=slug)
 
     sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
+    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
     filters = request.POST.get('filters', 'None')
 
     if sorted_by != '' and filters != 'None':
@@ -801,10 +867,24 @@ def change_status(request, slug, bill_id):
 
     if not bill.paid:
         bill.paid_at = request.POST.get('bill_paid_at', datetime.now())
-    else:
-        bill.paid_at = None
+        bill.payment_info = request.POST.get('payment_info', '')
+        bill.paid = True
+        if bill.installments_number > 1:
+            for installment in bill.installments.filter(paid=False):
+                installment.paid = True
+                installment.paid_at = bill.paid_at
+                installment.save()
 
-    bill.paid = not bill.paid
+    else:
+        bill.paid = False
+        bill.payment_info = ''
+        if bill.installments_number > 1:
+            for installment in bill.installments.filter(paid=True, paid_at=bill.paid_at):
+                installment.paid = False
+                installment.paid_at = None
+                installment.save()
+
+        bill.paid_at = None
 
     if reconcile:
         bill.reconciled = True
@@ -815,7 +895,7 @@ def change_status(request, slug, bill_id):
         return redirect('client_details', slug=slug)
 
     sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
+    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
     filters = request.POST.get('filters', 'None')
 
     if sorted_by != '' and filters != 'None':
@@ -879,8 +959,7 @@ def filter_bill_objects(filters, slug):
             bills = bills.filter(office__id=int(office))
 
         if from_date and to_date and from_date < to_date:
-            bills = bills.filter(due_date__gte=from_date)
-            bills = bills.filter(due_date__lte=to_date)
+            bills = bills.filter(due_date__gte=from_date, due_date__lte=to_date)
         elif from_date:
             bills = bills.filter(due_date__gte=from_date)
         elif to_date:
@@ -897,6 +976,22 @@ def filter_bill_objects(filters, slug):
             else:
                 bills = bills.filter(category=category)
 
+        if origin != 'all':
+            bills = bills.filter(origin=origin)
+
+        if code != 'all':
+            match code:
+                case 'code':
+                    bills = bills.filter(Q(code__isnull=False) & ~Q(code=''))
+                case 'link':
+                    bills = bills.filter(Q(link__isnull=False) & ~Q(link=''))
+                case 'both':
+                    bills = bills.filter(
+                        Q(code__isnull=False) & ~Q(code='') & Q(link__isnull=False) & ~Q(link='')
+                    )
+                case _:
+                    pass
+
         if late == 'false':
             bills = bills.filter(late=False)
 
@@ -911,6 +1006,12 @@ def filter_bill_objects(filters, slug):
 
         if max_value:
             bills = bills.filter(total__lte=max_value)
+
+        if installments != 'all':
+            if installments == 'true':
+                bills = bills.filter(installments_number__gte=1)
+            else:
+                bills = bills.filter(installments_number__lt=1)
 
     return bills, bills.order_by('-id').first().id if bills.count() > 0 else 0
 
@@ -981,3 +1082,155 @@ def filter_bills(request, slug):
         return redirect('client_balance', slug=slug)
     else:
         return redirect('filtered_client_balance', filters=filter_string, slug=slug)
+
+
+############################################
+
+
+def installment_change_status(request, slug, bill_id, installment_id):
+    if not get_permission(request, 'change', 'bill'):
+        return render(request, 'home/page-404.html')
+
+    current = BillInstallment.objects.get(id=installment_id)
+
+    if not current.paid:
+        current.paid_at = request.POST.get('bill_paid_at', datetime.now())
+    else:
+        current.paid_at = None
+
+    current.paid = not current.paid
+    current.payment_info = request.POST.get('installment_info', current.payment_info)
+    current.save()
+
+    installments = BillInstallment.objects.filter(bill__id=bill_id).order_by('due_date')
+    unpaid = installments.filter(paid=False)
+
+    if unpaid.count() > 0:
+        current.bill.due_date = unpaid[0].due_date
+        if current.bill.paid:
+            current.bill.paid = False
+            current.bill.paid_at = current.paid_at
+            current.bill.save()
+
+    else:
+        current.bill.paid = True
+        current.bill.paid_at = installments.last().paid_at
+        current.bill.save()
+
+    current.bill.save()
+
+    if request.POST.get('client_page', False):
+        return redirect('client_details', slug=slug)
+
+    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
+    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
+    filters = request.POST.get('filters', 'None')
+
+    if sorted_by not in ['', 'None'] and filters != 'None':
+        return redirect('sorted_filtered_client_balance', slug=slug,
+                        sorted_by=sorted_by, sort_type=sort_type, filters=filters)
+    if sorted_by not in ['', 'None']:
+        return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
+    elif filters != 'None':
+        return redirect('filtered_client_balance', slug=slug, filters=filters)
+    else:
+        return redirect('client_balance', slug=slug)
+
+
+def installment_edit(request, slug, bill_id, installment_id):
+    if not get_permission(request, 'change', 'bill'):
+        return render(request, 'home/page-404.html')
+
+    currency = request.POST.get('currency', 'BRL')
+
+    current = BillInstallment.objects.get(id=installment_id)
+    bill = Bill.objects.get(id=bill_id)
+
+    prev_installment_value = current.value if current.value else 0
+    new_installment_value = unmask_money(request.POST.get('installment_value', 0), currency)
+    due_date = request.POST.get('installment_due_date', current.due_date)
+    installment_payment_info = request.POST.get('installment_info', current.payment_info)
+
+    current.value = new_installment_value
+    current.due_date = due_date if due_date != '' else None
+    current.payment_info = installment_payment_info
+    current.save()
+
+    if prev_installment_value != new_installment_value:
+        bill.total -= prev_installment_value
+        bill.total += Money(new_installment_value, currency=bill.total.currency)
+        bill.save()
+
+    if current.due_date is None:
+        try:
+            current.bill.due_date = current.bill.installments.filter(
+                paid=False, due_date__isnull=False).order_by('due_date').first().due_date
+        except AttributeError:
+            try:
+                current.bill.due_date = current.bill.installments.filter(paid=False).order_by('due_date').last().due_date
+            except AttributeError:
+                current.bill.due_date = current.bill.installments.order_by('due_date').last().due_date
+
+        current.bill.save()
+
+    elif bill.due_date is None or BillInstallment.objects.get(id=installment_id).due_date < bill.due_date:
+        bill.due_date = due_date if due_date != '' else None
+        bill.save()
+
+    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
+    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
+    filters = request.POST.get('filters', 'None')
+
+    if sorted_by not in ['', 'None'] and filters != 'None':
+        return redirect('sorted_filtered_client_balance', slug=slug,
+                        sorted_by=sorted_by, sort_type=sort_type, filters=filters)
+    if sorted_by not in ['', 'None']:
+        return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
+    elif filters != 'None':
+        return redirect('filtered_client_balance', slug=slug, filters=filters)
+    else:
+        return redirect('client_balance', slug=slug)
+
+
+def installment_delete(request, slug, bill_id, installment_id):
+    if not get_permission(request, 'change', 'bill'):
+        return render(request, 'home/page-404.html')
+
+    installment = BillInstallment.objects.get(id=installment_id)
+
+    installment.bill.total -= installment.value
+    installment.bill.installments_number -= 1
+    installment.bill.due_date = installment.bill.installments.filter(paid=False).order_by('due_date').first().due_date
+    if installment.paid:
+        installment.bill.partial -= installment.value
+
+    installment.delete()
+
+    if installment.bill.installments_number == 1:
+        installment.bill.installments_number = 0
+
+    last_due_date = installment.bill.installments.all().order_by('due_date')
+    if last_due_date.filter(paid=False).count() >= 1:
+        installment.bill.due_date = last_due_date.filter(paid=False).first().due_date
+    else:
+        installment.bill.due_date = last_due_date.last().due_date
+
+    installment.bill.save()
+
+    for i, installment in enumerate(BillInstallment.objects.filter(bill__id=bill_id).order_by('due_date')):
+        installment.partial_id = i + 1
+        installment.save()
+
+    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
+    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
+    filters = request.POST.get('filters', 'None')
+
+    if sorted_by not in ['', 'None'] and filters != 'None':
+        return redirect('sorted_filtered_client_balance', slug=slug,
+                        sorted_by=sorted_by, sort_type=sort_type, filters=filters)
+    if sorted_by not in ['', 'None']:
+        return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
+    elif filters != 'None':
+        return redirect('filtered_client_balance', slug=slug, filters=filters)
+    else:
+        return redirect('client_balance', slug=slug)

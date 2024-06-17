@@ -102,7 +102,7 @@ clients_list_urls = [
 
 client_page_urls = [
 
-    path('clients/<slug:slug>', clients.details, name='client_details'),
+    path('clients/<slug:slug>/', clients.details, name='client_details'),
     path('clients/<slug:slug>/edit', clients.details, name='edit_client'),
     path('clients/<slug:slug>/picture', clients.change_picture, name='change_client_picture'),
 
@@ -114,11 +114,19 @@ client_page_urls = [
 
 client_balance_urls = [
 
-    path('clients/<slug:slug>/balance', clients.balance_page, name='client_balance'),
+    path('clients/<slug:slug>/balance/', clients.balance_page, name='client_balance'),
     path('clients/<slug:slug>/balance/new', clients.new_bill, name='new_client_bill'),
-    path('clients/<slug:slug>/edit=<int:bill_id>/', clients.edit_bill, name='edit_client_bill'),
+    path('clients/<slug:slug>/edit=<int:bill_id>', clients.edit_bill, name='edit_client_bill'),
     path('clients/<slug:slug>/balance/change-status=<int:bill_id>', clients.change_status,
          name='change_client_bill_status'),
+
+    path('clients/<slug:slug>/balance/bill=<int:bill_id>/edit=<int:installment_id>',
+         clients.installment_edit, name='edit_client_bill_installment'),
+    path('clients/<slug:slug>/balance/bill=<int:bill_id>/change-status=<int:installment_id>',
+         clients.installment_change_status, name='change_client_bill_installment_status'),
+    path('clients/<slug:slug>/balance/bill=<int:bill_id>/delete=<int:installment_id>',
+         clients.installment_delete, name='delete_client_bill_installment'),
+
     path('clients/<slug:slug>/balance/delete/<int:bill_id>', clients.delete_bill, name='delete_client_bill'),
     path('clients/<slug:slug>/balance/download-bill=<int:bill_id>', clients.download_bill, name='download_client_proof'),
 

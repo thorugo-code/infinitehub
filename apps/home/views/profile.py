@@ -1,3 +1,4 @@
+import datetime
 import os
 import json
 from core.settings import CORE_DIR
@@ -26,7 +27,7 @@ def details(request):
     context = {
         'user_profile': Profile.objects.get(user=user),
         'shared_documents': shared_documents,
-        'tasks': sorted(tasks_to_do, key=lambda x: x.deadline),
+        'tasks': sorted(tasks_to_do, key=lambda x: x.deadline if x.deadline else datetime.date.max),
         'projects': reversed(sorted(projects_to_do, key=lambda x: x.completition)),
         'completed_tasks': tasks_completed.count(),
         'completed_tasks_percentage': (tasks_completed.count() / all_tasks.count()) * 100 if all_tasks.count() > 0 else 0,
