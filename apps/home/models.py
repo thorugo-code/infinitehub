@@ -176,8 +176,8 @@ class Project(models.Model):
     archive = models.BooleanField(default=False)
 
     # Date Fields
-    start_date = models.DateField()
-    deadline = models.DateField()
+    start_date = models.DateField(blank=True, null=True)
+    deadline = models.DateField(blank=True, null=True)
 
     # Money Fields
     budget = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)

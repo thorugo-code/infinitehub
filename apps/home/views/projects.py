@@ -187,6 +187,9 @@ def create_project(request):
         deadline = request.POST['deadline']
         about = request.POST['about']
 
+        start_date = start_date if start_date != '' else None
+        deadline = deadline if deadline != '' else None
+
         # Create a new Project instance and save it to the database
         project = Project(
             title=title,
@@ -469,11 +472,14 @@ def details(request, id):
     project = Project.objects.get(id=id)
 
     if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        deadline = request.POST.get('deadline')
+
         project.title = request.POST.get('title', project.title)
         project.client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
         project.country = request.POST.get('country', project.country)
-        project.start_date = request.POST.get('start_date', project.start_date)
-        project.deadline = request.POST.get('deadline', project.deadline)
+        project.start_date = start_date if start_date != '' else None
+        project.deadline = deadline if deadline != '' else None
         project.about = request.POST.get('about', project.about)
         project.assigned_to.clear()
         for collaborator_id in request.POST.getlist("collaborators-choice"):
