@@ -244,10 +244,54 @@ profile_urls = [
 offices_urls = [
 
     path('offices/', offices.home, name='offices_home'),
-
     path('offices/new', offices.create, name='offices_create'),
-    path('offices/edit=<int:office_id>', offices.edit, name='offices_edit'),
     path('offices/delete=<int:office_id>', offices.delete, name='offices_delete'),
+
+    path('offices/<slug:slug>/', offices.details, name='office_details'),
+    path('offices/<slug:slug>/edit', offices.edit, name='offices_edit'),
+
+    path('offices/<slug:slug>/balance/', offices.balance, name='office_balance'),
+    path('offices/<slug:slug>/balance/new', offices.new_bill, name='new_office_bill'),
+    path('offices/<slug:slug>/edit=<int:bill_id>', offices.edit_bill, name='edit_office_bill'),
+    path('offices/<slug:slug>/balance/change-status=<int:bill_id>', offices.change_status,
+         name='change_office_bill_status'),
+
+    path('offices/<slug:slug>/balance/bill=<int:bill_id>/edit=<int:installment_id>',
+         offices.installment_edit, name='edit_office_bill_installment'),
+    path('offices/<slug:slug>/balance/bill=<int:bill_id>/change-status=<int:installment_id>',
+         offices.installment_change_status, name='change_office_bill_installment_status'),
+    path('clients/<slug:slug>/balance/bill=<int:bill_id>/delete=<int:installment_id>',
+         offices.installment_delete, name='delete_office_bill_installment'),
+
+    path('offices/<slug:slug>/balance/delete/<int:bill_id>', offices.delete_bill, name='delete_office_bill'),
+    path('offices/<slug:slug>/balance/download-bill=<int:bill_id>', offices.download_bill,
+         name='download_office_proof'),
+
+    path('offices/<slug:slug>/balance/order', offices.sort_and_filter_bills, name='sort_office_balance'),
+    path('offices/<slug:slug>/balance/filter', offices.filter_bills, name='filter_office_balance'),
+
+    path('offices/<slug:slug>/balance/order:<str:sorted_by>-<str:sort_type>', offices.balance,
+         name='sorted_office_balance'),
+    path('offices/<slug:slug>/balance/filters:<str:filters>', offices.balance, name='filtered_office_balance'),
+    path('offices/<slug:slug>/balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', offices.balance,
+         name='sorted_filtered_office_balance'),
+
+    path('offices/<slug:slug>/documents/', offices.documents, name='office_documents'),
+    path('offices/<slug:slug>/documents/new', offices.new_document, name='office_new_document'),
+    path('offices/<slug:slug>/documents/edit=<int:document_id>', offices.new_document, name='office_edit_document'),
+    path('offices/<slug:slug>/documents/delete=<int:document_id>', offices.delete_document,
+         name='office_delete_document'),
+    path('offices/<slug:slug>/documents/download=<int:document_id>', offices.download_document,
+         name='office_download_document'),
+
+    path('offices/<slug:slug>/documents/order', offices.sort_and_filter_documents, name='sort_office_documents'),
+    path('offices/<slug:slug>/documents/filter', offices.filter_documents, name='filter_office_documents'),
+
+    path('offices/<slug:slug>/documents/order:<str:sorted_by>-<str:sort_type>', offices.documents,
+         name='sorted_office_documents'),
+    path('offices/<slug:slug>/documents/filters:<str:filters>', offices.documents, name='filtered_office_documents'),
+    path('offices/<slug:slug>/documents/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>',
+         offices.documents, name='sorted_filtered_office_documents'),
 ]
 
 meetings_urls = [

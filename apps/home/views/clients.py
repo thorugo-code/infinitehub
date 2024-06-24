@@ -49,7 +49,7 @@ def home(request, filters=None, sorted_by=None, sort_type=None):
         'sort_type': sort_type,
     }
 
-    return render(request, 'home/clients-list.html', context)
+    return render(request, 'home/clients/home.html', context)
 
 
 def create(request):
@@ -238,11 +238,6 @@ def details(request, slug):
         client=client, paid=False, due_date__lt=datetime.now().date() + timedelta(days=40)
     ).order_by('due_date')
 
-    if bills_in_progress.count() < 6:
-        bills_in_progress = Bill.objects.filter(
-            client=client, paid=False
-        ).order_by('due_date')[:6]
-
     context = {
         'currency': 'BRL',  # TODO: Change to currency variable when implemented
         'user_profile': Profile.objects.get(user=request.user),
@@ -262,7 +257,7 @@ def details(request, slug):
         'highlight_documents': Document.objects.filter(client=client).order_by('-id')[:5],
     }
 
-    return render(request, 'home/client-page.html', context)
+    return render(request, 'home/clients/details.html', context)
 
 
 def change_picture(request, slug):
@@ -362,7 +357,7 @@ def documents_page(request, slug, sorted_by=None, sort_type=None, filters=None):
         'documents': documents,
     }
 
-    return render(request, 'home/client-documents.html', context)
+    return render(request, 'home/clients/documents.html', context)
 
 
 def new_document(request, slug, doc_id=None):
@@ -379,7 +374,7 @@ def new_document(request, slug, doc_id=None):
             document = Document(
                 client=client,
                 branch=Branch.objects.get(id=request.POST['branch_id']) if request.POST.get('branch_id') else None,
-                uploaded_by=User.objects.get(username=request.user.username),
+                uploaded_by=request.user,
                 name=request.POST.get('name', ''),
                 expiration=expiration if expiration else None,
                 category=request.POST.get('category', ''),
@@ -614,7 +609,7 @@ def balance_page(request, slug, sorted_by=None, sort_type=None, filters=None):
         'max_value': str(bills.order_by('-total').first().total)[2:].replace(',', '') if bills.count() > 0 else 0,
     }
 
-    return render(request, 'home/client-balance.html', context)
+    return render(request, 'home/clients/balance.html', context)
 
 
 def new_bill(request, slug):

@@ -389,12 +389,34 @@ class Task(models.Model):
 
 
 class Office(models.Model):
+    slug = models.SlugField(max_length=100, default='')
+
     avatar = models.ImageField(upload_to='uploads/offices/avatar',
                                default='placeholder.webp')
+
     name = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
+
     description = models.TextField(default='')
+
+    def save(self, *args, **kwargs):
+        super().save()
+
+        if not self.slug and self.name != '':
+            self.slug = slugify(self.name + '-' + str(self.id))
+            self.save()
+        elif self.slug != slugify(self.name + '-' + str(self.id)) or kwargs.get('slug'):
+            self.slug = slugify(self.name + '-' + str(self.id))
+            self.save()
+        elif self.name == '':
+            self.slug = slugify(str(self.id))
+            self.save()
+        elif self.slug.endswith('none'):
+            self.slug = self.slug.replace('none', str(self.id))
+            self.save()
+        else:
+            pass
 
 
 class Client(models.Model):
@@ -555,6 +577,7 @@ class Document(models.Model):
     # Foreign Keys and Relationships
     user = models.ForeignKey(User, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
     client = models.ForeignKey(Client, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
+    office = models.ForeignKey(Office, related_name='documents', on_delete=models.SET_NULL, null=True, default=None)
     branch = models.ForeignKey(Branch, related_name='documents', on_delete=models.SET_NULL, null=True, default=None)
     uploaded_by = models.ForeignKey(User, related_name='uploaded_documents', on_delete=models.SET_NULL, null=True,
                                     default=None)
@@ -672,3 +695,6 @@ class Meeting(models.Model):
     summary = models.TextField(default='')
 
     url = models.URLField()
+
+
+

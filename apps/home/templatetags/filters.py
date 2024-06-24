@@ -307,3 +307,8 @@ def add_string(value, arg):
         return str(value) + str(arg)
     except ValueError:
         return ""
+
+
+@register.filter(name='order_by')
+def order_by(value, arg):
+    return value.order_by(arg)

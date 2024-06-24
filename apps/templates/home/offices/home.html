@@ -12,7 +12,6 @@
                         <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-                                <li class="breadcrumb-item"><a href="#">Administrative</a></li>
                                 <li class="breadcrumb-item active">Offices</li>
                             </ol>
                         </nav>
@@ -56,7 +55,8 @@
                            style="min-height: 531.61px">
                         <thead class="thead-light">
                         <tr>
-                            <th scope="col" style="width: 40%">Name</th>
+                            <th scope="col" style="width: 0"></th>
+                            <th scope="col" style="width: 40%" class="pl-0">Name</th>
                             <th scope="col" style="width: 30%">CNPJ</th>
                             <th scope="col" style="width: 30%">Address</th>
                             {#                            <th scope="col" style="width: 10%">Projects</th>#}
@@ -68,22 +68,26 @@
                         {% load filters %}
                         {% for office in offices %}
                             <tr>
-                                <th scope="row" class="py-3">
-                                    <a href="" data-dismiss="modal" data-toggle="modal"
-                                       data-target="#officeDetailsModal{{ office.id }}"
-                                       class="media align-items-center">
-                                        <div class="avatar rounded-circle mr-3">
+                                <td>
+                                    <a href="{% url 'office_details' office.slug %}" class="media align-items-center">
+                                        <div class="avatar rounded-circle mr-0">
                                             <img
-                                                    style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
-                                                    alt="Image placeholder"
-                                                    src="{{ office.avatar.url }}">
+                                                style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
+                                                alt="Image placeholder"
+                                                src="{{ office.avatar.url }}">
                                         </div>
-                                        <div class="media-body">
-                                                    <span class="name mb-0 ml-2 text-sm"
-                                                          style="font-weight: 400; color: #525f7f">
-                                                        {{ office.name }}
-                                                    </span>
-                                        </div>
+                                    </a>
+                                </td>
+                                <th scope="row" class="pl-0">
+                                    <a href="{% url 'office_details' office.slug %}" style="height: 3rem">
+                                        <span class="name text-sm font-weight-normal text-dark">
+                                            {{ office.name }}
+                                        </span>
+                                        <br>
+                                        <span class="font-weight-light text-muted" style="font-size: 0.7rem">
+                                            <i class="fas fa-map-marker-alt text-light" style="font-size: 0.6rem"></i>
+                                            {{ office.location|truncatechars:40 }}
+                                        </span>
                                     </a>
                                 </th>
                                 <td>
@@ -92,12 +96,6 @@
                                 <td>
                                     <span>{{ office.location }}</span>
                                 </td>
-                                {#                                <td>#}
-                                {#                                    <span>{{ office.projects|wordcount }}</span>#}
-                                {#                                </td>#}
-                                {#                                <td>#}
-                                {#                                    <span class="badge badge-dot mr-4"></span>#}
-                                {#                                </td>#}
                                 <td class="text-right">
                                     <div class="dropdown">
                                         <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
@@ -105,8 +103,7 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                            <a class="dropdown-item" href="" data-dismiss="modal" data-toggle="modal"
-                                               data-target="#officeDetailsModal{{ office.id }}">Open</a>
+                                            <a class="dropdown-item" href="{% url 'office_details' office.slug %}">Open</a>
                                             {% if perms.home.delete_office %}
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item text-danger" href="" data-dismiss="modal"

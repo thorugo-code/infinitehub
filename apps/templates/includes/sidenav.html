@@ -67,7 +67,7 @@
                 
                     {% if perms.home.view_office %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'offices_home' %}">
+                            <a class="nav-link {% if 'offices' in segment %}active{% endif %}" href="{% url 'offices_home' %}">
                                 <i class="ni ni-briefcase-24 text-green" style="opacity: 90%"></i>
                                 <span class="nav-link-text">Offices</span>
                             </a>
