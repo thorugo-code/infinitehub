@@ -6,50 +6,49 @@ from apps.home.views import assets, collaborators, inventory, login, profile, pr
 projects_list_urls = [
 
     path('projects/create', projects.create_project, name='create_project'),
-    path('projects/id=<int:id>/', projects.details, name='project_details'),
+    path('projects/<slug:slug>/', projects.details, name='project_details'),
 
-    path("projects/", projects.page_list, name="project_list"),
-    path("projects/<str:situation>/", projects.page_list, name="project_list"),
+    path("projects/", projects.home, name="project_list"),
+    path("projects/<str:situation>/", projects.home, name="project_list"),
 
-    path('projects/id=<int:id>/delete', projects.delete, name='delete_project'),
-    path('projects/working/archive=<int:id>/redirect-to=<str:situation_page>', projects.change_archive,
+    path('projects/<slug:slug>/delete', projects.delete, name='delete_project'),
+    path('projects/working/archive=<slug:slug>/redirect-to=<str:situation_page>', projects.change_archive,
          name='archive_project'),
-    path('projects/archive/unarchive=<int:id>/redirect-to=<str:situation_page>', projects.change_archive,
+    path('projects/archive/unarchive=<slug:slug>/redirect-to=<str:situation_page>', projects.change_archive,
          name='unarchive_project'),
-    path('projects/change-status=<int:project_id>/redirect-to=<str:situation_page>', projects.change_project_status,
+    path('projects/change-status=<slug:slug>/redirect-to=<str:situation_page>', projects.change_project_status,
          name='change_project_status'),
 
     path('projects/order', projects.sort_and_filter_projects, name='sort_projects'),
     path('projects/filter', projects.filter_projects, name='filter_projects'),
 
-    path('projects/order:<str:sorted_by>-<str:sort_type>', projects.page_list, name='sorted_projects'),
-    path('projects/filters:<str:filters>', projects.page_list, name='filtered_projects'),
-    path('projects/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', projects.page_list,
+    path('projects/order:<str:sorted_by>-<str:sort_type>', projects.home, name='sorted_projects'),
+    path('projects/filters:<str:filters>', projects.home, name='filtered_projects'),
+    path('projects/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', projects.home,
          name='sorted_filtered_projects'),
 ]
 
 projects_page_urls = [
+    path('projects/<slug:slug>/', projects.edit, name='project_edit'),
 
-    path('projects/id=<int:id>/upload', projects.upload_file, name='upload_file'),
+    path('projects/<slug:slug>/upload', projects.upload_file, name='upload_file'),
 
-    path('projects/id=<int:project_id>/delete=<int:file_id>', projects.delete_file, name='delete_file'),
+    path('projects/<slug:slug>/delete=<int:file_id>', projects.delete_file, name='delete_file'),
 
     path('download_file/<int:file_id>/', projects.download_file, name='download_file'),
 
-    path('projects/id=<int:id>/change-picture', projects.change_picture, name='change_picture'),
+    path('projects/<slug:slug>/submit-task', projects.submit_task, name='submit_task'),
 
-    path('projects/id=<int:project_id>/submit-task', projects.submit_task, name='submit_task'),
-
-    path('projects/id=<int:project_id>/task=<int:task_id>/change-status', projects.change_task_status,
+    path('projects/<slug:slug>/task=<int:task_id>/change-status', projects.change_task_status,
          name='change_task_status'),
 
-    path('projects/id=<int:project_id>/edit=<int:task_id>/', projects.edit_task, name='edit_task'),
+    path('projects/<slug:slug>/edit=<int:task_id>/', projects.edit_task, name='edit_task'),
 
-    path('projects/id=<int:project_id>/delete-task=<int:task_id>', projects.delete_task, name='delete_task'),
+    path('projects/<slug:slug>/delete-task=<int:task_id>', projects.delete_task, name='delete_task'),
 
-    path('projects/id=<int:project_id>/link', projects.add_link, name='add_link'),
+    path('projects/<slug:slug>/link', projects.add_link, name='add_link'),
 
-    path('projects/id=<int:project_id>/delete-link=<int:link_id>', projects.delete_link, name='delete_link'),
+    path('projects/<slug:slug>/delete-link=<int:link_id>', projects.delete_link, name='delete_link'),
 ]
 
 assets_urls = [

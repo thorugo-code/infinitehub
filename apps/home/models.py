@@ -158,6 +158,8 @@ class Equipments(models.Model):
 
 
 class Project(models.Model):
+    slug = models.SlugField(max_length=100, default='')
+
     # Foreign Keys and Relationships
     client = models.ForeignKey('Client', related_name='projects', on_delete=models.SET_NULL, null=True)
     office = models.ForeignKey('Office', related_name='projects', on_delete=models.SET_NULL, null=True)
@@ -199,11 +201,26 @@ class Project(models.Model):
 
             self.completition = int((completed_tasks / total_tasks) * 100)
 
-        if self.client:
-            if 'placeholder' in self.img.name and not 'placeholder' in self.client.avatar.name:
+        if self.client and 'placeholder' in self.img.name:
+            if 'placeholder' not in self.client.avatar.name:
                 self.img = self.client.avatar
 
         super().save()
+
+        if not self.slug and self.title != '':
+            self.slug = slugify(self.title + '-' + str(self.id))
+            self.save()
+        elif self.slug != slugify(self.title + '-' + str(self.id)) or kwargs.get('slug'):
+            self.slug = slugify(self.title + '-' + str(self.id))
+            self.save()
+        elif self.title == '':
+            self.slug = slugify(str(self.id))
+            self.save()
+        elif self.slug.endswith('none'):
+            self.slug = self.slug.replace('none', str(self.id))
+            self.save()
+        else:
+            pass
 
 
 class Profile(models.Model):
@@ -386,6 +403,36 @@ class Task(models.Model):
             completed_tasks = self.project.tasks.filter(completed=True).count()
             self.project.completition = int((completed_tasks / total_tasks) * 100)
             self.project.save()
+
+
+class SubTask(models.Model):
+    task = models.ForeignKey(Task, related_name='subtasks', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    deadline = models.DateField(null=True, blank=True)
+    priority = models.IntegerField(default=0)
+
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateField(null=True, blank=True)
+    completed_by = models.ForeignKey(User, related_name='completed_subtasks', on_delete=models.SET_NULL, null=True,
+                                     blank=True)
+
+    created_at = models.DateField(auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name='created_subtasks', on_delete=models.SET_NULL, default=1, null=True)
+
+    owner = models.ForeignKey(User, related_name='user_subtasks', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *arg, **kwargs):
+        super().save()
+
+        if self.task:
+            total_subtasks = self.task.subtasks.count()
+            completed_subtasks = self.task.subtasks.filter(completed=True).count()
+            self.task.completed = total_subtasks == completed_subtasks
+            self.task.save()
 
 
 class Office(models.Model):

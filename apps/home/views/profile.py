@@ -36,7 +36,7 @@ def details(request):
         'segment': 'profile',
     }
 
-    return render(request, 'home/profile.html', context)
+    return render(request, 'home/profile/home.html', context)
 
 
 def change_picture(request):
@@ -100,7 +100,7 @@ def edit(request):
             "edit_profile": True,
         }
 
-        return render(request, "home/profile-wizard.html", context)
+        return render(request, "home/profile/wizard.html", context)
 
 
 def delete_file(request, file_id):
