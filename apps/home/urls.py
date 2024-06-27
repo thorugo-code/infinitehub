@@ -32,22 +32,22 @@ projects_page_urls = [
     path('projects/<slug:slug>/', projects.edit, name='project_edit'),
 
     path('projects/<slug:slug>/upload', projects.upload_file, name='upload_file'),
-
     path('projects/<slug:slug>/delete=<int:file_id>', projects.delete_file, name='delete_file'),
-
     path('download_file/<int:file_id>/', projects.download_file, name='download_file'),
 
     path('projects/<slug:slug>/submit-task', projects.submit_task, name='submit_task'),
-
     path('projects/<slug:slug>/task=<int:task_id>/change-status', projects.change_task_status,
          name='change_task_status'),
-
     path('projects/<slug:slug>/edit=<int:task_id>/', projects.edit_task, name='edit_task'),
-
     path('projects/<slug:slug>/delete-task=<int:task_id>', projects.delete_task, name='delete_task'),
 
-    path('projects/<slug:slug>/link', projects.add_link, name='add_link'),
+    path('projects/<slug:slug>/task=<int:task_id>/submit-subtask', projects.submit_subtask, name='submit_subtask'),
+    path('projects/<slug:slug>/task=<int:task_id>/subtask=<int:subtask_id>/change-status',
+         projects.change_subtask_status, name='change_subtask_status'),
+    path('projects/<slug:slug>/task=<int:task_id>/edit=<int:subtask_id>/', projects.edit_subtask, name='edit_subtask'),
+    path('projects/<slug:slug>/task=<int:task_id>/delete-subtask=<int:subtask_id>', projects.delete_subtask, name='delete_subtask'),
 
+    path('projects/<slug:slug>/link', projects.add_link, name='add_link'),
     path('projects/<slug:slug>/delete-link=<int:link_id>', projects.delete_link, name='delete_link'),
 ]
 

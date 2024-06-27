@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
-from apps.home.models import Project, UploadedFile, Profile, Task, Client, Link
+from apps.home.models import Project, UploadedFile, Profile, Task, Client, Link, SubTask
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from datetime import datetime
@@ -648,8 +648,84 @@ def change_task_status(request, slug, task_id):
             task.completed = True
             task.completed_by = request.user
             task.completed_at = datetime.now()
+            task.subtasks.filter(completed=False).update(
+                completed=True, completed_by=request.user, completed_at=datetime.now()
+            )
 
         task.save()
+
+        return redirect('project_details', slug=slug)
+
+    return redirect('project_details', slug=slug)
+
+
+#####################################################
+
+
+def submit_subtask(request, slug, task_id):
+    task = Task.objects.get(id=task_id)
+
+    if request.method == 'POST':
+        deadline = request.POST.get('subtaskDeadline', None)
+        if deadline == '':
+            deadline = None
+
+        subtask = SubTask(
+            task=task,
+            title=request.POST.get('subtaskTitle'),
+            priority=int(request.POST.get('subtaskPriority')),
+            deadline=deadline,
+            owner=User.objects.get(id=request.POST['subtaskOwner']) if request.POST.get('subtaskOwner') else None,
+            description=request.POST.get('subtaskDescription'),
+            created_by=request.user,
+        )
+
+        subtask.save()
+
+        return redirect('project_details', slug=slug)
+
+    return redirect('project_details', slug=slug)
+
+
+def delete_subtask(request, slug, task_id, subtask_id):
+    subtask = SubTask.objects.get(id=subtask_id, task__id=task_id)
+    subtask.delete()
+    subtask.task.project.save(update_tasks=True)
+
+    return redirect('project_details', slug=slug)
+
+
+def edit_subtask(request, slug, task_id, subtask_id):
+    subtask = SubTask.objects.get(id=subtask_id, task__id=task_id)
+
+    if request.method == 'POST':
+        post_deadline = request.POST.get('taskDeadlineEdit')
+        subtask.title = request.POST.get('taskTitleEdit', subtask.title)
+        subtask.description = request.POST.get('taskDescriptionEdit', subtask.description)
+        subtask.deadline = post_deadline if post_deadline else subtask.deadline
+        subtask.priority = int(request.POST.get('taskPriorityEdit', subtask.priority))
+        subtask.owner = User.objects.get(id=request.POST['taskOwnerEdit']) if request.POST.get('taskOwnerEdit') else subtask.owner
+        subtask.save()
+
+        return redirect('project_details', slug=slug)
+
+    return redirect('project_details', slug=slug)
+
+
+def change_subtask_status(request, slug, task_id, subtask_id):
+    subtask = SubTask.objects.get(id=subtask_id, task__id=task_id)
+
+    if request.method == 'POST':
+        if subtask.completed:
+            subtask.completed = False
+            subtask.completed_by = None
+            subtask.completed_at = None
+        else:
+            subtask.completed = True
+            subtask.completed_by = request.user
+            subtask.completed_at = datetime.now()
+
+        subtask.save()
 
         return redirect('project_details', slug=slug)
 
