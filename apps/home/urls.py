@@ -29,7 +29,7 @@ projects_list_urls = [
 ]
 
 projects_page_urls = [
-    path('projects/<slug:slug>/', projects.edit, name='project_edit'),
+    path('projects/<slug:slug>/edit', projects.edit, name='project_edit'),
 
     path('projects/<slug:slug>/upload', projects.upload_file, name='upload_file'),
     path('projects/<slug:slug>/delete=<int:file_id>', projects.delete_file, name='delete_file'),

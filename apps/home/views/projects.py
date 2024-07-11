@@ -186,6 +186,7 @@ def create_project(request):
         title = request.POST['title']
         client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
         country = request.POST['country']
+        manager = request.POST.get('manager', None)
         start_date = request.POST['start_date']
         deadline = request.POST['deadline']
         about = request.POST['about']
@@ -193,9 +194,15 @@ def create_project(request):
         start_date = start_date if start_date != '' else None
         deadline = deadline if deadline != '' else None
 
+        if manager is None or manager == '':
+            manager = None
+        else:
+            manager = Profile.objects.get(id=manager).user
+
         # Create a new Project instance and save it to the database
         project = Project(
             title=title,
+            manager=manager,
             client=client,
             country=country,
             start_date=start_date,
@@ -207,6 +214,9 @@ def create_project(request):
 
         for collaborator_id in request.POST.getlist("collaborators-choice"):
             project.assigned_to.add(User.objects.get(id=Profile.objects.get(id=collaborator_id).user.id))
+
+        if project.manager:
+            project.assigned_to.add(project.manager)
 
         project.save()
 
@@ -509,13 +519,17 @@ def edit(request, slug):
 
         project.title = request.POST.get('title', project.title)
         project.client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
+        project.manager = Profile.objects.get(id=request.POST['manager']).user if request.POST.get('manager') else None
         project.country = request.POST.get('country', project.country)
         project.start_date = start_date if start_date != '' else None
         project.deadline = deadline if deadline != '' else None
         project.about = request.POST.get('about', project.about)
         project.assigned_to.clear()
         for collaborator_id in request.POST.getlist("collaborators-choice"):
-            project.assigned_to.add(User.objects.get(id=Profile.objects.get(id=collaborator_id).user.id))
+            project.assigned_to.add(Profile.objects.get(id=collaborator_id).user)
+
+        if project.manager:
+            project.assigned_to.add(project.manager)
 
         if request.FILES.get('projectPicture'):
             file = request.FILES['projectPicture']
@@ -527,6 +541,8 @@ def edit(request, slug):
             project.img = file
 
         project.save()
+
+        return redirect('project_details', slug=project.slug)
 
     return redirect('project_details', slug=project.slug)
 

@@ -161,6 +161,7 @@ class Project(models.Model):
     slug = models.SlugField(max_length=100, default='')
 
     # Foreign Keys and Relationships
+    manager = models.ForeignKey(User, related_name='managed_projects', on_delete=models.SET_NULL, null=True)
     client = models.ForeignKey('Client', related_name='projects', on_delete=models.SET_NULL, null=True)
     office = models.ForeignKey('Office', related_name='projects', on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(User, related_name='created_projects', on_delete=models.SET_NULL, null=True)

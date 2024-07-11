@@ -74,229 +74,267 @@
                 <form method="post" id="updateProject" action="{% url 'project_edit' project.slug %}">
                     {% csrf_token %}
                     <div class="card shadow">
-                        <div class="pb-1">
-                            <div class="card-header">
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <h3 class="mb-0">Info</h3>
-                                    </div>
-                                    {% if edit_mode %}
-                                        <div class="col text-right">
-                                            <button type="submit" class="btn btn-sm btn-success">Save
-                                            </button>
-                                        </div>
-                                    {% else %}
-                                        <div class="col text-right">
-                                            <a href="?edit" class="btn btn-sm btn-neutral">
-                                                <i class="fas fa-cog"></i>
-                                            </a>
-                                        </div>
-                                    {% endif %}
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">Info</h3>
                                 </div>
-                            </div>
-                            <!-- Card body -->
-                            <div class="card-body" style="padding: 2rem">
                                 {% if edit_mode %}
-                                    <div class="row px-3">
-                                        <div class="col-lg-6">
-                                            <div class="form-group form-control-label">
-                                                <label class="form-control-label" for="title">Title</label>
-                                                <input type="text" id="title" name="title" class="form-control"
-                                                       placeholder="Client's name" value="{{ project.title }}">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="form-group form-control-label">
-                                                <label for="client" class="form-control-label">Client</label>
-                                                {% if edit_mode %}
-                                                    <select class="form-control" id="client" name="client">
-                                                        {% if not project.client and project.client_str %}
-                                                            <option value="" disabled
-                                                                    selected>{{ project.client.name|default:project.client_str|truncatechars:25 }}</option>
-                                                        {% else %}
-                                                            <option value=""></option>
-                                                        {% endif %}
-                                                        {% for client in clients %}
-                                                            <option value="{{ client.id }}"
-                                                                    {% if project.client == client %}selected{% endif %}>
-                                                                {{ client.name }}
-                                                            </option>
-                                                        {% endfor %}
-                                                    </select>
-                                                {% else %}
-                                                    <input type="text" id="client" name="client"
-                                                           class="form-control"
-                                                           placeholder="Client's name"
-                                                           value="{{ project.client.name|default:project.client_str|truncatechars:25 }}"
-                                                           disabled>
-                                                {% endif %}
-                                            </div>
-                                        </div>
+                                    <div class="col text-right">
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            Save
+                                        </button>
                                     </div>
-                                    <div class="px-3">
-                                        <div class="form-group form-control-label mb-3 pb-1">
-                                            <label for="choices-collaborators">
-                                                Collaborators
-                                            </label>
-                                            <select id="choices-collaborators" name="collaborators-choice" multiple>
+                                {% else %}
+                                    <div class="col text-right">
+                                        <a href="?edit" class="btn btn-sm btn-neutral">
+                                            <i class="fas fa-cog"></i>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding: 2rem">
+                            {% if edit_mode %}
+                                <div class="form-group form-control-label px-3">
+                                    <label class="form-control-label" for="title">Title</label>
+                                    <input type="text" id="title" name="title" class="form-control"
+                                           placeholder="Client's name" value="{{ project.title }}">
+                                </div>
+                                <div class="row px-3">
+                                    <div class="col-lg-6">
+                                        <div class="form-group form-control-label mb-3">
+                                            <label for="manager">Manager</label>
+                                            <select class="form-control" id="manager" name="manager">
+                                                <option value=""></option>
                                                 {% for collaborator in collaborators %}
                                                     <option value="{{ collaborator.id }}"
-                                                            {% if collaborator.user in project.assigned_to.all %}selected{% endif %}>{{ collaborator.user.get_full_name }}</option>
+                                                            {% if collaborator.user == project.manager %}selected{% endif %}>{{ collaborator.user.get_full_name }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
                                     </div>
-                                {% else %}
-                                    <div class="avatar-group pl-3 pb-4 align-items-center">
-                                        {% for collaborator in project.assigned_to.all %}
-                                            <a href="" class="avatar avatar-sm rounded-circle border-0"
-                                               style="background-color: #fff;"
-                                               data-toggle="tooltip"
-                                               data-original-title="{{ collaborator.get_full_name }}">
-                                                <div class="avatar avatar-sm rounded-circle">
-                                                    <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
-                                                         alt="Image placeholder"
-                                                         src="{{ collaborator.profile.avatar.url }}">
-                                                </div>
-                                            </a>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                                <div class="px-3">
-                                    <div class="row">
-                                        {% if edit_mode %}
-                                            <div class="col-lg-4">
-                                                <div class="form-group form-control-label">
-                                                    <label for="input-date">Start:</label>
-                                                    {% if edit_mode %}
-                                                        <input type="date" id="input-date" class="form-control"
-                                                               name="start_date"
-                                                               value="{{ project.start_date|date:'Y-m-d' }}">
+                                    <div class="col-lg-6">
+                                        <div class="form-group form-control-label">
+                                            <label for="client" class="form-control-label">Client</label>
+                                            {% if edit_mode %}
+                                                <select class="form-control" id="client" name="client">
+                                                    {% if not project.client and project.client_str %}
+                                                        <option value="" disabled
+                                                                selected>{{ project.client.name|default:project.client_str|truncatechars:25 }}</option>
                                                     {% else %}
-                                                        <input type="text" id="input-date" name="start_date"
-                                                               class="form-control" placeholder="dd/mm/aaaa"
-                                                               value="{{ project.start_date|date:'d/m/Y' }}"
-                                                               disabled>
+                                                        <option value=""></option>
                                                     {% endif %}
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="form-group form-control-label">
-                                                    <label for="input-address">Deadline:</label>
-                                                    {% if edit_mode %}
-                                                        <input type="date" id="input-date" class="form-control"
-                                                               name="deadline"
-                                                               value="{{ project.deadline|date:'Y-m-d' }}">
-                                                    {% else %}
-                                                        <input type="text" id="input-date" name="deadline"
-                                                               class="form-control" placeholder="dd/mm/aaaa"
-                                                               value="{{ project.deadline|date:'d/m/Y' }}"
-                                                               disabled>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 form-control-label">
-                                                <label for="input-client-area">Country</label>
-                                                <div class="form-group">
-                                                    {% if edit_mode %}
-                                                        <select class="form-control" , id="country" ,
-                                                                name="country">
-                                                            <option value="br"
-                                                                    {% if project.country == 'br' %}selected{% endif %}>
-                                                                Brazil
-                                                            </option>
-                                                            <option value="pt"
-                                                                    {% if project.country == 'pt' %}selected{% endif %}>
-                                                                Portugal
-                                                            </option>
-                                                        </select>
-                                                    {% else %}
-                                                        {% if project.country == "br" %}
-                                                            <img src="/static/assets/img/icons/custom/1x/br.png"
-                                                                 alt="br"
-                                                                 style="height: 25px; margin-top: 0.5rem">
-                                                        {% elif project.country == "pt" %}
-                                                            <img src="/static/assets/img/icons/custom/1x/pt.png"
-                                                                 alt="pt"
-                                                                 style="height: 25px; margin-top: 0.5rem">
-                                                        {% endif %}
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        {% else %}
-                                            <div class="col-lg-5">
-                                                <div class="form-group form-control-label">
-                                                    <label for="input-date">Start:</label>
-                                                    {% if edit_mode %}
-                                                        <input type="date" id="input-date" class="form-control"
-                                                               name="start_date"
-                                                               value="{{ project.start_date|date:'Y-m-d' }}">
-                                                    {% else %}
-                                                        <input type="text" id="input-date" name="start_date"
-                                                               class="form-control" placeholder="dd/mm/aaaa"
-                                                               value="{{ project.start_date|date:'d/m/Y' }}"
-                                                               disabled>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-5">
-                                                <div class="form-group form-control-label">
-                                                    <label for="input-address">Deadline:</label>
-                                                    {% if edit_mode %}
-                                                        <input type="date" id="input-date" class="form-control"
-                                                               name="deadline"
-                                                               value="{{ project.deadline|date:'Y-m-d' }}">
-                                                    {% else %}
-                                                        <input type="text" id="input-date" name="deadline"
-                                                               class="form-control" placeholder="dd/mm/aaaa"
-                                                               value="{{ project.deadline|date:'d/m/Y' }}"
-                                                               disabled>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-2 form-control-label">
-                                                <label for="input-client-area">Country</label>
-                                                <div class="form-group">
-                                                    {% if edit_mode %}
-                                                        <select class="form-control" , id="country" ,
-                                                                name="country">
-                                                            <option value="br"
-                                                                    {% if project.country == 'br' %}selected{% endif %}>
-                                                                Brazil
-                                                            </option>
-                                                            <option value="pt"
-                                                                    {% if project.country == 'pt' %}selected{% endif %}>
-                                                                Portugal
-                                                            </option>
-                                                        </select>
-                                                    {% else %}
-                                                        {% if project.country == "br" %}
-                                                            <img src="/static/assets/img/icons/custom/1x/br.png"
-                                                                 alt="br"
-                                                                 style="height: 25px; margin-top: 0.5rem">
-                                                        {% elif project.country == "pt" %}
-                                                            <img src="/static/assets/img/icons/custom/1x/pt.png"
-                                                                 alt="pt"
-                                                                 style="height: 25px; margin-top: 0.5rem">
-                                                        {% endif %}
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        {% endif %}
+                                                    {% for client in clients %}
+                                                        <option value="{{ client.id }}"
+                                                                {% if project.client == client %}selected{% endif %}>
+                                                            {{ client.name }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            {% else %}
+                                                <input type="text" id="client" name="client"
+                                                       class="form-control"
+                                                       placeholder="Client's name"
+                                                       value="{{ project.client.name|default:project.client_str|truncatechars:25 }}"
+                                                       disabled>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="px-3">
-                                    <div class="form-group form-control-label">
-                                        <label for="about">About</label>
-                                        {% if edit_mode %}
-                                            <textarea rows="3" class="form-control" id="about" name="about"
-                                                      placeholder="A few words about the project ...">{{ project.about }}</textarea>
-                                        {% else %}
-                                            <textarea rows="3" class="form-control" id="about" name="about"
-                                                      placeholder="A few words about the project ..."
-                                                      disabled>{{ project.about }}</textarea>
-                                        {% endif %}
+                                    <div class="form-group form-control-label mb-3 pb-1">
+                                        <label for="choices-collaborators">
+                                            Collaborators
+                                        </label>
+                                        <select id="choices-collaborators" name="collaborators-choice" multiple>
+                                            {% for collaborator in collaborators %}
+                                                <option value="{{ collaborator.id }}"
+                                                        {% if collaborator.user in project.assigned_to.all %}selected{% endif %}>{{ collaborator.user.get_full_name }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
+                                </div>
+                            {% else %}
+                                <div class="row">
+                                    {% if project.manager %}
+                                        <div class="col-auto">
+                                            <label class="form-control-label pl-3">Manager</label>
+                                            <div class="avatar-group pl-3 pb-4 align-items-center">
+                                                <a href="" class="avatar avatar-sm rounded-circle border-0"
+                                                   style="background-color: #fff;"
+                                                   data-toggle="tooltip"
+                                                   data-original-title="{{ project.manager.get_full_name }} (Manager)">
+                                                    <div class="avatar avatar-sm rounded-circle">
+                                                        <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
+                                                             alt="Image placeholder"
+                                                             src="{{ project.manager.profile.avatar.url }}">
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    <div class="col">
+                                        {% if project.manager and project.assigned_to.count > 1 %}
+                                            <label class="form-control-label pl-3">Collaborators</label>
+                                        {% elif not project.manager and project.assigned_to.count > 0 %}
+                                            <label class="form-control-label pl-3">Collaborators</label>
+                                        {% endif %}
+                                        <div class="avatar-group pl-3 pb-4 align-items-center">
+                                            {% for collaborator in project.assigned_to.all %}
+                                                {% if collaborator != project.manager %}
+                                                    <a href="" class="avatar avatar-sm rounded-circle border-0"
+                                                       style="background-color: #fff;"
+                                                       data-toggle="tooltip"
+                                                       data-original-title="{{ collaborator.get_full_name }}">
+                                                        <div class="avatar avatar-sm rounded-circle">
+                                                            <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
+                                                                 alt="Image placeholder"
+                                                                 src="{{ collaborator.profile.avatar.url }}">
+                                                        </div>
+                                                    </a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {# DATES #}
+                            <div class="px-3">
+                                <div class="row">
+                                    {% if edit_mode %}
+                                        <div class="col-lg-4">
+                                            <div class="form-group form-control-label">
+                                                <label for="input-date">Start:</label>
+                                                {% if edit_mode %}
+                                                    <input type="date" id="input-date" class="form-control"
+                                                           name="start_date"
+                                                           value="{{ project.start_date|date:'Y-m-d' }}">
+                                                {% else %}
+                                                    <input type="text" id="input-date" name="start_date"
+                                                           class="form-control" placeholder="dd/mm/aaaa"
+                                                           value="{{ project.start_date|date:'d/m/Y' }}"
+                                                           disabled>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group form-control-label">
+                                                <label for="input-address">Deadline:</label>
+                                                {% if edit_mode %}
+                                                    <input type="date" id="input-date" class="form-control"
+                                                           name="deadline"
+                                                           value="{{ project.deadline|date:'Y-m-d' }}">
+                                                {% else %}
+                                                    <input type="text" id="input-date" name="deadline"
+                                                           class="form-control" placeholder="dd/mm/aaaa"
+                                                           value="{{ project.deadline|date:'d/m/Y' }}"
+                                                           disabled>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 form-control-label">
+                                            <label for="input-client-area">Country</label>
+                                            <div class="form-group">
+                                                {% if edit_mode %}
+                                                    <select class="form-control" , id="country" ,
+                                                            name="country">
+                                                        <option value="br"
+                                                                {% if project.country == 'br' %}selected{% endif %}>
+                                                            Brazil
+                                                        </option>
+                                                        <option value="pt"
+                                                                {% if project.country == 'pt' %}selected{% endif %}>
+                                                            Portugal
+                                                        </option>
+                                                    </select>
+                                                {% else %}
+                                                    {% if project.country == "br" %}
+                                                        <img src="/static/assets/img/icons/custom/1x/br.png"
+                                                             alt="br"
+                                                             style="height: 25px; margin-top: 0.5rem">
+                                                    {% elif project.country == "pt" %}
+                                                        <img src="/static/assets/img/icons/custom/1x/pt.png"
+                                                             alt="pt"
+                                                             style="height: 25px; margin-top: 0.5rem">
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-lg-5">
+                                            <div class="form-group form-control-label">
+                                                <label for="input-date">Start:</label>
+                                                {% if edit_mode %}
+                                                    <input type="date" id="input-date" class="form-control"
+                                                           name="start_date"
+                                                           value="{{ project.start_date|date:'Y-m-d' }}">
+                                                {% else %}
+                                                    <input type="text" id="input-date" name="start_date"
+                                                           class="form-control" placeholder="dd/mm/aaaa"
+                                                           value="{{ project.start_date|date:'d/m/Y' }}"
+                                                           disabled>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="form-group form-control-label">
+                                                <label for="input-address">Deadline:</label>
+                                                {% if edit_mode %}
+                                                    <input type="date" id="input-date" class="form-control"
+                                                           name="deadline"
+                                                           value="{{ project.deadline|date:'Y-m-d' }}">
+                                                {% else %}
+                                                    <input type="text" id="input-date" name="deadline"
+                                                           class="form-control" placeholder="dd/mm/aaaa"
+                                                           value="{{ project.deadline|date:'d/m/Y' }}"
+                                                           disabled>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 form-control-label">
+                                            <label for="input-client-area">Country</label>
+                                            <div class="form-group">
+                                                {% if edit_mode %}
+                                                    <select class="form-control" , id="country" ,
+                                                            name="country">
+                                                        <option value="br"
+                                                                {% if project.country == 'br' %}selected{% endif %}>
+                                                            Brazil
+                                                        </option>
+                                                        <option value="pt"
+                                                                {% if project.country == 'pt' %}selected{% endif %}>
+                                                            Portugal
+                                                        </option>
+                                                    </select>
+                                                {% else %}
+                                                    {% if project.country == "br" %}
+                                                        <img src="/static/assets/img/icons/custom/1x/br.png"
+                                                             alt="br"
+                                                             style="height: 25px; margin-top: 0.5rem">
+                                                    {% elif project.country == "pt" %}
+                                                        <img src="/static/assets/img/icons/custom/1x/pt.png"
+                                                             alt="pt"
+                                                             style="height: 25px; margin-top: 0.5rem">
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {# ABOUT #}
+                            <div class="px-3">
+                                <div class="form-group form-control-label">
+                                    <label for="about">About</label>
+                                    {% if edit_mode %}
+                                        <textarea rows="3" class="form-control" id="about" name="about"
+                                                  placeholder="A few words about the project ...">{{ project.about }}</textarea>
+                                    {% else %}
+                                        <textarea rows="3" class="form-control" id="about" name="about"
+                                                  placeholder="A few words about the project ..."
+                                                  disabled>{{ project.about }}</textarea>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
