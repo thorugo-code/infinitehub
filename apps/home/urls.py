@@ -45,7 +45,8 @@ projects_page_urls = [
     path('projects/<slug:slug>/task=<int:task_id>/subtask=<int:subtask_id>/change-status',
          projects.change_subtask_status, name='change_subtask_status'),
     path('projects/<slug:slug>/task=<int:task_id>/edit=<int:subtask_id>/', projects.edit_subtask, name='edit_subtask'),
-    path('projects/<slug:slug>/task=<int:task_id>/delete-subtask=<int:subtask_id>', projects.delete_subtask, name='delete_subtask'),
+    path('projects/<slug:slug>/task=<int:task_id>/delete-subtask=<int:subtask_id>', projects.delete_subtask,
+         name='delete_subtask'),
 
     path('projects/<slug:slug>/link', projects.add_link, name='add_link'),
     path('projects/<slug:slug>/delete-link=<int:link_id>', projects.delete_link, name='delete_link'),
@@ -253,13 +254,22 @@ meetings_urls = [
 
     path('meetings/', meetings.home, name='meetings_home'),
 
-    path('meetings/id=<int:meeting_id>', meetings.details, name='meeting_details'),
+    path('meetings/id=<int:meeting_id>/', meetings.details, name='meeting_details'),
     path('meetings/edit=<int:meeting_id>', meetings.details, name='meeting_edit'),
 
     path('meetings/id=<int:meeting_id>/edit-task=<int:task_id>', meetings.edit_task, name='meeting_edit_task'),
-    path('meetings/id=<int:meeting_id>/delete-task=<int:task_id>', meetings.delete_task,
-         name='meeting_delete_task'),
+    path('meetings/id=<int:meeting_id>/delete-task=<int:task_id>', meetings.delete_task, name='meeting_delete_task'),
+    path('meetings/id=<int:meeting_id>/change-task-status=<int:task_id>', meetings.change_task_status,
+         name='meeting_change_task_status'),
 
+    path('meetings/id=<int:meeting_id>/task=<int:task_id>/submit-subtask', meetings.submit_subtask,
+         name='meeting_submit_subtask'),
+    path('meetings/id=<int:meeting_id>/task=<int:task_id>/subtask=<int:subtask_id>/change-status',
+         meetings.change_subtask_status, name='meeting_change_subtask_status'),
+    path('meetings/id=<int:meeting_id>/task=<int:task_id>/edit=<int:subtask_id>/', meetings.edit_subtask,
+         name='meeting_edit_subtask'),
+    path('meetings/id=<int:meeting_id>/task=<int:task_id>/delete-subtask=<int:subtask_id>', meetings.delete_subtask,
+         name='meeting_delete_subtask'),
 ]
 
 base_urls = [

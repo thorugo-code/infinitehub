@@ -1,0 +1,1256 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}  {% endblock title %}
+
+{% block stylesheets %}
+
+    <style>
+        .pointer-hover:hover {
+            cursor: pointer;
+        }
+        .rotate {
+            transition: transform 0.3s ease;
+        }
+        .rotate.down {
+            transform: rotate(180deg);
+        }
+    </style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+{% load filters %}
+
+<!-- Header container -->
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'meetings_home' %}">Meetings</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ meeting.title|truncatechars:50 }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <a href="#" data-toggle="modal" data-target="#editMeetingModal" class="btn btn-sm btn-neutral"><i class="fas fa-cog"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--6" style="min-height: 570px">
+
+    <!-- Meeting Infos Row -->
+    <div class="row">
+
+        <!-- Meeting Title Column -->
+        <div class="col-lg-7">
+            <div class="card card-stats" style="height: calc(100% - 30px)">
+                <div class="card-body align-items-center py-5 py-lg-4" style="display: flex">
+                    <div class="px-2 row">
+                        <span class="h3 mb-0 px-4">
+                            <span>{{ meeting.title }}</span>
+                            <small class="d-block h5 mb-0 mt-2 font-weight-light">
+                                {{ meeting.start|date:"d/m/Y H:i T" }}
+                            </small>
+                            <small class="d-block h5 font-weight-light text-muted">
+                                Created by {{ meeting.owner.get_full_name|default:meeting.external_owner }}
+                            </small>
+                            <a href="{{ meeting.url }}" style="font-size: 0.8125rem">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>Read.ai</span>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meeting Infos Column -->
+        <div class="col-lg-5">
+            <div class="card card-stats" style="height: calc(100% - 30px)">
+                <div class="card-body">
+                    <div class="row mb-3" {% if not meeting.client and not meeting.project %}style="height:100%{% endif %}">
+                        {% if not meeting.client and not meeting.project %}
+                            <div class="col">
+                                <div class="row align-items-center d-flex" style="height:100%">
+                                    <div class="col mb-2 text-center">
+                                        <div class="mt-2 mb-3 text-sm">
+                                            <span class="font-weight-light">No client or project assigned</span>
+                                        </div>
+                                        <a href="#" data-toggle="modal" data-target="#editMeetingModal" class="m-auto btn btn-sm btn-block btn-primary" style="width: 30%">
+                                            Add
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col btn-group" role="group">
+                                {% if meeting.client %}
+                                    <button type="button" class="btn btn-sm btn-neutral tabLinks1"
+                                            onclick="openTabContent1(event, 'client')" id="default">
+                                        Client
+                                    </button>
+                                {% endif %}
+                                {% if meeting.project %}
+                                    <button type="button" class="btn btn-sm btn-neutral tabLinks1"
+                                            onclick="openTabContent1(event, 'project')"
+                                            {% if not meeting.client %}id="default"{% endif %}>
+                                        Project
+                                    </button>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="align-items-center d-flex" style="height: calc(100% - 45px); width: 100%">
+                        {% if meeting.client %}
+                            <div id="client" class="tabcontent1">
+                                <div class="row py-1 pl-2">
+                                    <div class="col-md-auto align-items-center mb-md-0 mb-3 justify-content-center"
+                                         style="display: flex;">
+    {#                                    <a href="{% url 'client_details' meeting.client.slug %}">#}
+                                        <a href="{% url 'clients_home' %}">
+                                            <img class="rounded-circle"
+                                                 style="width: 50px; height: 50px; object-fit: cover; background-color: #fff; z-index: 1"
+                                                 src="{{ meeting.client.avatar.url }}"
+                                                 alt="{{ meeting.client.name }}">
+                                        </a>
+                                    </div>
+                                    <div class="col-md align-items-center" style="display: flex;">
+                                        <div class="row">
+                                            <span class="h5 p-0 m-0">
+                                                <span>{{ meeting.client.name|truncatechars:35 }}</span>
+                                                <br>
+                                                <small class="h5 font-weight-light text-muted mb-0">{{ meeting.client.area|default:"Client area" }}</small>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if meeting.project %}
+                            <div id="project" class="tabcontent1">
+                                <div class="row align-items-center">
+                                    <div class="col-auto pr-0 align-items-center" style="display: flex">
+                                        <a href="{% url 'project_details' meeting.project.slug %}" class="avatar rounded-circle">
+                                            <img alt="" src="{{ meeting.project.img.url }}"
+                                                 style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;">
+                                        </a>
+                                    </div>
+                                    <div class="col">
+                                        <a href="{% url 'project_details' meeting.project.slug %}" class="text-muted"><h5 class="mb-0">{{ meeting.project.title }}</h5></a>
+                                        <a href="{% url 'project_details' meeting.project.slug %}" class="text-muted"><h6 class="font-weight-light">{{ meeting.project.client.name|default:meeting.project.client_str }}</h6></a>
+                                        <div class="progress progress-xs mb-0">
+                                            <div class="progress-bar {% if meeting.project.completition >= 80 and meeting.project.deadline|time_to_date > 0 %}bg-success{% elif meeting.project.completition >= 40 and meeting.project.deadline|time_to_date > 0 %}bg-info{% elif meeting.project.completition >= 10 and meeting.project.deadline|time_to_date > 0 %}bg-yellow{% else %}bg-red{% endif %}" role="progressbar"
+                                                 aria-valuenow="{{ meeting.project.completition }}"
+                                                 aria-valuemin="0" aria-valuemax="100"
+                                                 style="width: {{ meeting.project.completition }}%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Meeting Description Row -->
+    <div class="row" style="margin-bottom: 30px">
+
+        <div class="col-sm-8">
+
+            <!-- Meeting Content Accordion -->
+            <div class="accordion">
+                <div class="card shadow my-0">
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-header {% if requests_to_attend > 0 %}bg-gradient-danger{% else %}bg-gradient-success{% endif %}"
+                                 id="heading4" role="button" data-toggle="collapse"
+                                 data-target="#collapse4" aria-expanded="false" aria-controls="collapse4" style="color: #fff">
+                                <h5 class="mb-0">
+                                    <span class="heading text-white">To Do:</span><br>
+                                    <span class="text-white text-sm">{{ requests_to_attend }} to attend</span>
+                                    <div class="mt-2">
+                                        <span class="text-nowrap text-white font-weight-light">
+                                            Total: {{ meeting.tasks.count }}
+                                        </span>
+                                    </div>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div id="collapse4" class="collapse" aria-labelledby="heading4" data-parent=".accordion">
+                        <div class="card-body px-0 py-1">
+                            <ul class="list-group list-group-flush" data-toggle="checklist">
+                                {% for task in meeting.tasks.all %}
+                                    <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-3 border-top-0">
+                                        <div class="checklist-item checklist-item-{% if task.priority == 1 %}success{% elif task.priority == 2 %}medium{% elif task.priority == 3 %}danger{% else %}info{% endif %} {% if task.completed %}checklist-item-checked{% endif %}" 
+                                             style="position: static;">
+                                            <a class="col" href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
+                                                <div class="checklist-info">
+                                                    <h5 class="checklist-title mb-0">{{ task.title }}</h5>
+                                                    <small class="text-{% if task.priority == 1 %}success{% elif task.priority == 2 %}medium{% elif task.priority == 3 %}danger{% else %}info{% endif %}">
+                                                        {% if task.priority == 1 %}Low{% elif task.priority == 2 %}
+                                                            Medium{% elif task.priority == 3 %}High{% else %}
+                                                            None{% endif %}
+                                                    </small>
+                                                    <small class="text-nowrap text-default">
+                                                        -
+                                                        {% if not task.completed %}
+                                                            {{ task.deadline|date:'d/m/Y'|default:"No deadline" }}
+                                                        {% else %}
+                                                            <span class="text-success">Completed</span>
+                                                        {% endif %}
+                                                        {% if task.project %}
+                                                            <i>({{ task.project.title }})</i>
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                            </a>
+                                        
+                                        
+                                            
+                                            <div class="col-auto p-0">
+                                                <div class="custom-control custom-checkbox {% if task.priority == 1 %}
+                                                    custom-checkbox-success {% elif task.priority == 2 %}
+                                                    custom-checkbox-medium {% elif task.priority == 3 %}
+                                                    custom-checkbox-danger {% else %} 
+                                                    custom-checkbox-info {% endif %}">
+                                                    <form method="post" id="changeStatusTask{{ task.id }}"
+                                                          action="{% url 'meeting_change_task_status' meeting.id task.id %}">
+                                                        {% csrf_token %}
+                                                        <label class="custom-control custom-checkbox m-0">
+                                                            <input class="custom-control-input"
+                                                                   id="chk-todo-task-{{ task.id }}"
+                                                                   type="checkbox"
+                                                                   {% if task.completed %}checked{% endif %}
+                                                                   onchange="submitCheckboxForm({{ task.id }})">
+                                                            <label class="custom-control-label"
+                                                                   for="chk-todo-task-{{ task.id }}"></label>
+                                                        </label>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        
+                                        
+                                        
+                                            {% if task.subtasks.count > 0 %}
+                                                <div class="col-auto pl-0 pr-2">
+                                                    <a class="pointer-hover accordion" data-toggle="collapse"
+                                                       data-target="#collapseDetails{{ task.id }}" aria-expanded="false"
+                                                       aria-controls="collapseDetails{{ task.id }}">
+                                                        <i class="fas fa-chevron-down text-muted rotate"
+                                                           style="font-size: 0.9rem"></i>
+                                                    </a>
+                                                </div>
+                                            {% endif %}
+                                            <div class="dropdown">
+                                                <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
+                                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                    <a class="dropdown-item" data-target="#taskDetails{{ task.id }}"
+                                                         data-toggle="modal" href="#">
+                                                          Open
+                                                    </a>
+                                                    {% if meeting.project %}
+                                                        <a class="dropdown-item" href="{% url 'project_details' meeting.project.slug %}">
+                                                            Go to project
+                                                        </a>
+                                                    {% endif %}
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="#" data-dismiss="modal"
+                                                       data-toggle="modal"
+                                                       data-target="#deleteTaskConfirm{{ task.id }}">
+                                                        Delete
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+    
+                                    <!-- Subtasks Collapse -->
+                                    <div class="collapse" id="collapseDetails{{ task.id }}">
+                                        <ul class="list-group list-group-flush" data-toggle="checklist">
+                                            {% for subtask in task.subtasks.all %}
+                                                <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4 border-top-0">
+                                                    <div class="checklist-item 
+                                                        {% if subtask.priority == 1 %} 
+                                                            checklist-item-success 
+                                                        {% elif subtask.priority == 2 %} 
+                                                            checklist-item-medium 
+                                                        {% elif subtask.priority == 3 %}
+                                                            checklist-item-danger 
+                                                        {% else %} 
+                                                            checklist-item-info 
+                                                        {% endif %}
+                                                        {% if subtask.completed %}
+                                                            checklist-item-checked
+                                                        {% endif %}">
+                                                        <a class="col" href="#" data-toggle="modal"
+                                                           data-target="#subtaskDetails{{ subtask.id }}">
+                                                            <div class="checklist-info">
+                                                                <h5 class="checklist-title mb-0 {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}">{{ subtask.title }}</h5>
+                                                                <small class="{% if subtask.priority == 1 %}
+                                                                text-success {% elif subtask.priority == 2 %} 
+                                                                text-medium {% elif subtask.priority == 3 %}
+                                                                text-danger {% else %} text-info {% endif %}">
+                                                                    {% if subtask.priority == 1 %}
+                                                                        Low {% elif subtask.priority == 2 %}
+                                                                        Medium {% elif subtask.priority == 3 %}
+                                                                        High {% else %}
+                                                                        None
+                                                                    {% endif %}
+                                                                </small>
+                                                                <small class="text-nowrap {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% else %}text-default{% endif %}">
+                                                                    - {{ subtask.deadline|date:'d/m/Y' }}
+                                                                </small>
+                                                            </div>
+                                                        </a>
+                                                        <div class="col-auto p-0">
+                                                            <div class="custom-control custom-checkbox {% if subtask.priority == 1 %}
+                                                            custom-checkbox-success {% elif subtask.priority == 2 %}
+                                                            custom-checkbox-medium {% elif subtask.priority == 3 %}
+                                                            custom-checkbox-danger {% else %} 
+                                                            custom-checkbox-info {% endif %}">
+                                                                <form method="post" id="changeStatusSubTask{{ subtask.id }}"
+                                                                      action="{% url 'meeting_change_subtask_status' meeting.id task.id subtask.id %}">
+                                                                    {% csrf_token %}
+                                                                    <label class="custom-control custom-checkbox m-0">
+                                                                        <input class="custom-control-input"
+                                                                               id="chk-todo-subtask-{{ subtask.id }}"
+                                                                               type="checkbox"
+                                                                               {% if subtask.completed %}checked{% endif %}
+                                                                               onchange="submitCheckboxSubForm({{ subtask.id }})">
+                                                                        <label class="custom-control-label"
+                                                                               for="chk-todo-subtask-{{ subtask.id }}"></label>
+                                                                    </label>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+    
+                                                <!-- Sub Task Details Modal -->
+                                                <div class="modal fade" id="subtaskDetails{{ subtask.id }}" tabindex="-1"
+                                                     role="dialog"
+                                                     aria-labelledby="subtaskDetails{{ subtask.id }}Label"
+                                                     aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header mt-2 align-items-center">
+                                                                <h5 class="modal-title my-1" style="margin-left: auto">
+                                                                    <i class="fas fa-circle {% if subtask.priority == 1 %}
+                                                                    text-success{% elif subtask.priority == 2 %}
+                                                                    text-medium{% elif subtask.priority == 3 %}
+                                                                    text-danger{% else %}
+                                                                    text-info{% endif %}"
+                                                                       style="font-size: 0.9rem">
+                                                                    </i>
+                                                                </h5>
+                                                                <span class="ml-3 my-1 {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}"
+                                                                      style="margin-right: auto; font-size: 1.2rem"
+                                                                      id="newFileModalLabel">
+                                                                    {{ subtask.title|truncatechars:'30' }}
+                                                                    <i class="fas fa-code-branch ml-1"
+                                                                       style="font-size: 1rem"></i>
+                                                                </span>
+                                                                <button type="button" class="close mt--4"
+                                                                        style="margin-left: -30px"
+                                                                        data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body py-0"
+                                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                                <form method="post" id="editSubTask{{ subtask.id }}"
+                                                                      action="{% url 'meeting_edit_subtask' meeting.id task.id subtask.id %}"
+                                                                      onsubmit="disableSubmitTaskButton()">
+                                                                    {% csrf_token %}
+                                                                    <div class="row">
+                                                                        <div class="form-group form-control-label col-sm">
+                                                                            <label for="taskTitleEdit">Title</label>
+                                                                            <input type="text" class="form-control"
+                                                                                   id="taskTitleEdit"
+                                                                                   name="taskTitleEdit" placeholder=""
+                                                                                   value="{{ subtask.title }}">
+                                                                        </div>
+                                                                        <div class="form-group form-control-label col-sm-4">
+                                                                            <label for="taskPriorityInputEdit">Priority</label>
+                                                                            <select class="form-control"
+                                                                                    id="taskPriorityInputEdit"
+                                                                                    name="taskPriorityEdit">
+                                                                                <option value="0"></option>
+                                                                                <option value="3"
+                                                                                        {% if subtask.priority == 3 %}selected{% endif %}>
+                                                                                    High
+                                                                                </option>
+                                                                                <option value="2"
+                                                                                        {% if subtask.priority == 2 %}selected{% endif %}>
+                                                                                    Medium
+                                                                                </option>
+                                                                                <option value="1"
+                                                                                        {% if subtask.priority == 1 %}selected{% endif %}>
+                                                                                    Low
+                                                                                </option>
+                                                                                <option value="0"
+                                                                                        {% if subtask.priority == 0 %}selected{% endif %}>
+                                                                                    None
+                                                                                </option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group form-control-label col-sm-6">
+                                                                            <label for="taskDeadlineEdit">Deadline</label>
+                                                                            <input type="date"
+                                                                                   class="form-control {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}"
+                                                                                   id="taskDeadlineEdit"
+                                                                                   name="taskDeadlineEdit"
+                                                                                   value="{{ subtask.deadline|date:"Y-m-d" }}">
+                                                                        </div>
+                                                                        <div class="form-group form-control-label col-sm-6">
+                                                                            <label for="taskOwnerEditInput">Owner</label>
+                                                                            <select class="form-control"
+                                                                                    id="taskOwnerEditInput"
+                                                                                    name="taskOwnerEdit">
+                                                                                <option value=""></option>
+                                                                                {% for collab in collaborators %}
+                                                                                    {% if collab.user.username != 'admin@infinitefoundry.com' %}
+                                                                                        <option value="{{ collab.user.id }}"
+                                                                                                {% if subtask.owner == collab.user %}selected{% endif %}>{{ collab.user.get_full_name }}</option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group mb-2 form-control-label">
+                                                                        <label for="taskDescriptionEdit">Description</label>
+                                                                        <textarea class="form-control"
+                                                                                  id="taskDescriptionEdit"
+                                                                                  name="taskDescriptionEdit"
+                                                                                  rows="2">{{ subtask.description }}</textarea>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                        data-dismiss="modal"
+                                                                        form="editSubTask{{ subtask.id }}"
+                                                                        id="cancelEditTaskButton">
+                                                                    Cancel
+                                                                </button>
+                                                                <a class="btn btn-danger"
+                                                                   href="#" data-dismiss="modal" data-toggle="modal"
+                                                                   data-target="#deleteSubTaskConfirm{{ subtask.id }}">
+                                                                    Delete
+                                                                </a>
+                                                                <button type="submit" class="btn btn-success"
+                                                                        form="editSubTask{{ subtask.id }}"
+                                                                        id="editTaskButton">
+                                                                    Save
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                                <!-- Delete Sub Task Confirm Modal -->
+                                                <div class="modal fade" id="deleteSubTaskConfirm{{ subtask.id }}"
+                                                     tabindex="-1" role="dialog"
+                                                     aria-labelledby="deleteSubTaskConfirmLabel{{ subtask.id }}"
+                                                     aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header mt-2">
+                                                                <h5 class="modal-title my-1"
+                                                                    style="margin-left: auto">
+                                                                    <i class="ni ni-fat-delete text-blue"
+                                                                       style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                                </h5>
+                                                                <span class="ml-3 my-1"
+                                                                      style="margin-right: auto; font-size: 1.2rem"
+                                                                      id="deleteTaskConfirmModalLabel">Are you sure?</span>
+                                                                <button type="button" class="close mt--4"
+                                                                        style="margin-left: -30px"
+                                                                        data-dismiss="modal"
+                                                                        aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body pb-0"
+                                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                                <form method="post"
+                                                                      id="deleteSubTaskConfirmForm{{ subtask.id }}"
+                                                                      action="{% url 'meeting_delete_subtask' meeting.id task.id subtask.id %}">
+                                                                    {% csrf_token %}
+                                                                    <div class="form-group">
+                                                                        <p class="text-center">Are you sure you want to
+                                                                            delete this task?
+                                                                            <br>
+                                                                            <i>"{{ subtask.title }}"</i>
+                                                                            <br>
+                                                                            This action cannot be undone.
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                        data-dismiss="modal">Cancel
+                                                                </button>
+    
+                                                                <button type="submit" class="btn btn-danger"
+                                                                        form="deleteSubTaskConfirmForm{{ subtask.id }}">
+                                                                    Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+    
+                                    <!-- New Sub Task Modal -->
+                                    <div class="modal fade" id="newSubTaskModal{{ task.id }}" tabindex="-1" role="dialog"
+                                         aria-labelledby="newSubTaskModalLabel{{ task.id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header mt-2 align-items-center">
+                                                    <h5 class="modal-title my-1" style="margin-left: auto">
+                                                        <i class="fas fa-code-branch text-blue"
+                                                           style="font-size: 1.2rem"></i>
+                                                    </h5>
+                                                    <span class="ml-3 my-1"
+                                                          style="margin-right: auto; font-size: 1.2rem"
+                                                          id="newFileModalLabel">New subtask</span>
+                                                    <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                            data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body py-0"
+                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    <form method="post" id="submitSubTask{{ task.id }}"
+                                                          action="{% url 'meeting_submit_subtask' meeting.id task.id %}"
+                                                          onsubmit="disableSubmitTaskButton()">
+                                                        {% csrf_token %}
+                                                        <div class="row">
+                                                            <div class="form-group form-control-label col">
+                                                                <label for="taskTitle">Title</label>
+                                                                <input type="text" class="form-control"
+                                                                       id="taskTitle"
+                                                                       name="subtaskTitle" required="" autofocus="">
+                                                            </div>
+                                                            <div class="form-group form-control-label col-4">
+                                                                <label for="taskPriorityInput">Priority</label>
+                                                                <select class="form-control" id="taskPriorityInput"
+                                                                        name="subtaskPriority">
+                                                                    <option value="0"></option>
+                                                                    <option value="3">High</option>
+                                                                    <option value="2">Medium</option>
+                                                                    <option value="1">Low</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group form-control-label col">
+                                                                <label for="taskDeadline">Deadline</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="taskDeadline"
+                                                                       name="subtaskDeadline">
+                                                            </div>
+                                                            <div class="form-group form-control-label col">
+                                                                <label for="taskOwnerInput">Owner</label>
+                                                                <select class="form-control" id="taskOwnerInput"
+                                                                        name="subtaskOwner">
+                                                                    <option value=""></option>
+                                                                    {% for collab in collaborators %}
+                                                                        {% if collab.user.username != 'admin@infinitefoundry.com' %}
+                                                                            <option value="{{ collab.user.id }}">{{ collab.user.get_full_name }}</option>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group mb-2 form-control-label">
+                                                            <label for="taskDescription">Description</label>
+                                                            <textarea class="form-control" id="taskDescription"
+                                                                      name="subtaskDescription" rows="2"></textarea>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                                            form="submitTask" id="cancelTaskButton">
+                                                        Cancel
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary"
+                                                            form="submitSubTask{{ task.id }}"
+                                                            id="submitTaskButton{{ task.id }}">
+                                                        Submit
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                            
+                                    <!-- Task Details Modal -->
+                                    <div class="modal fade" id="taskDetails{{ task.id }}" tabindex="-1" role="dialog"
+                                         aria-labelledby="taskDetails{{ task.id }}Label" aria-hidden="true">
+                                        <div class="modal-dialog my-6" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header mt-2 align-items-center">
+                                                    <h5 class="modal-title my-1" style="margin-left: auto">
+                                                        <i class="fas fa-circle {% if task.priority == 1 %}
+                                                                text-success{% elif task.priority == 2 %}
+                                                                text-medium{% elif task.priority == 3 %}
+                                                                text-danger{% else %}
+                                                                text-info{% endif %}"
+                                                           style="font-size: 0.9rem">
+                                                        </i>
+                                                    </h5>
+                                                    <span class="ml-3 my-1 {% if not task.completed and task.deadline|time_to_date < 0 %}text-danger{% endif %}"
+                                                          style="margin-right: auto; font-size: 1.2rem"
+                                                          id="newFileModalLabel">{{ task.title|truncatechars:'30' }}</span>
+                                                    <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                            data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body py-0"
+                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    <form method="post" id="editTask{{ task.id }}"
+                                                          action="{% url 'meeting_edit_task' meeting.id task.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="form-group form-control-label">
+                                                            <label for="taskTitleEdit">Title</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="taskTitleEdit"
+                                                                   name="taskTitleEdit" placeholder=""
+                                                                   value="{{ task.title }}">
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group form-control-label col-sm-8">
+                                                                <label for="taskProjectEditInput">Project</label>
+                                                                <select class="form-control" id="taskProjectEditInput"
+                                                                        name="taskProjectEdit">
+                                                                    <option value=""></option>
+                                                                    {% for project in projects %}
+                                                                        <option value="{{ project.id }}"
+                                                                                {% if meeting.project == project %}selected{% endif %}>
+                                                                            {{ project.title }}
+                                                                        </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group form-control-label col-sm-4">
+                                                                <label for="taskPriorityInputEdit">Priority</label>
+                                                                <select class="form-control" id="taskPriorityInputEdit"
+                                                                        name="taskPriorityEdit">
+                                                                    <option value="0"></option>
+                                                                    <option value="3"
+                                                                            {% if task.priority == 3 %}selected{% endif %}>
+                                                                        High
+                                                                    </option>
+                                                                    <option value="2"
+                                                                            {% if task.priority == 2 %}selected{% endif %}>
+                                                                        Medium
+                                                                    </option>
+                                                                    <option value="1"
+                                                                            {% if task.priority == 1 %}selected{% endif %}>
+                                                                        Low
+                                                                    </option>
+                                                                    <option value="0"
+                                                                            {% if task.priority == 0 %}selected{% endif %}>
+                                                                        None
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group form-control-label col-sm-6">
+                                                                <label for="taskDeadlineEdit">Deadline</label>
+                                                                <input type="date"
+                                                                       class="form-control {% if not task.completed and task.deadline|time_to_date < 0 %}text-danger{% endif %}"
+                                                                       id="taskDeadlineEdit"
+                                                                       name="taskDeadlineEdit" placeholder=""
+                                                                       onchange="enableSubmitTaskButton()"
+                                                                       onemptied="disableSubmitTaskButton()"
+                                                                       value="{{ task.deadline|date:"Y-m-d" }}">
+                                                            </div>
+                                                            <div class="form-group form-control-label col-sm-6">
+                                                                <label for="taskOwnerEditInput">Owner</label>
+                                                                <select class="form-control" id="taskOwnerEditInput"
+                                                                        name="taskOwnerEdit">
+                                                                    <option value=""></option>
+                                                                    {% for collab in collaborators %}
+                                                                        {% if collab.user.username != 'admin@infinitefoundry.com' %}
+                                                                            <option value="{{ collab.user.id }}"
+                                                                                    {% if task.owner == collab.user %}selected{% endif %}>{{ collab.user.get_full_name }}</option>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-control-label">
+                                                            <label for="taskDescriptionEdit">Description</label>
+                                                            <textarea class="form-control"
+                                                                      id="taskDescriptionEdit"
+                                                                      name="taskDescriptionEdit"
+                                                                      rows="2">{{ task.description }}</textarea>
+                                                        </div>
+                                                    </form>
+                                                    {% if task.subtasks.count > 0 %}
+                                                        <div class="form-group m-0 form-control-label">
+                                                            <label><i class="fas fa-code-branch pr-2"></i>Subtasks</label>
+                                                            <a class="btn btn-sm btn-neutral px-1 py-0 ml-2 mb-1"
+                                                               data-dismiss="modal"
+                                                               data-toggle="modal"
+                                                               data-target="#newSubTaskModal{{ task.id }}">
+                                                                <i class="fas fa-plus"></i>
+                                                            </a>
+                                                        </div>
+                                                        <ul class="list-group list-group-flush px-4"
+                                                            data-toggle="checklist">
+                                                            {% for subtask in task.subtasks.all %}
+                                                                <li class="checklist-entry list-group-item flex-column align-items-start py-2 px-0 
+                                                                {% if task.subtasks.count == 1 %}border-0{% elif subtask == task.subtasks.first %}border-top-0{% elif subtask == task.subtasks.last %}border-bottom-0{% endif %}">
+                                                                    <div class="p-0 checklist-item 
+                                                                    {% if subtask.priority == 1 %}
+                                                                        checklist-item-success 
+                                                                    {% elif subtask.priority == 2 %} 
+                                                                        checklist-item-medium 
+                                                                    {% elif subtask.priority == 3 %}
+                                                                        checklist-item-danger 
+                                                                    {% else %} 
+                                                                        checklist-item-info 
+                                                                    {% endif %}
+                                                                    {% if subtask.completed %}
+                                                                        checklist-item-checked
+                                                                    {% endif %}">
+                                                                        <a class="col p-0" href="#" data-dismiss="modal"
+                                                                           data-toggle="modal"
+                                                                           data-target="#subtaskDetails{{ subtask.id }}"
+                                                                           onclick="addShowClass('collapseDetails' + {{ task.id }})">
+                                                                            <div class="checklist-info pl-3">
+                                                                                <h5 class="checklist-title mb-0 {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}">{{ subtask.title }}</h5>
+                                                                                <small class="{% if subtask.priority == 1 %}
+                                                                                text-success {% elif subtask.priority == 2 %} 
+                                                                                text-medium {% elif subtask.priority == 3 %}
+                                                                                text-danger {% else %} text-info {% endif %}">
+                                                                                    {% if subtask.priority == 1 %}
+                                                                                        Low {% elif subtask.priority == 2 %}
+                                                                                        Medium {% elif subtask.priority == 3 %}
+                                                                                        High {% else %}
+                                                                                        None
+                                                                                    {% endif %}
+                                                                                </small>
+                                                                                <small class="text-nowrap {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% else %}text-default{% endif %}">
+                                                                                    - {{ subtask.deadline|date:'d/m/Y' }}
+                                                                                </small>
+                                                                            </div>
+                                                                        </a>
+                                                                        <div class="col-auto p-0">
+                                                                            <div class="custom-control custom-checkbox {% if subtask.priority == 1 %}
+                                                                            custom-checkbox-success {% elif subtask.priority == 2 %}
+                                                                            custom-checkbox-medium {% elif subtask.priority == 3 %}
+                                                                            custom-checkbox-danger {% else %} 
+                                                                            custom-checkbox-info {% endif %}">
+                                                                                <form method="post"
+                                                                                      id="changeStatusSubTask{{ subtask.id }}"
+                                                                                      action="{% url 'meeting_change_subtask_status' meeting.id task.id subtask.id %}">
+                                                                                    {% csrf_token %}
+                                                                                    <label class="custom-control custom-checkbox m-0">
+                                                                                        <input class="custom-control-input"
+                                                                                               id="chk-todo-task-{{ subtask.id }}"
+                                                                                               type="checkbox"
+                                                                                               {% if subtask.completed %}checked{% endif %}
+                                                                                               onchange="submitCheckboxSubForm({{ subtask.id }})">
+                                                                                        <label class="custom-control-label"
+                                                                                               for="chk-todo-task-{{ subtask.id }}"></label>
+                                                                                    </label>
+                                                                                </form>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    {% else %}
+                                                        <a class="btn btn-sm btn-neutral mt-3" data-dismiss="modal"
+                                                           data-toggle="modal"
+                                                           data-target="#newSubTaskModal{{ task.id }}">
+                                                            <i class="fas fa-plus mr-1"></i> Subtask
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                                            form="editTask{{ task.id }}" id="cancelEditTaskButton">
+                                                        Cancel
+                                                    </button>
+                                                    <a class="btn btn-danger"
+                                                       href="#" data-dismiss="modal" data-toggle="modal"
+                                                       data-target="#deleteTaskConfirm{{ task.id }}">
+                                                        Delete
+                                                    </a>
+                                                    <button type="submit" class="btn btn-success"
+                                                            form="editTask{{ task.id }}"
+                                                            id="editTaskButton">
+                                                        Save
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Delete Task Confirm Modal -->
+                                    <div class="modal fade" id="deleteTaskConfirm{{ task.id }}"
+                                         tabindex="-1" role="dialog"
+                                         aria-labelledby="deleteTaskConfirmLabel{{ task.id }}"
+                                         aria-hidden="true">
+                                        <div class="modal-dialog my-6" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header mt-2">
+                                                    <h5 class="modal-title my-1"
+                                                        style="margin-left: auto">
+                                                        <i class="ni ni-fat-delete text-blue"
+                                                           style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                    </h5>
+                                                    <span class="ml-3 my-1"
+                                                          style="margin-right: auto; font-size: 1.2rem"
+                                                          id="deleteTaskConfirmModalLabel">Are you sure?</span>
+                                                    <button type="button" class="close mt--4"
+                                                            style="margin-left: -30px"
+                                                            data-dismiss="modal"
+                                                            aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body pb-0"
+                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    <form method="post"
+                                                          id="deleteTaskConfirmForm{{ task.id }}"
+                                                          action="{% url 'meeting_delete_task' meeting.id task.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="form-group">
+                                                            <p class="text-center">Are you sure you want to delete this
+                                                                task?
+                                                                <br>
+                                                                <i>"{{ task.title }}"</i>
+                                                                <br>
+                                                                This action cannot be undone.
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">Cancel
+                                                    </button>
+
+                                                    <button type="submit" class="btn btn-danger"
+                                                            form="deleteTaskConfirmForm{{ task.id }}">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-header" id="heading1" role="button" data-toggle="collapse"
+                                 data-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                <h5 class="mb-0">
+                                    <span class="heading">Summary</span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="collapse1" class="collapse" aria-labelledby="heading1" data-parent=".accordion">
+                        <div class="card-body">
+                            <p class="card-text mb-4">
+                                {{ meeting.summary|truncatechars:500 }}
+                                {% if meeting.summary|length > 500 %}
+                                    <a href="#" data-target="#meetingSummaryModal" data-toggle="modal"
+                                       class="text-primary pointer-hover">
+                                        Read more
+                                    </a>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-header" id="heading2" role="button" data-toggle="collapse"
+                                 data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                <h5 class="mb-0">
+                                    <span class="heading">Topics</span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="collapse2" class="collapse" aria-labelledby="heading2" data-parent=".accordion">
+                        <div class="card-body">
+                            <ul>
+                                {% for topic in meeting.topics %}
+                                    <li class="font-weight-light mb-2">{{ topic.text }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-header" id="heading3" role="button" data-toggle="collapse"
+                                 data-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                <h5 class="mb-0">
+                                    <span class="heading">Key questions</span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="collapse3" class="collapse" aria-labelledby="heading3" data-parent=".accordion">
+                        <div class="card-body">
+                            <ul>
+                                {% for question in meeting.questions %}
+                                    <li class="font-weight-light mb-2">{{ question.text }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-4">
+
+            <!-- Participants Card -->
+            <div class="card shadow" style="min-height: 19rem; max-height: 31.45rem"> {# height: calc(100% - 200px) #}
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-neutral tabLinks2"
+                                    onclick="openTabContent2(event, 'collaborators')" id="default2">
+                                Collaborators
+                            </button>
+                            <button type="button" class="btn btn-sm btn-neutral tabLinks2"
+                                    onclick="openTabContent2(event, 'external')"
+                                    {% if meeting.external_participants|length == 0 %}disabled{% endif %}>
+                                External
+                            </button>
+                            <button type="button" class="btn btn-sm btn-neutral tabLinks2"
+                                    onclick="openTabContent2(event, 'invited')"
+                                    {% if meeting.invited_participants|length == 0 %}disabled{% endif %}>
+                                Invited
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive"
+                         style="min-height: 14.2rem; max-height: 26.65rem; overflow-y: auto">
+
+                        <div id="collaborators" class="tabcontent2">
+                            <table class="table align-items-center table-flush">
+                                <tbody>
+
+                                {% for collaborator in meeting.participants.all %}
+                                    <tr>
+                                        <td class="pl-4">
+
+                                            <a href="{% url 'collaborators_list' %}#{{ collaborator.id }}"
+                                               class="media align-items-center">
+                                                <img class="rounded-circle"
+                                                     style="width: 40px; height: 40px; object-fit: cover; background-color: #fff; z-index: 1"
+                                                     src="{{ collaborator.profile.avatar.url }}"
+                                                     alt="{{ collaborator.get_full_name }}">
+                                                <span class="h5 font-weight-normal mb-0 pl-3">
+                                                    {{ collaborator.get_full_name|default:"" }}
+                                                </span>
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="external" class="tabcontent2">
+                            <table class="table align-items-center table-flush">
+                                <tbody>
+
+                                {% for email in meeting.external_participants %}
+                                    <tr>
+                                        <td class="pl-4">
+                                            <span class="h5 font-weight-normal mb-0">
+                                                {{ email|default:"" }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="invited" class="tabcontent2">
+                            <table class="table align-items-center table-flush">
+                                <tbody>
+
+                                {% for name in meeting.invited_participants %}
+                                    <tr>
+                                        <td class="pl-4">
+                                            <span class="h5 font-weight-normal mb-0">
+                                                {{ name|default:"" }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-footer border-top-0 py-1"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Summary Modal -->
+<div class="modal fade" id="meetingSummaryModal" tabindex="-1" role="dialog" aria-labelledby="meetingSummaryModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header align-items-center">
+                <h5 class="modal-title pl-3" id="meetingSummaryModalLabel">Meeting Summary</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body px-5 pb-0">
+                <p>{{ meeting.summary }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<!-- Edit Meeting Modal -->
+<div class="modal fade" id="editMeetingModal" tabindex="-1" role="dialog" aria-labelledby="editMeetingModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header mt-2 align-items-center">
+                <h5 class="modal-title" style="margin-left: auto">
+                    <i class="fas fa-comments text-blue" style="font-size: 1.5rem"></i>
+                </h5>
+                <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem" id="editMeetingModalLabel">Edit</span>
+                <button type="button" class="close mt--4" style="margin-left: -30px" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'meeting_edit' meeting.id %}">
+                {% csrf_token %}
+                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                    <div class="form-group form-control-label mb-3">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" id="title" name="title"
+                               value="{{ meeting.title }}">
+                    </div>
+                    <div class="form-group form-control-label">
+                        <label for="project_">Project</label>
+                        <select type="text" class="form-control"
+                               id="project_" name="project">
+                            <option value=""></option>
+                            {% for project in projects %}
+                                <option value="{{ project.id }}" {% if project.id == meeting.project.id %}selected{% endif %}>
+                                    {{ project.title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="container-fluid">
+    {% include "includes/footer.html" %}
+</div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+    <script>
+
+        function openTabContent1(evt, mode) {
+            // Declare all variables
+            let i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent1");
+            for (i = 0; i < tabcontent.length; i++) {
+                if (tabcontent[i].id === "client" || tabcontent[i].id === "project") {
+                    tabcontent[i].style.display = "none";
+                }
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tabLinks1");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace("btn-primary", "btn-neutral");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(mode).style.display = "block";
+            document.getElementById(mode).style.width = "97%";
+            evt.currentTarget.className = evt.currentTarget.className.replace("btn-neutral", "btn-primary");
+        }
+
+        function openTabContent2(evt, mode) {
+            // Declare all variables
+            let i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent2");
+            for (i = 0; i < tabcontent.length; i++) {
+                if (tabcontent[i].id === "collaborators" || tabcontent[i].id === "external" || tabcontent[i].id === "invited") {
+                    tabcontent[i].style.display = "none";
+                }
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tabLinks2");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace("btn-primary", "btn-neutral");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(mode).style.display = "block";
+            evt.currentTarget.className = evt.currentTarget.className.replace("btn-neutral", "btn-primary");
+        }
+        
+        function copyToClipboard(element, link) {
+            navigator.clipboard.writeText(element).then(function () {
+                // Update the tooltip title using Bootstrap Tooltip method
+                $(link).attr('data-original-title', 'Copied!').tooltip('show');
+            }).catch(function (err) {
+                console.error('Unable to copy to clipboard', err);
+            });
+        }
+        
+        function clearTitle(element, link) {
+            $(link).attr('data-original-title', element).tooltip('hide');
+        }
+
+        function addShowClass(element_id) {
+            let element = document.getElementById(element_id);
+            element.classList.add('show');
+            element.focus();
+            
+            let toggleElement = document.querySelector(`[data-target="#${element_id}"]`);
+            if (toggleElement) {
+                let icon = toggleElement.querySelector('.rotate');
+                if (icon) {
+                    icon.classList.add('down');
+                }
+            }
+        }
+
+        function disableSubmitTaskButton() {
+            const cancelButton = document.getElementById("cancelTaskButton");
+            const uploadButton = document.getElementById("submitTaskButton");
+
+            cancelButton.setAttribute("disabled", "disabled");
+            uploadButton.setAttribute("disabled", "disabled");
+        }
+
+        function submitCheckboxForm(taskId) {
+            const formId = 'changeStatusTask' + taskId;
+            document.getElementById(formId).submit();
+        }
+
+        function submitCheckboxSubForm(subTaskId) {
+            const formId = 'changeStatusSubTask' + subTaskId;
+            document.getElementById(formId).submit();
+        }
+
+        try {
+            document.getElementById("default").click();
+        } catch (e) {
+            console.log(e);
+        }
+
+        document.getElementById("default2").click();
+        document.getElementById("heading1").click();
+
+    </script>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            let collapseElements = document.querySelectorAll('[data-toggle="collapse"]');
+
+            collapseElements.forEach(function (element) {
+                element.addEventListener('click', function (event) {
+                    let target = document.querySelector(this.getAttribute('data-target'));
+                    let icon = this.querySelector('.rotate');
+
+                    if (target.classList.contains('show')) {
+                        icon.classList.remove('down');
+                    } else {
+                        icon.classList.add('down');
+                    }
+                });
+            });
+        });
+        
+    </script>
+
+{% endblock javascripts %}

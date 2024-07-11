@@ -17,10 +17,18 @@
                             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
                                 {% if situation == "archive" %}
-                                    <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
-                                    <li class="breadcrumb-item active">Archive</li>
+                                    <li class="breadcrumb-item">
+                                        <a href="{% url 'project_list' %}">
+                                            Projects
+                                        </a>
+                                    </li>
+                                    <li class="breadcrumb-item active">
+                                        Archive
+                                    </li>
                                 {% else %}
-                                    <li class="breadcrumb-item active">Projects</li>
+                                    <li class="breadcrumb-item active">
+                                        Projects
+                                    </li>
                                 {% endif %}
                             </ol>
                         </nav>
