@@ -40,6 +40,10 @@ class Command(BaseCommand):
             'change_branch',
             'delete_branch',
             'view_branch',
+            'add_bankaccount',
+            'change_bankaccount',
+            'delete_bankaccount',
+            'view_bankaccount',
         ] + collaborators_permissions_list
 
         staff_permissions_list = [

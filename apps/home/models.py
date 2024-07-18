@@ -1,3 +1,4 @@
+import json
 import qrcode
 import random
 import string
@@ -15,6 +16,12 @@ from apps.authentication.models import AuthEmail
 from picklefield.fields import PickledObjectField
 from django.contrib.auth.models import User, Group
 from apps.home.storage_backends import PublicMediaStorage
+from core.settings import CORE_DIR
+
+
+BANKS = json.load(open(f'{CORE_DIR}/apps/static/assets/banks.json', 'r', encoding='utf-8'))
+BANK_CODES = ((k, f'{k} ({v})') for k, v in BANKS.items())
+BANK_NAMES = ((v, f'{v} ({k})') for k, v in BANKS.items())
 
 
 def get_favicon(url):
@@ -96,6 +103,9 @@ def custom_upload_path_documents(instance, filename):
 
     category = instance.category.replace(" ", "_") if instance.category else 'others'
     return f'documents/{path}/{category}/{filename}'
+
+
+############################################################
 
 
 class Equipments(models.Model):
@@ -720,3 +730,33 @@ class Meeting(models.Model):
     summary = models.TextField(default='')
 
     url = models.URLField()
+
+
+class BankAccount(models.Model):
+    # Foreign Keys and Relationships
+    user = models.ForeignKey(User, related_name='bank_accounts', on_delete=models.CASCADE)
+
+    # Integer Fields
+    bank_code = models.CharField(max_length=3, default='', choices=BANK_CODES)
+    agency = models.CharField(max_length=4, default='')
+    account = models.CharField(max_length=10, default='')
+
+    # Char Fields
+    bank_name = models.CharField(max_length=150, default='', choices=BANK_NAMES)
+    pix = models.CharField(max_length=100, default='', null=True, blank=True)
+    account_type = models.CharField(
+        max_length=2,
+        choices=(
+            ('PF', 'Pessoa Física'),
+            ('PJ', 'Pessoa Jurídica')
+        )
+    )
+
+    def __str__(self):
+        return f'{self.bank_name} - {self.agency} - {self.account}'
+
+    def save(self, *args, **kwargs):
+        if not self.bank_name or self.bank_name != BANKS[self.bank_code]:
+            self.bank_name = BANKS[self.bank_code]
+
+        super().save(*args, **kwargs)

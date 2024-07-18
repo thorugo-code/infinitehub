@@ -19,7 +19,7 @@ qrcode==7.4.2
 requests==2.32.0
 bs4==0.0.2
 beautifulsoup4==4.12.3
-setuptools==69.0.3
+setuptools==70.0.0
 cryptography==42.0.5
 celery==5.4.0
 django-picklefield==3.2

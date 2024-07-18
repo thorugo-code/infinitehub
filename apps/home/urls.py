@@ -162,31 +162,29 @@ client_documents_urls = [
 
 collaborators_page_urls = [
 
-    path('collaborators/<slug:slug>', collaborators.details, name='collaborator_details'),
-
+    path('collaborators/<slug:slug>/', collaborators.details, name='collaborator_details'),
     path('collaborators/new-document=<int:collab_id>', collaborators.newdoc, name='document_new'),
-
     path('collaborators/download=<int:document_id>', collaborators.download_document,
          name='download_collaborator_document'),
-
     path('collaborators/<slug:slug>/delete-document=<int:document_id>', collaborators.delete_document,
          name='delete_document'),
-
     path('collaborators/<slug:slug>/edit-document=<int:document_id>', collaborators.edit_document,
          name='edit_document'),
 
     path('collaborators/<slug:slug>/filter', collaborators.filter_docs, name='filter_documents'),
-
     path('collaborators/<slug:slug>/order', collaborators.sort_docs, name='sort_documents'),
-
     path('collaborators/<slug:slug>/order:<str:sorted_by>-<str:sort_type>', collaborators.details,
          name='sorted_documents'),
-
     path('collaborators/<slug:slug>/filters:<str:filters>', collaborators.details,
          name='filtered_documents'),
-
     path('collaborators/<slug:slug>/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', collaborators.details,
          name='sorted_filtered_documents'),
+
+    path('collaborators/<slug:slug>/add-account', collaborators.add_bank_account, name='collaborator_add_bank_account'),
+    path('collaborators/<slug:slug>/edit-account=<int:bank_account_id>', collaborators.edit_bank_account,
+         name='collaborator_edit_bank_account'),
+    path('collaborators/<slug:slug>/delete-account=<int:bank_account_id>', collaborators.delete_bank_account,
+         name='collaborator_delete_bank_account'),
 ]
 
 collaborators_list_urls = [

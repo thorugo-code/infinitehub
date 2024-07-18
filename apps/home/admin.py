@@ -22,6 +22,7 @@ class MeetingAdmin(admin.ModelAdmin):
 # class ProfileAdmin(admin.ModelAdmin):
 # class ProjectAdmin(admin.ModelAdmin):
 # class EquipmentsAdmin(admin.ModelAdmin):
+# class BankAccountAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Equipments)
@@ -38,3 +39,4 @@ admin.site.register(BillInstallment)
 admin.site.register(Document)
 admin.site.register(Link)
 admin.site.register(Meeting, MeetingAdmin)
+admin.site.register(BankAccount)
