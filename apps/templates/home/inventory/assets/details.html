@@ -380,7 +380,7 @@
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                                 {% if file.project %}
-                                                    <a class="dropdown-item" href="{% url 'project_details' file.project.id %}">Go to
+                                                    <a class="dropdown-item" href="{% url 'project_details' file.project.slug %}">Go to
                                                         project</a>
                                                     <div class="dropdown-divider"></div>
                                                 {% endif %}

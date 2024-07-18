@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
-from apps.home.models import Project, UploadedFile, Profile, Task, Client, Link
+from apps.home.models import Project, UploadedFile, Profile, Task, Client, Link, SubTask
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from datetime import datetime
@@ -11,8 +11,8 @@ from django.urls import reverse
 from urllib.parse import urlencode
 
 
-def change_archive(request, id, situation_page=None):
-    project = Project.objects.get(id=id)
+def change_archive(request, slug, situation_page=None):
+    project = Project.objects.get(slug=slug)
     if not project.archive and not project.finished or project.working:
         project.working = False
     elif not project.finished:
@@ -66,8 +66,8 @@ def change_archive(request, id, situation_page=None):
             return redirect('project_list', situation=situation_page)
 
 
-def change_project_status(request, project_id, situation_page=None):
-    project = Project.objects.get(id=project_id)
+def change_project_status(request, slug, situation_page=None):
+    project = Project.objects.get(slug=slug)
     if not project.archive and not project.finished or project.working:
         project.working = False
     elif not project.archive:
@@ -149,7 +149,10 @@ def get_paginated_projects(request, projects=None, situation=None, sorted_by=Non
     return paginator, projects
 
 
-def page_list(request, situation=None, filters=None, sorted_by=None, sort_type=None, page=None):
+#####################################################
+
+
+def home(request, situation=None, filters=None, sorted_by=None, sort_type=None, page=None):
     user_profile = Profile.objects.get(user=request.user)
     projects = filter_project_objects(filters)
 
@@ -173,7 +176,7 @@ def page_list(request, situation=None, filters=None, sorted_by=None, sort_type=N
         'filters': filters,
     }
 
-    return render(request, "home/projectsList.html", context)
+    return render(request, "home/projects/home.html", context)
 
 
 def create_project(request):
@@ -183,6 +186,7 @@ def create_project(request):
         title = request.POST['title']
         client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
         country = request.POST['country']
+        manager = request.POST.get('manager', None)
         start_date = request.POST['start_date']
         deadline = request.POST['deadline']
         about = request.POST['about']
@@ -190,9 +194,15 @@ def create_project(request):
         start_date = start_date if start_date != '' else None
         deadline = deadline if deadline != '' else None
 
+        if manager is None or manager == '':
+            manager = None
+        else:
+            manager = Profile.objects.get(id=manager).user
+
         # Create a new Project instance and save it to the database
         project = Project(
             title=title,
+            manager=manager,
             client=client,
             country=country,
             start_date=start_date,
@@ -205,9 +215,12 @@ def create_project(request):
         for collaborator_id in request.POST.getlist("collaborators-choice"):
             project.assigned_to.add(User.objects.get(id=Profile.objects.get(id=collaborator_id).user.id))
 
+        if project.manager:
+            project.assigned_to.add(project.manager)
+
         project.save()
 
-        return redirect('project_details', id=project.id)
+        return redirect('project_details', slug=project.slug)
 
     elif request.method == 'GET':
 
@@ -217,15 +230,15 @@ def create_project(request):
 
         request_project = Project.objects.get(id=project_id)
 
-        return render(request, 'home/project.html', {'project': request_project,
+        return render(request, 'home/projects/details.html', {'project': request_project,
                                                      'user_profile': user_profile})
 
     # Handle GET request or invalid form submission
     return render(request, 'home/page-404.html')
 
 
-def delete(request, id, situation_page=None):
-    project = get_object_or_404(Project, id=id)
+def delete(request, slug, situation_page=None):
+    project = get_object_or_404(Project, slug=slug)
 
     if request.method == 'POST':
         if 'placeholder' not in project.img.name:
@@ -468,29 +481,14 @@ def filter_projects(request):
 #####################################################
 
 
-def details(request, id):
-    project = Project.objects.get(id=id)
-
-    if request.method == 'POST':
-        start_date = request.POST.get('start_date')
-        deadline = request.POST.get('deadline')
-
-        project.title = request.POST.get('title', project.title)
-        project.client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
-        project.country = request.POST.get('country', project.country)
-        project.start_date = start_date if start_date != '' else None
-        project.deadline = deadline if deadline != '' else None
-        project.about = request.POST.get('about', project.about)
-        project.assigned_to.clear()
-        for collaborator_id in request.POST.getlist("collaborators-choice"):
-            project.assigned_to.add(User.objects.get(id=Profile.objects.get(id=collaborator_id).user.id))
-
-        project.save()
-
-        return redirect('project_details', id=project.id)
+def details(request, slug):
+    project = Project.objects.get(slug=slug)
 
     user_profile = Profile.objects.get(user=request.user)
-    tasks = sorted(Task.objects.filter(project=project), key=lambda x: x.deadline if x.deadline else datetime.max.date())
+    tasks = sorted(
+        Task.objects.filter(project=project), key=lambda x: x.deadline if x.deadline else datetime.max.date()
+    )
+
     edit_mode = request.GET.get('edit')
 
     if edit_mode is not None:
@@ -509,35 +507,51 @@ def details(request, id):
         'segment': 'projects'
     }
 
-    return render(request, 'home/project.html', context)
+    return render(request, 'home/projects/details.html', context)
 
 
-def edit(request, id):
-    project = Project.objects.get(id=id)
-    if request.method == 'POST':
-        return redirect('project_details', id=project.id)
-
-
-def change_picture(request, id):
-    project = Project.objects.get(id=id)
+def edit(request, slug):
+    project = Project.objects.get(slug=slug)
 
     if request.method == 'POST':
-        file = request.FILES['projectPicture']
-        previous_file = project.img
+        start_date = request.POST.get('start_date')
+        deadline = request.POST.get('deadline')
 
-        if 'placeholder' not in previous_file.name and file:
-            previous_file.delete(save=False)
+        project.title = request.POST.get('title', project.title)
+        project.client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
+        project.manager = Profile.objects.get(id=request.POST['manager']).user if request.POST.get('manager') else None
+        project.country = request.POST.get('country', project.country)
+        project.start_date = start_date if start_date != '' else None
+        project.deadline = deadline if deadline != '' else None
+        project.about = request.POST.get('about', project.about)
+        project.assigned_to.clear()
+        for collaborator_id in request.POST.getlist("collaborators-choice"):
+            project.assigned_to.add(Profile.objects.get(id=collaborator_id).user)
 
-        project.img = file
+        if project.manager:
+            project.assigned_to.add(project.manager)
+
+        if request.FILES.get('projectPicture'):
+            file = request.FILES['projectPicture']
+            previous_file = project.img
+
+            if 'placeholder.webp' not in previous_file.name and file:
+                previous_file.delete(save=False)
+
+            project.img = file
+
         project.save()
 
-        return redirect('project_details', id=project.id)
+        return redirect('project_details', slug=project.slug)
 
-    return redirect('project_details', id=project.id)
+    return redirect('project_details', slug=project.slug)
 
 
-def upload_file(request, id):
-    project = Project.objects.get(id=id)
+#####################################################
+
+
+def upload_file(request, slug):
+    project = Project.objects.get(slug=slug)
 
     if request.method == 'POST':
         file = request.FILES['file']
@@ -563,13 +577,13 @@ def upload_file(request, id):
 
         uploaded_file.save()
 
-        return redirect('project_details', id=project.id)
+        return redirect('project_details', slug=project.slug)
 
-    return redirect('project_details', id=project.id)
+    return redirect('project_details', slug=project.slug)
 
 
 @require_POST
-def delete_file(request, project_id, file_id):
+def delete_file(request, slug, file_id):
     uploaded_file = get_object_or_404(UploadedFile, pk=file_id)
     file_path = uploaded_file.file
     file_path.delete(save=False)
@@ -577,7 +591,7 @@ def delete_file(request, project_id, file_id):
     uploaded_file.save()
     uploaded_file.delete()
 
-    return redirect('project_details', id=project_id)
+    return redirect('project_details', slug=slug)
 
 
 def download_file(request, file_id):
@@ -589,8 +603,11 @@ def download_file(request, file_id):
     return response
 
 
-def submit_task(request, project_id):
-    project = Project.objects.get(id=project_id)
+#####################################################
+
+
+def submit_task(request, slug):
+    project = Project.objects.get(slug=slug)
 
     if request.method == 'POST':
         task = Task(
@@ -605,23 +622,21 @@ def submit_task(request, project_id):
 
         task.save()
 
-        return redirect('project_details', id=project.id)
+        return redirect('project_details', slug=project.slug)
 
-    return redirect('project_details', id=project.id)
+    return redirect('project_details', slug=project.slug)
 
 
-def delete_task(request, project_id, task_id):
-    project = Project.objects.get(id=project_id)
-    task = Task.objects.get(id=task_id, project=project)
+def delete_task(request, slug, task_id):
+    task = Task.objects.get(id=task_id, project__slug=slug)
     task.delete()
-    project.save(update_tasks=True)
+    task.project.save(update_tasks=True)
 
-    return redirect('project_details', id=project_id)
+    return redirect('project_details', slug=slug)
 
 
-def edit_task(request, project_id, task_id):
+def edit_task(request, slug, task_id):
     task = Task.objects.get(id=task_id)
-    project = Project.objects.get(id=project_id)
 
     if request.method == 'POST':
         post_deadline = request.POST.get('taskDeadlineEdit')
@@ -632,14 +647,13 @@ def edit_task(request, project_id, task_id):
         task.owner = User.objects.get(id=request.POST['taskOwnerEdit']) if request.POST.get('taskOwnerEdit') else task.owner
         task.save()
 
-        return redirect('project_details', id=project.id)
+        return redirect('project_details', slug=slug)
 
-    return redirect('project_details', id=project.id)
+    return redirect('project_details', slug=slug)
 
 
-def change_task_status(request, project_id, task_id):
+def change_task_status(request, slug, task_id):
     task = Task.objects.get(id=task_id)
-    project = Project.objects.get(id=project_id)
 
     if request.method == 'POST':
         if task.completed:
@@ -650,16 +664,95 @@ def change_task_status(request, project_id, task_id):
             task.completed = True
             task.completed_by = request.user
             task.completed_at = datetime.now()
+            task.subtasks.filter(completed=False).update(
+                completed=True, completed_by=request.user, completed_at=datetime.now()
+            )
 
         task.save()
 
-        return redirect('project_details', id=project.id)
+        return redirect('project_details', slug=slug)
 
-    return redirect('project_details', id=project.id)
+    return redirect('project_details', slug=slug)
 
 
-def add_link(request, project_id):
-    project = Project.objects.get(id=project_id)
+#####################################################
+
+
+def submit_subtask(request, slug, task_id):
+    task = Task.objects.get(id=task_id)
+
+    if request.method == 'POST':
+        deadline = request.POST.get('subtaskDeadline', None)
+        if deadline == '':
+            deadline = None
+
+        subtask = SubTask(
+            task=task,
+            title=request.POST.get('subtaskTitle'),
+            priority=int(request.POST.get('subtaskPriority')),
+            deadline=deadline,
+            owner=User.objects.get(id=request.POST['subtaskOwner']) if request.POST.get('subtaskOwner') else None,
+            description=request.POST.get('subtaskDescription'),
+            created_by=request.user,
+        )
+
+        subtask.save()
+
+        return redirect('project_details', slug=slug)
+
+    return redirect('project_details', slug=slug)
+
+
+def delete_subtask(request, slug, task_id, subtask_id):
+    subtask = SubTask.objects.get(id=subtask_id, task__id=task_id)
+    subtask.delete()
+    subtask.task.project.save(update_tasks=True)
+
+    return redirect('project_details', slug=slug)
+
+
+def edit_subtask(request, slug, task_id, subtask_id):
+    subtask = SubTask.objects.get(id=subtask_id, task__id=task_id)
+
+    if request.method == 'POST':
+        post_deadline = request.POST.get('taskDeadlineEdit')
+        subtask.title = request.POST.get('taskTitleEdit', subtask.title)
+        subtask.description = request.POST.get('taskDescriptionEdit', subtask.description)
+        subtask.deadline = post_deadline if post_deadline else subtask.deadline
+        subtask.priority = int(request.POST.get('taskPriorityEdit', subtask.priority))
+        subtask.owner = User.objects.get(id=request.POST['taskOwnerEdit']) if request.POST.get('taskOwnerEdit') else subtask.owner
+        subtask.save()
+
+        return redirect('project_details', slug=slug)
+
+    return redirect('project_details', slug=slug)
+
+
+def change_subtask_status(request, slug, task_id, subtask_id):
+    subtask = SubTask.objects.get(id=subtask_id, task__id=task_id)
+
+    if request.method == 'POST':
+        if subtask.completed:
+            subtask.completed = False
+            subtask.completed_by = None
+            subtask.completed_at = None
+        else:
+            subtask.completed = True
+            subtask.completed_by = request.user
+            subtask.completed_at = datetime.now()
+
+        subtask.save()
+
+        return redirect('project_details', slug=slug)
+
+    return redirect('project_details', slug=slug)
+
+
+#####################################################
+
+
+def add_link(request, slug):
+    project = Project.objects.get(slug=slug)
 
     if request.method == 'POST':
         link = Link(
@@ -671,14 +764,13 @@ def add_link(request, project_id):
 
         link.save()
 
-        return redirect('project_details', id=project.id)
+        return redirect('project_details', slug=slug)
 
-    return redirect('project_details', id=project.id)
+    return redirect('project_details', slug=slug)
 
 
-def delete_link(request, project_id, link_id):
-    project = Project.objects.get(id=project_id)
-    link = Link.objects.get(id=link_id, project=project)
+def delete_link(request, slug, link_id):
+    link = Link.objects.get(id=link_id, project__slug=slug)
     link.delete()
 
-    return redirect('project_details', id=project_id)
+    return redirect('project_details', slug=slug)

@@ -1,3 +1,4 @@
+import json
 import qrcode
 import random
 import string
@@ -15,6 +16,12 @@ from apps.authentication.models import AuthEmail
 from picklefield.fields import PickledObjectField
 from django.contrib.auth.models import User, Group
 from apps.home.storage_backends import PublicMediaStorage
+from core.settings import CORE_DIR
+
+
+BANKS = json.load(open(f'{CORE_DIR}/apps/static/assets/banks.json', 'r', encoding='utf-8'))
+BANK_CODES = ((k, f'{k} ({v})') for k, v in BANKS.items())
+BANK_NAMES = ((v, f'{v} ({k})') for k, v in BANKS.items())
 
 
 def get_favicon(url):
@@ -98,6 +105,9 @@ def custom_upload_path_documents(instance, filename):
     return f'documents/{path}/{category}/{filename}'
 
 
+############################################################
+
+
 class Equipments(models.Model):
     acquisition_date = models.DateField(default=datetime.now)
     name = models.CharField(max_length=100, default='Untitled')
@@ -158,7 +168,10 @@ class Equipments(models.Model):
 
 
 class Project(models.Model):
+    slug = models.SlugField(max_length=100, default='')
+
     # Foreign Keys and Relationships
+    manager = models.ForeignKey(User, related_name='managed_projects', on_delete=models.SET_NULL, null=True)
     client = models.ForeignKey('Client', related_name='projects', on_delete=models.SET_NULL, null=True)
     office = models.ForeignKey('Office', related_name='projects', on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(User, related_name='created_projects', on_delete=models.SET_NULL, null=True)
@@ -199,11 +212,26 @@ class Project(models.Model):
 
             self.completition = int((completed_tasks / total_tasks) * 100)
 
-        if self.client:
-            if 'placeholder' in self.img.name and not 'placeholder' in self.client.avatar.name:
+        if self.client and 'placeholder' in self.img.name:
+            if 'placeholder' not in self.client.avatar.name:
                 self.img = self.client.avatar
 
         super().save()
+
+        if not self.slug and self.title != '':
+            self.slug = slugify(self.title + '-' + str(self.id))
+            self.save()
+        elif self.slug != slugify(self.title + '-' + str(self.id)) or kwargs.get('slug'):
+            self.slug = slugify(self.title + '-' + str(self.id))
+            self.save()
+        elif self.title == '':
+            self.slug = slugify(str(self.id))
+            self.save()
+        elif self.slug.endswith('none'):
+            self.slug = self.slug.replace('none', str(self.id))
+            self.save()
+        else:
+            pass
 
 
 class Profile(models.Model):
@@ -386,6 +414,36 @@ class Task(models.Model):
             completed_tasks = self.project.tasks.filter(completed=True).count()
             self.project.completition = int((completed_tasks / total_tasks) * 100)
             self.project.save()
+
+
+class SubTask(models.Model):
+    task = models.ForeignKey(Task, related_name='subtasks', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    deadline = models.DateField(null=True, blank=True)
+    priority = models.IntegerField(default=0)
+
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateField(null=True, blank=True)
+    completed_by = models.ForeignKey(User, related_name='completed_subtasks', on_delete=models.SET_NULL, null=True,
+                                     blank=True)
+
+    created_at = models.DateField(auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name='created_subtasks', on_delete=models.SET_NULL, default=1, null=True)
+
+    owner = models.ForeignKey(User, related_name='user_subtasks', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *arg, **kwargs):
+        super().save()
+
+        if self.task:
+            total_subtasks = self.task.subtasks.count()
+            completed_subtasks = self.task.subtasks.filter(completed=True).count()
+            self.task.completed = total_subtasks == completed_subtasks
+            self.task.save()
 
 
 class Office(models.Model):
@@ -697,4 +755,31 @@ class Meeting(models.Model):
     url = models.URLField()
 
 
+class BankAccount(models.Model):
+    # Foreign Keys and Relationships
+    user = models.ForeignKey(User, related_name='bank_accounts', on_delete=models.CASCADE)
 
+    # Integer Fields
+    bank_code = models.CharField(max_length=3, default='', choices=BANK_CODES)
+    agency = models.CharField(max_length=4, default='')
+    account = models.CharField(max_length=10, default='')
+
+    # Char Fields
+    bank_name = models.CharField(max_length=150, default='', choices=BANK_NAMES)
+    pix = models.CharField(max_length=100, default='', null=True, blank=True)
+    account_type = models.CharField(
+        max_length=2,
+        choices=(
+            ('PF', 'Pessoa Física'),
+            ('PJ', 'Pessoa Jurídica')
+        )
+    )
+
+    def __str__(self):
+        return f'{self.bank_name} - {self.agency} - {self.account}'
+
+    def save(self, *args, **kwargs):
+        if not self.bank_name or self.bank_name != BANKS[self.bank_code]:
+            self.bank_name = BANKS[self.bank_code]
+
+        super().save(*args, **kwargs)

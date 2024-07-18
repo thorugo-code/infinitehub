@@ -15,7 +15,7 @@
                             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
                                 <li class="breadcrumb-item"><a href="">Inventory</a></li>
-                                <li class="breadcrumb-item"><a href="/assets/">Assets</a></li>
+                                <li class="breadcrumb-item"><a href="/assets">Assets</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
                             </ol>
                         </nav>
@@ -261,7 +261,7 @@
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                                 {% if file.project %}
-                                                    <a class="dropdown-item" href="{% url 'project_details' file.project.id %}">Go to
+                                                    <a class="dropdown-item" href="{% url 'project_details' file.project.slug %}">Go to
                                                         project</a>
                                                     <div class="dropdown-divider"></div>
                                                 {% endif %}

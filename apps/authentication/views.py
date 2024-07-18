@@ -398,4 +398,4 @@ def fill_profile(request):
             "user": user_profile,
         }
 
-        return render(request, "home/profile-wizard.html", context)
+        return render(request, "home/profile/wizard.html", context)

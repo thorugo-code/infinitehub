@@ -2,6 +2,17 @@
 
 {% block title %} Profile {% endblock title %}
 
+{% block stylesheets %}
+    <style>
+        .rotate {
+            transition: transform 0.3s ease;
+        }
+        .rotate.down {
+            transform: rotate(180deg);
+        }
+    </style>
+{% endblock stylesheets %} 
+
 {% block content %}
     
     {% load filters %}
@@ -34,6 +45,7 @@
     <!-- Page content -->
     <div class="container-fluid" style="margin-top: -17rem">
         <div class="row">
+
             <div class="col-xl-4 order-xl-1">
             
                 <!-- Profile Picture Card -->
@@ -527,8 +539,8 @@
                                                     </a>
                                                 </div>
                                                 <div class="col">
-                                                    <a href="{% url 'project_details' project.id %}" class="text-muted"><h5 class="mb-0">{{ project.title }}</h5></a>
-                                                    <a href="{% url 'project_details' project.id %}" class="text-muted"><h6 class="font-weight-light">{{ project.client.name|default:project.client_str }}</h6></a>
+                                                    <a href="{% url 'project_details' project.slug %}" class="text-muted"><h5 class="mb-0">{{ project.title }}</h5></a>
+                                                    <a href="{% url 'project_details' project.slug %}" class="text-muted"><h6 class="font-weight-light">{{ project.client.name|default:project.client_str }}</h6></a>
                                                     <div class="progress progress-xs mb-0">
                                                         <div class="progress-bar {% if project.completition >= 80 and project.deadline|time_to_date > 0 %}bg-success{% elif project.completition >= 40 and project.deadline|time_to_date > 0 %}bg-info{% elif project.completition >= 10 and project.deadline|time_to_date > 0 %}bg-yellow{% else %}bg-red{% endif %}" role="progressbar"
                                                              aria-valuenow="{{ project.completition }}"
@@ -554,13 +566,13 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-body p-0 pb-2">
-                                <ul class="list-group list-group-flush px-2" data-toggle="checklist" 
-                                    style="min-height: 20.5rem; max-height: 28.5rem; overflow-y: auto;">
+                            <div class="card-body p-0 pb-2" style="min-height: 20.5rem; max-height: 28.5rem; overflow-y: auto;">
+                                <ul class="list-group list-group-flush pr-2" data-toggle="checklist" >
                                     {% for task in tasks %}
                                         <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-3 border-top-0">
-                                            <div class="checklist-item checklist-item-{% if task.priority == 1 %}success{% elif task.priority == 2 %}medium{% elif task.priority == 3 %}danger{% else %}info{% endif %} {% if task.completed %}checklist-item-checked{% endif %}">
-                                                <a href="{% url 'project_details' task.project.id %}#task{{ task.id }}">
+                                            <div class="checklist-item checklist-item-{% if task.priority == 1 %}success{% elif task.priority == 2 %}medium{% elif task.priority == 3 %}danger{% else %}info{% endif %} {% if task.completed %}checklist-item-checked{% endif %}"
+                                                 style="position: static !important">
+                                                <a href="#" data-toggle="modal" data-target="#taskDetails{{ task.id }}">
                                                     <div class="checklist-info">
                                                         <h5 class="checklist-title mb-0">{{ task.title }}</h5>
                                                         <small class="text-{% if task.priority == 1 %}success{% elif task.priority == 2 %}medium{% elif task.priority == 3 %}danger{% else %}info{% endif %}">
@@ -572,8 +584,264 @@
                                                         <i>({{ task.project.title }})</i>{% endif %} </small>
                                                     </div>
                                                 </a>
+                                                {% if task.subtasks.count > 0 %}
+                                                    <div class="col-auto p-0">
+                                                        <a class="pointer-hover accordion" data-toggle="collapse" 
+                                                           data-target="#collapseDetails{{ task.id }}" aria-expanded="false" 
+                                                           aria-controls="collapseDetails{{ task.id }}">
+                                                            <i class="fas fa-chevron-down text-muted rotate" style="font-size: 0.9rem"></i>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </li>
+
+                                        <!-- Subtasks Collapse -->
+                                        <div class="collapse" id="collapseDetails{{ task.id }}">
+                                            <ul class="list-group list-group-flush" data-toggle="checklist">
+                                                {% for subtask in task.subtasks.all %}
+                                                    <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4 border-top-0">
+                                                        <div class="checklist-item 
+                                                            {% if subtask.priority == 1 %} 
+                                                                checklist-item-success 
+                                                            {% elif subtask.priority == 2 %} 
+                                                                checklist-item-medium 
+                                                            {% elif subtask.priority == 3 %}
+                                                                checklist-item-danger 
+                                                            {% else %} 
+                                                                checklist-item-info 
+                                                            {% endif %}
+                                                            {% if subtask.completed %}
+                                                                checklist-item-checked
+                                                            {% endif %}">
+                                                            <a class="col p-0" href="#" data-toggle="modal"
+                                                               data-target="#subtaskDetails{{ subtask.id }}">
+                                                                <div class="checklist-info">
+                                                                    <h5 class="checklist-title mb-0 {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}">{{ subtask.title }}</h5>
+                                                                    <small class="{% if subtask.priority == 1 %}
+                                                                        text-success {% elif subtask.priority == 2 %} 
+                                                                        text-medium {% elif subtask.priority == 3 %}
+                                                                        text-danger {% else %} text-info {% endif %}">
+                                                                        {% if subtask.priority == 1 %}
+                                                                            Low {% elif subtask.priority == 2 %}
+                                                                            Medium {% elif subtask.priority == 3 %}
+                                                                            High {% else %}
+                                                                            None
+                                                                        {% endif %}
+                                                                    </small>
+                                                                    <small class="text-nowrap {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% else %}text-default{% endif %}">
+                                                                        - {{ subtask.deadline|date:'d/m/Y' }}
+                                                                    </small>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+
+                                                    <!-- Sub Task Details Modal -->
+                                                    <div class="modal fade" id="subtaskDetails{{ subtask.id }}"
+                                                         tabindex="-1"
+                                                         role="dialog"
+                                                         aria-labelledby="subtaskDetails{{ subtask.id }}Label"
+                                                         aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header mt-2 align-items-center">
+                                                                    <h5 class="modal-title my-1"
+                                                                        style="margin-left: auto">
+                                                                        <i class="fas fa-circle {% if subtask.priority == 1 %}
+                                                                            text-success{% elif subtask.priority == 2 %}
+                                                                            text-medium{% elif subtask.priority == 3 %}
+                                                                            text-danger{% else %}
+                                                                            text-info{% endif %}"
+                                                                           style="font-size: 0.9rem">
+                                                                        </i>
+                                                                    </h5>
+                                                                    <span class="ml-3 my-1 {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}"
+                                                                          style="margin-right: auto; font-size: 1.2rem"
+                                                                          id="newFileModalLabel">
+                                                                        {{ subtask.title|truncatechars:'30' }}
+                                                                        <i class="fas fa-code-branch ml-1"
+                                                                           style="font-size: 1rem"></i>
+                                                                    </span>
+                                                                    <button type="button" class="close mt--4"
+                                                                            style="margin-left: -30px"
+                                                                            data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                                    <div class="row">
+                                                                        <div class="form-group form-control-label col-sm">
+                                                                            <label for="taskTitleEdit">Title</label>
+                                                                            <input type="text" class="form-control"
+                                                                                   id="taskTitleEdit" placeholder=""
+                                                                                   value="{{ subtask.title }}" disabled>
+                                                                        </div>
+                                                                        <div class="form-group form-control-label col-sm-auto">
+                                                                            <label for="taskDeadlineEdit">Deadline</label>
+                                                                            <input type="date" id="taskDeadlineEdit"
+                                                                                   class="form-control {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}"
+                                                                                   value="{{ subtask.deadline|date:"Y-m-d" }}" disabled>
+                                                                        </div>
+                                                                    </div>
+                                                                    {% if subtask.owner != request.user %}
+                                                                        <div class="row">
+                                                                            <div class="form-group form-control-label col-sm">
+                                                                                <label for="taskOwner">Owner</label>
+                                                                                <input type="text" class="form-control"
+                                                                                       id="taskOwner" placeholder=""
+                                                                                       value="{{ subtask.owner.get_full_name }}" disabled>
+                                                                            </div>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                    <div class="form-group mb-2 form-control-label">
+                                                                        <label for="taskDescriptionEdit">Description</label>
+                                                                        <textarea class="form-control"
+                                                                                  id="taskDescriptionEdit"
+                                                                                  name="taskDescriptionEdit"
+                                                                                  rows="2" disabled>{{ subtask.description }}</textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary"
+                                                                            data-dismiss="modal"
+                                                                            form="editSubTask{{ subtask.id }}"
+                                                                            id="cancelEditTaskButton">
+                                                                        Cancel
+                                                                    </button>
+                                                                    <a href="{% url 'project_details' task.project.slug %}#task{{ task.id }}sub{{ subtask.id }}" class="btn btn-primary">
+                                                                        Edit
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+
+                                        <!-- Task Details Modal -->
+                                        <div class="modal fade" id="taskDetails{{ task.id }}" tabindex="-1" role="dialog"
+                                             aria-labelledby="taskDetails{{ task.id }}Label" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header mt-2 align-items-center">
+                                                        <h5 class="modal-title my-1" style="margin-left: auto">
+                                                            <i class="fas fa-circle {% if task.priority == 1 %}
+                                                            text-success{% elif task.priority == 2 %}
+                                                            text-medium{% elif task.priority == 3 %}
+                                                            text-danger{% else %}
+                                                            text-info{% endif %}"
+                                                               style="font-size: 0.9rem">
+                                                            </i>
+                                                        </h5>
+                                                        <span class="ml-3 my-1 {% if not task.completed and task.deadline|time_to_date < 0 %}text-danger{% endif %}"
+                                                              style="margin-right: auto; font-size: 1.2rem"
+                                                              id="newFileModalLabel">{{ task.title|truncatechars:'30' }}</span>
+                                                        <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                                data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body py-0"
+                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                        {% csrf_token %}
+                                                        <div class="row">
+                                                            <div class="form-group form-control-label col-sm">
+                                                                <label for="taskTitleEdit">Title</label>
+                                                                <input type="text" class="form-control"
+                                                                       id="taskTitleEdit" placeholder=""
+                                                                       value="{{ task.title }}" disabled>
+                                                            </div>
+                                                            <div class="form-group form-control-label col-sm-auto">
+                                                                <label for="taskDeadlineEdit">Deadline</label>
+                                                                <input type="date"
+                                                                       class="form-control {% if not task.completed and task.deadline|time_to_date < 0 %}text-danger{% endif %}"
+                                                                       id="taskDeadlineEdit"
+                                                                       name="taskDeadlineEdit" disabled
+                                                                       value="{{ task.deadline|date:"Y-m-d" }}">
+                                                            </div>
+                                                        </div>
+                                                        {% if task.owner != request.user %}
+                                                            <div class="row">
+                                                                <div class="form-group form-control-label col-sm">
+                                                                    <label for="taskOwner">Owner</label>
+                                                                    <input type="text" class="form-control"
+                                                                           id="taskOwner" placeholder=""
+                                                                           value="{{ task.owner.get_full_name }}" disabled>
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                        <div class="form-group {% if task.subtasks.count <= 0 %}mb-2{% endif %} form-control-label">
+                                                            <label for="taskDescriptionEdit">Description</label>
+                                                            <textarea class="form-control"
+                                                                      id="taskDescriptionEdit"
+                                                                      name="taskDescriptionEdit" disabled
+                                                                      rows="2">{{ task.description }}</textarea>
+                                                        </div>
+                                                        {% if task.subtasks.count > 0 %}
+                                                            <div class="form-group m-0 form-control-label">
+                                                                <label><i class="fas fa-code-branch pr-2"></i>Subtasks</label>
+                                                            </div>
+                                                            <ul class="list-group list-group-flush px-4"
+                                                                data-toggle="checklist">
+                                                                {% for subtask in task.subtasks.all %}
+                                                                    <li class="checklist-entry list-group-item flex-column align-items-start py-2 px-0 
+                                                                    {% if task.subtasks.count == 1 %}border-0{% elif subtask == task.subtasks.first %}border-top-0{% elif subtask == task.subtasks.last %}border-bottom-0{% endif %}">
+                                                                        <div class="p-0 checklist-item 
+                                                                        {% if subtask.priority == 1 %}
+                                                                            checklist-item-success 
+                                                                        {% elif subtask.priority == 2 %} 
+                                                                            checklist-item-medium 
+                                                                        {% elif subtask.priority == 3 %}
+                                                                            checklist-item-danger 
+                                                                        {% else %} 
+                                                                            checklist-item-info 
+                                                                        {% endif %}
+                                                                        {% if subtask.completed %}
+                                                                            checklist-item-checked
+                                                                        {% endif %}">
+                                                                            <a class="col p-0" href="#" data-dismiss="modal"
+                                                                               data-toggle="modal"
+                                                                               data-target="#subtaskDetails{{ subtask.id }}"
+                                                                               onclick="addShowClass('collapseDetails' + {{ task.id }})">
+                                                                                <div class="checklist-info pl-3">
+                                                                                    <h5 class="checklist-title mb-0 {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}">{{ subtask.title }}</h5>
+                                                                                    <small class="{% if subtask.priority == 1 %}
+                                                                                    text-success {% elif subtask.priority == 2 %} 
+                                                                                    text-medium {% elif subtask.priority == 3 %}
+                                                                                    text-danger {% else %} text-info {% endif %}">
+                                                                                        {% if subtask.priority == 1 %}
+                                                                                            Low {% elif subtask.priority == 2 %}
+                                                                                            Medium {% elif subtask.priority == 3 %}
+                                                                                            High {% else %}
+                                                                                            None
+                                                                                        {% endif %}
+                                                                                    </small>
+                                                                                    <small class="text-nowrap {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% else %}text-default{% endif %}">
+                                                                                        - {{ subtask.deadline|date:'d/m/Y' }}
+                                                                                    </small>
+                                                                                </div>
+                                                                            </a>
+                                                                        </div>
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <a href="{% url 'project_details' task.project.slug %}#task{{ task.id }}" class="btn btn-primary">
+                                                            Edit
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     {% endfor %}
                                 </ul>
                             </div>
@@ -723,6 +991,37 @@
             cancelButton.setAttribute("disabled", "disabled");
             uploadButton.setAttribute("disabled", "disabled");
         }
+
+        function addShowClass(element_id) {
+            let element = document.getElementById(element_id);
+            element.classList.add('show');
+            element.focus();
+            
+            let toggleElement = document.querySelector(`[data-target="#${element_id}"]`);
+            if (toggleElement) {
+                let icon = toggleElement.querySelector('.rotate');
+                if (icon) {
+                    icon.classList.add('down');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            let collapseElements = document.querySelectorAll('[data-toggle="collapse"]');
+
+            collapseElements.forEach(function (element) {
+                element.addEventListener('click', function (event) {
+                    let target = document.querySelector(this.getAttribute('data-target'));
+                    let icon = this.querySelector('.rotate');
+
+                    if (target.classList.contains('show')) {
+                        icon.classList.remove('down');
+                    } else {
+                        icon.classList.add('down');
+                    }
+                });
+            });
+        });
 
     </script>
     

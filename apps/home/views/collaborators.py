@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from apps.home.models import Profile, Office, Document
+from apps.home.models import Profile, Office, Document, BankAccount, BANKS
 from django.core.files.storage import default_storage
 from django.http import HttpResponse, Http404
 from django.contrib.auth.models import User
@@ -85,7 +85,7 @@ def page_list(request, filters=None, sorted_by=None, sort_type=None):
         'max_aso_date': max_aso_date,
     }
 
-    return render(request, 'home/collaborators-list.html', context)
+    return render(request, 'home/collaborators/home.html', context)
 
 
 def details(request, slug, sorted_by=None, sort_type=None, filters=None):
@@ -121,9 +121,10 @@ def details(request, slug, sorted_by=None, sort_type=None, filters=None):
         'expired_documents': expired_documents_count,
         'expired_documents_percentage': (expired_documents_count / Document.objects.filter(
             user=collab.user).count()) * 100 if Document.objects.filter(user=collab.user).count() > 0 else 0,
+        'banks': BANKS.items(),
     }
 
-    return render(request, 'home/collaborator-page.html', context)
+    return render(request, 'home/collaborators/details.html', context)
 
 
 def newdoc(request, collab_id):
@@ -419,5 +420,58 @@ def fill_collaborator_initial_infos(request, slug):
     collaborator.cpf = cpf if cpf else collaborator.cpf
 
     collaborator.save()
+
+    return redirect('collaborator_details', slug=slug)
+
+
+#####################################################
+
+
+def add_bank_account(request, slug):
+    collaborator = Profile.objects.get(slug=slug)
+
+    if not request.user.has_perm('home.add_bankaccount'):
+        context = {'user_profile': Profile.objects.get(user=request.user)}
+        return render(request, 'home/page-404.html', context)
+
+    bank_account = BankAccount(
+        user=collaborator.user,
+        bank_code=request.POST['bank'],
+        agency=request.POST['agency'],
+        account=request.POST['account'],
+        account_type=request.POST['account_type'],
+        pix=request.POST.get('pix', None),
+    )
+
+    bank_account.save()
+
+    return redirect('collaborator_details', slug=slug)
+
+
+def edit_bank_account(request, slug, bank_account_id):
+    if not request.user.has_perm('home.change_bankaccount'):
+        context = {'user_profile': Profile.objects.get(user=request.user)}
+        return render(request, 'home/page-404.html', context)
+
+    bank_account = get_object_or_404(BankAccount, id=bank_account_id)
+
+    bank_account.bank_code = request.POST.get('bank', bank_account.bank_code)
+    bank_account.agency = request.POST.get('agency', bank_account.agency)
+    bank_account.account = request.POST.get('account', bank_account.account)
+    bank_account.account_type = request.POST.get('account_type', bank_account.account_type)
+    bank_account.pix = request.POST.get('pix', bank_account.pix)
+
+    bank_account.save()
+
+    return redirect('collaborator_details', slug=slug)
+
+
+def delete_bank_account(request, slug, bank_account_id):
+    if not request.user.has_perm('home.delete_bankaccount'):
+        context = {'user_profile': Profile.objects.get(user=request.user)}
+        return render(request, 'home/page-404.html', context)
+
+    bank_account = get_object_or_404(BankAccount, id=bank_account_id)
+    bank_account.delete()
 
     return redirect('collaborator_details', slug=slug)

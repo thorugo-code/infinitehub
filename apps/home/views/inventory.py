@@ -50,7 +50,7 @@ def inventory_list(request):
         'segment': 'inventory',
     }
 
-    return render(request, 'home/inventory.html', context)
+    return render(request, 'home/inventory/equipments/home.html', context)
 
 
 def download_qrcode_inventory(request, equipment_id):

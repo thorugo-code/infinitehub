@@ -38,7 +38,7 @@ def assets_list(request, category=None):
                                           'office', 'images', 'video', 'others'])
         paginator, files = get_paginated_files(request, category_filter)
 
-    return render(request, "home/assetsList.html", {'files_list': files,
+    return render(request, "home/inventory/assets/home.html", {'files_list': files,
                                                     'category': category,
                                                     'title': title,
                                                     'user_profile': user_profile})
@@ -78,7 +78,7 @@ def assets_hub(request):
         # 'clients': Client.objects.all()
     }
 
-    return render(request, "home/assetsPage.html", context)
+    return render(request, "home/inventory/assets/details.html", context)
 
 
 @require_POST
