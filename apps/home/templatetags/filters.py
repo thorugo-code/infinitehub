@@ -2,6 +2,7 @@ from django import template
 from django.template.defaultfilters import stringfilter
 from apps.home.models import Office, Branch
 from datetime import datetime
+from django.db.models.query import QuerySet
 
 register = template.Library()
 
@@ -312,3 +313,20 @@ def add_string(value, arg):
 @register.filter(name='order_by')
 def order_by(value, arg):
     return value.order_by(arg)
+
+
+@register.filter(name='index_of')
+def index_of(value, arg):
+    if isinstance(value, list):
+        try:
+            return value.index(arg)
+        except ValueError:
+            return None
+    elif isinstance(value, QuerySet):
+        value_list = list(value.values_list('id', flat=True))
+        try:
+            return value_list.index(arg)
+        except ValueError:
+            return None
+    else:
+        return None

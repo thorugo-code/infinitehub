@@ -73,14 +73,14 @@
                             </a>
                         </li>
                     {% endif %}
-                    {% if perms.home.view_bill %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'balance_page' %}">
-                                <i class="ni ni-chart-bar-32 text-pink" style="opacity: 90%"></i>
-                                <span class="nav-link-text">Balance Sheet</span>
-                            </a>
-                        </li>
-                    {% endif %}
+{#                    {% if perms.home.view_bill %}#}
+{#                        <li class="nav-item">#}
+{#                            <a class="nav-link" href="{% url 'balance_page' %}">#}
+{#                                <i class="ni ni-chart-bar-32 text-pink" style="opacity: 90%"></i>#}
+{#                                <span class="nav-link-text">Balance Sheet</span>#}
+{#                            </a>#}
+{#                        </li>#}
+{#                    {% endif %}#}
                 
                     <!-- Clients items -->
                     {% if perms.home.view_client %}
@@ -111,7 +111,7 @@
                 </ul>
             </div>
             <!-- Down items -->
-            <ul class="navbar-nav flex-column" style="background: #fff; position: absolute; bottom: 15px">
+            <ul class="navbar-nav flex-column" id="bottomNavList" style="background: #fff; position: absolute; bottom: 15px">
                 <li class="nav-item">
                     <a class="nav-link {% if 'profile' in segment %}active{% endif %}" href="{% url 'profile' %}">
                         <i class="ni ni-single-02"></i>

@@ -9,7 +9,7 @@ projects_list_urls = [
     path('projects/<slug:slug>/', projects.details, name='project_details'),
 
     path("projects/", projects.home, name="project_list"),
-    path("projects/<str:situation>/", projects.home, name="project_list"),
+    path("projects/sub/<str:situation>/", projects.home, name="project_list"),
 
     path('projects/<slug:slug>/delete', projects.delete, name='delete_project'),
     path('projects/working/archive=<slug:slug>/redirect-to=<str:situation_page>', projects.change_archive,
@@ -67,22 +67,22 @@ assets_urls = [
 
 balance_urls = [
 
-    path('balance/', balance.home, name='balance_page'),
+    # path('balance/', balance.home, name='balance_page'),
 
-    path('balance/new', balance.new_bill, name='new_bill'),
-    path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
-    path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
-    path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
+    # path('balance/new', balance.new_bill, name='new_bill'),
+    # path('balance/delete-bill=<int:bill_id>/', balance.delete_bill, name='delete_bill'),
+    # path('balance/edit-bill=<int:bill_id>/', balance.edit_bill, name='edit_bill'),
+    # path('balance/change-bill-status=<int:bill_id>', balance.change_status, name='change_bill_status'),
 
-    path('balance/order', balance.sort_and_filter_bills, name='sort_bills'),
-    path('balance/filter', balance.filter_bills, name='filter_bills'),
+    # path('balance/order', balance.sort_and_filter_bills, name='sort_bills'),
+    # path('balance/filter', balance.filter_bills, name='filter_bills'),
 
-    path('balance/order:<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
-    path('balance/filters:<str:filters>', balance.home, name='filtered_bills'),
-    path('balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', balance.home,
-         name='sorted_filtered_bills'),
+    # path('balance/order:<str:sorted_by>-<str:sort_type>', balance.home, name='sorted_bills'),
+    # path('balance/filters:<str:filters>', balance.home, name='filtered_bills'),
+    # path('balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', balance.home,
+    #      name='sorted_filtered_bills'),
 
-    path('balance/download-bill=<int:bill_id>', balance.download_bill, name='download_proof'),
+    # path('balance/download-bill=<int:bill_id>', balance.download_bill, name='download_proof'),
 ]
 
 clients_list_urls = [
@@ -248,31 +248,37 @@ offices_urls = [
     path('offices/<slug:slug>/', offices.details, name='office_details'),
     path('offices/<slug:slug>/edit', offices.edit, name='offices_edit'),
 
-    path('offices/<slug:slug>/balance/', offices.balance, name='office_balance'),
-    path('offices/<slug:slug>/balance/new', offices.new_bill, name='new_office_bill'),
-    path('offices/<slug:slug>/edit=<int:bill_id>', offices.edit_bill, name='edit_office_bill'),
-    path('offices/<slug:slug>/balance/change-status=<int:bill_id>', offices.change_status,
-         name='change_office_bill_status'),
+    path('offices/<slug:slug>/bank-account', offices.add_bank_account, name='offices_add_bank_account'),
+    path('offices/<slug:slug>/bank-account/edit=<int:bank_account_id>', offices.edit_bank_account,
+         name='offices_edit_bank_account'),
+    path('offices/<slug:slug>/bank-account/delete=<int:bank_account_id>', offices.delete_bank_account,
+         name='offices_delete_bank_account'),
 
-    path('offices/<slug:slug>/balance/bill=<int:bill_id>/edit=<int:installment_id>',
-         offices.installment_edit, name='edit_office_bill_installment'),
-    path('offices/<slug:slug>/balance/bill=<int:bill_id>/change-status=<int:installment_id>',
-         offices.installment_change_status, name='change_office_bill_installment_status'),
-    path('clients/<slug:slug>/balance/bill=<int:bill_id>/delete=<int:installment_id>',
-         offices.installment_delete, name='delete_office_bill_installment'),
+    # path('offices/<slug:slug>/balance/', offices.balance, name='office_balance'),
+    # path('offices/<slug:slug>/balance/new', offices.new_bill, name='new_office_bill'),
+    # path('offices/<slug:slug>/edit=<int:bill_id>', offices.edit_bill, name='edit_office_bill'),
+    # path('offices/<slug:slug>/balance/change-status=<int:bill_id>', offices.change_status,
+    #      name='change_office_bill_status'),
 
-    path('offices/<slug:slug>/balance/delete/<int:bill_id>', offices.delete_bill, name='delete_office_bill'),
-    path('offices/<slug:slug>/balance/download-bill=<int:bill_id>', offices.download_bill,
-         name='download_office_proof'),
+    # path('offices/<slug:slug>/balance/bill=<int:bill_id>/edit=<int:installment_id>',
+    #      offices.installment_edit, name='edit_office_bill_installment'),
+    # path('offices/<slug:slug>/balance/bill=<int:bill_id>/change-status=<int:installment_id>',
+    #      offices.installment_change_status, name='change_office_bill_installment_status'),
+    # path('clients/<slug:slug>/balance/bill=<int:bill_id>/delete=<int:installment_id>',
+    #      offices.installment_delete, name='delete_office_bill_installment'),
 
-    path('offices/<slug:slug>/balance/order', offices.sort_and_filter_bills, name='sort_office_balance'),
-    path('offices/<slug:slug>/balance/filter', offices.filter_bills, name='filter_office_balance'),
+    # path('offices/<slug:slug>/balance/delete/<int:bill_id>', offices.delete_bill, name='delete_office_bill'),
+    # path('offices/<slug:slug>/balance/download-bill=<int:bill_id>', offices.download_bill,
+    #      name='download_office_proof'),
 
-    path('offices/<slug:slug>/balance/order:<str:sorted_by>-<str:sort_type>', offices.balance,
-         name='sorted_office_balance'),
-    path('offices/<slug:slug>/balance/filters:<str:filters>', offices.balance, name='filtered_office_balance'),
-    path('offices/<slug:slug>/balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', offices.balance,
-         name='sorted_filtered_office_balance'),
+    # path('offices/<slug:slug>/balance/order', offices.sort_and_filter_bills, name='sort_office_balance'),
+    # path('offices/<slug:slug>/balance/filter', offices.filter_bills, name='filter_office_balance'),
+
+    # path('offices/<slug:slug>/balance/order:<str:sorted_by>-<str:sort_type>', offices.balance,
+    #      name='sorted_office_balance'),
+    # path('offices/<slug:slug>/balance/filters:<str:filters>', offices.balance, name='filtered_office_balance'),
+    # path('offices/<slug:slug>/balance/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', offices.balance,
+    #      name='sorted_filtered_office_balance'),
 
     path('offices/<slug:slug>/documents/', offices.documents, name='office_documents'),
     path('offices/<slug:slug>/documents/new', offices.new_document, name='office_new_document'),

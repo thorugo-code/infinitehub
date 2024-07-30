@@ -3,7 +3,7 @@ from .models import *
 
 
 class OfficeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'cnpj', 'location')
+    list_display = ('company_name', 'cnpj')
 
 
 class MeetingAdmin(admin.ModelAdmin):

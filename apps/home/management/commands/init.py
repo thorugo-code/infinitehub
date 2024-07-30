@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.sessions.models import Session
-from apps.home.models import Project
+from apps.home.models import Project, Office
 
 
 class Command(BaseCommand):
@@ -21,3 +21,11 @@ class Command(BaseCommand):
             project.save()
         else:
             self.stdout.write(self.style.SUCCESS('OK'))
+
+        # Update Offices
+        self.stdout.write(f'Updating offices...', ending=' ')
+        for office in Office.objects.all():
+            office.save()
+        else:
+            self.stdout.write(self.style.SUCCESS('OK'))
+

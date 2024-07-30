@@ -1,6 +1,6 @@
 from apps.home.views.balance import INCOME_CATEGORIES, EXPENSE_CATEGORIES, unmask_money, check_late_bills
 from django.shortcuts import render, redirect, get_object_or_404
-from apps.home.models import Profile, Office, Document, Bill, Client, Branch, BillInstallment
+from apps.home.models import Profile, Office, Document, Bill, Client, Branch, BillInstallment, BANKS, BankAccount
 from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, F
@@ -153,10 +153,14 @@ def create(request):
 
     if request.method == 'POST':
         office = Office(
-            name=request.POST['name'],
-            cnpj=request.POST['cnpj'],
-            location=request.POST['address'],
-            description=request.POST['description'],
+            company_name=request.POST['company_name'],
+            fantasy_name=request.POST.get('fantasy_name', ''),
+            cnpj=request.POST.get('cnpj', ''),
+            duns=request.POST['duns'],
+            state_inscription=request.POST.get('state_inscription', ''),
+            municipal_inscription=request.POST.get('municipal_inscription', ''),
+            address=request.POST.get('address', ''),
+            description=request.POST.get('description', ''),
         )
 
         office.save()
@@ -169,6 +173,9 @@ def delete(request, office_id):
         return render(request, 'home/page-404.html')
 
     office = Office.objects.get(id=office_id)
+    if office.avatar and 'placeholder.webp' not in office.avatar.name:
+        office.avatar.delete(save=False)
+
     office.delete()
 
     return redirect('offices_home')
@@ -243,6 +250,7 @@ def details(request, slug):
         'last_month_balance': last_month_balance,
         'last_month_balance_percentage': round(last_month_percentage, 1),
         'clients': Client.objects.all(),
+        'banks': BANKS.items(),
     }
 
     return render(request, 'home/offices/details.html', context)
@@ -255,20 +263,24 @@ def edit(request, slug):
     office = Office.objects.get(slug=slug)
 
     if request.method == 'POST':
-        office.name = request.POST.get('name', office.name)
+        office.company_name = request.POST.get('company_name', office.company_name)
+        office.fantasy_name = request.POST.get('fantasy_name', office.fantasy_name)
         office.cnpj = request.POST.get('cnpj', office.cnpj)
+        office.state_inscription = request.POST.get('state_inscription', office.state_inscription)
+        office.municipal_inscription = request.POST.get('municipal_inscription', office.municipal_inscription)
+        office.address = request.POST.get('address', office.address)
+        office.duns = request.POST.get('duns', office.duns)
         office.description = request.POST.get('about', office.description)
-        office.location = request.POST.get('address', office.location)
 
         if request.FILES.get('avatar', None):
-            if office.avatar:
+            if office.avatar and 'placeholder' not in office.avatar:
                 office.avatar.delete(save=False)
 
             office.avatar = request.FILES['avatar']
 
         office.save()
 
-    return redirect('office_details', slug=slug)
+    return redirect('office_details', slug=office.slug)
 
 
 ##############################################################
@@ -1045,3 +1057,53 @@ def filter_documents(request, slug):
     else:
         return redirect('filtered_office_documents', filters=filter_string, slug=slug)
 
+
+##############################################################
+
+
+def add_bank_account(request, slug):
+    if not request.user.has_perm('home.add_bankaccount'):
+        return render(request, 'home/page-404.html')
+
+    office = Office.objects.get(slug=slug)
+
+    if request.method == 'POST':
+        bank_account = BankAccount(
+            office=office,
+            bank_code=request.POST.get('bank'),
+            agency=request.POST.get('agency'),
+            account=request.POST.get('account'),
+            pix=request.POST.get('pix'),
+            account_type='PJ'
+        )
+
+        bank_account.save()
+
+    return redirect('office_details', slug=slug)
+
+
+def edit_bank_account(request, slug, bank_account_id):
+    if not request.user.has_perm('home.change_bankaccount'):
+        return render(request, 'home/page-404.html')
+
+    bank_account = BankAccount.objects.get(id=bank_account_id)
+
+    if request.method == 'POST':
+        bank_account.bank_code = request.POST.get('bank', bank_account.bank_code)
+        bank_account.agency = request.POST.get('agency', bank_account.agency)
+        bank_account.account = request.POST.get('account', bank_account.account)
+        bank_account.pix = request.POST.get('pix', bank_account.pix)
+
+        bank_account.save()
+
+    return redirect('office_details', slug=slug)
+
+
+def delete_bank_account(request, slug, bank_account_id):
+    if not request.user.has_perm('home.delete_bankaccount'):
+        return render(request, 'home/page-404.html')
+
+    bank_account = BankAccount.objects.get(id=bank_account_id)
+    bank_account.delete()
+
+    return redirect('office_details', slug=slug)

@@ -46,7 +46,7 @@
     <div class="row">
     
         <!-- Office Title Column -->
-        <div class="col-lg-7">
+        <div class="{% if office.municipal_inscription or office.state_inscription or office.duns or office.fantasy_name %}col-lg-8{% else %}col-lg-12{% endif %}">
             <div class="card card-stats" style="height: calc(100% - 30px)">
                 <div class="card-body align-items-center py-5 py-lg-4" style="display: flex">
                     <div class="row px-md-4">
@@ -54,18 +54,18 @@
                             <a href="#" data-toggle="modal" data-target="#pictureModal">
                                 <img class="rounded-circle"
                                      style="width: 100px; height: 100px; object-fit: cover; background-color: #fff; z-index: 1"
-                                     src="{{ office.avatar.url }}" alt="{{ office.name }}">
+                                     src="{{ office.avatar.url }}" alt="{{ office.company_name }}">
                             </a>
                         </div>
                         <div class="col-md align-items-center" style="display: flex;">
                             <div class="pl-2 row">
                                 <span class="h3 p-0 m-0 pl-4">
-                                    <span>{{ office.name }}</span>
+                                    <span>{{ office.company_name }}</span>
                                     <small class="d-block h5 font-weight-light text-muted">{{ office.cnpj|default:'00.000.000/0001-00' }}</small>
-                                    {% if office.location %}
+                                    {% if office.address %}
                                         <div class="h5 font-weight-normal">
                                             <i class="fas fa-map-marker-alt mr-1" style="font-size: 0.7rem"></i>
-                                            {{ office.location }}
+                                            {{ office.address }}
                                         </div>
                                     {% endif %}
                                     {% if office.description %}
@@ -80,44 +80,143 @@
                 </div>
             </div>
         </div>
-    
-        <!-- Office DRE's Column -->
-        <div class="col-lg-5">
-            <div class="card" style="height: calc(100% - 30px)">
-                <div class="card-body p-4 ml-2">
-                    <div class="row">
-                        <div class="col">
-                            <h5 class="card-title text-uppercase text-muted mb-0">DRE Reports</h5>
-                            <span class="h2 font-weight-bold mb-0">0</span>
-                        </div>
-                        <div class="col-auto">
-                            <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#newPageModal">
-                                    New
-                                </a>
-                                <hr class="my-1">
-                                <a class="dropdown-item"
-                                   href="">
-                                    See all
-                                </a>
+
+        <!-- Office Infos Column -->
+        {% if office.municipal_inscription or office.state_inscription or office.duns or office.fantasy_name %}
+            <div class="col-lg-4">
+                <div class="card card-stats" style="height: calc(100% - 30px)">
+                    <div class="card-body py-lg-4">
+                        <div class="row align-items-center" style="height: 100%">
+                            <div class="col">
+                                <div class="h5 pl-2">
+                                    <span>INFO:</span>
+                                </div>
+                                {% if office.fantasy_name %}
+                                    <div class="h5 mt-2 pl-2">
+                                        <a data-toggle="tooltip" data-placement="top" title="" class="pointer-hover"
+                                           onpointerdown="copyToClipboard('{{ office.fantasy_name }}', this)"
+                                           onpointerleave="clearTitle('Copy', this)" data-original-title="Copy">
+                                            <i class="far fa-copy pr-2 font-weight-light text-blue"
+                                               style="font-size: 90%"></i>
+                                        </a>
+                                        <span>Fantasy Name: {{ office.fantasy_name }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if office.duns %}
+                                    <div class="h5 font-weight-400 pl-2">
+                                        <a data-toggle="tooltip" data-placement="top" title="" class="pointer-hover"
+                                           onpointerdown="copyToClipboard('{{ office.duns }}', this)"
+                                           onpointerleave="clearTitle('Copy', this)" data-original-title="Copy">
+                                            <i class="far fa-copy pr-2 font-weight-light text-blue"
+                                               style="font-size: 90%"></i>
+                                        </a>
+                                        <span>Duns: {{ office.duns }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if office.state_inscription %}
+                                    <div class="h5 font-weight-400 pl-2">
+                                        <a data-toggle="tooltip" data-placement="top" title="" class="pointer-hover"
+                                           onpointerdown="copyToClipboard('{{ office.state_inscription }}', this)"
+                                           onpointerleave="clearTitle('Copy', this)" data-original-title="Copy">
+                                            <i class="far fa-copy pr-2 font-weight-light text-blue"
+                                               style="font-size: 90%"></i>
+                                        </a>
+                                        <span>SI: {{ office.state_inscription }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if office.municipal_inscription %}
+                                    <div class="h5 font-weight-400 pl-2">
+                                        <a data-toggle="tooltip" data-placement="top" title="" class="pointer-hover"
+                                           onpointerdown="copyToClipboard('{{ office.municipal_inscription }}', this)"
+                                           onpointerleave="clearTitle('Copy', this)" data-original-title="Copy">
+                                            <i class="far fa-copy pr-2 font-weight-light text-blue"
+                                               style="font-size: 90%"></i>
+                                        </a>
+                                        <span>MI: {{ office.municipal_inscription }}</span>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-                    <small class="bottom-4" style="position: absolute">
-                        <span class="text-nowrap pr-1">0</span>
-                        <span class="text-nowrap font-weight-light">Annually</span>
-                        <br>
-                        <span class="text-nowrap pr-1">0</span>
-                        <span class="text-nowrap font-weight-light">Monthly</span>
-                    </small>
                 </div>
             </div>
-        </div>
+        {% endif %}
     
+        <!-- Office DRE's Column -->
+{#        <div class="col-lg-5">#}
+{#            <div class="card" style="height: calc(100% - 30px)">#}
+{#                <div class="card-body p-4 ml-2">#}
+{#                    <div class="row">#}
+{#                        <div class="col">#}
+{#                            <h5 class="card-title text-uppercase text-muted mb-0">DRE Reports</h5>#}
+{#                            <span class="h2 font-weight-bold mb-0">0</span>#}
+{#                        </div>#}
+{#                        <div class="col-auto">#}
+{#                            <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"#}
+{#                                    aria-haspopup="true" aria-expanded="false">#}
+{#                                <i class="fas fa-ellipsis-h"></i>#}
+{#                            </button>#}
+{#                            <div class="dropdown-menu dropdown-menu-right">#}
+{#                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#newPageModal">#}
+{#                                    New#}
+{#                                </a>#}
+{#                                <hr class="my-1">#}
+{#                                <a class="dropdown-item"#}
+{#                                   href="">#}
+{#                                    See all#}
+{#                                </a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <small class="bottom-4" style="position: absolute">#}
+{#                        <span class="text-nowrap pr-1">0</span>#}
+{#                        <span class="text-nowrap font-weight-light">Annually</span>#}
+{#                        <br>#}
+{#                        <span class="text-nowrap pr-1">0</span>#}
+{#                        <span class="text-nowrap font-weight-light">Monthly</span>#}
+{#                    </small>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+    
+    </div>
+
+    <!-- Highlights Row -->
+    <div class="card-deck">
+        <div class="card bg-gradient-default">
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0 text-white">PGR</h5>
+                        <span class="h2 font-weight-bold mb-0 text-white">{{ office.pgr|date:'d/m/Y'|default:'-' }}</span>
+                    </div>
+                </div>
+                <p class="mt-2 mb-0 text-sm">
+                        <span class="{% if office.pgr|time_to_date < 30 and office.pgr|time_to_date > 0 %}text-warning{% elif office.pgr|time_to_date < 0 %}text-danger{% else %}text-white{% endif %} badge badge-dot"><span
+                                class="">
+                            <i class="{% if office.pgr|time_to_date > 30 %}bg-green{% elif office.pgr|time_to_date > 0 %}bg-warning{% elif office.pgr|time_to_date < 0 %}bg-danger{% else %}bg-info{% endif %}"></i>{{ office.pgr|time_to_date|default:0 }} days</span>
+                        <span class="text-nowrap text-light">{% if office.pgr|time_to_date < 0 %}expired{% else %}to
+                            expire{% endif %}</span>
+                </p>
+            </div>
+    </div>
+        <div class="card bg-gradient-default">
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0 text-white">PCMSO</h5>
+                        <span class="h2 font-weight-bold mb-0 text-white">{{ office.pcmso|date:'d/m/Y'|default:'-' }}</span>
+                    </div>
+                </div>
+                <p class="mt-2 mb-0 text-sm">
+                    <span class="{% if office.pcmso|time_to_date < 30 and office.pcmso|time_to_date > 0 %}text-warning{% elif office.pcmso|time_to_date < 0 %}text-danger{% else %}text-white{% endif %} badge badge-dot"><span
+                            class="">
+                        <i class="{% if office.pcmso|time_to_date > 30 %}bg-green{% elif office.pcmso|time_to_date > 0 %}bg-warning{% elif office.pcmso|time_to_date < 0 %}bg-danger{% else %}bg-info{% endif %}"></i>{{ office.pcmso|time_to_date|default:0 }} days</span>
+                    <span class="text-nowrap text-light">{% if office.pcmso|time_to_date < 0 %}expired{% else %}to
+                        expire{% endif %}</span>
+                </p>
+            </div>
+        </div>
     </div>
 
     <!-- Documents Card -->
@@ -335,6 +434,8 @@
                                                                 <option value="Invoice" {% if document.category == 'Invoice' %}selected{% endif %}>Invoice</option>
                                                                 <option value="Lending contract" {% if document.category == 'Lending contract' %}selected{% endif %}>Lending contract</option>
                                                                 <option value="Lending invoice" {% if document.category == 'Lending invoice' %}selected{% endif %}>Lending invoice</option>
+                                                                <option value="PGR" {% if document.category == 'PGR' %}selected{% endif %}>PGR</option>
+                                                                <option value="PCMSO" {% if document.category == 'PCMSO' %}selected{% endif %}>PCMSO</option>
                                                                 <option value="Receipt" {% if document.category == 'Receipt' %}selected{% endif %}>Receipt</option>
                                                                 <option value="Sales invoice" {% if document.category == 'Sales invoice' %}selected{% endif %}>Sales invoice</option>
                                                                 <option value="Service contract" {% if document.category == 'Service contract' %}selected{% endif %}>Service contract</option>
@@ -526,8 +627,7 @@
                     <div class="form-group form-control-label">
                         <label for="documentNameInput">Name</label>
                         <input class="form-control" id="documentNameInput"
-                               name="name"
-                               placeholder="" type="text">
+                               name="name" type="text">
                     </div>
                     <div class="row">
                         <div class="col-sm form-group form-control-label">
@@ -537,6 +637,8 @@
                                 <option value="Invoice">Invoice</option>
                                 <option value="Lending contract">Lending contract</option>
                                 <option value="Lending invoice">Lending invoice</option>
+                                <option value="PGR">PGR</option>
+                                <option value="PCMSO">PCMSO</option>
                                 <option value="Receipt">Receipt</option>
                                 <option value="Sales invoice">Sales invoice</option>
                                 <option value="Service contract">Service contract</option>

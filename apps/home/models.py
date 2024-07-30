@@ -452,22 +452,29 @@ class Office(models.Model):
     avatar = models.ImageField(upload_to='uploads/offices/avatar',
                                default='placeholder.webp')
 
-    name = models.CharField(max_length=100)
-    cnpj = models.CharField(max_length=100)
-    location = models.CharField(max_length=100)
+    company_name = models.CharField(max_length=100, default='')
+    fantasy_name = models.CharField(max_length=100, default='')
+    cnpj = models.CharField(max_length=100, default='')
+    duns = models.CharField(max_length=9, default='')
+    address = models.CharField(max_length=100, default='')
+    municipal_inscription = models.CharField(max_length=20, default='')
+    state_inscription = models.CharField(max_length=20, default='')
+
+    pgr = models.DateField(null=True, blank=True, default=None)
+    pcmso = models.DateField(null=True, blank=True, default=None)
 
     description = models.TextField(default='')
 
     def save(self, *args, **kwargs):
         super().save()
 
-        if not self.slug and self.name != '':
-            self.slug = slugify(self.name + '-' + str(self.id))
+        if not self.slug and self.company_name != '':
+            self.slug = slugify(self.company_name + '-' + str(self.id))
             self.save()
-        elif self.slug != slugify(self.name + '-' + str(self.id)) or kwargs.get('slug'):
-            self.slug = slugify(self.name + '-' + str(self.id))
+        elif self.slug != slugify(self.company_name + '-' + str(self.id)) or kwargs.get('slug'):
+            self.slug = slugify(self.company_name + '-' + str(self.id))
             self.save()
-        elif self.name == '':
+        elif self.company_name == '':
             self.slug = slugify(str(self.id))
             self.save()
         elif self.slug.endswith('none'):
@@ -666,10 +673,24 @@ class Document(models.Model):
 
         if self.category == 'ASO':
             user_profile = Profile.objects.get(user=self.user)
-            aso_files = sorted(Document.objects.filter(user=self.user, name__iexact='aso'), key=lambda x: x.expiration)
+            aso_files = sorted(Document.objects.filter(user=self.user, category__iexact='ASO'), key=lambda x: x.expiration)
             last_aso = aso_files[-1] if aso_files else None
             user_profile.aso = last_aso.expiration if aso_files else None
             user_profile.save()
+
+        elif self.category == 'PGR':
+            office = Office.objects.get(id=self.office.id)
+            pgr_files = sorted(Document.objects.filter(office=self.office, category__iexact='PGR'), key=lambda x: x.expiration)
+            last_pgr = pgr_files[-1] if pgr_files else None
+            office.pgr = last_pgr.expiration if pgr_files else None
+            office.save()
+
+        elif self.category == 'PCMSO':
+            office = Office.objects.get(id=self.office.id)
+            pcmso_files = sorted(Document.objects.filter(office=self.office, category__iexact='PCMSO'), key=lambda x: x.expiration)
+            last_pcmso = pcmso_files[-1] if pcmso_files else None
+            office.pcmso = last_pcmso.expiration if pcmso_files else None
+            office.save()
 
     def save(self, *args, **kwargs):
         super().save()
@@ -683,6 +704,26 @@ class Document(models.Model):
             user_profile = Profile.objects.get(user=self.user)
             user_profile.aso = expiration_date if user_profile.aso is None or user_profile.aso < expiration_date else user_profile.aso
             user_profile.save()
+
+        if self.category == 'PGR' and self.expiration is not None:
+            try:
+                expiration_date = datetime.strptime(self.expiration, '%Y-%m-%d').date()
+            except TypeError:
+                expiration_date = self.expiration
+
+            office = Office.objects.get(id=self.office.id)
+            office.pgr = expiration_date if office.pgr is None or office.pgr < expiration_date else office.pgr
+            office.save()
+
+        if self.category == 'PCMSO' and self.expiration is not None:
+            try:
+                expiration_date = datetime.strptime(self.expiration, '%Y-%m-%d').date()
+            except TypeError:
+                expiration_date = self.expiration
+
+            office = Office.objects.get(id=self.office.id)
+            office.pcmso = expiration_date if office.pcmso is None or office.pcmso < expiration_date else office.pcmso
+            office.save()
 
 
 class Link(models.Model):
@@ -757,7 +798,8 @@ class Meeting(models.Model):
 
 class BankAccount(models.Model):
     # Foreign Keys and Relationships
-    user = models.ForeignKey(User, related_name='bank_accounts', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='bank_accounts', on_delete=models.CASCADE, null=True, blank=True)
+    office = models.ForeignKey(Office, related_name='bank_accounts', on_delete=models.CASCADE, null=True, blank=True)
 
     # Integer Fields
     bank_code = models.CharField(max_length=3, default='', choices=BANK_CODES)
@@ -772,7 +814,7 @@ class BankAccount(models.Model):
         choices=(
             ('PF', 'Pessoa Física'),
             ('PJ', 'Pessoa Jurídica')
-        )
+        ),
     )
 
     def __str__(self):

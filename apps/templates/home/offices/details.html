@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %} {{ office.name }} {% endblock title %}
+{% block title %} {{ office.company_name }} {% endblock title %}
 
 {% block stylesheets %}
 
@@ -13,6 +13,19 @@
         }
         .rotate.down {
             transform: rotate(180deg);
+        }
+        .dropzone {
+            border: 0;
+            padding: 0 0;
+        }
+        .dropzone .dz-message{
+            margin: 0 0;
+        }
+        .dz-preview .dz-error-message {
+            display: none !important;
+        }
+        .dropzone .dz-preview .dz-remove {
+            display: none;
         }
     </style>
 
@@ -30,10 +43,19 @@
                 <div class="col-lg-6 col-7">
                     <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                         <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-                            <li class="breadcrumb-item"><a href="{% url 'offices_home' %}">Offices</a>
+                            <li class="breadcrumb-item">
+                                <a href="/">
+                                    <i class="fas fa-home"></i>
+                                </a>
                             </li>
-                            <li class="breadcrumb-item active">{{ office.name|default:office.slug|truncatechars:25 }}</li>
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'offices_home' %}">
+                                    Offices
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active">
+                                {{ office.company_name|default:office.slug|truncatechars:25 }}
+                            </li>
                         </ol>
                     </nav>
                 </div>
@@ -52,7 +74,7 @@
     <div class="row">
     
         <!-- Office Title Column -->
-        <div class="col-lg-12">
+        <div class="{% if office.municipal_inscription or office.state_inscription or office.duns or office.fantasy_name %}col-lg-8{% else %}col-lg-12{% endif %}">
             <div class="card card-stats" style="height: calc(100% - 30px)">
                 <div class="card-body align-items-center py-5 py-lg-4" style="display: flex">
                     <div class="row px-md-4">
@@ -60,18 +82,18 @@
                             <a href="#" data-toggle="modal" data-target="#pictureModal">
                                 <img class="rounded-circle"
                                      style="width: 100px; height: 100px; object-fit: cover; background-color: #fff; z-index: 1"
-                                     src="{{ office.avatar.url }}" alt="{{ office.name }}">
+                                     src="{{ office.avatar.url }}" alt="{{ office.company_name }}">
                             </a>
                         </div>
                         <div class="col-md align-items-center" style="display: flex;">
                             <div class="pl-2 row">
                                 <span class="h3 p-0 m-0 pl-4">
-                                    <span>{{ office.name }}</span>
+                                    <span>{{ office.company_name }}</span>
                                     <small class="d-block h5 font-weight-light text-muted">{{ office.cnpj|default:'00.000.000/0001-00' }}</small>
-                                    {% if office.location %}
+                                    {% if office.address %}
                                         <div class="h5 font-weight-normal">
                                             <i class="fas fa-map-marker-alt mr-1" style="font-size: 0.7rem"></i>
-                                            {{ office.location }}
+                                            {{ office.address }}
                                         </div>
                                     {% endif %}
                                     {% if office.description %}
@@ -86,66 +108,367 @@
                 </div>
             </div>
         </div>
+
+        <!-- Office Infos Column -->
+        {% if office.municipal_inscription or office.state_inscription or office.duns or office.fantasy_name %}
+            <div class="col-lg-4">
+                <div class="card card-stats" style="height: calc(100% - 30px)">
+                    <div class="card-body py-lg-4">
+                        <div class="row align-items-center" style="height: 100%">
+                            <div class="col">
+                                <div class="h5 pl-2">
+                                    <span>INFO:</span>
+                                </div>
+                                {% if office.fantasy_name %}
+                                    <div class="h5 mt-2 pl-2">
+                                        <a data-toggle="tooltip" data-placement="top" title="" class="pointer-hover"
+                                           onpointerdown="copyToClipboard('{{ office.fantasy_name }}', this)"
+                                           onpointerleave="clearTitle('Copy', this)" data-original-title="Copy">
+                                            <i class="far fa-copy pr-2 font-weight-light text-blue"
+                                               style="font-size: 90%"></i>
+                                        </a>
+                                        <span>Fantasy Name: {{ office.fantasy_name }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if office.duns %}
+                                    <div class="h5 font-weight-400 pl-2">
+                                        <a data-toggle="tooltip" data-placement="top" title="" class="pointer-hover"
+                                           onpointerdown="copyToClipboard('{{ office.duns }}', this)"
+                                           onpointerleave="clearTitle('Copy', this)" data-original-title="Copy">
+                                            <i class="far fa-copy pr-2 font-weight-light text-blue"
+                                               style="font-size: 90%"></i>
+                                        </a>
+                                        <span>Duns: {{ office.duns }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if office.state_inscription %}
+                                    <div class="h5 font-weight-400 pl-2">
+                                        <a data-toggle="tooltip" data-placement="top" title="" class="pointer-hover"
+                                           onpointerdown="copyToClipboard('{{ office.state_inscription }}', this)"
+                                           onpointerleave="clearTitle('Copy', this)" data-original-title="Copy">
+                                            <i class="far fa-copy pr-2 font-weight-light text-blue"
+                                               style="font-size: 90%"></i>
+                                        </a>
+                                        <span>SI: {{ office.state_inscription }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if office.municipal_inscription %}
+                                    <div class="h5 font-weight-400 pl-2">
+                                        <a data-toggle="tooltip" data-placement="top" title="" class="pointer-hover"
+                                           onpointerdown="copyToClipboard('{{ office.municipal_inscription }}', this)"
+                                           onpointerleave="clearTitle('Copy', this)" data-original-title="Copy">
+                                            <i class="far fa-copy pr-2 font-weight-light text-blue"
+                                               style="font-size: 90%"></i>
+                                        </a>
+                                        <span>MI: {{ office.municipal_inscription }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     
     </div>
 
     <!-- Office Data Row -->
-    <div class="row flex-row-reverse flex-wrap-reverse">
+    <div class="row">
 
-        <!-- Balance + Documents Column -->
-        <div class="col-md-4">
-        
-            <!-- Balance Card -->
-            <div class="card bg-gradient-default">
-                <div class="card-body">
-                    <div class="mb-2">
-                        <div class="text-light text-sm text-uppercase">Balance</div>
-                        <div class="mt-2">
-                            <sup class="{% if balance > 0 %}text-success{% elif balance < 0 %}text-danger{% else %}text-white{% endif %}">
-                                {% if currency == 'BRL' %}
-                                    R$
-                                {% else %}
-                                    $
+        <!-- Documents Highlights Column -->
+        <div class="col-lg-4">
+
+            <!-- Bank Infos Card -->
+            {% if office.bank_accounts.count > 0 and perms.home.view_bankaccount %}
+                <div class="card" style="height: 280.19px">
+                    <div class="card-body">
+                        <div class="row" style="display: inline-table !important">
+                            <div class="col">
+                                {% for account in office.bank_accounts.all %}
+                                    <button type="button" class="mr-0 btn btn-sm btn-neutral tabLinks"
+                                            onclick="openTabContent(event, {{ account.id }})"
+                                            {% if account == office.bank_accounts.first %}
+                                            id="default_tab"{% endif %}>
+                                        {{ office.bank_accounts.all|index_of:account.id|add:1 }}
+                                    </button>
+                                {% endfor %}
+                                {% if perms.home.add_bankaccount %}
+                                    <a href="#" data-toggle="modal" data-target="#addBankAccountModal"
+                                       class="btn btn-sm btn-neutral tabLinks">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
                                 {% endif %}
-                            </sup>
-                            <span class="h2 {% if balance > 0 %}text-success{% elif balance < 0 %}text-danger{% else %}text-white{% endif %}">
-                                {{ balance|without_currency|default:'0.00' }}
-                            </span>
-                        </div>
-                        <div class="text-sm mt-2">
-                            {% if last_month_balance_percentage > 0 %}
-                                <span class="text-success font-weight-600">+ {{ last_month_balance_percentage }}%</span>
-                                <span class="text-light font-weight-light">|</span>
-                            {% elif last_month_balance_percentage < 0 %}
-                                <span class="text-danger font-weight-600">- {{ last_month_balance_percentage|absolute }}%</span>
-                                <span class="text-light font-weight-light">|</span>
-                            {% endif %}
-                            <span class="text-light">{{ last_month_balance|default:'0' }}</span>
-                            <small class="text-light font-weight-light">Last month</small>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-xl">
-                            <small class="text-light">Income: {{ income_percentage|default:0 }}%</small>
-                            <div class="progress progress-xs my-2">
-                                <div class="progress-bar bg-success" style="width: {{ income_percentage }}%"></div>
                             </div>
                         </div>
-                        <div class="col-xl">
-                            <small class="text-light">Expense: {{ expense_percentage|default:0 }}%</small>
-                            <div class="progress progress-xs my-2">
-                                <div class="progress-bar bg-danger" style="width: {{ expense_percentage }}%"></div>
+                        <div class="row justify-content-between mt-3">
+                            <div class="col">
+
+                                {% for account in office.bank_accounts.all %}
+
+                                    <div id="{{ account.id }}" class="tabcontent">
+                                        <div>
+                                            <span class="h6 surtitle text-muted">
+                                               Bank
+                                            </span>
+                                            <p class="h5">
+                                                {{ account.bank_code }} - {{ account.bank_name|truncatechars:40 }}
+                                            </p>
+                                        </div>
+                                        <div class="mt-3">
+                                            <span class="h6 surtitle text-muted">Agency / Bank account</span>
+                                            <br>
+                                            <span class="h2">{{ account.agency }}</span>
+                                            <span class="ml-2 h2">{{ account.account }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span class="h6 surtitle text-muted">Pix</span>
+                                            <br>
+                                            <p class="h4">{{ account.pix|default:'-' }}</p>
+                                        </div>
+                                        {% if perms.home.change_bankaccount %}
+                                            <a href="#" data-toggle="modal"
+                                               data-target="#editBankAccountModal{{ account.id }}"
+                                               class="btn btn-sm btn-neutral tabLinks mt--3"
+                                               style="z-index: 1; position: absolute; right: 10px; top: -30px">
+                                                <i class="fas fa-cog"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Edit Bank Account Modal -->
+                                    {% if perms.home.change_bankaccount %}
+                                        <div class="modal fade" id="editBankAccountModal{{ account.id }}" tabindex="-1"
+                                             role="dialog"
+                                             aria-labelledby="editBankAccountModal{{ account.id }}Label"
+                                             aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document"
+                                                 style="max-width: 500px">
+                                                <div class="modal-content">
+                                                    <div class="modal-header mt-2 align-items-center">
+                                                        <h5 class="modal-title" style="margin-left: auto">
+                                                            <i class="fas fa-university text-blue"
+                                                               style="font-size: 1.4rem"></i>
+                                                        </h5>
+                                                        <span class="ml-3 my-1"
+                                                              style="margin-right: auto; font-size: 1.2rem"
+                                                              id="editBankAccountModalLabel{{ account.id }}">Edit Bank Account</span>
+                                                        <button type="button" class="close mt--4"
+                                                                style="margin-left: -30px"
+                                                                data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body py-0"
+                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                        <form id="editBankAccountForm{{ account.id }}" method="post"
+                                                              action="{% url 'offices_edit_bank_account' office.slug account.id %}">
+                                                            {% csrf_token %}
+                                                            <div class="form-group form-control-label">
+                                                                <label for="bankNameInput">Bank</label>
+                                                                <select class="form-control" id="bankNameInput"
+                                                                        name="bank" required="" autofocus="">
+                                                                    {% for bank in banks %}
+                                                                        <option value="{{ bank.0 }}"
+                                                                                {% if account.bank_code == bank.0 %}
+                                                                                selected
+                                                                                {% endif %}>{{ bank.0 }}
+                                                                            - {{ bank.1 }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-3 form-group form-control-label">
+                                                                    <label for="agencyInput">Agency</label>
+                                                                    <input class="form-control" id="agencyInput"
+                                                                           name="agency" required=""
+                                                                           type="text" minlength="4" maxlength="4"
+                                                                           value="{{ account.agency }}">
+                                                                </div>
+                                                                <div class="col form-group form-control-label">
+                                                                    <label for="accountInput">Account</label>
+                                                                    <input class="form-control" id="agencyInput"
+                                                                           name="account" required="" autofocus=""
+                                                                           type="text"
+                                                                           value="{{ account.account }}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group form-control-label mb-3">
+                                                                <label for="pixInput">Pix</label>
+                                                                <input class="form-control" id="pixInput" name="pix"
+                                                                       type="text"
+                                                                       value="{{ account.pix|default:'' }}">
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-secondary" data-dismiss="modal"
+                                                                form="addBankAccountForm"
+                                                                id="cancelButtonFile" type="button">
+                                                            Cancel
+                                                        </button>
+                                                        {% if perms.home.delete_bankaccount %}
+                                                            <a href="" data-dismiss="modal" data-toggle="modal"
+                                                               data-target="#deleteConfirmBankAccount{{ account.id }}"
+                                                               class="btn btn-danger text-white"
+                                                               style="margin-right: 0.5rem">
+                                                                Delete
+                                                            </a>
+                                                        {% endif %}
+                                                        <button class="btn btn-primary"
+                                                                form="editBankAccountForm{{ account.id }}"
+                                                                type="submit">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Delete Confirm Modal -->
+                                        {% if perms.home.delete_bankaccount %}
+                                            <div aria-hidden="true"
+                                                 aria-labelledby="deleteConfirmBankAccountLabel{{ account.id }}"
+                                                 class="modal fade" id="deleteConfirmBankAccount{{ account.id }}"
+                                                 role="dialog"
+                                                 tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-centered" style="max-width: 500px"
+                                                     role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header mt-2">
+                                                            <h5 class="modal-title my-1"
+                                                                style="margin-left: auto">
+                                                                <i class="ni ni-fat-delete text-blue"
+                                                                   style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                            </h5>
+                                                            <span class="ml-3 my-1"
+                                                                  id="deleteConfirmBankAccountLabel{{ account.id }}"
+                                                                  style="margin-right: auto; font-size: 1.2rem">Are you sure?</span>
+                                                            <button aria-label="Close" class="close mt--4"
+                                                                    data-dismiss="modal"
+                                                                    style="margin-left: -30px"
+                                                                    type="button">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body py-0"
+                                                             style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                            <p class="text-center">Are you sure you want to delete this
+                                                                account?
+                                                                <br>
+                                                                This action cannot be undone.
+                                                            </p>
+                                                            <form id="deleteBankAccountForm{{ account.id }}"
+                                                                  method="post"
+                                                                  action="{% url 'offices_delete_bank_account' office.slug account.id %}">
+                                                                {% csrf_token %}
+                                                                <div class="row">
+                                                                    <div class="col-sm-7 form-group form-control-label">
+                                                                        <label for="deleteBankAccountInput"
+                                                                               style="font-size:0.8125rem; font-weight:600">Bank</label>
+                                                                        <input class="form-control"
+                                                                               id="deleteBankAccountInput"
+                                                                               type="text"
+                                                                               value="{{ account.bank_code }} - {{ account.bank_name }}"
+                                                                               disabled>
+                                                                    </div>
+                                                                    <div class="col-sm-5 form-group form-control-label">
+                                                                        <label for="deleteBankAccountInput"
+                                                                               style="font-size:0.8125rem; font-weight:600">Agency
+                                                                            / Account</label>
+                                                                        <input class="form-control"
+                                                                               id="deleteBankAccountInput"
+                                                                               type="text"
+                                                                               value="{{ account.agency }} {{ account.account }}"
+                                                                               disabled>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group form-control-label">
+                                                                    <label for="deleteBankAccountInput"
+                                                                           style="font-size:0.8125rem; font-weight:600">Pix</label>
+                                                                    <input class="form-control"
+                                                                           id="deleteBankAccountInput"
+                                                                           type="text" value="{{ account.pix|default:'' }}"
+                                                                           disabled>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-secondary" data-dismiss="modal"
+                                                                    type="button">Cancel
+                                                            </button>
+                                                            <button class="btn btn-danger text-white" type="submit"
+                                                                    form="deleteBankAccountForm{{ account.id }}">
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                {% endfor %}
+
                             </div>
                         </div>
                     </div>
-                    <a class="btn btn-sm btn-block btn-primary mt-3" 
-                       href="{% url 'office_balance' office.slug %}">
-                        Manage
-                    </a>
+                </div>
+            {% endif %}
+
+            <!-- Add Bank Card -->
+            {% if office.bank_accounts.count == 0 and perms.home.add_bankaccount %}
+                <a href="#" data-toggle="modal" data-target="#addBankAccountModal">
+                    <div class="card">
+                        <div class="card-body justify-content-center d-flex">
+                            <div class="align-items-center justify-content-center">
+                                <i class="fas fa-university align-items-center justify-content-center d-flex mb-1" style="font-size: 1.5rem"></i>
+                                <span class="font-weight-bold" style="font-size: 0.8rem">Add Bank</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
+        
+            <div class="card bg-gradient-default">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0 text-white">PGR</h5>
+                            <span class="h2 font-weight-bold mb-0 text-white">{{ office.pgr|date:'d/m/Y'|default:'-' }}</span>
+                        </div>
+                    </div>
+                    <p class="mt-2 mb-0 text-sm">
+                            <span class="{% if office.pgr|time_to_date < 30 and office.pgr|time_to_date > 0 %}text-warning{% elif office.pgr|time_to_date < 0 %}text-danger{% else %}text-white{% endif %} badge badge-dot"><span
+                                    class="">
+                                <i class="{% if office.pgr|time_to_date > 30 %}bg-green{% elif office.pgr|time_to_date > 0 %}bg-warning{% elif office.pgr|time_to_date < 0 %}bg-danger{% else %}bg-info{% endif %}"></i>{{ office.pgr|time_to_date|default:0 }} days</span>
+                            <span class="text-nowrap text-light">{% if office.pgr|time_to_date < 0 %}expired{% else %}to
+                                expire{% endif %}</span>
+                    </p>
+                </div>
+        </div>
+            <div class="card bg-gradient-default">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0 text-white">PCMSO</h5>
+                            <span class="h2 font-weight-bold mb-0 text-white">{{ office.pcmso|date:'d/m/Y'|default:'-' }}</span>
+                        </div>
+                    </div>
+                    <p class="mt-2 mb-0 text-sm">
+                        <span class="{% if office.pcmso|time_to_date < 30 and office.pcmso|time_to_date > 0 %}text-warning{% elif office.pcmso|time_to_date < 0 %}text-danger{% else %}text-white{% endif %} badge badge-dot"><span
+                                class="">
+                            <i class="{% if office.pcmso|time_to_date > 30 %}bg-green{% elif office.pcmso|time_to_date > 0 %}bg-warning{% elif office.pcmso|time_to_date < 0 %}bg-danger{% else %}bg-info{% endif %}"></i>{{ office.pcmso|time_to_date|default:0 }} days</span>
+                        <span class="text-nowrap text-light">{% if office.pcmso|time_to_date < 0 %}expired{% else %}to
+                            expire{% endif %}</span>
+                    </p>
                 </div>
             </div>
-        
-            <!-- Documents Card -->
+
+        </div>
+
+        <!-- Documents Column -->
+        <div class="col">
             <div class="card">
                 <div class="card-header">
                     <div class="row align-items-center">
@@ -162,18 +485,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive" style="min-height: 4.3rem; max-height: 19.65rem; overflow-y: auto">
+                <div class="table-responsive" style="min-height: 23.5rem; overflow-y: auto">
                     <table class="table align-items-center table-flush">
                         <tbody>
-                            {% for document in office.documents.all|order_by:'-id'|slice:5 %}
+                            {% for document in office.documents.all|order_by:'-id'|slice:10 %}
                                 <tr>
                                     <th scope="row" class="p-2 align-items-center">
                                         <a class="align-items-center" style="display: flex"
                                            data-target="#watchDocumentModal{{ document.id }}"
-                                           data-toggle="modal" href="">
+                                           data-toggle="modal" href="#">
                                             <div class="row">
                                                 <div class="col-auto align-items-center d-flex pr-0">
-                                                    <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}" alt="{{ document.name }}" 
+                                                    <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}" alt="{{ document.name }}"
                                                          class="pl-2"
                                                          style="height: 18px">
                                                 </div>
@@ -205,7 +528,7 @@
                                         </a>
                                     </td>
                                 </tr>
-
+    
                                 <!-- Watch File Modal -->
                                 <div aria-hidden="true"
                                      aria-labelledby="watchDocumentModalLabel{{ document.id }}"
@@ -292,7 +615,7 @@
                                         </div>
                                     </div>
                                 </div>
-
+    
                             {% endfor %}
                         </tbody>
                     </table>
@@ -307,975 +630,8 @@
                     {% endif %}
                 </div>
             </div>
-        
         </div>
 
-        <!-- Stats + Bills Column -->
-        <div class="col-md-8">
-        
-            <!-- Stats Row -->
-            <div class="card-deck">
-                <div class="card bg-gradient-purple">
-                    <div class="card-body p-4 ml-2">
-                        <div class="row">
-                            <div class="col">
-                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">DRE Reports</h5>
-                                <span class="h2 font-weight-bold mb-0 text-white">0</span>
-                            </div>
-                            <div class="col-auto">
-                                <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#newPageModal">
-                                        New
-                                    </a>
-                                    <hr class="my-1">
-                                    <a class="dropdown-item"
-                                       href="">
-                                        See all
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <small class="bottom-4" style="position: absolute">
-                            <span class="text-nowrap text-white pr-1">0</span>
-                            <span class="text-nowrap text-white font-weight-light">Annually</span>
-                            <br>
-                            <span class="text-nowrap text-white pr-1">0</span>
-                            <span class="text-nowrap text-white font-weight-light">Monthly</span>
-                        </small>
-                    </div>
-                </div>
-                <div class="card {% if requests_to_attend > 0 %}bg-gradient-danger{% else %}bg-gradient-success{% endif %}"
-                     style="min-width: 0; height: 140px !important">
-                    <div class="card-body p-4 ml-2">
-                        <div class="row">
-                            <div class="col">
-                                <h5 class="card-title text-uppercase text-muted mb-0 text-white">Requests</h5>
-                                <span class="h2 font-weight-bold mb-0 text-white">{{ requests_to_attend|default:0 }}</span>
-                                <span class="h3 font-weight-normal mb-0 text-white">to attend</span>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-nowrap text-sm text-white font-weight-light">
-                                Total: {{ office.requests.all.count|default:0 }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        
-            <!-- Bills in progress card -->
-            <div class="card shadow" style="min-height: 17.5rem; max-height: 31.45rem"> {# height: calc(100% - 200px) #}
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col">
-                            <span class="h5 font-weight-light text-muted mb-0">
-                                ({{ bills_in_progress.count|default:0 }}/{{ office.bills.all.count }})
-                            </span>
-                            <span class="h3 mb-0">Bills in progress</span>
-                        </div>
-                        <div class="col-auto px-2">
-                            <a class="btn btn-sm btn-neutral"
-                               href="{% url 'office_balance' office.slug %}">
-                                See all
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive"
-                         style="min-height: 12.7rem; max-height: 26.95rem; overflow-y: auto">
-                        <table class="table align-items-center table-flush">
-                            <tbody>
-                            {% for bill in bills_in_progress %}
-                                <tr>
-                                    <td class="p-0 pl-4">
-                                        {% if bill.installments_number > 1 %}
-                                            <a class="pointer-hover accordion" data-toggle="collapse" 
-                                               data-target="#collapseDetails{{ bill.id }}" aria-expanded="false" 
-                                               aria-controls="collapseDetails{{ bill.id }}">
-                                                <i class="fas fa-chevron-down text-muted rotate"></i>
-                                            </a>
-                                        {% endif %}
-                                    </td>
-                                    <td class="p-0 pl-2" style="width: 0">
-                                        {% if bill.category in income_categories %}
-                                            <a href="#" data-toggle="modal"
-                                               data-target="#detailsBillModal{{ bill.id }}" class="text-dark">
-                                                <i class="fas fa-plus text-green"
-                                                   style="font-size: 0.7125rem"></i>
-                                            </a>
-                                        {% elif bill.category in expense_categories %}
-                                            <a href="#" data-toggle="modal"
-                                               data-target="#detailsBillModal{{ bill.id }}" class="text-dark">
-                                                <i class="fas fa-minus text-red"
-                                                   style="font-size: 0.7125rem"></i>
-                                            </a>
-                                        {% else %}
-                                            <a href="#" data-toggle="modal"
-                                               data-target="#detailsBillModal{{ bill.id }}" class="text-dark">
-                                                <i class="fas fa-question text-blue"
-                                                   style="font-size: 0.7125rem"></i>
-                                            </a>
-                                        {% endif %}
-                                    </td>
-                                    <td class="pl-3">
-                                        <a href="#" data-toggle="modal"
-                                           data-target="#detailsBillModal{{ bill.id }}" class="text-dark">
-                                            {{ bill.title|default:'-' }}
-                                            <br>
-                                            <span class="text-muted font-weight-light">
-                                                {{ bill.category|default:'-' }}
-                                            </span>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        {{ bill.due_date|date:'d/m/y'|default:'-' }}
-                                        {% if bill.due_date %}
-                                            <br>
-                                            {% if bill.due_date|time_to_date > 30 %}
-                                                <span class="text-muted">
-                                                    {{ bill.due_date|time_to_date }} days to expire
-                                                </span>
-                                            {% elif bill.due_date|time_to_date > 0 %}
-                                                <span class="text-warning">
-                                                    {{ bill.due_date|time_to_date }} days to expire
-                                                </span>
-                                            {% else %}
-                                                <span class="text-danger">
-                                                    {{ bill.due_date|time_to_date|absolute }} days expired
-                                                </span>
-                                            {% endif %}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if bill.link %}
-                                            <a href="{{ bill.link }}" target="_blank">
-                                                <i class="fas fa-link"
-                                                   style="font-size: 0.7rem"></i> {{ bill.code|default:'Link'|truncatechars:25 }}
-                                            </a>
-                                        {% else %}
-                                            {{ bill.code|default:'-' }}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ bill.client.name|truncatechars:20|default:'-' }}
-                                        <br>
-                                        <span class="text-muted font-weight-light" style="font-size: 0.8rem">
-                                            {{ bill.payer.name }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {{ bill.total|default:'-' }}
-                                        {% if bill.installments_number > 1 %}
-                                            <a class="pointer-hover accordion" data-toggle="collapse" 
-                                               data-target="#collapseDetails{{ bill.id }}" aria-expanded="false" 
-                                               aria-controls="collapseDetails{{ bill.id }}">
-                                                ({{ bill.installments_number }}x)
-                                            </a>
-                                        {% endif %}
-                                        <br>
-                                        <span class="text-muted font-weight-light">
-                                            {{ bill.method }}
-                                        </span>
-                                    </td>
-                                    <td class="text-right px-2" style="width: 0">
-                                        <div class="dropdown">
-                                            <a class="btn btn-sm btn-icon-only text-light" href="#"
-                                               role="button"
-                                               data-toggle="dropdown" aria-haspopup="true"
-                                               aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                <a class="dropdown-item" data-toggle="modal" href=""
-                                                   data-dismiss="modal"
-                                                   data-target="#detailsBillModal{{ bill.id }}">
-                                                    Open
-                                                </a>
-                                                {% if perms.home.change_bill or perms.home.delete_bill %}
-                                                    <div class="dropdown-divider"></div>
-                                                    {% if bill.paid and perms.home.change_bill %}
-                                                        <a class="dropdown-item text-warning" href=""
-                                                           data-dismiss="modal"
-                                                           data-toggle="modal"
-                                                           data-target="#paidConfirm{{ bill.id }}">
-                                                            Set as pending
-                                                        </a>
-                                                    {% elif perms.home.change_bill %}
-                                                        <a class="dropdown-item text-success" href=""
-                                                           data-dismiss="modal"
-                                                           data-toggle="modal"
-                                                           data-target="#paidConfirm{{ bill.id }}">
-                                                            Set as paid
-                                                        </a>
-                                                    {% endif %}
-                                                    {% if perms.home.delete_bill %}
-                                                        <a class="dropdown-item text-danger" href=""
-                                                           data-dismiss="modal"
-                                                           data-toggle="modal"
-                                                           data-target="#deleteConfirm{{ bill.id }}">
-                                                            Delete
-                                                        </a>
-                                                    {% endif %}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td colspan="14" class="p-0 border-0">
-                                        <div aria-labelledby="collapseDetailsLabel{{ bill.id }}" data-parent=".accordion" id="collapseDetails{{ bill.id }}" class="collapse">
-                                            <ul class="list-group list-group-flush list border-top">
-                                                {% for installment in bill.installments.all %}
-                                                    {% if not installment.paid and installment.due_date|time_to_date <= 40 %}
-                                                        
-                                                        <li class="list-group-item px-4 border-0">
-                                                            <div class="row mx-0 align-items-center">
-                                                                <div class="col-auto p-0">
-                                                                    <a class="badge badge-sm badge-secondary" href="#" role="button"
-                                                                       data-toggle="modal" data-target="#editInstallment{{ installment.id }}">
-                                                                        <i class="fas fa-eye"></i>
-                                                                    </a>
-                                                                </div>
-                                                                {% if installment.paid %}
-                                                                    <div class="col-auto pl-2 pr-0">
-                                                                        <a class="badge badge-sm badge-success" href="" role="button"
-                                                                           data-toggle="modal" data-target="#paidInstallmentConfirm{{ installment.id }}">
-                                                                            <i class="fas fa-check"></i>
-                                                                        </a>
-                                                                    </div>
-                                                                {% else %}
-                                                                    <div class="col-auto pl-2 pr-0">
-                                                                        <a class="badge badge-sm badge-warning" href="" role="button"
-                                                                           data-toggle="modal" data-target="#paidInstallmentConfirm{{ installment.id }}">
-                                                                            <i class="fas fa-hourglass-half"></i>
-                                                                        </a>
-                                                                    </div>
-                                                                {% endif %}
-                                                                <div class="col-auto pl-2">
-                                                                    <a class="badge badge-sm badge-danger" href="#" role="button"
-                                                                       data-toggle="modal" data-target="#deleteInstallmentConfirm{{ installment.id }}">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </a>
-                                                                </div>
-                                                                <div class="col-auto">
-                                                                    <small>ID:</small>
-                                                                    <h5 class="mb-0">{{ installment.partial_id }}/{{ bill.installments.count }}</h5>
-                                                                </div>
-                                                                <div class="col-auto">
-                                                                    <small>Value:</small>
-                                                                    <h5 class="mb-0">{{ installment.value }}</h5>
-                                                                </div>
-                                                                <div class="col-auto">
-                                                                    <small>Due Date:</small>
-                                                                    {% if installment.due_date|time_to_date < 10 and not installment.paid %}
-                                                                        <h5 class="mb-0 text-warning">
-                                                                    {% elif installment.due_date|time_to_date < 0 and not installment.paid %}
-                                                                        <h5 class="mb-0 text-danger">
-                                                                    {% elif installment.paid %}
-                                                                        <h5 class="mb-0 text-success">
-                                                                    {% else %}
-                                                                        <h5 class="mb-0">
-                                                                    {% endif %}
-                                                                    {{ installment.due_date|date:"d/m/y"|default:"-" }}</h5>
-                                                                </div>
-                                                                <div class="col-auto">
-                                                                    <small>Paid At:</small>
-                                                                    {% if installment.paid %}
-                                                                        <h5 class="mb-0">{{ installment.paid_at|date:"d/m/y" }}</h5>
-                                                                    {% elif installment.due_date|time_to_date < 10 %}
-                                                                        <h5 class="mb-0 text-warning">Pending</h5>
-                                                                    {% elif installment.due_date|time_to_date < 0 %}
-                                                                        <h5 class="mb-0 text-danger">Late</h5>
-                                                                    {% else %}
-                                                                        <h5 class="mb-0">Pending</h5>
-                                                                    {% endif %}
-                                                                </div>
-                                                                <div class="col"></div>
-                                                            </div>
-                                                        </li>
-    
-                                                        <!-- Edit Installment Modal -->
-                                                        <div class="modal fade" id="editInstallment{{ installment.id }}"
-                                                             tabindex="-1" role="dialog"
-                                                             aria-labelledby="editInstallmentLabel{{ installment.id }}"
-                                                             aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header mt-2" style="justify-content: center">
-                                                                        <span class="my-1"
-                                                                              style="margin: auto; font-size: 1.2rem"
-                                                                              id="editInstallmentModalLabel{{ installment.id }}">
-                                                                            ({{ installment.partial_id }}/{{ installment.bill.installments.count }}) 
-                                                                            {{ installment.bill.title|truncatechars:30 }} 
-                                                                        </span>
-                                                                        <button type="button" class="close mt--4"
-                                                                                style="margin-left: -30px"
-                                                                                data-dismiss="modal"
-                                                                                aria-label="Close">
-                                                                            <span aria-hidden="true">&times;</span>
-                                                                        </button>
-                                                                    </div>
-                                                                    <div class="modal-body py-0"
-                                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                                        <form method="post"
-                                                                              id="editInstallmentForm{{ installment.id }}"
-                                                                              action="">
-                                                                            {% csrf_token %}
-    
-                                                                            <input type="hidden" value="{{ sorted_by }}"
-                                                                                   name="sort_by">
-                                                                            <input type="hidden" value="{{ sort_type }}"
-                                                                                   name="sort_type">
-                                                                            <input type="hidden" value="{{ filters }}"
-                                                                                   name="filters">
-    
-                                                                            <div class="row">
-                                                                                <div class="col-sm form-group form-control-label">
-                                                                                    <label for="installment_value{{ installment.id }}">Value</label>
-                                                                                    <input type="text" class="form-control" 
-                                                                                           id="installment_value{{ installment.id }}"
-                                                                                           value="{{ installment.value }}" disabled>
-                                                                                </div>
-                                                                                <div class="col-sm-4 form-group form-control-label">
-                                                                                    <label for="dueDate">Due date</label>
-                                                                                    <input type="date" class="form-control" id="dueDate"
-                                                                                           value="{{ installment.due_date|date:'Y-m-d' }}" 
-                                                                                           disabled>
-                                                                                </div>
-                                                                                {% if installment.paid %}
-                                                                                    <div class="col-sm-4 form-group form-control-label">
-                                                                                        <label for="paidAt">Paid at</label>
-                                                                                        <input type="date"
-                                                                                               class="form-control"
-                                                                                               id="paidAt"
-                                                                                               value="{{ installment.paid_at|date:'Y-m-d' }}"
-                                                                                               disabled>
-                                                                                    </div>
-                                                                                {% endif %}
-                                                                            </div>
-                                                                            <div class="form-group form-control-label">
-                                                                                <label for="installmentEditInfoInput">Info</label>
-                                                                                <textarea type="date" class="form-control"
-                                                                                          id="installmentEditInfoInput"
-                                                                                          name="installment_info" disabled
-                                                                                >{{ installment.payment_info }}</textarea>
-                                                                            </div>
-    
-                                                                        </form>
-                                                                    </div>
-                                                                    <div class="modal-footer pt-1">
-                                                                        <button type="button" class="btn btn-secondary"
-                                                                                data-dismiss="modal">Cancel
-                                                                        </button>
-                                                                        <a href="#" target="_blank" data-dismiss="modal" data-toggle="modal"
-                                                                           data-target="#paidInstallmentConfirm{{ installment.id }}" 
-                                                                        {% if installment.paid %}
-                                                                           class="btn btn-warning">
-                                                                            Set as pending
-                                                                        {% else %}
-                                                                           class="btn btn-success">
-                                                                            Set as paid
-                                                                        {% endif %}
-                                                                        </a>
-                                                                        <a href=""
-                                                                           class="btn btn-primary">
-                                                                            Edit
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <!-- Change status Modal -->
-                                                        <div class="modal fade"
-                                                             id="paidInstallmentConfirm{{ installment.id }}"
-                                                             tabindex="-1"
-                                                             role="dialog"
-                                                             aria-labelledby="paidInstallmentConfirmLabel{{ installment.id }}"
-                                                             aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header mt-2">
-                                                                        <h5 class="modal-title my-1"
-                                                                            style="margin-left: auto">
-                                                                            <i class="ni ni-fat-delete text-blue"
-                                                                               style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                                        </h5>
-                                                                        <span class="ml-3 my-1"
-                                                                              style="margin-right: auto; font-size: 1.2rem"
-                                                                              id="paidConfirmModalLabel{{ installment.id }}">Are you sure?</span>
-                                                                        <button type="button" class="close mt--4"
-                                                                                style="margin-left: -30px"
-                                                                                data-dismiss="modal"
-                                                                                aria-label="Close">
-                                                                            <span aria-hidden="true">&times;</span>
-                                                                        </button>
-                                                                    </div>
-                                                                    <div class="modal-body py-0"
-                                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                                        <p class="text-center">Are you sure you want to
-                                                                            change status of this
-                                                                            bill?
-                                                                            <br>
-                                                                            This action can be undone.
-                                                                        </p>
-                                                                        <form method="post"
-                                                                              id="paidInstallmentConfirmForm{{ installment.id }}"
-                                                                              action="">
-                                                                            {% csrf_token %}
-    
-                                                                            <input type="hidden" value="{{ sorted_by }}"
-                                                                                   name="sort_by">
-                                                                            <input type="hidden" value="{{ sort_type }}"
-                                                                                   name="sort_type">
-                                                                            <input type="hidden" value="{{ filters }}"
-                                                                                   name="filters">
-                                                                            <input type="hidden" value="True"
-                                                                                   name="office_page">
-    
-                                                                            <div class="row">
-                                                                                <div class="col-sm-8 form-group form-control-label mb-3">
-                                                                                    <label for="name">Title</label>
-                                                                                    <input class="form-control" id="name"
-                                                                                           value="{{ installment.bill.title }} ({{ installment.partial_id }}/{{ installment.bill.installments.count }})"
-                                                                                           disabled>
-                                                                                </div>
-                                                                                <div class="col-sm-4 form-group form-control-label">
-                                                                                    <label for="dueDate">Due date</label>
-                                                                                    <input type="date" class="form-control"
-                                                                                           id="dueDate"
-                                                                                           value="{{ installment.due_date|date:'Y-m-d' }}"
-                                                                                           disabled>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col-sm form-group form-control-label">
-                                                                                    <label for="total">Total</label>
-                                                                                    <input inputmode="decimal"
-                                                                                           class="form-control" id="total"
-                                                                                           value="{{ installment.value }}"
-                                                                                           disabled>
-                                                                                </div>
-                                                                                {% if installment.paid %}
-                                                                                    <div class="col-sm form-group form-control-label">
-                                                                                        <label for="paidAt">Paid at</label>
-                                                                                        <input type="date"
-                                                                                               class="form-control"
-                                                                                               id="paidAt"
-                                                                                               value="{{ installment.paid_at|date:'Y-m-d' }}"
-                                                                                               disabled>
-                                                                                    </div>
-                                                                                {% else %}
-                                                                                    <div class="col-sm form-group form-control-label">
-                                                                                        <label for="billPaidInput">Paid
-                                                                                            at</label>
-                                                                                        <input type="date"
-                                                                                               class="form-control"
-                                                                                               id="billPaidInput"
-                                                                                               name="bill_paid_at" required
-                                                                                               autofocus>
-                                                                                    </div>
-                                                                                {% endif %}
-                                                                            </div>
-                                                                            <div class="form-group form-control-label">
-                                                                                <label for="installmentEditInfoInput">Info</label>
-                                                                                <textarea type="date"
-                                                                                          class="form-control"
-                                                                                          id="installmentEditInfoInput"
-                                                                                          name="installment_info"
-                                                                                          {% if installment.paid %}disabled{% endif %}
-                                                                                >{{ installment.payment_info }}</textarea>
-                                                                            </div>
-    
-                                                                        </form>
-                                                                    </div>
-                                                                    <div class="modal-footer pt-1">
-                                                                        <button type="button" class="btn btn-secondary"
-                                                                                data-dismiss="modal">Cancel
-                                                                        </button>
-                                                                        {% if installment.paid %}
-                                                                            <button type="submit" class="btn btn-warning"
-                                                                                    form="paidInstallmentConfirmForm{{ installment.id }}">
-                                                                                Set as pending
-                                                                            </button>
-                                                                        {% else %}
-                                                                            <button type="submit" class="btn btn-success"
-                                                                                    form="paidInstallmentConfirmForm{{ installment.id }}">
-                                                                                Set as paid
-                                                                            </button>
-                                                                        {% endif %}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-    
-                                                        <!-- Delete Modal -->
-                                                        <div class="modal fade"
-                                                             id="deleteInstallmentConfirm{{ installment.id }}"
-                                                             tabindex="-1"
-                                                             role="dialog" aria-labelledby="deleteInstallmentConfirmLabel{{ installment.id }}"
-                                                             aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header mt-2">
-                                                                        <h5 class="modal-title my-1"
-                                                                            style="margin-left: auto">
-                                                                            <i class="ni ni-fat-delete text-blue"
-                                                                               style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                                        </h5>
-                                                                        <span class="ml-3 my-1"
-                                                                              style="margin-right: auto; font-size: 1.2rem"
-                                                                              id="deleteInstallmentConfirmModalLabel{{ installment.id }}">Are you sure?</span>
-                                                                        <button type="button" class="close mt--4"
-                                                                                style="margin-left: -30px"
-                                                                                data-dismiss="modal"
-                                                                                aria-label="Close">
-                                                                            <span aria-hidden="true">&times;</span>
-                                                                        </button>
-                                                                    </div>
-                                                                    <div class="modal-body py-0"
-                                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                                        <p class="text-center">Are you sure you want to
-                                                                            delete this
-                                                                            installment?
-                                                                            <br>
-                                                                            This action cannot be undone.
-                                                                        </p>
-                                                                        <form method="post"
-                                                                              id="deleteInstallmentConfirmForm{{ installment.id }}"
-                                                                              action="">
-                                                                            {% csrf_token %}
-                                                                            <input type="hidden" value="{{ sorted_by }}"
-                                                                                   name="sort_by">
-                                                                            <input type="hidden" value="{{ sort_type }}"
-                                                                                   name="sort_type">
-                                                                            <input type="hidden" value="{{ filters }}"
-                                                                                   name="filters">
-                                                                        </form>
-                                                                        <div class="row">
-                                                                            <div class="col form-group form-control-label mb-3">
-                                                                                <label for="name">Title</label>
-                                                                                <input class="form-control" id="name"
-                                                                                       name="bill_name"
-                                                                                       value="{{ installment.bill.title }} ({{ installment.partial_id }}/{{ bill.installments_number }})" disabled>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col form-group form-control-label">
-                                                                                <label for="billTotalInfo">Value</label>
-                                                                                <input inputmode="decimal"
-                                                                                       class="form-control"
-                                                                                       id="billTotalInfo"
-                                                                                       name="bill_total" placeholder=""
-                                                                                       value="{{ installment.value }}" disabled>
-                                                                            </div>
-                                                                            <div class="col form-group form-control-label">
-                                                                                <label for="billDueDateInput">Due
-                                                                                    date</label>
-                                                                                <input type="date" class="form-control"
-                                                                                       id="billDueDateInput"
-                                                                                       name="bill_due_date" placeholder=""
-                                                                                       value="{{ installment.due_date|date:'Y-m-d' }}"
-                                                                                       disabled>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer pt-1">
-                                                                        <button type="button" class="btn btn-secondary"
-                                                                                data-dismiss="modal">Cancel
-                                                                        </button>
-                                                                        <button type="submit" class="btn btn-danger"
-                                                                                form="deleteInstallmentConfirmForm{{ installment.id }}">
-                                                                            Delete
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Details Modal -->
-                                <div class="modal fade" id="detailsBillModal{{ bill.id }}" tabindex="-1"
-                                     role="dialog"
-                                     aria-labelledby="detailsBillModal{{ bill.id }}Label" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header mt-2 align-items-center">
-                                                <h5 class="modal-title" style="margin-left: auto">
-                                                    {% if bill.category in income_categories %}
-                                                        <i class="fas fa-plus text-green"
-                                                           style="font-size: 1rem"></i>
-                                                    {% else %}
-                                                        <i class="fas fa-minus text-danger"
-                                                           style="font-size: 1rem"></i>
-                                                    {% endif %}
-                                                </h5>
-                                                <span class="ml-3 my-1"
-                                                      style="margin-right: auto; font-size: 1.2rem"
-                                                      id="detailsBillModal{{ bill.id }}Label">{% if bill.title != '' %}
-                                                    {{ bill.title|truncatechars:25 }}{% else %}
-                                                    Bill{% endif %}</span>
-                                                <button type="button" class="close mt--4"
-                                                        style="margin-left: -30px"
-                                                        data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body py-0"
-                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <form id="editBillForm{{ bill.id }}" method="post"
-                                                      action=""
-                                                      enctype="multipart/form-data"
-                                                      onsubmit=blockSubmit(event,'submitReceiveButton')>
-                                                    {% csrf_token %}
-                                                    <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                                    <input type="hidden" value="{{ sort_type }}"
-                                                           name="sort_type">
-                                                    <input type="hidden" value="{{ filters }}" name="filters">
-                                                    <input type="hidden" value="{{ office.slug }}"
-                                                           name="office_slug">
-                                                    <input type="hidden" value="True" name="office_page">
-                                                    
-                                                    {# OFFICE / REGIONAL #}
-                                                    <div class="row">
-                                                        <div class="col form-group form-control-label mb-3">
-                                                            <label for="beneficiaryDetails">Office</label>
-                                                            <input type="text" class="form-control" 
-                                                                   id="beneficiaryDetails" value="{{ bill.office.name }}" 
-                                                                   disabled>
-                                                        </div>
-                                                        <div class="col-6 form-group form-control-label mb-3">
-                                                            <label for="regional">Regional</label>
-                                                            <input type="text" id="regional" class="form-control" 
-                                                                   value="{{ bill.payer.name }}" disabled>
-                                                        </div>
-                                                    </div>
-                                                    {# ORIGIN / METHOD #}
-                                                    <div class="row">
-                                                        <div class="col-6 form-group form-control-label mb-3">
-                                                            <label for="origin">Origin</label>
-                                                            <input type="text" id="origin" class="form-control" 
-                                                                   value="{{ bill.origin }}" disabled>
-                                                        </div>
-                                                        <div class="col-6 form-group form-control-label mb-3">
-                                                            <label for="categoryDetails">Category</label>
-                                                            <input type="text" class="form-control" id="categoryDetails" 
-                                                                   value="{{ bill.category }}" disabled>
-                                                        </div>
-                                                    </div>
-                                                    {# TOTAL / DUE DATE #}
-                                                    <div class="row">
-                                                        <div class="col form-group form-control-label">
-                                                            <label for="valueDetails{{ bill.id }}">Total</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="valueDetails{{ bill.id }}"
-                                                                   value="{{ bill.total }} ({{ bill.installments_number }}x)" disabled>
-                                                        </div>
-                                                        <div class="col form-group form-control-label"
-                                                             style="flex: 0 0 30%; max-width: 30%">
-                                                            <label for="methodDetails">Method</label>
-                                                            <input type="text" class="form-control" id="methodDetails"
-                                                                   value="{{ bill.method }}" disabled>
-                                                        </div>
-                                                        <div class="col form-group form-control-label"
-                                                             style="flex: 0 0 30%; max-width: 30%">
-                                                            <label for="billDueDateInputDetails">
-                                                                Due date
-                                                            </label>
-                                                            <input type="date" class="form-control"
-                                                                   id="billDueDateInputDetails"
-                                                                   value="{{ bill.due_date|date:'Y-m-d' }}" disabled>
-                                                        </div>
-                                                    </div>
-                                                    {# CODE / PROOF #}
-                                                    {% if bill.proof or bill.code or bill.link %}
-                                                        <div class="row">
-                                                            {% if bill.code or bill.link %}
-                                                                <div class="col-auto form-group form-control-label my-3 pr-0 align-items-center d-flex">
-                                                                    <a href="{{ bill.link|default:'#' }}"
-                                                                       class="px-2 ml-1 mr-2 mb-2">
-                                                                        <i class="fas fa-link mr-1"></i> {{ bill.code|default:bill.link|truncatechars:15 }}
-                                                                    </a>
-                                                                </div>
-                                                            {% endif %}
-                                                            {% if bill.proof %}
-                                                                <div class="col my-3 px-2">
-                                                                    <a href=""
-                                                                       class="btn btn-sm btn-secondary px-2 ml-1 mr-2 mb-2 text-success"  
-                                                                       style="width: 100%">
-                                                                        <i class="fas fa-download mr-1"></i> Proof: {{ bill.proof|file_name_only_with_extension|truncatechars:35 }}
-                                                                    </a>
-                                                                </div>
-                                                            {% endif %}
-                                                        </div>
-                                                    {% endif %}
-
-                                                </form>
-                                            </div>
-                                            <div class="modal-footer pb-4 pt-2">
-                                                {% if perms.home.change_bill or bill.proof %}
-                                                    <button type="button" class="btn btn-secondary"
-                                                            data-dismiss="modal">Cancel
-                                                    </button>
-                                                {% endif %}
-                                                {% if bill.paid and perms.home.change_bill %}
-                                                    <a class="btn btn-warning ml-1 mr-2" href="" data-dismiss="modal"
-                                                       data-toggle="modal"
-                                                       data-target="#paidConfirm{{ bill.id }}">
-                                                        Set as pending
-                                                    </a>
-                                                {% elif perms.home.change_bill %}
-                                                    <a class="btn btn-success ml-1 mr-2" href="" data-dismiss="modal"
-                                                       data-toggle="modal"
-                                                       data-target="#paidConfirm{{ bill.id }}">
-                                                        Set as paid
-                                                    </a>
-                                                {% endif %}
-                                                {% if perms.home.change_bill %}
-                                                    <a href="" class="btn btn-primary mr-0">
-                                                        Edit
-                                                    </a>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Change Status Modal -->
-                                <div class="modal fade"
-                                     id="paidConfirm{{ bill.id }}"
-                                     tabindex="-1"
-                                     role="dialog" aria-labelledby="paidConfirmLabel{{ bill.id }}"
-                                     aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header mt-2">
-                                                <h5 class="modal-title my-1" style="margin-left: auto">
-                                                    <i class="ni ni-fat-delete text-blue"
-                                                       style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                </h5>
-                                                <span class="ml-3 my-1"
-                                                      style="margin-right: auto; font-size: 1.2rem"
-                                                      id="paidConfirmModalLabel{{ bill.id }}">Are you sure?</span>
-                                                <button type="button" class="close mt--4"
-                                                        style="margin-left: -30px" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body py-0"
-                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <p class="text-center">Are you sure you want to change status of
-                                                    this
-                                                    bill?
-                                                    <br>
-                                                    This action can be undone.</p>
-                                                <form method="post"
-                                                      id="paidConfirmForm{{ bill.id }}"
-                                                      action="">
-                                                    {% csrf_token %}
-                                                
-                                                    <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                                    <input type="hidden" value="{{ sort_type }}" name="sort_type">
-                                                    <input type="hidden" value="{{ filters }}" name="filters">
-                                                    <input type="hidden" value="True" name="office_page">
-                                                
-                                                    <div class="row">
-                                                        <div class="col-sm-8 form-group form-control-label mb-3">
-                                                            <label for="name">Title</label>
-                                                            <input class="form-control" id="name"
-                                                                   value="{{ bill.title }}" disabled>
-                                                        </div>
-                                                        <div class="col-sm-4 form-group form-control-label">
-                                                            <label for="dueDate">Due date</label>
-                                                            <input type="date" class="form-control"
-                                                                   id="dueDate"
-                                                                   value="{{ bill.due_date|date:'Y-m-d' }}"
-                                                                   disabled>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-sm form-group form-control-label">
-                                                            <label for="total">Total</label>
-                                                            <input inputmode="decimal" class="form-control" id="total" 
-                                                                   value="{{ bill.total }}" disabled>
-                                                        </div>
-                                                        {% if bill.paid %}
-                                                            <div class="col-sm form-group form-control-label">
-                                                                <label for="paidAt">Paid at</label>
-                                                                <input type="date" class="form-control" id="paidAt"
-                                                                       value="{{ bill.paid_at|date:'Y-m-d' }}" disabled>
-                                                            </div>
-                                                        {% else %}
-                                                            <div class="col-sm form-group form-control-label">
-                                                                <label for="billPaidInput">Paid at</label>
-                                                                <input type="date" class="form-control" id="billPaidInput"
-                                                                       name="bill_paid_at" required autofocus>
-                                                            </div>
-                                                        {% endif %}
-                                                    </div>
-                                                    <div class="form-group form-control-label">
-                                                        <label for="installmentEditInfoInput">Info</label>
-                                                        <textarea type="date"
-                                                                  class="form-control"
-                                                                  id="installmentEditInfoInput"
-                                                                  name="payment_info"></textarea>
-                                                    </div>
-                                                    {% if bill.proof %}
-                                                        <div class="align-items-center d-flex mb-2">
-                                                            <img src="/static/assets/img/icons/extensions/1x/{{ bill.proof.name|file_extension_icon }}" alt="" style="height: 18px">
-                                                            <span class="ml-2 text-sm">{{ bill.proof|file_name_only_with_extension }}</span>
-                                                        </div>
-                                                    {% endif %}
-                                                
-                                                </form>
-                                            </div>
-                                            <div class="modal-footer pt-1">
-                                                <button type="button" class="btn btn-secondary"
-                                                        data-dismiss="modal">Cancel
-                                                </button>
-                                                {% if bill.paid %}
-                                                    <button type="submit" class="btn btn-warning"
-                                                            form="paidConfirmForm{{ bill.id }}">
-                                                        Set as pending
-                                                    </button>
-                                                {% else %}
-                                                    <button type="submit" class="btn btn-success"
-                                                            form="paidConfirmForm{{ bill.id }}">
-                                                        Set as paid
-                                                    </button>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Delete Modal -->
-                                <div class="modal fade"
-                                     id="deleteConfirm{{ bill.id }}"
-                                     tabindex="-1"
-                                     role="dialog" aria-labelledby="deleteConfirmLabel{{ bill.id }}"
-                                     aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header mt-2">
-                                                <h5 class="modal-title my-1" style="margin-left: auto">
-                                                    <i class="ni ni-fat-delete text-blue"
-                                                       style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                </h5>
-                                                <span class="ml-3 my-1"
-                                                      style="margin-right: auto; font-size: 1.2rem"
-                                                      id="deleteConfirmModalLabel{{ bill.id }}">Are you sure?</span>
-                                                <button type="button" class="close mt--4"
-                                                        style="margin-left: -30px" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body py-0"
-                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <p class="text-center">Are you sure you want to delete this
-                                                    bill?
-                                                    <br>
-                                                    This action cannot be undone.
-                                                </p>
-                                                <form method="post"
-                                                      id="deleteConfirmForm{{ bill.id }}"
-                                                      action="">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                                    <input type="hidden" value="{{ sort_type }}"
-                                                           name="sort_type">
-                                                    <input type="hidden" value="{{ filters }}" name="filters">
-                                                    <input type="hidden" value="True" name="office_page">
-                                                </form>
-                                                <div class="row">
-                                                    <div class="col form-group form-control-label mb-3">
-                                                        <label for="name">Title</label>
-                                                        <input class="form-control" id="name"
-                                                               name="bill_name"
-                                                               value="{{ bill.title }}" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col form-group form-control-label mb-3">
-                                                        <label for="beneficiary">Office</label>
-                                                        <input class="form-control" id="beneficiary"
-                                                               name="bill_beneficiary"
-                                                               value="
-                                                                               
-                                                                       {% if bill.office.name %}{{ bill.office.name }}{% else %}N/A{% endif %}"
-                                                               disabled>
-                                                    </div>
-                                                    <div class="col form-group form-control-label mb-3">
-                                                        <label for="category">Category</label>
-                                                        <input class="form-control" id="category"
-                                                               name="bill_category"
-                                                               value="{{ bill.category }}" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col form-group form-control-label">
-                                                        <label for="billTotalInfo">Total</label>
-                                                        <input inputmode="decimal"
-                                                               class="form-control"
-                                                               id="billTotalInfo"
-                                                               name="bill_total" placeholder=""
-                                                               value="{{ bill.total }}" disabled>
-                                                    </div>
-                                                    <div class="col form-group form-control-label">
-                                                        <label for="billDueDateInput">Due
-                                                            date</label>
-                                                        <input type="date" class="form-control"
-                                                               id="billDueDateInput"
-                                                               name="bill_due_date" placeholder=""
-                                                               value="{{ bill.due_date|date:'Y-m-d' }}"
-                                                               disabled>
-                                                    </div>
-                                                </div>
-                                                {% if bill.proof %}
-                                                    <div class="align-items-center d-flex mb-2">
-                                                        <img src="/static/assets/img/icons/extensions/1x/{{ bill.proof.name|file_extension_icon }}"
-                                                             alt="" style="height: 18px">
-                                                        <span class="ml-2 text-sm">{{ bill.proof|file_name_only_with_extension }}</span>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                            <div class="modal-footer pt-1">
-                                                <button type="button" class="btn btn-secondary"
-                                                        data-dismiss="modal">Cancel
-                                                </button>
-                                                <button type="submit" class="btn btn-danger"
-                                                        form="deleteConfirmForm{{ bill.id }}">
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer border-top-0 py-1"></div>
-            </div>
-        
-        </div>
-    
     </div>
 
 </div>
@@ -1302,28 +658,52 @@
             <form method="post" action="{% url 'offices_edit' office.slug  %}">
                 {% csrf_token %}
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                    <div class="form-group form-control-label mb-3">
+                        <label for="company_name">Company Name</label>
+                        <input type="text" class="form-control" id="company_name"
+                               name="company_name" value="{{ office.company_name }}" required>
+                    </div>
                     <div class="row">
                         <div class="col-7 form-group form-control-label mb-3">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" name="name"
-                                   placeholder="Office name" value="{{ office.name }}">
+                            <label for="fantasy_name">Fantasy Name</label>
+                            <input type="text" class="form-control" id="fantasy_name"
+                                   name="fantasy_name" value="{{ office.fantasy_name }}">
                         </div>
                         <div class="col-5 form-group form-control-label mb-3">
-                            <label for="newofficecnpj">CNPJ</label>
-                            <input type="text" class="form-control" id="newofficecnpj" name="cnpj"
-                                   placeholder="00.000.000/0000-00" value="{{ office.cnpj }}">
+                            <label for="cnpj">CNPJ</label>
+                            <input type="text" class="form-control" id="cnpj"
+                                   name="cnpj" value="{{ office.cnpj }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col form-group form-control-label mb-3">
+                            <label for="state_inscription">State Inscription</label>
+                            <input type="text" class="form-control"
+                                   id="state_inscription" name="state_inscription" value="{{ office.state_inscription }}">
+                        </div>
+                        <div class="col form-group form-control-label mb-3">
+                            <label for="municipal_inscription">Municipal Inscription</label>
+                            <input type="text" class="form-control"
+                                   id="municipal_inscription" name="municipal_inscription"
+                                   value="{{ office.municipal_inscription }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8 form-group form-control-label">
+                            <label for="address">Address</label>
+                            <input inputmode="decimal" class="form-control"
+                                   id="address" name="address" value="{{ office.address }}">
+                        </div>
+                        <div class="col-sm form-group form-control-label mb-3">
+                            <label for="duns">DUNS</label>
+                            <input type="text" class="form-control" id="duns" name="duns"
+                                   minlength="9" maxlength="9" value="{{ office.duns }}" required>
                         </div>
                     </div>
                     <div class="form-group form-control-label">
-                        <label for="address">Address</label>
-                        <input type="text" class="form-control"
-                               id="address"
-                               name="address" placeholder="Office address" value="{{ office.location }}">
-                    </div>
-                    <div class="form-group form-control-label">
-                        <label for="about">About</label>
-                        <textarea rows="4" class="form-control" id="about" name="about"
-                                  placeholder="A few words about the office ...">{{ office.description }}</textarea>
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description"
+                                  name="description">{{ office.description }}</textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1382,6 +762,66 @@
     </div>
 </div>
 
+<!-- Add Bank Account Modal -->
+{% if perms.home.add_bankaccount %}
+    <div class="modal fade" id="addBankAccountModal" tabindex="-1" role="dialog"
+         aria-labelledby="addBankAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
+            <div class="modal-content">
+                <div class="modal-header mt-2 align-items-center">
+                    <h5 class="modal-title" style="margin-left: auto">
+                        <i class="fas fa-university text-blue" style="font-size: 1.4rem"></i>
+                    </h5>
+                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
+                          id="addBankAccountModalLabel">Add Bank Account</span>
+                    <button type="button" class="close mt--4" style="margin-left: -30px"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                    <form id="addBankAccountForm" method="post" action="{% url 'offices_add_bank_account' office.slug %}">
+                        {% csrf_token %}
+                        <div class="form-group form-control-label">
+                            <label for="bankNameInput">Bank</label>
+                            <select class="form-control" id="bankNameInput" name="bank" required>
+                                {% for bank in banks %}
+                                    <option value="{{ bank.0 }}">{{ bank.0 }} - {{ bank.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 form-group form-control-label">
+                                <label for="agencyInput">Agency</label>
+                                <input class="form-control" id="agencyInput" name="agency" required
+                                       type="text" minlength="4" maxlength="4">
+                            </div>
+                            <div class="col form-group form-control-label">
+                                <label for="accountInput">Account</label>
+                                <input class="form-control" id="agencyInput" name="account" required
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group form-control-label mb-3">
+                            <label for="pixInput">Pix</label>
+                            <input class="form-control" id="pixInput" name="pix" type="text">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" form="addBankAccountForm"
+                            id="cancelButtonFile" type="button">
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary" form="addBankAccountForm" type="submit">
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 {% endblock content %}
 
 <!-- Specific JS goes HERE -->
@@ -1394,29 +834,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
     
     <script>
-    
-        document.getElementById('newofficecnpj').addEventListener('input', function (event) {
-            let input = event.target;
-            let inputValue = input.value.replace(/\D/g, '');
-
-            if (inputValue.length <= 2) {
-                input.value = inputValue.replace(/^(\d{0,2})/, '$1');
-            } else if (inputValue.length <= 5) {
-                input.value = inputValue.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
-            } else if (inputValue.length <= 8) {
-                input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
-            } else if (inputValue.length <= 12) {
-                input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
-            } else if (inputValue.length <= 14) {
-                input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
-            } else {
-                input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
-            }
-        });
         
-    </script>
-    
-    <script>
+        function copyToClipboard(element, link) {
+            navigator.clipboard.writeText(element).then(function () {
+                // Update the tooltip title using Bootstrap Tooltip method
+                $(link).attr('data-original-title', 'Copied!').tooltip('show');
+            }).catch(function (err) {
+                console.error('Unable to copy to clipboard', err);
+            });
+        }
+        
+        function clearTitle(element, link) {
+            $(link).attr('data-original-title', element).tooltip('hide');
+        }
     
         function formatPhone(input) {
             let inputValue = input.value.replace(/\D/g, '');
@@ -1441,94 +871,27 @@
                 input.value = inputValue.replace(/^(\d{2})(\d{2})(\d{5})(\d{4}).*/, '+$1 ($2) $3 $4');
             }
         }
-        
-        document.querySelectorAll('.phone-input').forEach(function (element) {
-            element.addEventListener('input', function (event) {
-                formatPhone(event.target);
-            });
-        });
-        
-    </script>
 
-    <script>
-        
-        function copyToClipboard(element, link) {
-            navigator.clipboard.writeText(element).then(function () {
-                // Update the tooltip title using Bootstrap Tooltip method
-                $(link).attr('data-original-title', 'Copied!').tooltip('show');
-            }).catch(function (err) {
-                console.error('Unable to copy to clipboard', err);
-            });
-        }
-        
-        function clearTitle(element, link) {
-            $(link).attr('data-original-title', element).tooltip('hide');
-        }
-
-        function updateFileName(event) {
-            const fileInput = event.target;
-            const fileNamePlaceholder = document.getElementById('fileNamePlaceholder');
-
-            if (fileInput.files.length > 0) {
-                fileNamePlaceholder.textContent = fileInput.files[0].name;
-            } else {
-                fileNamePlaceholder.textContent = '{#  FILE NAME  #}';
-            }
-        }
-        
-        function updateBillFileName(event, id = 0) {
-            const fileInput = event.target;
-            let fileInputLabel;
-            if (id > 0) {
-                fileInputLabel = document.getElementById(`fileInputLabel${id}`);
-            } else {
-                fileInputLabel = document.getElementById('fileInputLabel');
+        function openTabContent(evt, mode) {
+            let tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
             }
 
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name.slice(0, 60);
-                if (fileInput.files[0].name.length > 60) {
-                    fileInputLabel.textContent = fileName + '...';
-                } else {
-                    fileInputLabel.textContent = fileName;
-                }
-                fileInputLabel.classList.remove('btn-neutral');
-                fileInputLabel.classList.add('btn');
-                fileInputLabel.classList.add('btn-sm');
-                fileInputLabel.classList.add('btn-success');
-            } else {
-                fileInputLabel.textContent = 'Attach proof';
-                fileInputLabel.classList.remove('btn-success');
-                fileInputLabel.classList.add('btn');
-                fileInputLabel.classList.add('btn-sm');
-                fileInputLabel.classList.add('btn-neutral');
+            let tablinks = document.getElementsByClassName("tabLinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace("btn-primary", "btn-neutral");
             }
+
+            document.getElementById(mode).style.display = "block";
+            evt.currentTarget.className = evt.currentTarget.className.replace("btn-neutral", "btn-primary");
         }
 
-        document.getElementById('documentInput').addEventListener('change', updateFileName);
-
-    </script>
-
-    <script>
-    
-        document.getElementById('pictureInput').addEventListener('change', function (event) {
-            const fileInput = event.target;
-            const previewImage = document.getElementById('pictureAvatar');
-
-            const file = fileInput.files[0];
-            if (file) {
-                // Read the selected file as a data URL and set it as the source of the image
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    previewImage.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-    </script>
-    
-    <script>
+        try {
+            document.getElementById("default_tab").click();
+        } catch (e) {
+            console.log(e);
+        }
     
         $(document).ready(function () {
             function setupInput(input) {
@@ -1556,22 +919,62 @@
             });
         });
         
-    </script>
-    
-    <script>
-    
-        document.addEventListener('DOMContentLoaded', function () {
-            let tagsInput = document.getElementById('choices-collaborators');
-
-            let choices = new Choices(tagsInput, {
-                removeItemButton: true,
-                maxItemCount: 20,
+        document.querySelectorAll('.phone-input').forEach(function (element) {
+            element.addEventListener('input', function (event) {
+                formatPhone(event.target);
             });
         });
-        
-    </script>
+    
+        document.getElementById('cnpj').addEventListener('input', function (event) {
+            let input = event.target;
+            let inputValue = input.value.replace(/\D/g, '');
 
-    <script>
+            if (inputValue.length <= 2) {
+                input.value = inputValue.replace(/^(\d{0,2})/, '$1');
+            } else if (inputValue.length <= 5) {
+                input.value = inputValue.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+            } else if (inputValue.length <= 8) {
+                input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+            } else if (inputValue.length <= 12) {
+                input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+            } else if (inputValue.length <= 14) {
+                input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
+            } else {
+                input.value = inputValue.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
+            }
+        });
+
+        document.getElementById('state_inscription').addEventListener('input', function (event) {
+            let input = event.target;
+            let inputValue = input.value.replace(/\D/g, '');
+
+            if (inputValue.length <= 3) {
+                input.value = inputValue.replace(/^(\d{0,3})/, '$1');
+            } else if (inputValue.length <= 6) {
+                input.value = inputValue.replace(/^(\d{3})(\d{0,3})/, '$1.$2');
+            } else if (inputValue.length <= 9) {
+                input.value = inputValue.replace(/^(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+            } else if (inputValue.length <= 12) {
+                input.value = inputValue.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3.$4');
+            } else {
+                input.value = inputValue.replace(/^(\d{3})(\d{3})(\d{3})(\d{3}).*/, '$1.$2.$3.$4');
+            }
+        });
+    
+        document.getElementById('pictureInput').addEventListener('change', function (event) {
+            const fileInput = event.target;
+            const previewImage = document.getElementById('pictureAvatar');
+
+            const file = fileInput.files[0];
+            if (file) {
+                // Read the selected file as a data URL and set it as the source of the image
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', function () {
             let collapseElements = document.querySelectorAll('[data-toggle="collapse"]');
@@ -1589,7 +992,7 @@
                 });
             });
         });
-        
+
     </script>
 
 {% endblock javascripts %}
