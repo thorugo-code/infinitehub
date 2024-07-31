@@ -44,10 +44,6 @@ def get_favicon(url):
     return None
 
 
-def rand_slug():
-    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(20))
-
-
 def unmask_money(value, currency):
     if value == "":
         return 0.0
@@ -331,13 +327,18 @@ class Profile(models.Model):
 class UploadedFile(models.Model):
     project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
     client = models.ForeignKey('Client', related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
+    uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.SET_NULL, default=1, null=True)
+
     file = models.FileField(upload_to=custom_upload_path_projects, max_length=500)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.SET_NULL, default=1,
-                                    null=True)
+
+    custom_name = models.CharField(max_length=100, default='')
     category = models.CharField(max_length=100, default='others')
-    description = models.TextField(default='')
+
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
     value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
+
+    description = models.TextField(default='')
 
     def __str__(self):
         return self.file.name

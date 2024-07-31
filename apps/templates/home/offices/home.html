@@ -54,40 +54,41 @@
                 <table id="projectsListTable" class="table-responsive table align-items-center table-flush"
                        style="min-height: 531.61px">
                     <thead class="thead-light">
-                    <tr>
-                        <th scope="col" style="width: 0"></th>
-                        <th scope="col" style="width: 40%" class="pl-0">Name</th>
-                        <th scope="col" style="width: 30%">CNPJ</th>
-                        <th scope="col" style="width: 30%">Address</th>
-                        {#                            <th scope="col" style="width: 10%">Projects</th>#}
-                        {#                            <th scope="col" style="width: 15%">Balance</th>#}
-                        <th scope="col" style="width: 0"></th>
-                    </tr>
+                        <tr>
+                            <th scope="col" style="width: 0"></th>
+                            <th scope="col" style="width: 40%" class="pl-0">Name</th>
+                            <th scope="col" style="width: 30%">CNPJ</th>
+                            <th scope="col" style="width: 30%">Address</th>
+                            {#                            <th scope="col" style="width: 10%">Projects</th>#}
+                            {#                            <th scope="col" style="width: 15%">Balance</th>#}
+                            {% if perms.home.change_office %}
+                                <th scope="col" style="width: 0"></th>
+                            {% endif %}
+                        </tr>
                     </thead>
                     <tbody class="list">
                     {% load filters %}
                     {% for office in offices %}
                         <tr>
                             <td>
-                                <a href="{% url 'office_details' office.slug %}" class="media align-items-center">
+                                <a {% if perms.home.change_office %}href="{% url 'office_details' office.slug %}"{% else %}
+                                   href="" data-toggle="modal" data-target=""{% endif %} class="media align-items-center">
                                     <div class="avatar rounded-circle mr-0">
-                                        <img
-                                            style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
-                                            alt="Image placeholder"
-                                            src="{{ office.avatar.url }}">
+                                        <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
+                                             alt="Image placeholder" src="{{ office.avatar.url }}">
                                     </div>
                                 </a>
                             </td>
                             <th scope="row" class="pl-0">
-                                <a href="{% url 'office_details' office.slug %}" style="height: 3rem">
+                                <a {% if perms.home.change_office %}href="{% url 'office_details' office.slug %}"{% else %}
+                                   href="" data-toggle="modal" data-target=""{% endif %} style="height: 3rem">
                                     <span class="name text-sm font-weight-normal text-dark">
                                         {{ office.company_name }}
                                     </span>
-                                    {% if office.address %}
+                                    {% if office.fantasy_name %}
                                         <br>
                                         <span class="font-weight-light text-muted" style="font-size: 0.7rem">
-                                            <i class="fas fa-map-marker-alt text-light" style="font-size: 0.6rem"></i>
-                                            {{ office.address|truncatechars:40 }}
+                                            {{ office.fantasy_name|truncatechars:40 }}
                                         </span>
                                     {% endif %}
                                 </a>
@@ -98,23 +99,27 @@
                             <td>
                                 <span>{{ office.address }}</span>
                             </td>
-                            <td class="text-right">
-                                <div class="dropdown">
-                                    <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
-                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                        <a class="dropdown-item" href="{% url 'office_details' office.slug %}">Open</a>
-                                        {% if perms.home.delete_office %}
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item text-danger" href="" data-dismiss="modal"
-                                               data-toggle="modal"
-                                               data-target="#deleteConfirm{{ office.id }}">Delete</a>
-                                        {% endif %}
+                            {% if perms.home.change_office %}
+                                <td class="text-right">
+                                    <div class="dropdown">
+                                        <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
+                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                            <a class="dropdown-item" href="{% url 'office_details' office.slug %}">
+                                                Open
+                                            </a>
+                                            {% if perms.home.delete_office %}
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item text-danger" href="" data-dismiss="modal"
+                                                   data-toggle="modal"
+                                                   data-target="#deleteConfirm{{ office.id }}">Delete</a>
+                                            {% endif %}
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
+                                </td>
+                            {% endif %}
                         </tr>
 
                         <!-- Office Details Modal -->

@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from apps.home.models import Profile, Task, Office, Document, UploadedFile
+from django.db.models import Q
 
 
 def details(request):
@@ -17,7 +18,9 @@ def details(request):
     else:
         shared_documents = Document.objects.filter(shared=True, user=user)
 
-    all_tasks = Task.objects.filter(owner=user)
+    query = Q(owner=user) | Q(subtasks__owner=user)
+
+    all_tasks = Task.objects.filter(query)
     tasks_to_do = all_tasks.filter(completed=False)
     tasks_completed = all_tasks.filter(completed=True)
     all_projects = user.assigned_projects.all()
@@ -25,6 +28,7 @@ def details(request):
     projects_completed = all_projects.filter(finished=True)
 
     context = {
+        'tasks_count': all_tasks.count(),
         'user_profile': Profile.objects.get(user=user),
         'shared_documents': shared_documents,
         'tasks': sorted(tasks_to_do, key=lambda x: x.deadline if x.deadline else datetime.date.max),

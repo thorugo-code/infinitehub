@@ -563,7 +563,7 @@
                                     {% for office in offices %}
                                         <option value="{{ office.id }}"
                                                 {% if 'office=' in filters and filters|extract_from_key:'office' == office.id %} selected {% endif %}>
-                                            {{ office.name }}
+                                            {{ office.company_name }}
                                         </option>
                                     {% endfor %}
                                 </select>

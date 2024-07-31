@@ -10,6 +10,10 @@ class MeetingAdmin(admin.ModelAdmin):
     list_display = ('title', 'start', 'url')
 
 
+class UploadFileAdmin(admin.ModelAdmin):
+    list_display = ('custom_name', 'file', 'uploaded_at')
+
+
 # class DocumentAdmin(admin.ModelAdmin):
 # class LinkAdmin(admin.ModelAdmin):
 # class BillInstallmentAdmin(admin.ModelAdmin):

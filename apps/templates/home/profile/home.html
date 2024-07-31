@@ -670,13 +670,30 @@
                                                                     </button>
                                                                 </div>
                                                                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                                    <div class="row">
-                                                                        <div class="form-group form-control-label col-sm">
+                                                                    {% if request.user != subtask.owner %}
+                                                                        <div class="form-group form-control-label">
                                                                             <label for="taskTitleEdit">Title</label>
                                                                             <input type="text" class="form-control"
                                                                                    id="taskTitleEdit" placeholder=""
                                                                                    value="{{ subtask.title }}" disabled>
                                                                         </div>
+                                                                    {% endif %}
+                                                                    <div class="row">
+                                                                        {% if request.user != subtask.owner %}
+                                                                            <div class="form-group form-control-label col-sm">
+                                                                                <label for="taskOwnerEdit">Owner</label>
+                                                                                <input type="text" class="form-control"
+                                                                                       id="taskOwnerEdit" placeholder=""
+                                                                                       value="{{ subtask.owner.get_full_name }}" disabled>
+                                                                            </div>
+                                                                        {% else %}
+                                                                            <div class="form-group form-control-label col-sm">
+                                                                                <label for="taskTitleEdit">Title</label>
+                                                                                <input type="text" class="form-control"
+                                                                                       id="taskTitleEdit" placeholder=""
+                                                                                       value="{{ subtask.title }}" disabled>
+                                                                            </div>
+                                                                        {% endif %}
                                                                         <div class="form-group form-control-label col-sm-auto">
                                                                             <label for="taskDeadlineEdit">Deadline</label>
                                                                             <input type="date" id="taskDeadlineEdit"
@@ -684,16 +701,6 @@
                                                                                    value="{{ subtask.deadline|date:"Y-m-d" }}" disabled>
                                                                         </div>
                                                                     </div>
-                                                                    {% if subtask.owner != request.user %}
-                                                                        <div class="row">
-                                                                            <div class="form-group form-control-label col-sm">
-                                                                                <label for="taskOwner">Owner</label>
-                                                                                <input type="text" class="form-control"
-                                                                                       id="taskOwner" placeholder=""
-                                                                                       value="{{ subtask.owner.get_full_name }}" disabled>
-                                                                            </div>
-                                                                        </div>
-                                                                    {% endif %}
                                                                     <div class="form-group mb-2 form-control-label">
                                                                         <label for="taskDescriptionEdit">Description</label>
                                                                         <textarea class="form-control"

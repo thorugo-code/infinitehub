@@ -38,10 +38,14 @@ def assets_list(request, category=None):
                                           'office', 'images', 'video', 'others'])
         paginator, files = get_paginated_files(request, category_filter)
 
-    return render(request, "home/inventory/assets/home.html", {'files_list': files,
-                                                    'category': category,
-                                                    'title': title,
-                                                    'user_profile': user_profile})
+    context = {
+        'files_list': files,
+        'category': category,
+        'title': title,
+        'user_profile': user_profile
+    }
+
+    return render(request, "home/inventory/assets/home.html", context)
 
 
 def assets_hub(request):

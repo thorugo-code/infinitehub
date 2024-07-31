@@ -54,24 +54,24 @@
                                         <i class="fas fa-sort"></i>
                                     {% endif %}
                                 </a>
-                                <a href="#" class="btn btn-sm {% if filters is None %}btn-neutral{% else %}btn-primary{% endif %}" data-toggle="modal"
-                                   data-target="#filterModal">
-                                    <i class="fas fa-filter {% if filters is None %}{% else %}mr-0{% endif %}"></i>
-                                    {% if filters is not None %}
-                                        {% load filters %}
-                                        {% with filters_list=filters|split:'&' %}
-                                            {% for filter_item in filters_list %}
-                                                {% if 'office=' in filter_item %}
-                                                    <span>Office</span>
-                                                {% elif 'group=' in filter_item %}
-                                                    <span>
-                                                        {% if not filters|first_filter:'group' %} | {% endif %}Group
-                                                    </span>
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% endwith %}
-                                    {% endif %}
-                                </a>
+{#                                <a href="#" class="btn btn-sm {% if filters is None %}btn-neutral{% else %}btn-primary{% endif %}" data-toggle="modal"#}
+{#                                   data-target="#filterModal">#}
+{#                                    <i class="fas fa-filter {% if filters is None %}{% else %}mr-0{% endif %}"></i>#}
+{#                                    {% if filters is not None %}#}
+{#                                        {% load filters %}#}
+{#                                        {% with filters_list=filters|split:'&' %}#}
+{#                                            {% for filter_item in filters_list %}#}
+{#                                                {% if 'office=' in filter_item %}#}
+{#                                                    <span>Office</span>#}
+{#                                                {% elif 'group=' in filter_item %}#}
+{#                                                    <span>#}
+{#                                                        {% if not filters|first_filter:'group' %} | {% endif %}Group#}
+{#                                                    </span>#}
+{#                                                {% endif %}#}
+{#                                            {% endfor %}#}
+{#                                        {% endwith %}#}
+{#                                    {% endif %}#}
+{#                                </a>#}
                                 {% if perms.home.add_client %}
                                     <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
                                        data-target="#newClientModal">
@@ -88,7 +88,7 @@
                         <tr>
                             <th scope="col" style="width: 0"></th>
                             {% if perms.home.change_client %}
-                                <th scope="col" class="pl-0" style="width: 25%">Name
+                                <th scope="col" class="pl-0" style="width: 35%">Name
                                     {% if sorted_by == 'name' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
                                     {% elif sorted_by == 'name' and sort_type == 'asc' %}
@@ -101,39 +101,10 @@
                                     {% endif %}
                                 </th>
                                 <th scope="col" style="width: 15%">CNPJ</th>
-                                <th scope="col" style="width: 20%">Contact</th>
+                                <th scope="col" style="width: 25%">Contact</th>
                                 <th scope="col" style="width: 20%">XML</th>
-                                <th scope="col" style="width: 20%">Office
-                                    {% if sorted_by == 'office' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'office' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
-                            {% elif user_profile.user.username|check_group:'collaborator' %}
-                                <th scope="col" class="pl-0" style="width: 30%">Name
-                                    {% if sorted_by == 'name' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'name' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                    {% if sorted_by == 'area' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'area' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
-                                <th scope="col" style="width: 20%">CNPJ</th>
-                                <th scope="col" style="width: 25%">Contact</th>
-                                <th scope="col" style="width: 25%">Office
-                                    {% if sorted_by == 'office' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'office' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
                             {% else %}
-                                <th scope="col" class="pl-0" style="width: 30%">Name
+                                <th scope="col" class="pl-0" style="width: 40%">Name
                                     {% if sorted_by == 'name' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
                                     {% elif sorted_by == 'name' and sort_type == 'asc' %}
@@ -145,8 +116,8 @@
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
-                                <th scope="col" style="width: 20%">CNPJ</th>
-                                <th scope="col" style="width: 25%">Contact</th>
+                                <th scope="col" style="width: 25%">CNPJ</th>
+                                <th scope="col" style="width: 35%">Contact</th>
                             {% endif %}
                             <th scope="col" style="width: 0"></th>
                         </tr>
@@ -161,9 +132,6 @@
                                            data-target="#detailsClientModal{{ client.id }}"
                                        {% elif perms.home.change_client and client.contact_email and client.office %}
                                            href="{% url 'client_details' client.slug %}"
-                                       {% else %}
-                                           href="" data-dismiss="modal" data-toggle="modal"
-                                           data-target="#fillClientModal{{ client.id }}"
                                        {% endif %}
                                     class="media align-items-center">
                                         <div class="avatar rounded-circle">
@@ -178,17 +146,14 @@
                                     <a {% if user_profile.user.username|check_group:'collaborator' and perms.home.view_client and not perms.home.change_client %}
                                            href="" data-dismiss="modal" data-toggle="modal"
                                            data-target="#detailsClientModal{{ client.id }}"
-                                       {% elif perms.home.change_client and client.contact_email and client.office %}
+                                       {% elif perms.home.change_client %}
                                            href="{% url 'client_details' client.slug %}"
-                                       {% else %}
-                                           href="" data-dismiss="modal" data-toggle="modal"
-                                           data-target="#fillClientModal{{ client.id }}"
                                        {% endif %}
                                     class="media align-items-center">
                                         <div class="media-body">
                                             <span class="name mb-0 text-sm"
                                                   style="font-weight: 400; color: #525f7f">
-                                                {{ client.name|truncatechars:30 }}
+                                                {{ client.name|truncatechars:40 }}
                                             </span>
                                             <span class="d-block text-muted font-weight-light">
                                                 {{ client.area|truncatechars:30 }}
@@ -215,9 +180,6 @@
                                         {% endif %}
                                     </td>
                                 {% endif %}
-                                <td>
-                                    <span>{{ client.office.name|truncatechars:30 }}</span>
-                                </td>
                                 <td class="text-right">
                                     <div class="dropdown">
                                         <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
@@ -228,11 +190,8 @@
                                             <a {% if user_profile.user.username|check_group:'collaborator' and perms.home.view_client and not perms.home.change_client %}
                                                    href="" data-dismiss="modal" data-toggle="modal"
                                                    data-target="#detailsClientModal{{ client.id }}"
-                                               {% elif perms.home.change_client and client.contact_email and client.office %}
+                                               {% elif perms.home.change_client %}
                                                    href="{% url 'client_details' client.slug %}"
-                                               {% else %}
-                                                   href="" data-dismiss="modal" data-toggle="modal"
-                                                   data-target="#fillClientModal{{ client.id }}"
                                                {% endif %}
                                             class="dropdown-item">
                                                 Open
@@ -266,138 +225,49 @@
                                             </button>
                                         </div>
                                         <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form id="editClientForm{{ client.id }}" method="post" action="{% url 'edit_client' client.id %}">
-                                                {% csrf_token %}
-                                                <div class="row">
-                                                    <div class="col-7 form-group form-control-label mb-3">
-                                                        <label for="name">Name</label>
-                                                        <input type="text" class="form-control" id="name" name="name"
-                                                               placeholder="Client name" value="{{ client.name }}" {% if not perms.home.change_client %}disabled{% endif %}>
-                                                    </div>
-                                                    <div class="col-5 form-group form-control-label mb-3">
-                                                        <label for="cnpj">CNPJ</label>
-                                                        <input type="text" class="form-control" id="cnpj" name="cnpj"
-                                                               placeholder="00.000.000/0000-00" value="{{ client.cnpj }}" {% if not perms.home.change_client %}disabled{% endif %}>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group form-control-label">
+                                            <div class="form-group form-control-label">
+                                                <label for="name">Name</label>
+                                                <input type="text" class="form-control" id="name" name="name"
+                                                       placeholder="Client name" value="{{ client.name }}" disabled>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-7 form-group form-control-label mb-3">
                                                     <label for="area">Area</label>
-                                                    <input type="text" class="form-control"
-                                                           id="area"
-                                                           name="area" placeholder="Client area of activity" value="{{ client.area }}" {% if not perms.home.change_client %}disabled{% endif %}>
+                                                    <input type="text" class="form-control" id="area"
+                                                           name="area" placeholder="Client area of activity"
+                                                           value="{{ client.area }}" disabled>
                                                 </div>
-                                                <div class="form-group form-control-label">
-                                                    <label for="address">Address</label>
-                                                    <input type="text" class="form-control"
-                                                           id="address"
-                                                           name="address" placeholder="Client address" value="{{ client.location }}" {% if not perms.home.change_client %}disabled{% endif %}>
+                                                <div class="col-5 form-group form-control-label mb-3">
+                                                    <label for="cnpj">CNPJ</label>
+                                                    <input type="text" class="form-control" id="cnpj" name="cnpj"
+                                                           value="{{ client.cnpj }}" disabled>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="col form-group form-control-label">
-                                                        <label for="area">Email</label>
-                                                        <input type="email" id="area" name="email"
-                                                               class="form-control" placeholder="client@email.com" value="{{ client.email }}" {% if not perms.home.change_client %}disabled{% endif %}>
-                                                    </div>
-                                                    <div class="col form-group form-control-label">
-                                                        <label for="phone">Phone</label>
-                                                        <input type="text" id="phone" name="phone"
-                                                               class="form-control" placeholder="(00) 0000-0000" value="{{ client.phone }}" {% if not perms.home.change_client %}disabled{% endif %}>
-                                                    </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-5 form-group form-control-label">
+                                                    <label for="phone">Phone</label>
+                                                    <input type="text" id="phone" name="phone"
+                                                           class="form-control" value="{{ client.phone }}" disabled>
                                                 </div>
-                                                <div class="form-group form-control-label">
-                                                    <label for="about">About</label>
-                                                    <textarea rows="4" class="form-control" id="about" name="about"
-                                                              placeholder="A few words about the client ..." {% if not perms.home.change_client %}disabled{% endif %}>{{ client.description }}</textarea>
+                                                <div class="col-sm-7 form-group form-control-label">
+                                                    <label for="area">Email</label>
+                                                    <input type="email" id="area" name="email"
+                                                           class="form-control" value="{{ client.contact_email }}" disabled>
                                                 </div>
-                                            </form>
+                                            </div>
+                                            <div class="form-group form-control-label">
+                                                <label for="address">Address</label>
+                                                <input type="text" class="form-control"
+                                                       id="address"
+                                                       name="address" value="{{ client.location }}" disabled>
+                                            </div>
+                                            <div class="form-group form-control-label">
+                                                <label for="about">About</label>
+                                                <textarea rows="2" class="form-control" id="about" name="about"
+                                                          disabled>{{ client.description }}</textarea>
+                                            </div>
                                         </div>
-                                        <div class="modal-footer pt-1">
-{#                                            {% if perms.home.change_client %}#}
-                                            {% if user.is_superuser %}
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                                Cancel
-                                            </button>
-                                            <button type="submit" class="btn btn-primary" id="submitButton" form="editClientForm{{ client.id }}">
-                                                Save
-                                            </button>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-
-                            {% if perms.home.change_client %}
-                                <!-- Fill Modal -->
-                                <div class="modal fade" id="fillClientModal{{ client.id }}" tabindex="-1" role="dialog"
-                                 aria-labelledby="fillClientModal{{ client.id }}Label" aria-hidden="true">
-                                <div class="modal-dialog my-4" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header mt-2 align-items-center">
-                                            <h5 class="modal-title" style="margin-left: auto">
-                                                <i class="fas fa-user-tie text-blue" style="font-size: 1.5rem"></i>
-                                            </h5>
-                                            <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
-                                                  id="fillClientModal{{ client.id }}Label">{{ client.name|truncatechars:30 }}</span>
-                                            <button type="button" class="close mt--4" style="margin-left: -30px"
-                                                    data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body py-2" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form id="fillClientForm{{ client.id }}" method="post" action="{% url 'edit_client' client.slug %}">
-                                                {% csrf_token %}
-                                                <div class="row pt-2">
-                                                    <div class="col-7 form-group form-control-label">
-                                                        <label for="area">Area of activity</label>
-                                                        <input type="text" class="form-control" id="area" name="area" 
-                                                               value="{{ client.area }}">
-                                                    </div>
-                                                    <div class="col-5 form-group form-control-label">
-                                                        <label for="office">Office</label>
-                                                        <select type="text" class="form-control"
-                                                               id="office" name="office">
-                                                            <option value=""></option>
-                                                            {% for office in offices %}
-                                                                <option value="{{ office.id }}" {% if client.office == office %}selected{% endif %}>{{ office.name }}</option>
-                                                            {% endfor %}
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-7 form-group form-control-label">
-                                                        <label for="contact_email">Contact email</label>
-                                                        <input type="email" id="contact_email" name="contact_email"
-                                                               class="form-control" value="{{ client.contact_email }}">
-                                                    </div>
-                                                    <div class="col-5 form-group form-control-label">
-                                                        <label for="phone">Phone</label>
-                                                        <input type="text" id="phone" name="phone"
-                                                               class="form-control phone-input" value="{{ client.phone }}">
-                                                    </div>
-                                                </div>
-                                                <div class="form-group form-control-label">
-                                                    <label for="xml_email">XML</label>
-                                                    <input type="email" id="area" name="xml_email"
-                                                           class="form-control" value="{{ client.xml_email }}">
-                                                </div>
-                                                <div class="form-group form-control-label">
-                                                    <label for="about">About</label>
-                                                    <textarea rows="3" class="form-control" id="about" name="about"
-                                                              >{{ client.description }}</textarea>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer pt-1">
-                                            {% if perms.home.change_client %}
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                                Cancel
-                                            </button>
-                                            <button type="submit" class="btn btn-success" id="submitButton" form="fillClientForm{{ client.id }}">
-                                                Save
-                                            </button>
-                                            {% endif %}
-                                        </div>
+                                        <div class="modal-footer pt-1"></div>
                                     </div>
                                 </div>
                             </div>
@@ -474,75 +344,75 @@
     </div>
 
     <!-- Filter Modal -->
-    <div class="modal fade" id="filterModal" tabindex="-1" role="dialog"
-         aria-labelledby="filterModalLabel" aria-hidden="true">
-        <div class="modal-dialog my-6" role="document">
-            <div class="modal-content">
-                <div class="modal-header mt-2 align-items-center">
-                    <h5 class="modal-title" style="margin-left: auto">
-                        <i class="ni ni-ui-04 text-blue" style="font-size: 1.5rem"></i>
-                    </h5>
-                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
-                          id="filterModalLabel">Filter</span>
-                    <button type="button" class="close mt--4" style="margin-left: -30px"
-                            data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                
-                    <form action="{% url 'filter_clients' %}" id="filterClients" method="post"
-                          onsubmit="disableButtonsFile()">
-                        {% csrf_token %}
-                        <input type="hidden" name="sort_by" value="{{ sorted_by }}">
-                        <input type="hidden" name="sort_type" value="{{ sort_type }}">
-                        <div class="row">
-                            <div class="col-sm form-group form-control-label">
-                                <label for="officeInput">Office</label>
-                                <select class="form-control" id="officeInput" name="office">
-                                    <option value="all"></option>
-                                    {% for office in offices %}
-                                        <option value="{{ office.id }}"
-                                                {% if 'office=' in filters and filters|extract_from_key:'office' == office.id %} selected {% endif %}>
-                                            {{ office.name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                    <form action="{% url 'sort_clients' %}" method="post" id="unfilterForm">
-                        {% csrf_token %}
-                        <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                        {% if sort_type == 'asc' %}
-                            <input type="hidden" value="True" name="asc">
-                        {% elif sort_type == 'desc' %}
-                            <input type="hidden" value="True" name="desc">
-                        {% endif %}
-                    </form>
-
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-dismiss="modal" form="uploadDocument"
-                            id="cancelButtonFile" type="button">
-                        Cancel
-                    </button>
-                    {% if filters and sorted_by %}
-                        <button type="submit" class="btn btn-danger" id="filterButton" form="unfilterForm">
-                            Unfilter
-                        </button>
-                    {% elif filters %}
-                        <a href="{% url 'clients_home' %}" class="btn btn-danger">
-                            Unfilter
-                        </a>
-                    {% endif %}
-                    <button class="btn btn-primary" form="filterClients" type="submit">
-                        Filter
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+{#    <div class="modal fade" id="filterModal" tabindex="-1" role="dialog"#}
+{#         aria-labelledby="filterModalLabel" aria-hidden="true">#}
+{#        <div class="modal-dialog my-6" role="document">#}
+{#            <div class="modal-content">#}
+{#                <div class="modal-header mt-2 align-items-center">#}
+{#                    <h5 class="modal-title" style="margin-left: auto">#}
+{#                        <i class="ni ni-ui-04 text-blue" style="font-size: 1.5rem"></i>#}
+{#                    </h5>#}
+{#                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"#}
+{#                          id="filterModalLabel">Filter</span>#}
+{#                    <button type="button" class="close mt--4" style="margin-left: -30px"#}
+{#                            data-dismiss="modal" aria-label="Close">#}
+{#                        <span aria-hidden="true">&times;</span>#}
+{#                    </button>#}
+{#                </div>#}
+{#                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">#}
+{#                #}
+{#                    <form action="{% url 'filter_clients' %}" id="filterClients" method="post"#}
+{#                          onsubmit="disableButtonsFile()">#}
+{#                        {% csrf_token %}#}
+{#                        <input type="hidden" name="sort_by" value="{{ sorted_by }}">#}
+{#                        <input type="hidden" name="sort_type" value="{{ sort_type }}">#}
+{#                        <div class="row">#}
+{#                            <div class="col-sm form-group form-control-label">#}
+{#                                <label for="officeInput">Office</label>#}
+{#                                <select class="form-control" id="officeInput" name="office">#}
+{#                                    <option value="all"></option>#}
+{#                                    {% for office in offices %}#}
+{#                                        <option value="{{ office.id }}"#}
+{#                                                {% if 'office=' in filters and filters|extract_from_key:'office' == office.id %} selected {% endif %}>#}
+{#                                            {{ office.company_name }}#}
+{#                                        </option>#}
+{#                                    {% endfor %}#}
+{#                                </select>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </form>#}
+{#                    <form action="{% url 'sort_clients' %}" method="post" id="unfilterForm">#}
+{#                        {% csrf_token %}#}
+{#                        <input type="hidden" value="{{ sorted_by }}" name="sort_by">#}
+{#                        {% if sort_type == 'asc' %}#}
+{#                            <input type="hidden" value="True" name="asc">#}
+{#                        {% elif sort_type == 'desc' %}#}
+{#                            <input type="hidden" value="True" name="desc">#}
+{#                        {% endif %}#}
+{#                    </form>#}
+{##}
+{#                </div>#}
+{#                <div class="modal-footer">#}
+{#                    <button class="btn btn-secondary" data-dismiss="modal" form="uploadDocument"#}
+{#                            id="cancelButtonFile" type="button">#}
+{#                        Cancel#}
+{#                    </button>#}
+{#                    {% if filters and sorted_by %}#}
+{#                        <button type="submit" class="btn btn-danger" id="filterButton" form="unfilterForm">#}
+{#                            Unfilter#}
+{#                        </button>#}
+{#                    {% elif filters %}#}
+{#                        <a href="{% url 'clients_home' %}" class="btn btn-danger">#}
+{#                            Unfilter#}
+{#                        </a>#}
+{#                    {% endif %}#}
+{#                    <button class="btn btn-primary" form="filterClients" type="submit">#}
+{#                        Filter#}
+{#                    </button>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
     <!-- Sort Modal -->
     <div class="modal fade" id="sortModal" tabindex="-1" role="dialog"
@@ -576,11 +446,11 @@
                                     <option value="name" {% if sorted_by == 'name' %} selected {% endif %}>
                                         Name
                                     </option>
-                                    {% if user_profile.user.username|check_group:'collaborator' %}
-                                        <option value="office" {% if sorted_by == 'office' %} selected {% endif %}>
-                                            Office
-                                        </option>
-                                    {% endif %}
+{#                                    {% if user_profile.user.username|check_group:'collaborator' %}#}
+{#                                        <option value="office" {% if sorted_by == 'office' %} selected {% endif %}>#}
+{#                                            Office#}
+{#                                        </option>#}
+{#                                    {% endif %}#}
                                 </select>
                             </div>
                             <div class="col-4 form-group align-items-center" style="display: flex">
@@ -653,7 +523,7 @@
                                        id="office" name="office">
                                     <option value=""></option>
                                     {% for office in offices %}
-                                        <option value="{{ office.id }}">{{ office.name }}</option>
+                                        <option value="{{ office.id }}">{{ office.company_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

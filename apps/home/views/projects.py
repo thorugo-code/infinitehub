@@ -557,7 +557,7 @@ def upload_file(request, slug):
         file = request.FILES['file']
 
         uploaded_file = UploadedFile.objects.create(project=project, file=file)
-        uploaded_file.description = request.POST.get('file_description', 'DEFAULT')
+        uploaded_file.description = request.POST.get('file_description', '')
 
         masked_value = request.POST.get('file_value', 'USD 0.00')
         masked_value = masked_value.replace('USD ', '')
@@ -574,6 +574,8 @@ def upload_file(request, slug):
 
         uploaded_by = request.user
         uploaded_file.uploaded_by = uploaded_by
+
+        uploaded_file.custom_name = request.POST.get('file_custom_name', '')
 
         uploaded_file.save()
 

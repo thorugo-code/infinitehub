@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %} {{ office.name }} {% endblock title %}
+{% block title %} {{ office.company_name }} {% endblock title %}
 
 {% block stylesheets %}
 
@@ -28,7 +28,7 @@
                             </li>
                             <li class="breadcrumb-item"><a href="{% url 'offices_home' %}">Offices</a>
                             </li>
-                            <li class="breadcrumb-item active"><a href="{% url 'office_details' office.slug %}">{{ office.name|default:office.slug|truncatechars:20 }}</a>
+                            <li class="breadcrumb-item active"><a href="{% url 'office_details' office.slug %}">{{ office.company_name|default:office.slug|truncatechars:20 }}</a>
                             </li>
                             <li class="breadcrumb-item active">Documents</li>
                         </ol>

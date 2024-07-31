@@ -176,7 +176,7 @@
                                                 <select id="office" name="office" class="form-control">
                                                     {% for office in offices %}
                                                         <option value="{{ office.id }}"
-                                                                {% if user.office.id == office.id %}selected{% endif %}>{{ office.name }}</option>
+                                                                {% if user.office.id == office.id %}selected{% endif %}>{{ office.company_name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>

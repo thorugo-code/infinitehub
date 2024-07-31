@@ -517,7 +517,7 @@
                                         {% endif %}
                                         <span class="pl-1">{{ bill.category|default:'-'|truncatechars:20 }}</span>
                                     </td>
-                                    <td>{{ bill.office.name|default:'-' }}</td>
+                                    <td>{{ bill.office.company_name|default:'-' }}</td>
                                     <td>{{ bill.origin|default:'-' }}</td>
                                     <td>{{ bill.method|default:'-' }}</td>
                                     <td>{{ bill.total|default:'-' }} 
@@ -1018,7 +1018,7 @@
                                                             <select class="form-control" id="beneficiaryDetails" name="office_id" {% if not perms.home.change_bill %}disabled{% endif %}>
                                                                 <option value=""></option>
                                                                 {% for office in offices %}
-                                                                    <option value="{{ office.id }}" {% if bill.office.id == office.id %}selected{% endif %}>{{ office.name }}</option>
+                                                                    <option value="{{ office.id }}" {% if bill.office.id == office.id %}selected{% endif %}>{{ office.company_name }}</option>
                                                                 {% endfor %}
                                                             </select>
                                                         </div>
@@ -1375,7 +1375,7 @@
                                                         <label for="beneficiary">Office</label>
                                                         <input class="form-control" id="beneficiary"
                                                                name="bill_beneficiary"
-                                                               value="{% if bill.office.name %}{{ bill.office.name }}{% else %}N/A{% endif %}" disabled>
+                                                               value="{% if bill.office.company_name %}{{ bill.office.company_name }}{% else %}N/A{% endif %}" disabled>
                                                     </div>
                                                     <div class="col form-group form-control-label mb-3">
                                                         <label for="category">Category</label>
@@ -1499,7 +1499,7 @@
                             <select class="form-control" id="beneficiary" name="office_id">
                                 <option value=""></option>
                                 {% for office in offices %}
-                                    <option value="{{ office.id }}">{{ office.name }}</option>
+                                    <option value="{{ office.id }}">{{ office.company_name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -1675,7 +1675,7 @@
                                 <option value=""></option>
                                 {% for office in offices %}
                                     <option value="{{ office.id }}"
-                                            {% if filters|extract_from_key:'office' == office.id %}selected{% endif %}>{{ office.name }}</option>
+                                            {% if filters|extract_from_key:'office' == office.id %}selected{% endif %}>{{ office.company_name }}</option>
                                 {% endfor %}
                             </select>
                         </div>

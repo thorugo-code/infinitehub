@@ -1395,7 +1395,7 @@
                                                         <div class="col form-group form-control-label mb-3">
                                                             <label for="beneficiaryDetails">Office</label>
                                                             <input type="text" class="form-control" 
-                                                                   id="beneficiaryDetails" value="{{ bill.office.name }}" 
+                                                                   id="beneficiaryDetails" value="{{ bill.office.company_name }}" 
                                                                    disabled>
                                                         </div>
                                                         <div class="col-6 form-group form-control-label mb-3">
@@ -1656,9 +1656,7 @@
                                                         <label for="beneficiary">Office</label>
                                                         <input class="form-control" id="beneficiary"
                                                                name="bill_beneficiary"
-                                                               value="
-                                                                               
-                                                                       {% if bill.office.name %}{{ bill.office.name }}{% else %}N/A{% endif %}"
+                                                               value="{% if bill.office.company_name %}{{ bill.office.company_name }}{% else %}N/A{% endif %}"
                                                                disabled>
                                                     </div>
                                                     <div class="col form-group form-control-label mb-3">
@@ -1922,7 +1920,7 @@
                                 <option value=""></option>
                                 {% for office in offices %}
                                     <option value="{{ office.id }}" {% if office.id == client.office.id %}selected{% endif %}>
-                                        {{ office.name }}
+                                        {{ office.company_name }}
                                     </option>
                                 {% endfor %}
                             </select>

@@ -192,6 +192,9 @@
                                     <td>
                                         {% if project.client %}
                                             <span class="client">{{ project.client.name|truncatechars:25 }}</span>
+                                            <span class="d-block text-muted" style="font-size: 0.7rem">
+                                                {{ project.client.area }}
+                                            </span>
                                         {% elif project.client_str %}
                                             <i class="client text-red">"{{ project.client_str }}"</i>
                                         {% else %}

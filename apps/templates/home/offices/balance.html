@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %} {{ office.name }} {% endblock title %}
+{% block title %} {{ office.company_name }} {% endblock title %}
 
 {% block stylesheets %}
     <style>
@@ -37,7 +37,7 @@
                             </li>
                             <li class="breadcrumb-item active">
                                 <a href="{% url 'office_details' office.slug %}">
-                                    {{ office.name|default:office.slug|truncatechars:20 }}
+                                    {{ office.company_name|default:office.slug|truncatechars:20 }}
                                 </a>
                             </li>
                             <li class="breadcrumb-item active">
@@ -66,13 +66,13 @@
                             <a href="#" data-toggle="modal" data-target="#pictureModal">
                                 <img class="rounded-circle"
                                      style="width: 100px; height: 100px; object-fit: cover; background-color: #fff; z-index: 1"
-                                     src="{{ office.avatar.url }}" alt="{{ office.name }}">
+                                     src="{{ office.avatar.url }}" alt="{{ office.company_name }}">
                             </a>
                         </div>
                         <div class="col-md align-items-center" style="display: flex;">
                             <div class="pl-2 row">
                                 <span class="h3 p-0 m-0 pl-4">
-                                    <span>{{ office.name }}</span>
+                                    <span>{{ office.company_name }}</span>
                                     <small class="d-block h5 font-weight-light text-muted">{{ office.cnpj|default:'00.000.000/0001-00' }}</small>
                                     {% if office.location %}
                                         <div class="h5 font-weight-normal">
@@ -1003,7 +1003,7 @@
                                                             <select class="form-control" id="beneficiaryDetails" name="office_id" {% if not perms.home.change_bill %}disabled{% endif %}>
                                                                 <option value=""></option>
                                                                 {% for office in offices %}
-                                                                    <option value="{{ office.id }}" {% if bill.office.id == office.id %}selected{% endif %}>{{ office.name }}</option>
+                                                                    <option value="{{ office.id }}" {% if bill.office.id == office.id %}selected{% endif %}>{{ office.company_name }}</option>
                                                                 {% endfor %}
                                                             </select>
                                                         </div>
@@ -1360,7 +1360,7 @@
                                                         <label for="beneficiary">Office</label>
                                                         <input class="form-control" id="beneficiary"
                                                                name="bill_beneficiary"
-                                                               value="{% if bill.office.name %}{{ bill.office.name }}{% else %}N/A{% endif %}" disabled>
+                                                               value="{% if bill.office.company_name %}{{ bill.office.company_name }}{% else %}N/A{% endif %}" disabled>
                                                     </div>
                                                     <div class="col form-group form-control-label mb-3">
                                                         <label for="category">Category</label>
