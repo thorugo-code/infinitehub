@@ -1,5 +1,4 @@
 import pytz
-from decouple import config
 from datetime import datetime
 from celery import shared_task
 from core.settings import EMAIL_HOST_USER
@@ -14,13 +13,15 @@ def send_mail_celery(self, subject, message, author, recipient_list, html=None):
 
 
 @shared_task(bind=True)
-def confirm_register_email(self, email, token):
+def confirm_register_email(self, path, email, token):
     subject = 'Register confirmation'
 
-    message = (f'Hello! Please click the link below to confirm your email.\n\n'
-               f'{config("WEBSITE_URL")}/validate/{token}\n\n'
-               f'If you did not request this, please ignore this email.\n\n'
-               f'Thanks, Infinite Foundry.')
+    message = (
+        f'Hello! Please click the link below to confirm your email.\n\n'
+        f'{path}/validate/{token}\n\n'
+        f'If you did not request this, please ignore this email.\n\n'
+        f'Thanks, Infinite Foundry.'
+    )
 
     email_from = EMAIL_HOST_USER
     to_email = [email]
@@ -28,11 +29,11 @@ def confirm_register_email(self, email, token):
 
 
 @shared_task(bind=True)
-def reset_password_email(self, username, token):
+def reset_password_email(self, path, username, token):
     subject = 'Password reset'
 
     message = (f'Hello! Please click the link below to reset your password.\n\n'
-               f'{config("WEBSITE_URL")}/reset-password/{token}\n\n'
+               f'{path}/reset-password/{token}\n\n'
                f'If you did not request this, please ignore this email.\n\n'
                f'Thanks, Infinite Foundry.')
 

@@ -27,54 +27,54 @@ collaborators_permissions_list = [
 ]
 
 admin_permissions_list = [
-                             'add_bill',
-                             'change_bill',
-                             'delete_bill',
-                             'view_bill',
-                             'add_client',
-                             'change_client',
-                             'delete_client',
-                             'change_collaborator',
-                             'delete_collaborator',
-                             'add_document',
-                             'change_document',
-                             'delete_document',
-                             'view_document',
-                             'add_office',
-                             'change_office',
-                             'delete_office',
-                             'add_branch',
-                             'change_branch',
-                             'delete_branch',
-                             'view_branch',
-                         ] + collaborators_permissions_list
+    'add_bill',
+    'change_bill',
+    'delete_bill',
+    'view_bill',
+    'add_client',
+    'change_client',
+    'delete_client',
+    'change_collaborator',
+    'delete_collaborator',
+    'add_document',
+    'change_document',
+    'delete_document',
+    'view_document',
+    'add_office',
+    'change_office',
+    'delete_office',
+    'add_branch',
+    'change_branch',
+    'delete_branch',
+    'view_branch',
+] + collaborators_permissions_list
 
 staff_permissions_list = [
-                             'add_logentry',
-                             'change_logentry',
-                             'delete_logentry',
-                             'view_logentry',
-                             'add_group',
-                             'change_group',
-                             'delete_group',
-                             'view_group',
-                             'add_permission',
-                             'change_permission',
-                             'delete_permission',
-                             'view_permission',
-                             'add_user',
-                             'change_user',
-                             'delete_user',
-                             'view_user',
-                             'add_contenttype',
-                             'change_contenttype',
-                             'delete_contenttype',
-                             'view_contenttype',
-                             'add_session',
-                             'change_session',
-                             'delete_session',
-                             'view_session',
-                         ] + collaborators_permissions_list
+    'add_logentry',
+    'change_logentry',
+    'delete_logentry',
+    'view_logentry',
+    'add_group',
+    'change_group',
+    'delete_group',
+    'view_group',
+    'add_permission',
+    'change_permission',
+    'delete_permission',
+    'view_permission',
+    'add_user',
+    'change_user',
+    'delete_user',
+    'view_user',
+    'add_contenttype',
+    'change_contenttype',
+    'delete_contenttype',
+    'view_contenttype',
+    'add_session',
+    'change_session',
+    'delete_session',
+    'view_session',
+] + collaborators_permissions_list
 
 admin_permissions = Permission.objects.filter(codename__in=admin_permissions_list)
 
@@ -114,7 +114,7 @@ def login_view(request):
             if user and auth:
                 login(request, user)
                 profile, created = Profile.objects.get_or_create(user=user)
-                if created or profile.first_access:
+                if created and profile.first_access or profile.first_access:
                     return redirect("fill_profile")
                 else:
                     return redirect("home")
@@ -141,7 +141,7 @@ def login_view(request):
                         )
                         auth_object.save()
 
-                        confirm_register_email.delay(username, auth_object.token)
+                        confirm_register_email.delay(config("WEBSITE_URL"), username, auth_object.token)
                         messages.error(request, f"Authentication key created, check your email.")
 
                     elif not auth:
@@ -184,7 +184,7 @@ def register_user(request):
             )
             auth.save()
 
-            confirm_register_email.delay(username, auth.token)
+            confirm_register_email.delay(config("WEBSITE_URL"), username, auth.token)
             messages.success(request, 'User created! Please confirm your email to login.')
             return redirect('home')
         else:
@@ -203,7 +203,7 @@ def reconfirm_email(request):
     auth_object.key = key.decode()
     auth_object.save()
 
-    confirm_register_email.delay(user.username, auth_object.token)
+    confirm_register_email.delay(config("WEBSITE_URL"), user.username, auth_object.token)
     messages.success(request, 'Email sent! Please confirm your email to login.')
     return redirect('home')
 
@@ -250,7 +250,7 @@ def validate_email(request, token):
         messages.info(request, 'Email already confirmed')
 
     else:
-        messages.error(request, 'Invalid token')
+        messages.error(request, 'Unknown error')
 
     return redirect('home')
 
@@ -271,7 +271,7 @@ def request_reset_password(request):
         pass_reset_object.created_at = datetime.now(tz=pytz.utc)
         pass_reset_object.save()
 
-        reset_password_email.delay(username, pass_reset_object.token)
+        reset_password_email.delay(config("WEBSITE_URL"), username, pass_reset_object.token)
         messages.success(request, 'Email sent! Check your email to password reset.')
         return redirect('home')
 
