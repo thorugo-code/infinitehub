@@ -192,63 +192,53 @@
                                                         >
                                                     </div>
                                                 </div>
-                                                <form id="equipmentModal{{ equip.id }}Form" method="post" action="">
-                                                    {% csrf_token %}
-                                                    <div class="form-group form-control-label mb-3">
-                                                        <label for="title">Name</label>
-                                                        <input type="text" class="form-control" id="name" name="name"
-                                                               placeholder="Equipment's name" value="{{ equip.name }}" disabled>
-                                                    </div>
-                                                    <div class="form-group form-control-label mb-3">
-                                                        <label for="series">Series</label>
-                                                        <input type="text" class="form-control" id="series"
-                                                               name="series"
-                                                               placeholder="Equipment series" value="{{ equip.series }}" disabled>
-                                                    </div>
-                                                    <div class="form-group form-control-label mb-3">
-                                                        <label for="supplier">Supplier</label>
-                                                        <input type="text" class="form-control" id="supplier"
-                                                               name="supplier"
-                                                               placeholder="Equipment supplier name"
-                                                               value="{{ equip.supplier }}" disabled>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <div class="form-group form-control-label">
-                                                                <label for="acquisition-date-info">Acquisition</label>
-                                                                <input type="date" id="acquisition-date-info"
-                                                                       name="acquisition_date"
-                                                                       class="form-control" onchange="enableButtons()"
-                                                                       value="{{ equip.acquisition_date|date:'Y-m-d' }}" disabled>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col">
-                                                            <div class="form-group form-control-label">
-                                                                <label for="equipmentValue">Value</label>
-                                                                <input inputmode="decimal" class="form-control"
-                                                                       id="equipmentValueInfo"
-                                                                       name="equipment_value" placeholder="0.00"
-                                                                       value="{{ equip.price }}" disabled>
-                                                            </div>
+                                                <div class="form-group form-control-label mb-3">
+                                                    <label for="title">Name</label>
+                                                    <input type="text" class="form-control" id="name" name="name"
+                                                           placeholder="Equipment's name" value="{{ equip.name }}" disabled>
+                                                </div>
+                                                <div class="form-group form-control-label mb-3">
+                                                    <label for="series">Series</label>
+                                                    <input type="text" class="form-control" id="series"
+                                                           name="series"
+                                                           placeholder="Equipment series" value="{{ equip.series }}" disabled>
+                                                </div>
+                                                <div class="form-group form-control-label mb-3">
+                                                    <label for="supplier">Supplier</label>
+                                                    <input type="text" class="form-control" id="supplier"
+                                                           name="supplier"
+                                                           placeholder="Equipment supplier name"
+                                                           value="{{ equip.supplier }}" disabled>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group form-control-label">
+                                                            <label for="acquisition-date-info">Acquisition</label>
+                                                            <input type="date" id="acquisition-date-info"
+                                                                   name="acquisition_date"
+                                                                   class="form-control" onchange="enableButtons()"
+                                                                   value="{{ equip.acquisition_date|date:'Y-m-d' }}" disabled>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group form-control-label">
-                                                        <label for="about">About</label>
-                                                        <textarea rows="3" class="form-control" id="about"
-                                                                  name="about-user"
-                                                                  placeholder="A few words about the equipment ..."
-                                                                  disabled>{{ equip.description }}</textarea>
+                                                    <div class="col">
+                                                        <div class="form-group form-control-label">
+                                                            <label for="equipmentValue">Value</label>
+                                                            <input inputmode="decimal" class="form-control"
+                                                                   id="equipmentValueInfo"
+                                                                   name="equipment_value" placeholder="0.00"
+                                                                   value="{{ equip.price }}" disabled>
+                                                        </div>
                                                     </div>
-                                                </form>
+                                                </div>
+                                                <div class="form-group form-control-label">
+                                                    <label for="about">About</label>
+                                                    <textarea rows="3" class="form-control" id="about"
+                                                              name="about-user"
+                                                              placeholder="A few words about the equipment ..."
+                                                              disabled>{{ equip.description }}</textarea>
+                                                </div>
                                             </div>
                                             <div class="modal-footer">
-{#                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">#}
-{#                                                    Cancel#}
-{#                                                </button>#}
-{#                                                <button type="submit" class="btn btn-primary" id="submitInfoButton"#}
-{#                                                        form="newEquipmentForm" disabled>#}
-{#                                                    Submit#}
-{#                                                </button>#}
                                             </div>
                                         </div>
                                     </div>
@@ -280,7 +270,7 @@
                                                 <form method="post"
                                                       id="deleteConfirmForm{{ equip.id }}"
                                                       action="{% url 'delete_equipment' equip.id %}"
-                                                      onsubmit="disableDeleteButton({{ equip.id }})">
+                                                      onsubmit="disableByID('deleteButton{{ equip.id }}')">
                                                     {% csrf_token %}
                                                     <div class="form-group">
                                                         <label for="equipName">Equipment</label>
@@ -412,7 +402,8 @@
                     </button>
                 </div>
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="newEquipmentForm" method="post" action="">
+                    <form id="newEquipmentForm" method="post" action="{% url 'new_equipment' %}" 
+                          onsubmit="disableByID('submitButton')">
                         {% csrf_token %}
                         <div class="form-group form-control-label mb-3">
                             <label for="name">Name</label>
@@ -505,26 +496,6 @@
             });
         });
 
-    </script>
-
-    <script>
-        function enableButtons() {
-            const acquisitionDate = document.getElementById("acquisition-date");
-            const submitButton = document.getElementById("submitButton");
-
-            const valorAcquisitionData = acquisitionDate.value;
-
-            if (valorAcquisitionData === "") {
-                console.log(valorAcquisitionData);
-            } else {
-                submitButton.removeAttribute("disabled");
-            }
-        }
-
-        function disableDeleteButton(id) {
-            const deleteButton = document.getElementById("deleteButton"+id);
-            deleteButton.setAttribute("disabled", "disabled");
-        }
     </script>
 
 {% endblock javascripts %}

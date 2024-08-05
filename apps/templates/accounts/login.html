@@ -29,12 +29,13 @@
                                             <span class="status h4 font-weight-light">{{ message }}</span>
 {#                                            {% if 'confirm your email.' in message.message %}#}
                                             {% if 'User has not been activated' in message.message %}
-                                                <form id="resend_email" method="POST" action="{% url 'resend_confirmation' %}">
+                                                <form id="resend_email" method="POST" action="{% url 'resend_confirmation' %}" 
+                                                      onsubmit="disableByID('resendButton')">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="email" value="{{ form.username.value }}">
 
                                                     <span class="d-block status h4 font-weight-light">
-                                                        <a href="#" {% if form.username.value %}onclick="submit()"{% else %}{% endif %} class="text-blue">Resend</a> it if needed.
+                                                        <a href="#" id="resendButton" {% if form.username.value %}onclick="submit()"{% else %}{% endif %} class="text-blue">Resend</a> it if needed.
                                                     </span>
 
                                                 </form>
@@ -54,7 +55,7 @@
 
                         </div>
 
-                        <form method="POST">
+                        <form method="POST" onsubmit="disableByID('signInButton')">
 
                             {% csrf_token %}
 
@@ -90,7 +91,7 @@
                                 </div>
                             </div>
                             <div class="text-center">
-                                <button type="submit" class="btn btn-primary my-4">Sign in</button>
+                                <button type="submit" id="signInButton" class="btn btn-primary my-4">Sign in</button>
                             </div>
                         </form>
                     </div>
@@ -123,7 +124,7 @@
                     <p>
                         Enter your email address and we will send you a link to reset your password.
                     </p>
-                    <form method="POST" action="{% url 'reset_password' %}">
+                    <form method="POST" action="{% url 'reset_password' %}" onsubmit="disableByID('resetButton')">
                         {% csrf_token %}
                         <div class="form-group">
                             <div class="input-group input-group-alternative">
@@ -134,7 +135,7 @@
                             </div>
                         </div>
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary my-4">Send Reset Link</button>
+                            <button type="submit" id="resetButton" class="btn btn-primary my-4">Send Reset Link</button>
                         </div>
                     </form>
                 </div>

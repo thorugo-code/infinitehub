@@ -671,9 +671,9 @@
                                                                 </div>
                                                                 <div class="modal-body py-0"
                                                                      style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                                    <form method="post"
-                                                                          id="editInstallmentForm{{ installment.id }}"
-                                                                          action="{% url 'edit_client_bill_installment' client.slug bill.id installment.id %}">
+                                                                    <form method="post" id="editInstallmentForm{{ installment.id }}"
+                                                                          action="{% url 'edit_client_bill_installment' client.slug bill.id installment.id %}" 
+                                                                          onsubmit="disableByID('editInstallmentButton{{ installment.id }}')">
                                                                         {% csrf_token %}
 
                                                                         <input type="hidden" value="{{ sorted_by }}"
@@ -734,6 +734,7 @@
                                                                     {% endif %}
                                                                     </a>
                                                                     <button type="submit" class="btn btn-primary"
+                                                                            id="editInstallmentButton{{ installment.id }}"
                                                                             form="editInstallmentForm{{ installment.id }}">
                                                                         Save
                                                                     </button>
@@ -775,9 +776,9 @@
                                                                         <br>
                                                                         This action can be undone.
                                                                     </p>
-                                                                    <form method="post"
-                                                                          id="paidInstallmentConfirmForm{{ installment.id }}"
-                                                                          action="{% url 'change_client_bill_installment_status' client.slug bill.id installment.id %}">
+                                                                    <form method="post" id="paidInstallmentConfirmForm{{ installment.id }}"
+                                                                          action="{% url 'change_client_bill_installment_status' client.slug bill.id installment.id %}" 
+                                                                          onsubmit="disableByID('paidInstallmentConfirmButton{{ installment.id }}')">
                                                                         {% csrf_token %}
 
                                                                         <input type="hidden" value="{{ sorted_by }}"
@@ -849,11 +850,13 @@
                                                                     </button>
                                                                     {% if installment.paid %}
                                                                         <button type="submit" class="btn btn-warning"
+                                                                                id="paidInstallmentConfirmButton{{ installment.id }}"
                                                                                 form="paidInstallmentConfirmForm{{ installment.id }}">
                                                                             Set as pending
                                                                         </button>
                                                                     {% else %}
                                                                         <button type="submit" class="btn btn-success"
+                                                                                id="paidInstallmentConfirmButton{{ installment.id }}"
                                                                                 form="paidInstallmentConfirmForm{{ installment.id }}">
                                                                             Set as paid
                                                                         </button>
@@ -895,9 +898,9 @@
                                                                         <br>
                                                                         This action cannot be undone.
                                                                     </p>
-                                                                    <form method="post"
-                                                                          id="deleteInstallmentConfirmForm{{ installment.id }}"
-                                                                          action="{% url 'delete_client_bill_installment' client.slug bill.id installment.id %}">
+                                                                    <form method="post" id="deleteInstallmentConfirmForm{{ installment.id }}"
+                                                                          action="{% url 'delete_client_bill_installment' client.slug bill.id installment.id %}" 
+                                                                          onsubmit="disableByID('deleteInstallmentConfirmButton{{ installment.id }}')">
                                                                         {% csrf_token %}
                                                                         <input type="hidden" value="{{ sorted_by }}"
                                                                                name="sort_by">
@@ -939,6 +942,7 @@
                                                                             data-dismiss="modal">Cancel
                                                                     </button>
                                                                     <button type="submit" class="btn btn-danger"
+                                                                            id="deleteInstallmentConfirmButton{{ installment.id }}"
                                                                             form="deleteInstallmentConfirmForm{{ installment.id }}">
                                                                         Delete
                                                                     </button>
@@ -974,9 +978,10 @@
                                                 </button>
                                             </div>
                                             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <form id="editBillForm{{ bill.id }}" method="post" action="{% url 'edit_client_bill' client.slug bill.id %}"
+                                                <form id="editBillForm{{ bill.id }}" method="post" 
+                                                      action="{% url 'edit_client_bill' client.slug bill.id %}"
                                                       enctype="multipart/form-data"
-                                                      onsubmit=blockSubmit(event,'submitReceiveButton')>
+                                                      onsubmit=disableByID('editBillButton{{ bill.id }}')>
                                                     {% csrf_token %}
                                                     <input type="hidden" name="income" value="true">
                                                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
@@ -1244,9 +1249,9 @@
                                                     <br>
                                                     This action can be undone.
                                                 </p>
-                                                <form method="post"
-                                                      id="paidConfirmForm{{ bill.id }}"
-                                                      action="{% url 'change_client_bill_status' client.slug bill.id %}">
+                                                <form method="post" id="paidConfirmForm{{ bill.id }}"
+                                                      action="{% url 'change_client_bill_status' client.slug bill.id %}" 
+                                                      onsubmit="disableByID('paidConfirmButton{{ bill.id }}')">
                                                     {% csrf_token %}
 
                                                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
@@ -1311,11 +1316,13 @@
                                                 </button>
                                                 {% if bill.paid %}
                                                     <button type="submit" class="btn btn-warning"
+                                                            id="paidConfirmButton{{ bill.id }}"
                                                             form="paidConfirmForm{{ bill.id }}">
                                                         Set as pending
                                                     </button>
                                                 {% else %}
                                                     <button type="submit" class="btn btn-success"
+                                                            id="paidConfirmButton{{ bill.id }}"
                                                             form="paidConfirmForm{{ bill.id }}">
                                                         Set as paid
                                                     </button>
@@ -1354,9 +1361,9 @@
                                                     <br>
                                                     This action cannot be undone.
                                                 </p>
-                                                <form method="post"
-                                                      id="deleteConfirmForm{{ bill.id }}"
-                                                      action="{% url 'delete_client_bill' client.slug bill.id %}">
+                                                <form method="post" id="deleteConfirmForm{{ bill.id }}"
+                                                      action="{% url 'delete_client_bill' client.slug bill.id %}" 
+                                                      onsubmit="disableByID('deleteConfirmButton{{ bill.id }}')">
                                                     {% csrf_token %}
                                                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
                                                     <input type="hidden" value="{{ sort_type }}" name="sort_type">
@@ -1415,6 +1422,7 @@
                                                         data-dismiss="modal">Cancel
                                                 </button>
                                                 <button type="submit" class="btn btn-danger"
+                                                        id="deleteConfirmButton{{ bill.id }}"
                                                         form="deleteConfirmForm{{ bill.id }}">
                                                     Delete
                                                 </button>
@@ -1460,7 +1468,7 @@
             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                 <form id="newBillForm" method="post" action="{% url 'new_client_bill' client.slug %}"
                       enctype="multipart/form-data"
-                      onsubmit=blockSubmit(event,'submitReceiveButton')>
+                      onsubmit=disableByID('newBillButton')>
                     {% csrf_token %}
                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
                     <input type="hidden" value="{{ sort_type }}" name="sort_type">
@@ -1492,7 +1500,7 @@
                             </select>
 
                         </div>
-                    </div> {# TITLE / CATEGORY #}
+                    </div>{# TITLE / CATEGORY #}
                     <div class="row">
                         <div class="col form-group form-control-label">
                             <label for="beneficiary">Office</label>
@@ -1625,7 +1633,7 @@
             </div>
             <div class="modal-footer pt-2 pb-4">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary" form="newBillForm">
+                <button type="submit" class="btn btn-primary" form="newBillForm" id="newBillButton">
                     Submit
                 </button>
             </div>
@@ -1650,7 +1658,8 @@
                 </button>
             </div>
             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form id="filterForm" method="post" action="{% url 'filter_client_balance' client.slug %}">
+                <form id="filterForm" method="post" action="{% url 'filter_client_balance' client.slug %}" 
+                      onsubmit="disableByID('filterButton')">
                     {% csrf_token %}
                     <input type="hidden" name="sort_by" value="{{ sorted_by }}">
                     <input type="hidden" name="sort_type" value="{{ sort_type }}">
@@ -1849,7 +1858,8 @@
                     </div>
                 </form>
 
-                <form action="{% url 'sort_client_balance' client.slug %}" method="post" id="unfilterForm">
+                <form action="{% url 'sort_client_balance' client.slug %}" method="post" id="unfilterForm" 
+                      onsubmit="disableByID('unfilterButton')">
                     {% csrf_token %}
                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
                     {% if sort_type == 'asc' %}
@@ -1865,7 +1875,7 @@
                     Cancel
                 </button>
                 {% if filters and sorted_by %}
-                    <button type="submit" class="btn btn-danger" id="filterButton" form="unfilterForm">
+                    <button type="submit" class="btn btn-danger" id="unfilterButton" form="unfilterForm">
                         Unfilter
                     </button>
                 {% elif filters %}
@@ -1898,7 +1908,8 @@
                 </button>
             </div>
             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form id="sortForm" method="post" action="{% url 'sort_client_balance' client.slug %}">
+                <form id="sortForm" method="post" action="{% url 'sort_client_balance' client.slug %}" 
+                      onsubmit="disableByID('sortButton')">
                     {% csrf_token %}
                     <input type="hidden" name="filters" value="{{ filters }}">
                     <label class="form-control-label" for="sortByModalInput">Data</label>

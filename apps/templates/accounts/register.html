@@ -30,12 +30,13 @@
                                             {% endif %}
                                             <span class="status h4 font-weight-light">{{ message }}</span>
                                             {% if 'confirm your email.' in message.message %}
-                                                <form id="resend_email" method="POST" action="{% url 'resend_confirmation' %}">
+                                                <form id="resend_email" method="POST" action="{% url 'resend_confirmation' %}" 
+                                                      onsubmit="disableByID('resendButton')">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="email" value="{{ form.username.value }}">
 
                                                     <span class="d-block status h4 font-weight-light">
-                                                        <a href="#" {% if form.username.value %}onclick="submit()"{% else %}{% endif %} class="text-blue">Resend</a> it if needed.
+                                                        <a href="#" id="resendButton" {% if form.username.value %}onclick="submit()"{% else %}{% endif %} class="text-blue">Resend</a> it if needed.
                                                     </span>
 
                                                 </form>
@@ -57,7 +58,7 @@
 
                         {% if not success %}
 
-                            <form method="POST">
+                            <form method="POST" onsubmit="disableByID('submitButton')">
 
                                 {% csrf_token %}
 
@@ -105,7 +106,7 @@
 {#                                </div>#}
                                 
                                 <div class="text-center">
-                                    <button type="submit" class="btn btn-primary mt-3">Create account</button>
+                                    <button type="submit" id="submitButton" class="btn btn-primary mt-3">Create account</button>
                                 </div>
                             </form>
 

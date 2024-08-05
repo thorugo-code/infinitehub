@@ -142,7 +142,8 @@
                                     <div class="modal-body py-0"
                                          style="padding-left: 2.5rem; padding-right: 2.5rem">
                                         <form id="officeEditForm{{ office.id }}" method="post"
-                                              action="{% url 'offices_edit' office.id %}">
+                                              action="{% url 'offices_edit' office.id %}" 
+                                              onsubmit="disableByID('officeEditButton{{ office.id }}')">
                                             {% csrf_token %}
                                             <div class="row">
                                                 <div class="col-7 form-group form-control-label mb-3">
@@ -179,7 +180,7 @@
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                                                 Cancel
                                             </button>
-                                            <button type="submit" class="btn btn-primary" id="submitButton"
+                                            <button type="submit" class="btn btn-primary" id="officeEditButton{{ office.id }}"
                                                     form="officeEditForm{{ office.id }}">
                                                 Save
                                             </button>
@@ -230,7 +231,8 @@
                                             <br>
                                             This action cannot be undone.
                                         <form method="post" id="deleteConfirmForm{{ office.id }}"
-                                              action="{% url 'offices_delete' office.id %}">
+                                              action="{% url 'offices_delete' office.id %}" 
+                                              onsubmit="disableByID('deleteConfirmButton{{ office.id }}')">
                                             {% csrf_token %}
                                         </form>
                                     </div>
@@ -239,6 +241,7 @@
                                                 data-dismiss="modal">Cancel
                                         </button>
                                         <button type="submit" class="btn btn-danger"
+                                                id="deleteConfirmButton{{ office.id }}"
                                                 form="deleteConfirmForm{{ office.id }}">Delete
                                         </button>
                                     </div>
@@ -392,7 +395,8 @@
                 </div>
 
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="newOfficeForm" method="post" action="{% url 'offices_create' %}">
+                    <form id="newOfficeForm" method="post" action="{% url 'offices_create' %}" 
+                          onsubmit="disableByID('submitButton')">
                         {% csrf_token %}
                         <div class="form-group form-control-label mb-3">
                             <label for="company_name">Company Name</label>

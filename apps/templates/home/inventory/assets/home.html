@@ -89,64 +89,62 @@
                                                     </div>
                                                     <div class="modal-body py-0"
                                                          style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                        <form id="downloadFile{{ file.pk }}">
-                                                            <div class="form-group mt--1"
-                                                                 style="display: flex; justify-content: center">
-                                                                <img
-                                                                        id="filePreviewModal"
-                                                                        src="/static/assets/img/icons/extensions/1x/{{ file.file.name|file_extension_icon }}"
-                                                                        alt="New File"
-                                                                        style="height: 130px"/>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="fileType">Name</label>
+                                                        <div class="form-group mt--1"
+                                                             style="display: flex; justify-content: center">
+                                                            <img
+                                                                    id="filePreviewModal"
+                                                                    src="/static/assets/img/icons/extensions/1x/{{ file.file.name|file_extension_icon }}"
+                                                                    alt="New File"
+                                                                    style="height: 130px"/>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="fileType">Name</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="fileType"
+                                                                   value="{{ file.file.name|file_name_only_with_extension }}"
+                                                                   disabled>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group col-lg-6">
+                                                                <label for="fileType">Category</label>
                                                                 <input type="text" class="form-control"
                                                                        id="fileType"
-                                                                       value="{{ file.file.name|file_name_only_with_extension }}"
+                                                                       value="{{ file.category|refformatted_category }}"
                                                                        disabled>
                                                             </div>
-                                                            <div class="row">
-                                                                <div class="form-group col-lg-6">
-                                                                    <label for="fileType">Category</label>
-                                                                    <input type="text" class="form-control"
-                                                                           id="fileType"
-                                                                           value="{{ file.category|refformatted_category }}"
-                                                                           disabled>
-                                                                </div>
-                                                                <div class="form-group col-lg-6">
-                                                                    <label for="fileValue">Value</label>
-                                                                    <input inputmode="decimal"
-                                                                           class="form-control"
-                                                                           id="fileValue"
-                                                                           value="{{ file.value }}"
-                                                                           placeholder="$ 0.00"
-                                                                           disabled>
-                                                                </div>
+                                                            <div class="form-group col-lg-6">
+                                                                <label for="fileValue">Value</label>
+                                                                <input inputmode="decimal"
+                                                                       class="form-control"
+                                                                       id="fileValue"
+                                                                       value="{{ file.value }}"
+                                                                       placeholder="$ 0.00"
+                                                                       disabled>
                                                             </div>
-                                                            <div class="row">
-                                                                <div class="form-group col-lg-6">
-                                                                    <label for="fileUploadUser">Uploaded
-                                                                        By</label>
-                                                                    <input type="text" class="form-control"
-                                                                           id="fileUploadUser"
-                                                                           value="{{ file.uploaded_by.first_name }} {{ file.uploaded_by.last_name }}"
-                                                                           disabled>
-                                                                </div>
-                                                                <div class="form-group col-lg-6">
-                                                                    <label for="fileUploadDate">Date</label>
-                                                                    <input type="date" class="form-control"
-                                                                           id="fileUploadDate"
-                                                                           value="{{ file.uploaded_at|date:'Y-m-d' }}"
-                                                                           disabled>
-                                                                </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group col-lg-6">
+                                                                <label for="fileUploadUser">Uploaded
+                                                                    By</label>
+                                                                <input type="text" class="form-control"
+                                                                       id="fileUploadUser"
+                                                                       value="{{ file.uploaded_by.first_name }} {{ file.uploaded_by.last_name }}"
+                                                                       disabled>
                                                             </div>
-                                                            <div class="form-group">
-                                                                <label for="fileDescription">Description</label>
-                                                                <textarea class="form-control"
-                                                                          id="fileDescription"
-                                                                          disabled>{{ file.description }}</textarea>
+                                                            <div class="form-group col-lg-6">
+                                                                <label for="fileUploadDate">Date</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="fileUploadDate"
+                                                                       value="{{ file.uploaded_at|date:'Y-m-d' }}"
+                                                                       disabled>
                                                             </div>
-                                                        </form>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="fileDescription">Description</label>
+                                                            <textarea class="form-control"
+                                                                      id="fileDescription"
+                                                                      disabled>{{ file.description }}</textarea>
+                                                        </div>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
@@ -184,19 +182,19 @@
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
-                                                    <div class="modal-body py-0"
-                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                         <form method="post"
                                                               id="deleteConfirmForm{{ file.pk }}"
-                                                              action="{% url 'delete_file_from_storage' file.pk %}">
+                                                              action="{% url 'delete_file_from_storage' file.pk %}" 
+                                                              onsubmit="disableByID('deleteConfirmButton{{ file.pk }}')">
                                                             {% csrf_token %}
                                                             <div class="form-group mt-4"
                                                                  style="display: flex; justify-content: center">
                                                                 <img
-                                                                        id="filePreviewModal"
-                                                                        src="/static/assets/img/icons/extensions/1x/{{ file.file.name|file_extension_icon }}"
-                                                                        alt="New File"
-                                                                        style="height: 130px"/>
+                                                                    id="filePreviewModal"
+                                                                    src="/static/assets/img/icons/extensions/1x/{{ file.file.name|file_extension_icon }}"
+                                                                    alt="New File"
+                                                                    style="height: 130px"/>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="fileName">Name</label>
@@ -213,6 +211,7 @@
                                                         </button>
 
                                                         <button type="submit" class="btn btn-danger"
+                                                                id="deleteConfirmButton{{ file.pk }}"
                                                                 form="deleteConfirmForm{{ file.pk }}">
                                                             Delete
                                                         </button>

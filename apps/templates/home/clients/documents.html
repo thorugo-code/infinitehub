@@ -295,8 +295,8 @@
                                             <div class="modal-body py-0"
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                 <form action="{% url 'edit_client_document' client.slug document.id %}"
-                                                      id="editFile{{ document.id }}"
-                                                      method="post">
+                                                      id="editFile{{ document.id }}" method="post" 
+                                                      onsubmit="disableByID('editFileSubmitButton{{ document.id }}')">
                                                     {% csrf_token %}
                                                     {% load filters %}
                                                     <input type="hidden" name="redirect_to" value="client_documents">
@@ -387,9 +387,11 @@
                                                     Delete
                                                 </button>
                                                 <a class="btn btn-success"
-                                                   href="{% url 'download_client_document' client.slug document.id %}">Download</a>
+                                                   href="{% url 'download_client_document' client.slug document.id %}">
+                                                    Download
+                                                </a>
                                                 <button class="btn btn-primary text-white"
-                                                        type="submit"
+                                                        type="submit" id="editFileSubmitButton{{ document.id }}"
                                                         form="editFile{{ document.id }}">
                                                     Save
                                                 </button>
@@ -425,8 +427,8 @@
                                             <div class="modal-body py-0"
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                 <form action="{% url 'delete_client_document' client.slug document.id %}"
-                                                      id="deleteConfirmDocumentForm{{ document.id }}"
-                                                      method="post">
+                                                      id="deleteConfirmDocumentForm{{ document.id }}" method="post" 
+                                                      onsubmit="disableByID('deleteConfirmDocumentButton{{ document.id }}')">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="redirect_to" value="client_documents">
                                                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
@@ -478,9 +480,10 @@
                                                 <button class="btn btn-secondary" data-dismiss="modal"
                                                         type="button">Cancel
                                                 </button>
-                                                <button class="btn btn-danger"
-                                                        form="deleteConfirmDocumentForm{{ document.id }}"
-                                                        type="submit">Delete
+                                                <button class="btn btn-danger" type="submit" 
+                                                        id="deleteConfirmDocumentButton{{ document.id }}"
+                                                        form="deleteConfirmDocumentForm{{ document.id }}">
+                                                    Delete
                                                 </button>
                                             </div>
                                         </div>
@@ -517,8 +520,7 @@
             <div class="modal-body py-0"
                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                 <form action="{% url 'new_client_document' client.slug %}" enctype="multipart/form-data"
-                      id="uploadDocument"
-                      method="post" onsubmit="disableButtonsFile()">
+                      id="uploadDocument" method="post" onsubmit="disableByID('uploadButtonFile')">
                     {% csrf_token %}
                     <input type="hidden" name="redirect_to" value="client_documents">
                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
@@ -621,8 +623,7 @@
             <div class="modal-body py-0"
                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                 <form action="{% url 'filter_client_documents' client.slug %}" enctype="multipart/form-data"
-                      id="filterDocument"
-                      method="post" onsubmit="disableButtonsFile()">
+                      id="filterDocument" method="post" onsubmit="disableByID('filterDocumentButton')">
                     {% csrf_token %}
                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
                     <input type="hidden" value="{{ sort_type }}" name="sort_type">
@@ -666,7 +667,8 @@
                         </div>
                     </div>
                 </form>
-                <form action="{% url 'sort_client_documents' client.slug %}" method="post" id="unfilterForm">
+                <form action="{% url 'sort_client_documents' client.slug %}" method="post" id="unfilterForm" 
+                      onsubmit="disableByID('unfilterButton')">
                     {% csrf_token %}
                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
                     {% if sort_type == 'asc' %}
@@ -682,7 +684,7 @@
                     Cancel
                 </button>
                 {% if filters and sorted_by %}
-                    <button type="submit" class="btn btn-danger" id="filterButton" form="unfilterForm">
+                    <button type="submit" class="btn btn-danger" id="unfilterButton" form="unfilterForm">
                         Unfilter
                     </button>
                 {% elif filters %}
@@ -690,7 +692,7 @@
                         Unfilter
                     </a>
                 {% endif %}
-                <button class="btn btn-primary" form="filterDocument" id="uploadButtonFile"
+                <button class="btn btn-primary" form="filterDocument" id="filterDocumentButton"
                         type="submit">
                     Filter
                 </button>
@@ -716,7 +718,8 @@
                 </button>
             </div>
             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form id="sortForm" method="post" action="{% url 'sort_client_documents' client.slug %}">
+                <form id="sortForm" method="post" action="{% url 'sort_client_documents' client.slug %}" 
+                      onsubmit="disableByID('sortButton')">
                     {% csrf_token %}
                     <input type="hidden" name="filters" value="{{ filters }}">
                     <label class="form-control-label" for="sortByModalInput">Data</label>

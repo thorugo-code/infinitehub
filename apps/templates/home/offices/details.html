@@ -261,7 +261,8 @@
                                                     <div class="modal-body py-0"
                                                          style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                         <form id="editBankAccountForm{{ account.id }}" method="post"
-                                                              action="{% url 'offices_edit_bank_account' office.slug account.id %}">
+                                                              action="{% url 'offices_edit_bank_account' office.slug account.id %}" 
+                                                              onsubmit="disableByID('editBankAccountButton{{ account.id }}')">
                                                             {% csrf_token %}
                                                             <div class="form-group form-control-label">
                                                                 <label for="bankNameInput">Bank</label>
@@ -315,6 +316,7 @@
                                                             </a>
                                                         {% endif %}
                                                         <button class="btn btn-primary"
+                                                                id="editBankAccountButton{{ account.id }}"
                                                                 form="editBankAccountForm{{ account.id }}"
                                                                 type="submit">
                                                             Submit
@@ -357,9 +359,9 @@
                                                                 <br>
                                                                 This action cannot be undone.
                                                             </p>
-                                                            <form id="deleteBankAccountForm{{ account.id }}"
-                                                                  method="post"
-                                                                  action="{% url 'offices_delete_bank_account' office.slug account.id %}">
+                                                            <form id="deleteBankAccountForm{{ account.id }}" method="post"
+                                                                  action="{% url 'offices_delete_bank_account' office.slug account.id %}" 
+                                                                  onsubmit="disableByID('deleteBankAccountButton{{ account.id }}')">
                                                                 {% csrf_token %}
                                                                 <div class="row">
                                                                     <div class="col-sm-7 form-group form-control-label">
@@ -397,6 +399,7 @@
                                                                     type="button">Cancel
                                                             </button>
                                                             <button class="btn btn-danger text-white" type="submit"
+                                                                    id="deleteBankAccountButton{{ account.id }}"
                                                                     form="deleteBankAccountForm{{ account.id }}">
                                                                 Delete
                                                             </button>
@@ -655,7 +658,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="{% url 'offices_edit' office.slug  %}">
+            <form method="post" action="{% url 'offices_edit' office.slug  %}" onsubmit="disableByID('editOfficeButton')">
                 {% csrf_token %}
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                     <div class="form-group form-control-label mb-3">
@@ -708,7 +711,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" class="btn btn-primary" id="editOfficeButton">Save</button>
                 </div>
             </form>
         </div>
@@ -726,15 +729,11 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body py-0"
-                 style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form id="pictureForm" method="post"
-                      action="{% url 'offices_edit' office.slug %}"
-                      enctype="multipart/form-data"
-                      onsubmit="disableButtons()">
+            <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                <form id="pictureForm" method="post" action="{% url 'offices_edit' office.slug %}"
+                      enctype="multipart/form-data" onsubmit="disableByID('uploadButton')">
                     {% csrf_token %}
-                    <div class="form-group my-5 mb-0"
-                         style="display: flex; justify-content: center">
+                    <div class="form-group my-5 mb-0" style="display: flex; justify-content: center">
                         <div class="card-profile-image align-items-center justify-content-center"
                              style="background-color: #adb5bd00; height: 180px; display: flex">
                             <input type="file" id="pictureInput" style="display: none"
@@ -780,7 +779,8 @@
                     </button>
                 </div>
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="addBankAccountForm" method="post" action="{% url 'offices_add_bank_account' office.slug %}">
+                    <form id="addBankAccountForm" method="post" action="{% url 'offices_add_bank_account' office.slug %}" 
+                          onsubmit="disableByID('addBankAccountButton')">
                         {% csrf_token %}
                         <div class="form-group form-control-label">
                             <label for="bankNameInput">Bank</label>
@@ -813,7 +813,7 @@
                             id="cancelButtonFile" type="button">
                         Cancel
                     </button>
-                    <button class="btn btn-primary" form="addBankAccountForm" type="submit">
+                    <button class="btn btn-primary" id="addBankAccountButton" form="addBankAccountForm" type="submit">
                         Submit
                     </button>
                 </div>

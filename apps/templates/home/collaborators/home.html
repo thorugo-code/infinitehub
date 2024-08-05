@@ -440,7 +440,9 @@
                                             </button>
                                         </div>
                                         <div class="modal-body pt-3 pb-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form id="collaboratorFillInfosForm{{ collab.id }}" method="post" action="{% url 'fill_collaborator' collab.slug %}">
+                                            <form id="collaboratorFillInfosForm{{ collab.id }}" method="post" 
+                                                  action="{% url 'fill_collaborator' collab.slug %}" 
+                                                  onsubmit="disableByID('collaboratorFillInfosButton{{ collab.id }}')">
                                                 {% csrf_token %}
                                                 <div class="row">
                                                     <div class="col-8 form-group form-control-label">
@@ -467,7 +469,8 @@
                                                     id="cancelButtonFile" type="button">
                                                 Cancel
                                             </button>
-                                            <button class="btn btn-success" form="collaboratorFillInfosForm{{ collab.id }}" type="submit">
+                                            <button class="btn btn-success" form="collaboratorFillInfosForm{{ collab.id }}" type="submit" 
+                                                    id="collaboratorFillInfosButton{{ collab.id }}">
                                                 Save
                                             </button>
                                         </div>
@@ -550,8 +553,8 @@
                 </div>
                 <div class="modal-body py-0"
                      style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form action="{% url 'filter_collaborators' %}" enctype="multipart/form-data" id="filterCollaborators" method="post"
-                          onsubmit="disableButtonsFile()">
+                    <form action="{% url 'filter_collaborators' %}" enctype="multipart/form-data" id="filterCollaborators" 
+                          method="post" onsubmit="disableByID('filterCollaborators')">
                         {% csrf_token %}
                         <input type="hidden" name="sort_by" value="{{ sorted_by }}">
                         <input type="hidden" name="sort_type" value="{{ sort_type }}">
@@ -577,18 +580,6 @@
                                 </select>
                             </div>
                         </div>
-{#                        <div class="row">#}
-{#                            <div class="col form-group form-control-label">#}
-{#                                <label for="from-date">Birth from</label>#}
-{#                                <input class="form-control" id="from-date" name="from" autofocus="" type="date"#}
-{#                                       value="{% if 'from=' in filters %}{{ filters|extract_from_key:'from' }}{% endif %}">#}
-{#                            </div>#}
-{#                            <div class="col form-group form-control-label">#}
-{#                                <label for="to-date">To</label>#}
-{#                                <input class="form-control" id="to-date" name="to" autofocus="" type="date"#}
-{#                                       value="{% if 'to=' in filters %}{{ filters|extract_from_key:'to' }}{% endif %}">#}
-{#                            </div>#}
-{#                        </div>#}
                         <label class="form-control-label">Status</label>
                         <div class="mt-2 form-group align-items-center" style="display: flex">
                             <label class="mb-0 mr-2" style="font-size: 0.875rem">Disabled</label>
@@ -605,7 +596,8 @@
                             </label>
                         </div>
                     </form>
-                    <form action="{% url 'sort_collaborators' %}" method="post" id="unfilterForm">
+                    <form action="{% url 'sort_collaborators' %}" method="post" id="unfilterForm" 
+                          onsubmit="disableByID('unfilterButton')">
                         {% csrf_token %}
                         <input type="hidden" value="{{ sorted_by }}" name="sort_by">
                         {% if sort_type == 'asc' %}
@@ -621,7 +613,7 @@
                         Cancel
                     </button>
                     {% if filters and sorted_by %}
-                        <button type="submit" class="btn btn-danger" id="filterButton" form="unfilterForm">
+                        <button type="submit" class="btn btn-danger" id="unfilterButton" form="unfilterForm">
                             Unfilter
                         </button>
                     {% elif filters %}
@@ -629,7 +621,7 @@
                             Unfilter
                         </a>
                     {% endif %}
-                    <button class="btn btn-primary" form="filterCollaborators" type="submit">
+                    <button class="btn btn-primary" id="filterCollaboratorsButton" form="filterCollaborators" type="submit">
                         Filter
                     </button>
                 </div>
@@ -654,7 +646,8 @@
                     </button>
                 </div>
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="sortCollaboratorsForm" method="post" action="{% url 'sort_collaborators' %}">
+                    <form id="sortCollaboratorsForm" method="post" action="{% url 'sort_collaborators' %}" 
+                          onsubmit="disableByID('sortButton')">
                         {% csrf_token %}
                         <input type="hidden" name="filters" value="{{ filters }}">
                         <label class="form-control-label" for="sortByModalInput">Data</label>

@@ -315,15 +315,17 @@
                                                 <br>
                                                 This action cannot be undone.
                                             <form method="post" id="deleteConfirmForm{{ client.id }}"
-                                                  action="{% url 'delete_client' client.slug %}">
+                                                  action="{% url 'delete_client' client.slug %}" 
+                                                  onsubmit="disableByID('deleteClientConfirmButton{{ client.id }}');
+                                                  disableByID('deleteClientCancelButton{{ client.id }}')">
                                                 {% csrf_token %}
                                             </form>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
+                                            <button type="button" class="btn btn-secondary" id="deleteClientCancelButton{{ client.id }}"
                                                     data-dismiss="modal">Cancel
                                             </button>
-                                            <button type="submit" class="btn btn-danger"
+                                            <button type="submit" class="btn btn-danger" id="deleteClientConfirmButton{{ client.id }}"
                                                     form="deleteConfirmForm{{ client.id }}">Delete
                                             </button>
                                         </div>
@@ -343,77 +345,6 @@
         </div>
     </div>
 
-    <!-- Filter Modal -->
-{#    <div class="modal fade" id="filterModal" tabindex="-1" role="dialog"#}
-{#         aria-labelledby="filterModalLabel" aria-hidden="true">#}
-{#        <div class="modal-dialog my-6" role="document">#}
-{#            <div class="modal-content">#}
-{#                <div class="modal-header mt-2 align-items-center">#}
-{#                    <h5 class="modal-title" style="margin-left: auto">#}
-{#                        <i class="ni ni-ui-04 text-blue" style="font-size: 1.5rem"></i>#}
-{#                    </h5>#}
-{#                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"#}
-{#                          id="filterModalLabel">Filter</span>#}
-{#                    <button type="button" class="close mt--4" style="margin-left: -30px"#}
-{#                            data-dismiss="modal" aria-label="Close">#}
-{#                        <span aria-hidden="true">&times;</span>#}
-{#                    </button>#}
-{#                </div>#}
-{#                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">#}
-{#                #}
-{#                    <form action="{% url 'filter_clients' %}" id="filterClients" method="post"#}
-{#                          onsubmit="disableButtonsFile()">#}
-{#                        {% csrf_token %}#}
-{#                        <input type="hidden" name="sort_by" value="{{ sorted_by }}">#}
-{#                        <input type="hidden" name="sort_type" value="{{ sort_type }}">#}
-{#                        <div class="row">#}
-{#                            <div class="col-sm form-group form-control-label">#}
-{#                                <label for="officeInput">Office</label>#}
-{#                                <select class="form-control" id="officeInput" name="office">#}
-{#                                    <option value="all"></option>#}
-{#                                    {% for office in offices %}#}
-{#                                        <option value="{{ office.id }}"#}
-{#                                                {% if 'office=' in filters and filters|extract_from_key:'office' == office.id %} selected {% endif %}>#}
-{#                                            {{ office.company_name }}#}
-{#                                        </option>#}
-{#                                    {% endfor %}#}
-{#                                </select>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </form>#}
-{#                    <form action="{% url 'sort_clients' %}" method="post" id="unfilterForm">#}
-{#                        {% csrf_token %}#}
-{#                        <input type="hidden" value="{{ sorted_by }}" name="sort_by">#}
-{#                        {% if sort_type == 'asc' %}#}
-{#                            <input type="hidden" value="True" name="asc">#}
-{#                        {% elif sort_type == 'desc' %}#}
-{#                            <input type="hidden" value="True" name="desc">#}
-{#                        {% endif %}#}
-{#                    </form>#}
-{##}
-{#                </div>#}
-{#                <div class="modal-footer">#}
-{#                    <button class="btn btn-secondary" data-dismiss="modal" form="uploadDocument"#}
-{#                            id="cancelButtonFile" type="button">#}
-{#                        Cancel#}
-{#                    </button>#}
-{#                    {% if filters and sorted_by %}#}
-{#                        <button type="submit" class="btn btn-danger" id="filterButton" form="unfilterForm">#}
-{#                            Unfilter#}
-{#                        </button>#}
-{#                    {% elif filters %}#}
-{#                        <a href="{% url 'clients_home' %}" class="btn btn-danger">#}
-{#                            Unfilter#}
-{#                        </a>#}
-{#                    {% endif %}#}
-{#                    <button class="btn btn-primary" form="filterClients" type="submit">#}
-{#                        Filter#}
-{#                    </button>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-
     <!-- Sort Modal -->
     <div class="modal fade" id="sortModal" tabindex="-1" role="dialog"
          aria-labelledby="sortModalLabel" aria-hidden="true">
@@ -431,7 +362,8 @@
                     </button>
                 </div>
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="sortClientsForm" method="post" action="{% url 'sort_clients' %}">
+                    <form id="sortClientsForm" method="post" action="{% url 'sort_clients' %}" 
+                          onsubmit="disableByID('sortButton')">
                         {% csrf_token %}
                         <input type="hidden" name="filters" id="filters" value="{{ filters }}">
                         <label class="form-control-label" for="sort">Data</label>
@@ -446,11 +378,6 @@
                                     <option value="name" {% if sorted_by == 'name' %} selected {% endif %}>
                                         Name
                                     </option>
-{#                                    {% if user_profile.user.username|check_group:'collaborator' %}#}
-{#                                        <option value="office" {% if sorted_by == 'office' %} selected {% endif %}>#}
-{#                                            Office#}
-{#                                        </option>#}
-{#                                    {% endif %}#}
                                 </select>
                             </div>
                             <div class="col-4 form-group align-items-center" style="display: flex">
@@ -497,7 +424,8 @@
                     </button>
                 </div>
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="newClientForm" method="post" action="{% url 'create_client' %}">
+                    <form id="newClientForm" method="post" action="{% url 'create_client' %}" 
+                          onsubmit="disableByID('submitButton')">
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-7 form-group form-control-label mb-3">

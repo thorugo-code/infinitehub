@@ -251,7 +251,8 @@
                                                             <div class="modal-body py-0"
                                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                                 <form id="editBankAccountForm{{ account.id }}" method="post"
-                                                                      action="{% url 'collaborator_edit_bank_account' collaborator.slug account.id %}">
+                                                                      action="{% url 'collaborator_edit_bank_account' collaborator.slug account.id %}"
+                                                                      onsubmit="disableByID('editBankAccountButton{{ account.id }}')">
                                                                     {% csrf_token %}
                                                                     <div class="form-group form-control-label">
                                                                         <label for="bankNameInput">Bank</label>
@@ -325,8 +326,9 @@
                                                                         Delete
                                                                     </a>
                                                                 {% endif %}
-                                                                <button class="btn btn-primary" form="editBankAccountForm{{ account.id }}"
-                                                                        type="submit">
+                                                                <button class="btn btn-primary" type="submit"
+                                                                        form="editBankAccountForm{{ account.id }}"
+                                                                        id="editBankAccountButton{{ account.id }}">
                                                                     Submit
                                                                 </button>
                                                             </div>
@@ -367,7 +369,8 @@
                                                                         This action cannot be undone.
                                                                     </p>
                                                                     <form id="deleteBankAccountForm{{ account.id }}" method="post"
-                                                                          action="{% url 'collaborator_delete_bank_account' collaborator.slug account.id %}">
+                                                                          action="{% url 'collaborator_delete_bank_account' collaborator.slug account.id %}"
+                                                                          onsubmit="disableByID('deleteBankAccountButton{{ account.id }}')">
                                                                         {% csrf_token %}
                                                                         <div class="row">
                                                                             <div class="col-sm-7 form-group form-control-label">
@@ -399,6 +402,7 @@
                                                                             type="button">Cancel
                                                                     </button>
                                                                     <button class="btn btn-danger text-white" type="submit"
+                                                                            id="deleteBankAccountButton{{ account.id }}"
                                                                             form="deleteBankAccountForm{{ account.id }}">
                                                                         Delete
                                                                     </button>
@@ -680,11 +684,10 @@
                                                         <span aria-hidden="true">&times;</span>
                                                     </button>
                                                 </div>
-                                                <div class="modal-body py-0"
-                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                     <form action="{% url 'edit_document' collaborator.slug document.id %}"
-                                                          id="editFile{{ document.id }}"
-                                                          method="post">
+                                                          id="editFile{{ document.id }}" method="post" 
+                                                          onsubmit="disableByID('editFileButton{{ document.id }}')">
                                                         {% csrf_token %}
                                                         {% load filters %}
                                                         <div class="form-group mt--1"
@@ -761,6 +764,7 @@
                                                     </a>
                                                     <button class="btn btn-primary text-white"
                                                             type="submit"
+                                                            id="editFileButton{{ document.id }}"
                                                             form="editFile{{ document.id }}">
                                                         Save
                                                     </button>
@@ -793,11 +797,10 @@
                                                         <span aria-hidden="true">&times;</span>
                                                     </button>
                                                 </div>
-                                                <div class="modal-body py-0"
-                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                     <form action="{% url 'delete_document' collaborator.slug document.id %}"
-                                                          id="deleteConfirmDocumentForm{{ document.id }}"
-                                                          method="post">
+                                                          id="deleteConfirmDocumentForm{{ document.id }}" method="post" 
+                                                          onsubmit="disableByID('deleteConfirmDocumentButton{{ document.id }}')">
                                                         {% csrf_token %}
                                                         <div class="form-group mt-4"
                                                              style="display: flex; justify-content: center">
@@ -822,6 +825,7 @@
                                                             type="button">Cancel
                                                     </button>
                                                     <button class="btn btn-danger"
+                                                            id="deleteConfirmDocumentButton{{ document.id }}"
                                                             form="deleteConfirmDocumentForm{{ document.id }}"
                                                             type="submit">Delete
                                                     </button>
@@ -860,11 +864,9 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body py-0"
-                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+            <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                 <form action="{% url 'document_new' collaborator.user.id %}" enctype="multipart/form-data"
-                      id="uploadDocument"
-                      method="post" onsubmit="disableButtonsFile()">
+                      id="uploadDocument" method="post" onsubmit="disableByID('uploadDocumentButton')">
                     {% csrf_token %}
                     <div class="form-group mt-4"
                          style="display: flex; justify-content: center">
@@ -924,7 +926,7 @@
                         id="cancelButtonFile" type="button">
                     Cancel
                 </button>
-                <button class="btn btn-primary" form="uploadDocument" id="uploadButtonFile"
+                <button class="btn btn-primary" form="uploadDocument" id="uploadDocumentButton"
                         type="submit">
                     Upload
                 </button>
@@ -951,11 +953,10 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body py-0"
-                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+            <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                 <form action="{% url 'filter_documents' collaborator.slug %}" enctype="multipart/form-data"
                       id="filterDocument"
-                      method="post" onsubmit="disableButtonsFile()">
+                      method="post" onsubmit="disableByID('filterDocumentButton')">
                     {% csrf_token %}
                     <input type="hidden" name="sort_by" value="{{ sorted_by }}">
                     <input type="hidden" name="sort_type" value="{{ sort_type }}">
@@ -994,7 +995,8 @@
                         </div>
                     </div>
                 </form>
-                <form action="{% url 'sort_documents' collaborator.slug %}" method="post" id="unfilterForm">
+                <form action="{% url 'sort_documents' collaborator.slug %}" method="post" id="unfilterForm" 
+                      onsubmit="disableByID('unfilterDocumentButton')">
                     {% csrf_token %}
                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
                     {% if sort_type == 'asc' %}
@@ -1010,7 +1012,7 @@
                     Cancel
                 </button>
                 {% if filters and sorted_by %}
-                    <button type="submit" class="btn btn-danger" id="filterButton" form="unfilterForm">
+                    <button type="submit" class="btn btn-danger" id="unfilterDocumentButton" form="unfilterForm">
                         Unfilter
                     </button>
                 {% elif filters %}
@@ -1018,7 +1020,7 @@
                         Unfilter
                     </a>
                 {% endif %}
-                <button class="btn btn-primary" form="filterDocument" id="uploadButtonFile"
+                <button class="btn btn-primary" form="filterDocument" id="filterDocumentButton"
                         type="submit">
                     Filter
                 </button>
@@ -1044,7 +1046,8 @@
                 </button>
             </div>
             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form id="sortForm" method="post" action="{% url 'sort_documents' collaborator.slug %}">
+                <form id="sortForm" method="post" action="{% url 'sort_documents' collaborator.slug %}" 
+                      onsubmit="disableByID('sortButton')">
                     {% csrf_token %}
                     <input type="hidden" name="filters" value="{{ filters }}">
                     <label class="form-control-label" for="sortByModalInput">Data</label>
@@ -1107,7 +1110,8 @@
                 </button>
             </div>
             <div class="modal-body pt-3 pb-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form id="collaboratorEditInfosForm" method="post" action="{% url 'fill_collaborator' collaborator.slug %}">
+                <form id="collaboratorEditInfosForm" method="post" action="{% url 'fill_collaborator' collaborator.slug %}" 
+                      onsubmit="disableByID('collaboratorEditInfosButton')">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-8 form-group form-control-label">
@@ -1134,7 +1138,8 @@
                         id="cancelButtonFile" type="button">
                     Cancel
                 </button>
-                <button class="btn btn-success" form="collaboratorEditInfosForm" type="submit">
+                <button class="btn btn-success" id="collaboratorEditInfosButton" 
+                        form="collaboratorEditInfosForm" type="submit">
                     Save
                 </button>
             </div>
@@ -1203,7 +1208,9 @@
                     </button>
                 </div>
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="addBankAccountForm" method="post" action="{% url 'collaborator_add_bank_account' collaborator.slug %}">
+                    <form id="addBankAccountForm" method="post" 
+                          action="{% url 'collaborator_add_bank_account' collaborator.slug %}"
+                          onsubmit="disableByID('addBankAccountButton')">
                         {% csrf_token %}
                         <div class="form-group form-control-label">
                             <label for="bankNameInput">Bank</label>
@@ -1247,7 +1254,7 @@
                             id="cancelButtonFile" type="button">
                         Cancel
                     </button>
-                    <button class="btn btn-primary" form="addBankAccountForm" type="submit">
+                    <button class="btn btn-primary" id="addBankAccountButton" form="addBankAccountForm" type="submit">
                         Submit
                     </button>
                 </div>

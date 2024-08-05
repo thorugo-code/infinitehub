@@ -70,7 +70,8 @@
         <div class="col-xl-7">
 
             <!-- Project Info Card -->
-            <form method="post" id="updateProject" action="{% url 'project_edit' project.slug %}">
+            <form method="post" id="updateProject" action="{% url 'project_edit' project.slug %}" 
+                  onsubmit="disableByID('updateProjectSaveButton')">
                 {% csrf_token %}
                 <div class="card shadow">
                     <div class="card-header">
@@ -80,7 +81,7 @@
                             </div>
                             {% if edit_mode %}
                                 <div class="col text-right">
-                                    <button type="submit" class="btn btn-sm btn-success">
+                                    <button type="submit" class="btn btn-sm btn-success" id="updateProjectSaveButton">
                                         Save
                                     </button>
                                 </div>
@@ -408,9 +409,9 @@
                                         </div>
                                         <div class="modal-body pb-0"
                                              style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form method="post"
-                                                  id="deleteLinkConfirmForm{{ link.id }}"
-                                                  action="{% url 'delete_link' project.slug link.id %}">
+                                            <form method="post" id="deleteLinkConfirmForm{{ link.id }}"
+                                                  action="{% url 'delete_link' project.slug link.id %}"
+                                                  onsubmit="disableByID('deleteLinkConfirmButton{{ link.id }}')">
                                                 {% csrf_token %}
                                                 <div class="form-group">
                                                     <p class="text-center">Are you sure you want to delete this
@@ -428,6 +429,7 @@
                                             </button>
 
                                             <button type="submit" class="btn btn-danger"
+                                                    id="deleteLinkConfirmButton{{ link.id }}"
                                                     form="deleteLinkConfirmForm{{ link.id }}">
                                                 Delete
                                             </button>
@@ -508,73 +510,68 @@
                                         </div>
                                         <div class="modal-body py-0"
                                              style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form method="post"
-                                                  id="downloadFile{{ uploaded_file.pk }}"
-                                                  action="{% url 'delete_file' project.slug uploaded_file.pk %}">
-                                                {% csrf_token %}
-                                                <div class="form-group mt--1"
-                                                     style="display: flex; justify-content: center">
-                                                    <img id="filePreviewModal" alt="New File"
-                                                         src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
-                                                         style="height: 130px"/>
+                                            <div class="form-group mt--1"
+                                                 style="display: flex; justify-content: center">
+                                                <img id="filePreviewModal" alt="New File"
+                                                     src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
+                                                     style="height: 130px"/>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group form-control-label col-sm-9">
+                                                    <label for="fileType"
+                                                           style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                    
+                                                    <input type="text" class="form-control"
+                                                           id="fileType"
+                                                           {% if uploaded_file.custom_name %}
+                                                           value="{{ uploaded_file.custom_name }} ({{ uploaded_file.file.name|file_name_only_with_extension }})"
+                                                           {% else %}
+                                                           value="{{ uploaded_file.file|file_name_only_with_extension }}"
+                                                           {% endif %}
+                                                           disabled>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="form-group form-control-label col-sm-9">
-                                                        <label for="fileType"
-                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                        
-                                                        <input type="text" class="form-control"
-                                                               id="fileType"
-                                                               {% if uploaded_file.custom_name %}
-                                                               value="{{ uploaded_file.custom_name }} ({{ uploaded_file.file.name|file_name_only_with_extension }})"
-                                                               {% else %}
-                                                               value="{{ uploaded_file.file|file_name_only_with_extension }}"
-                                                               {% endif %}
-                                                               disabled>
-                                                    </div>
-                                                    <div class="form-group form-control-label col-sm-3">
-                                                        <label for="fileSize"
-                                                               style="font-size:0.8125rem; font-weight:600">Size</label>
-                                                        <input type="text" class="form-control" id="fileSize"
-                                                               value="{{ uploaded_file.file.size|filesizeformat }}"
-                                                               disabled>
-                                                    </div>
+                                                <div class="form-group form-control-label col-sm-3">
+                                                    <label for="fileSize"
+                                                           style="font-size:0.8125rem; font-weight:600">Size</label>
+                                                    <input type="text" class="form-control" id="fileSize"
+                                                           value="{{ uploaded_file.file.size|filesizeformat }}"
+                                                           disabled>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="form-group form-control-label col-sm-4">
-                                                        <label for="fileUploadUser"
-                                                               style="font-size:0.8125rem; font-weight:600">Uploaded
-                                                            By</label>
-                                                        <input type="text" class="form-control"
-                                                               id="fileUploadUser"
-                                                               value="{{ uploaded_file.uploaded_by.first_name }} {{ uploaded_file.uploaded_by.last_name }}"
-                                                               disabled>
-                                                    </div>
-                                                    <div class="form-group form-control-label col-sm-4">
-                                                        <label for="fileType"
-                                                               style="font-size:0.8125rem; font-weight:600">Category</label>
-                                                        <input type="text" class="form-control"
-                                                               id="fileType"
-                                                               value="{{ uploaded_file.category|refformatted_category }}"
-                                                               disabled>
-                                                    </div>
-                                                    <div class="form-group form-control-label col-sm-4">
-                                                        <label for="fileUploadDate"
-                                                               style="font-size:0.8125rem; font-weight:600">Date</label>
-                                                        <input type="date" class="form-control"
-                                                               id="fileUploadDate"
-                                                               value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
-                                                               disabled>
-                                                    </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group form-control-label col-sm-4">
+                                                    <label for="fileUploadUser"
+                                                           style="font-size:0.8125rem; font-weight:600">Uploaded
+                                                        By</label>
+                                                    <input type="text" class="form-control"
+                                                           id="fileUploadUser"
+                                                           value="{{ uploaded_file.uploaded_by.first_name }} {{ uploaded_file.uploaded_by.last_name }}"
+                                                           disabled>
                                                 </div>
-                                                <div class="form-group form-control-label">
-                                                    <label for="fileDescription"
-                                                           style="font-size:0.8125rem; font-weight:600">Description</label>
-                                                    <textarea class="form-control"
-                                                              id="fileDescription"
-                                                              disabled>{{ uploaded_file.description }}</textarea>
+                                                <div class="form-group form-control-label col-sm-4">
+                                                    <label for="fileType"
+                                                           style="font-size:0.8125rem; font-weight:600">Category</label>
+                                                    <input type="text" class="form-control"
+                                                           id="fileType"
+                                                           value="{{ uploaded_file.category|refformatted_category }}"
+                                                           disabled>
                                                 </div>
-                                            </form>
+                                                <div class="form-group form-control-label col-sm-4">
+                                                    <label for="fileUploadDate"
+                                                           style="font-size:0.8125rem; font-weight:600">Date</label>
+                                                    <input type="date" class="form-control"
+                                                           id="fileUploadDate"
+                                                           value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
+                                                           disabled>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-control-label">
+                                                <label for="fileDescription"
+                                                       style="font-size:0.8125rem; font-weight:600">Description</label>
+                                                <textarea class="form-control"
+                                                          id="fileDescription"
+                                                          disabled>{{ uploaded_file.description }}</textarea>
+                                            </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
@@ -617,9 +614,9 @@
                                         </div>
                                         <div class="modal-body py-0"
                                              style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form method="post"
-                                                  id="deleteConfirmForm{{ uploaded_file.pk }}"
-                                                  action="{% url 'delete_file' project.slug uploaded_file.pk %}">
+                                            <form method="post" id="deleteConfirmForm{{ uploaded_file.pk }}"
+                                                  action="{% url 'delete_file' project.slug uploaded_file.pk %}" 
+                                                  onsubmit="disableByID('deleteConfirmButton{{ uploaded_file.pk }}')">
                                                 {% csrf_token %}
                                                 <div class="form-group mt-4"
                                                      style="display: flex; justify-content: center">
@@ -645,6 +642,7 @@
                                             </button>
 
                                             <button type="submit" class="btn btn-danger"
+                                                    id="deleteConfirmButton{{ uploaded_file.pk }}"
                                                     form="deleteConfirmForm{{ uploaded_file.pk }}">
                                                 Delete
                                             </button>
@@ -709,7 +707,8 @@
                                         custom-checkbox-danger {% else %} 
                                         custom-checkbox-info {% endif %}">
                                             <form method="post" id="changeStatusTask{{ task.id }}"
-                                                  action="{% url 'change_task_status' project.slug task.id %}">
+                                                  action="{% url 'change_task_status' project.slug task.id %}" 
+                                                  onsubmit="disableByID('chk-todo-task-{{ task.id }}')">
                                                 {% csrf_token %}
                                                 <label class="custom-control custom-checkbox m-0">
                                                     <input class="custom-control-input"
@@ -781,7 +780,8 @@
                                                     custom-checkbox-danger {% else %} 
                                                     custom-checkbox-info {% endif %}">
                                                         <form method="post" id="changeStatusSubTask{{ subtask.id }}"
-                                                              action="{% url 'change_subtask_status' project.slug task.id subtask.id %}">
+                                                              action="{% url 'change_subtask_status' project.slug task.id subtask.id %}" 
+                                                              onsubmit="disableByID('chk-todo-subtask-{{ subtask.id }}')">
                                                             {% csrf_token %}
                                                             <label class="custom-control custom-checkbox m-0">
                                                                 <input class="custom-control-input"
@@ -832,7 +832,7 @@
                                                          style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                         <form method="post" id="editSubTask{{ subtask.id }}"
                                                               action="{% url 'edit_subtask' project.slug task.id subtask.id %}"
-                                                              onsubmit="disableSubmitTaskButton()">
+                                                              onsubmit="disableByID('editSubTaskButton{{ subtask.id }}')">
                                                             {% csrf_token %}
                                                             <div class="row">
                                                                 <div class="form-group form-control-label col-sm">
@@ -914,7 +914,7 @@
                                                         </a>
                                                         <button type="submit" class="btn btn-success"
                                                                 form="editSubTask{{ subtask.id }}"
-                                                                id="editTaskButton">
+                                                                id="editSubTaskButton{{ subtask.id }}">
                                                             Save
                                                         </button>
                                                     </div>
@@ -947,9 +947,9 @@
                                                     </div>
                                                     <div class="modal-body pb-0"
                                                          style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                        <form method="post"
-                                                              id="deleteSubTaskConfirmForm{{ subtask.id }}"
-                                                              action="{% url 'delete_subtask' project.slug task.id subtask.id %}">
+                                                        <form method="post" id="deleteSubTaskConfirmForm{{ subtask.id }}"
+                                                              action="{% url 'delete_subtask' project.slug task.id subtask.id %}" 
+                                                              onsubmit="disableByID('deleteSubTaskConfirmButton{{ subtask.id }}')">
                                                             {% csrf_token %}
                                                             <div class="form-group">
                                                                 <p class="text-center">Are you sure you want to
@@ -967,6 +967,7 @@
                                                         </button>
 
                                                         <button type="submit" class="btn btn-danger"
+                                                                id="deleteSubTaskConfirmButton{{ subtask.id }}"
                                                                 form="deleteSubTaskConfirmForm{{ subtask.id }}">
                                                             Delete
                                                         </button>
@@ -1001,7 +1002,7 @@
                                              style="padding-left: 2.5rem; padding-right: 2.5rem">
                                             <form method="post" id="submitSubTask{{ task.id }}"
                                                   action="{% url 'submit_subtask' project.slug task.id %}"
-                                                  onsubmit="disableSubmitTaskButton()">
+                                                  onsubmit="disableByID('submitSubTaskButton{{ task.id }}')">
                                                 {% csrf_token %}
                                                 <div class="row">
                                                     <div class="form-group form-control-label col">
@@ -1055,7 +1056,7 @@
                                             </button>
                                             <button type="submit" class="btn btn-primary"
                                                     form="submitSubTask{{ task.id }}"
-                                                    id="submitTaskButton{{ task.id }}">
+                                                    id="submitSubTaskButton{{ task.id }}">
                                                 Submit
                                             </button>
                                         </div>
@@ -1090,7 +1091,7 @@
                                              style="padding-left: 2.5rem; padding-right: 2.5rem">
                                             <form method="post" id="editTask{{ task.id }}"
                                                   action="{% url 'edit_task' project.slug task.id %}"
-                                                  onsubmit="disableSubmitTaskButton()">
+                                                  onsubmit="disableByID('editTaskButton{{ task.id }}')">
                                                 {% csrf_token %}
                                                 <div class="row">
                                                     <div class="form-group form-control-label col-sm">
@@ -1212,9 +1213,9 @@
                                                                     custom-checkbox-medium {% elif subtask.priority == 3 %}
                                                                     custom-checkbox-danger {% else %} 
                                                                     custom-checkbox-info {% endif %}">
-                                                                        <form method="post"
-                                                                              id="changeStatusSubTask{{ subtask.id }}"
-                                                                              action="{% url 'change_subtask_status' project.slug task.id subtask.id %}">
+                                                                        <form method="post" id="changeStatusSubTask{{ subtask.id }}"
+                                                                              action="{% url 'change_subtask_status' project.slug task.id subtask.id %}" 
+                                                                              onsubmit="disableByID('chk-todo-task-{{ subtask.id }}')">
                                                                             {% csrf_token %}
                                                                             <label class="custom-control custom-checkbox m-0">
                                                                                 <input class="custom-control-input"
@@ -1252,7 +1253,7 @@
                                             </a>
                                             <button type="submit" class="btn btn-success"
                                                     form="editTask{{ task.id }}"
-                                                    id="editTaskButton">
+                                                    id="editTaskButton{{ task.id }}">
                                                 Save
                                             </button>
                                         </div>
@@ -1285,9 +1286,9 @@
                                         </div>
                                         <div class="modal-body pb-0"
                                              style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form method="post"
-                                                  id="deleteTaskConfirmForm{{ task.id }}"
-                                                  action="{% url 'delete_task' project.slug task.id %}">
+                                            <form method="post" id="deleteTaskConfirmForm{{ task.id }}"
+                                                  action="{% url 'delete_task' project.slug task.id %}" 
+                                                  onsubmit="disableByID('deleteTaskConfirmButton{{ task.id }}')">
                                                 {% csrf_token %}
                                                 <div class="form-group">
                                                     <p class="text-center">Are you sure you want to delete this
@@ -1305,6 +1306,7 @@
                                             </button>
 
                                             <button type="submit" class="btn btn-danger"
+                                                    id="deleteTaskConfirmButton{{ task.id }}"
                                                     form="deleteTaskConfirmForm{{ task.id }}">
                                                 Delete
                                             </button>
@@ -1348,7 +1350,7 @@
             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                 <form id="profilePictureForm" method="post"
                       action="{% url 'project_edit' project.slug %}" enctype="multipart/form-data"
-                      onsubmit="disableButtons()">
+                      onsubmit="disableByID('profilePictureButton')">
                     {% csrf_token %}
                     <div class="form-group my-6 mb-0"
                          style="display: flex; justify-content: center">
@@ -1372,7 +1374,7 @@
                         id="cancelButton">Cancel
                 </button>
                 <button type="submit" class="btn btn-primary" form="profilePictureForm"
-                        id="uploadButton">Save
+                        id="profilePictureButton">Save
                 </button>
             </div>
         </div>
@@ -1401,14 +1403,14 @@
                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                 <form method="post" id="submitTask"
                       action="{% url 'submit_task' project.slug %}"
-                      onsubmit="disableSubmitTaskButton()">
+                      onsubmit="disableByID('submitTaskButton')">
                     {% csrf_token %}
                     <div class="row">
                         <div class="form-group form-control-label col">
                             <label for="taskTitle">Title</label>
                             <input type="text" class="form-control"
                                    id="taskTitle"
-                                   name="taskTitle" required="" autofocus="">
+                                   name="taskTitle" required>
                         </div>
                         <div class="form-group form-control-label col-4">
                             <label for="taskPriorityInput">Priority</label>
@@ -1480,7 +1482,8 @@
             </div>
             <div class="modal-body py-0"
                  style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form method="post" id="submitLink" action="{% url 'add_link' project.slug %}">
+                <form method="post" id="submitLink" action="{% url 'add_link' project.slug %}" 
+                      onsubmit="disableByID('submitLinkButton')">
                     {% csrf_token %}
                     <div class="form-group form-control-label">
                         <label for="linkTitle">Title</label>
@@ -1523,9 +1526,8 @@
             </div>
             <div class="modal-body py-0"
                  style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form method="post" id="uploadFile"
-                      action="{% url 'upload_file' project.slug %}"
-                      enctype="multipart/form-data" onsubmit="disableButtonsFile()">
+                <form method="post" id="uploadFile" action="{% url 'upload_file' project.slug %}"
+                      enctype="multipart/form-data" onsubmit="disableByID('uploadButtonFile')">
                     {% csrf_token %}
                     <div class="form-group form-control-label mb-2">
                         <input type="file" id="documentInput" style="display: none"
@@ -1720,14 +1722,6 @@
         function disableButtonsFile() {
             const cancelButton = document.getElementById("cancelButtonFile");
             const uploadButton = document.getElementById("uploadButtonFile");
-
-            cancelButton.setAttribute("disabled", "disabled");
-            uploadButton.setAttribute("disabled", "disabled");
-        }
-
-        function disableSubmitTaskButton() {
-            const cancelButton = document.getElementById("cancelTaskButton");
-            const uploadButton = document.getElementById("submitTaskButton");
 
             cancelButton.setAttribute("disabled", "disabled");
             uploadButton.setAttribute("disabled", "disabled");

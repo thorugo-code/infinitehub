@@ -364,79 +364,74 @@
                                             </div>
                                             <div class="modal-body py-0"
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <form method="post"
-                                                      id="downloadFile{{ uploaded_file.pk }}"
-                                                      action="">
-                                                    {% csrf_token %}
-                                                    <div class="form-group mt--1"
-                                                         style="display: flex; justify-content: center">
-                                                        <img
-                                                                id="filePreviewModal"
-                                                                src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
-                                                                alt="New File"
-                                                                style="height: 130px"/>
-                                                    </div>
-                                                    <div class="form-group form-control-label">
+                                                <div class="form-group mt--1"
+                                                     style="display: flex; justify-content: center">
+                                                    <img
+                                                            id="filePreviewModal"
+                                                            src="/static/assets/img/icons/extensions/1x/{{ uploaded_file.file.name|file_extension_icon }}"
+                                                            alt="New File"
+                                                            style="height: 130px"/>
+                                                </div>
+                                                <div class="form-group form-control-label">
+                                                    <label for="fileType"
+                                                           style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                    <input type="text" class="form-control"
+                                                           id="fileType"
+                                                           value="{{ uploaded_file.file.name|file_name_only_with_extension }}"
+                                                           disabled>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="form-group form-control-label col-sm-4">
                                                         <label for="fileType"
-                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                               style="font-size:0.8125rem; font-weight:600">Category</label>
                                                         <input type="text" class="form-control"
                                                                id="fileType"
-                                                               value="{{ uploaded_file.file.name|file_name_only_with_extension }}"
+                                                               value="{{ uploaded_file.category|refformatted_category }}"
                                                                disabled>
                                                     </div>
-                                                    <div class="row">
-                                                        <div class="form-group form-control-label col-sm-4">
-                                                            <label for="fileType"
-                                                                   style="font-size:0.8125rem; font-weight:600">Category</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="fileType"
-                                                                   value="{{ uploaded_file.category|refformatted_category }}"
-                                                                   disabled>
-                                                        </div>
-                                                        <div class="form-group form-control-label col-sm-4">
-                                                            <label for="fileUploadDate"
-                                                                   style="font-size:0.8125rem; font-weight:600">Date</label>
-                                                            <input type="date" class="form-control"
-                                                                   id="fileUploadDate"
-                                                                   value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
-                                                                   disabled>
-                                                        </div>
-                                                        <div class="form-group form-control-label col-sm-4">
-                                                            <label for="fileSize"
-                                                                   style="font-size:0.8125rem; font-weight:600">Size</label>
-                                                            <input type="text" class="form-control" id="fileSize"
-                                                                   value="{{ uploaded_file.file.size|filesizeformat }}"
-                                                                   disabled>
-                                                        </div>
+                                                    <div class="form-group form-control-label col-sm-4">
+                                                        <label for="fileUploadDate"
+                                                               style="font-size:0.8125rem; font-weight:600">Date</label>
+                                                        <input type="date" class="form-control"
+                                                               id="fileUploadDate"
+                                                               value="{{ uploaded_file.uploaded_at|date:'Y-m-d' }}"
+                                                               disabled>
                                                     </div>
-                                                    <div class="row">
-                                                        <div class="form-group form-control-label col-lg-6">
-                                                            <label for="fileUploadUser"
-                                                                   style="font-size:0.8125rem; font-weight:600">Project</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="fileUploadUser"
-                                                                   value="{{ uploaded_file.project.title }}"
-                                                                   disabled>
-                                                        </div>
-                                                        <div class="form-group form-control-label col-lg-6">
-                                                            <label for="fileValue"
-                                                                   style="font-size:0.8125rem; font-weight:600">Client</label>
-                                                            <input inputmode="decimal"
-                                                                   class="form-control"
-                                                                   id="fileValue"
-                                                                   value="{{ uploaded_file.project.client }}"
-                                                                   placeholder="$ 0.00"
-                                                                   disabled>
-                                                        </div>
+                                                    <div class="form-group form-control-label col-sm-4">
+                                                        <label for="fileSize"
+                                                               style="font-size:0.8125rem; font-weight:600">Size</label>
+                                                        <input type="text" class="form-control" id="fileSize"
+                                                               value="{{ uploaded_file.file.size|filesizeformat }}"
+                                                               disabled>
                                                     </div>
-                                                    <div class="form-group form-control-label">
-                                                        <label for="fileDescription"
-                                                               style="font-size:0.8125rem; font-weight:600">Description</label>
-                                                        <textarea class="form-control"
-                                                                  id="fileDescription"
-                                                                  disabled>{{ uploaded_file.description }}</textarea>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="form-group form-control-label col-lg-6">
+                                                        <label for="fileUploadUser"
+                                                               style="font-size:0.8125rem; font-weight:600">Project</label>
+                                                        <input type="text" class="form-control"
+                                                               id="fileUploadUser"
+                                                               value="{{ uploaded_file.project.title }}"
+                                                               disabled>
                                                     </div>
-                                                </form>
+                                                    <div class="form-group form-control-label col-lg-6">
+                                                        <label for="fileValue"
+                                                               style="font-size:0.8125rem; font-weight:600">Client</label>
+                                                        <input inputmode="decimal"
+                                                               class="form-control"
+                                                               id="fileValue"
+                                                               value="{{ uploaded_file.project.client }}"
+                                                               placeholder="$ 0.00"
+                                                               disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-control-label">
+                                                    <label for="fileDescription"
+                                                           style="font-size:0.8125rem; font-weight:600">Description</label>
+                                                    <textarea class="form-control"
+                                                              id="fileDescription"
+                                                              disabled>{{ uploaded_file.description }}</textarea>
+                                                </div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
@@ -478,9 +473,9 @@
                                             </div>
                                             <div class="modal-body py-0"
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <form method="post"
-                                                      id="deleteConfirmForm{{ uploaded_file.pk }}"
-                                                      action="{% url 'delete_file_from_profile' uploaded_file.pk %}">
+                                                <form method="post" id="deleteConfirmForm{{ uploaded_file.pk }}"
+                                                      action="{% url 'delete_file_from_profile' uploaded_file.pk %}" 
+                                                      onsubmit="disableButtons('deleteConfirmButton{{ uploaded_file.pk }}')">
                                                     {% csrf_token %}
                                                     <div class="form-group mt-4"
                                                          style="display: flex; justify-content: center">
@@ -506,6 +501,7 @@
                                                 </button>
 
                                                 <button type="submit" class="btn btn-danger"
+                                                        id="deleteConfirmButton{{ uploaded_file.pk }}"
                                                         form="deleteConfirmForm{{ uploaded_file.pk }}">
                                                     Delete
                                                 </button>
@@ -883,10 +879,8 @@
                 </div>
                 <div class="modal-body py-0"
                      style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="profilePictureForm" method="post"
-                          action="{% url 'change_profile_picture' %}"
-                          enctype="multipart/form-data"
-                          onsubmit="disableButtons()">
+                    <form id="profilePictureForm" method="post" action="{% url 'change_profile_picture' %}"
+                          enctype="multipart/form-data" onsubmit="disableByID('uploadButton')">
                         {% csrf_token %}
                         <div class="form-group mt-7 mb-0"
                              style="display: flex; justify-content: center">
@@ -903,7 +897,7 @@
                         <div class="form-group form-control-label">
                             <label for="fileInput">Select file</label>
                             <input type="file" class="form-control-file" id="fileInput"
-                                   name="profilePicture"
+                                   name="profilePicture" accept="image/*"
                                    onchange="previewImage(event); enableButtons()">
                         </div>
                     </form>

@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %}  {% endblock title %}
+{% block title %}{% endblock title %}
 
 {% block stylesheets %}
 
@@ -230,7 +230,8 @@
                                                     custom-checkbox-danger {% else %} 
                                                     custom-checkbox-info {% endif %}">
                                                     <form method="post" id="changeStatusTask{{ task.id }}"
-                                                          action="{% url 'meeting_change_task_status' meeting.id task.id %}">
+                                                          action="{% url 'meeting_change_task_status' meeting.id task.id %}" 
+                                                          onsubmit="disableByID('chk-todo-task-{{ task.id }}')">
                                                         {% csrf_token %}
                                                         <label class="custom-control custom-checkbox m-0">
                                                             <input class="custom-control-input"
@@ -328,7 +329,8 @@
                                                             custom-checkbox-danger {% else %} 
                                                             custom-checkbox-info {% endif %}">
                                                                 <form method="post" id="changeStatusSubTask{{ subtask.id }}"
-                                                                      action="{% url 'meeting_change_subtask_status' meeting.id task.id subtask.id %}">
+                                                                      action="{% url 'meeting_change_subtask_status' meeting.id task.id subtask.id %}" 
+                                                                      onsubmit="disableByID('chk-todo-subtask-{{ subtask.id }}')">
                                                                     {% csrf_token %}
                                                                     <label class="custom-control custom-checkbox m-0">
                                                                         <input class="custom-control-input"
@@ -379,7 +381,7 @@
                                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                                 <form method="post" id="editSubTask{{ subtask.id }}"
                                                                       action="{% url 'meeting_edit_subtask' meeting.id task.id subtask.id %}"
-                                                                      onsubmit="disableSubmitTaskButton()">
+                                                                      onsubmit="disableByID('editSubTaskButton{{ subtask.id }}')">
                                                                     {% csrf_token %}
                                                                     <div class="row">
                                                                         <div class="form-group form-control-label col-sm">
@@ -461,7 +463,7 @@
                                                                 </a>
                                                                 <button type="submit" class="btn btn-success"
                                                                         form="editSubTask{{ subtask.id }}"
-                                                                        id="editTaskButton">
+                                                                        id="editSubTaskButton{{ subtask.id }}">
                                                                     Save
                                                                 </button>
                                                             </div>
@@ -494,9 +496,9 @@
                                                             </div>
                                                             <div class="modal-body pb-0"
                                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                                <form method="post"
-                                                                      id="deleteSubTaskConfirmForm{{ subtask.id }}"
-                                                                      action="{% url 'meeting_delete_subtask' meeting.id task.id subtask.id %}">
+                                                                <form method="post" id="deleteSubTaskConfirmForm{{ subtask.id }}"
+                                                                      action="{% url 'meeting_delete_subtask' meeting.id task.id subtask.id %}" 
+                                                                      onsubmit="disableByID('deleteSubTaskConfirmButton{{ subtask.id }}')">
                                                                     {% csrf_token %}
                                                                     <div class="form-group">
                                                                         <p class="text-center">Are you sure you want to
@@ -514,6 +516,7 @@
                                                                 </button>
     
                                                                 <button type="submit" class="btn btn-danger"
+                                                                        id="deleteSubTaskConfirmButton{{ subtask.id }}"
                                                                         form="deleteSubTaskConfirmForm{{ subtask.id }}">
                                                                     Delete
                                                                 </button>
@@ -544,11 +547,10 @@
                                                         <span aria-hidden="true">&times;</span>
                                                     </button>
                                                 </div>
-                                                <div class="modal-body py-0"
-                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                     <form method="post" id="submitSubTask{{ task.id }}"
                                                           action="{% url 'meeting_submit_subtask' meeting.id task.id %}"
-                                                          onsubmit="disableSubmitTaskButton()">
+                                                          onsubmit="disableByID('submitTaskButton{{ task.id }}')">
                                                         {% csrf_token %}
                                                         <div class="row">
                                                             <div class="form-group form-control-label col">
@@ -636,7 +638,8 @@
                                                 <div class="modal-body py-0"
                                                      style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                     <form method="post" id="editTask{{ task.id }}"
-                                                          action="{% url 'meeting_edit_task' meeting.id task.id %}">
+                                                          action="{% url 'meeting_edit_task' meeting.id task.id %}" 
+                                                          onsubmit="disableByID('editTaskButton{{ task.id }}')">
                                                         {% csrf_token %}
                                                         <div class="form-group form-control-label">
                                                             <label for="taskTitleEdit">Title</label>
@@ -774,7 +777,8 @@
                                                                             custom-checkbox-info {% endif %}">
                                                                                 <form method="post"
                                                                                       id="changeStatusSubTask{{ subtask.id }}"
-                                                                                      action="{% url 'meeting_change_subtask_status' meeting.id task.id subtask.id %}">
+                                                                                      action="{% url 'meeting_change_subtask_status' meeting.id task.id subtask.id %}" 
+                                                                                      onsubmit="disableByID('chk-todo-task-{{ subtask.id }}">
                                                                                     {% csrf_token %}
                                                                                     <label class="custom-control custom-checkbox m-0">
                                                                                         <input class="custom-control-input"
@@ -812,7 +816,7 @@
                                                     </a>
                                                     <button type="submit" class="btn btn-success"
                                                             form="editTask{{ task.id }}"
-                                                            id="editTaskButton">
+                                                            id="editTaskButton{{ task.id }}">
                                                         Save
                                                     </button>
                                                 </div>
@@ -845,9 +849,9 @@
                                                 </div>
                                                 <div class="modal-body pb-0"
                                                      style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                    <form method="post"
-                                                          id="deleteTaskConfirmForm{{ task.id }}"
-                                                          action="{% url 'meeting_delete_task' meeting.id task.id %}">
+                                                    <form method="post" id="deleteTaskConfirmForm{{ task.id }}"
+                                                          action="{% url 'meeting_delete_task' meeting.id task.id %}" 
+                                                          onsubmit="disableByID('deleteTaskConfirmButton{{ task.id }}')">
                                                         {% csrf_token %}
                                                         <div class="form-group">
                                                             <p class="text-center">Are you sure you want to delete this
@@ -865,6 +869,7 @@
                                                     </button>
 
                                                     <button type="submit" class="btn btn-danger"
+                                                            id="deleteTaskConfirmButton{{ task.id }}"
                                                             form="deleteTaskConfirmForm{{ task.id }}">
                                                         Delete
                                                     </button>
@@ -1087,7 +1092,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="{% url 'meeting_edit' meeting.id %}">
+            <form method="post" action="{% url 'meeting_edit' meeting.id %}" onsubmit="disableByID('editMeetingModalSubmitButton')">
                 {% csrf_token %}
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                     <div class="form-group form-control-label mb-3">
@@ -1110,7 +1115,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" class="btn btn-primary" id="editMeetingModalSubmitButton">Save</button>
                 </div>
             </form>
         </div>
@@ -1201,14 +1206,6 @@
                     icon.classList.add('down');
                 }
             }
-        }
-
-        function disableSubmitTaskButton() {
-            const cancelButton = document.getElementById("cancelTaskButton");
-            const uploadButton = document.getElementById("submitTaskButton");
-
-            cancelButton.setAttribute("disabled", "disabled");
-            uploadButton.setAttribute("disabled", "disabled");
         }
 
         function submitCheckboxForm(taskId) {

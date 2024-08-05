@@ -244,9 +244,8 @@
                                                     
                                                         {% if perms.home.change_branch %}
                                                             <form action="{% url 'edit_client_branch' client.slug branch.id %}"
-                                                                  enctype="multipart/form-data"
-                                                                  id="editRegionalUnitForm{{ branch.id }}"
-                                                                  method="post" onsubmit="">
+                                                                  enctype="multipart/form-data" id="editRegionalUnitForm{{ branch.id }}"
+                                                                  method="post" onsubmit="disableByID('editRegionalUnitButton{{ branch.id }}')">
                                                                 {% csrf_token %}
                                                                 <div class="form-group form-control-label">
                                                                     <label for="regionalUnitNameInput">Name</label>
@@ -345,7 +344,7 @@
                                                         {% if perms.home.change_branch %}
                                                             <button class="btn btn-primary"
                                                                     form="editRegionalUnitForm{{ branch.id }}"
-                                                                    id="uploadButtonFile"
+                                                                    id="editRegionalUnitButton{{ branch.id }}"
                                                                     type="submit">
                                                                 Submit
                                                             </button>
@@ -381,8 +380,8 @@
                                                         </div>
                                                         <div class="modal-body py-2">
                                                             <form action="{% url 'delete_client_branch' client.slug branch.id %}"
-                                                                  id="deleteBranchForm{{ branch.id }}"
-                                                                  method="post">
+                                                                  id="deleteBranchForm{{ branch.id }}" method="post" 
+                                                                  onsubmit="disableByID('deleteBranchButton{{ branch.id }}')">
                                                                 {% csrf_token %}
                                                                 <div class="form-group form-control-label">
                                                                     <label for="regionalUnitNameInput">Name</label>
@@ -406,6 +405,7 @@
                                                             </button>
                                                             <button class="btn btn-danger"
                                                                     form="deleteBranchForm{{ branch.id }}"
+                                                                    id="deleteBranchButton{{ branch.id }}"
                                                                     type="submit">Delete
                                                             </button>
                                                         </div>
@@ -577,8 +577,8 @@
                                             <div class="modal-body py-0"
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                 <form action="{% url 'edit_client_document' client.slug document.id %}"
-                                                      id="editFile{{ document.id }}"
-                                                      method="post">
+                                                      id="editFile{{ document.id }}" method="post" 
+                                                      onsubmit="disableByID('editFileButton{{ document.id }}')">
                                                     {% csrf_token %}
                                                     {% load filters %}
                                                     <div class="form-group mt--1"
@@ -668,6 +668,7 @@
                                                    href="{% url 'download_client_document' client.slug document.id %}">Download</a>
                                                 <button class="btn btn-primary text-white"
                                                         type="submit"
+                                                        id="editFileButton{{ document.id }}"
                                                         form="editFile{{ document.id }}">
                                                     Save
                                                 </button>
@@ -700,11 +701,10 @@
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
-                                            <div class="modal-body py-0"
-                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                            <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                 <form action="{% url 'delete_client_document' client.slug document.id %}"
-                                                      id="deleteConfirmDocumentForm{{ document.id }}"
-                                                      method="post">
+                                                      id="deleteConfirmDocumentForm{{ document.id }}" method="post" 
+                                                      onsubmit="disableByID('deleteConfirmDocumentButton{{ document.id }}')">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="redirect_to" value="client_details">
                                                     <div class="form-group mt-4"
@@ -728,6 +728,7 @@
                                                         type="button">Cancel
                                                 </button>
                                                 <button class="btn btn-danger"
+                                                        id="deleteConfirmDocumentButton{{ document.id }}"
                                                         form="deleteConfirmDocumentForm{{ document.id }}"
                                                         type="submit">Delete
                                                 </button>
@@ -1059,45 +1060,40 @@
                                                                             <span aria-hidden="true">&times;</span>
                                                                         </button>
                                                                     </div>
-                                                                    <div class="modal-body py-0"
-                                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                                        <form method="post"
-                                                                              id="editInstallmentForm{{ installment.id }}"
-                                                                              action="{% url 'edit_client_bill_installment' client.slug bill.id installment.id %}">
-                                                                            {% csrf_token %}
+                                                                    <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
     
-                                                                            <input type="hidden" value="{{ sorted_by }}"
-                                                                                   name="sort_by">
-                                                                            <input type="hidden" value="{{ sort_type }}"
-                                                                                   name="sort_type">
-                                                                            <input type="hidden" value="{{ filters }}"
-                                                                                   name="filters">
-    
-                                                                            <div class="row">
-                                                                                <div class="col-sm form-group form-control-label">
-                                                                                    <label for="installment_value{{ installment.id }}">Value</label>
-                                                                                    <input type="text" class="form-control" 
-                                                                                           id="installment_value{{ installment.id }}"
-                                                                                           value="{{ installment.value }}" disabled>
-                                                                                </div>
+                                                                        <input type="hidden" value="{{ sorted_by }}"
+                                                                               name="sort_by">
+                                                                        <input type="hidden" value="{{ sort_type }}"
+                                                                               name="sort_type">
+                                                                        <input type="hidden" value="{{ filters }}"
+                                                                               name="filters">
+
+                                                                        <div class="row">
+                                                                            <div class="col-sm form-group form-control-label">
+                                                                                <label for="installment_value{{ installment.id }}">Value</label>
+                                                                                <input type="text" class="form-control" 
+                                                                                       id="installment_value{{ installment.id }}"
+                                                                                       value="{{ installment.value }}" disabled>
+                                                                            </div>
+                                                                            <div class="col-sm-4 form-group form-control-label">
+                                                                                <label for="dueDate">Due date</label>
+                                                                                <input type="date" class="form-control" id="dueDate"
+                                                                                       value="{{ installment.due_date|date:'Y-m-d' }}" 
+                                                                                       disabled>
+                                                                            </div>
+                                                                            {% if installment.paid %}
                                                                                 <div class="col-sm-4 form-group form-control-label">
-                                                                                    <label for="dueDate">Due date</label>
-                                                                                    <input type="date" class="form-control" id="dueDate"
-                                                                                           value="{{ installment.due_date|date:'Y-m-d' }}" 
+                                                                                    <label for="paidAt">Paid at</label>
+                                                                                    <input type="date"
+                                                                                           class="form-control"
+                                                                                           id="paidAt"
+                                                                                           value="{{ installment.paid_at|date:'Y-m-d' }}"
                                                                                            disabled>
                                                                                 </div>
-                                                                                {% if installment.paid %}
-                                                                                    <div class="col-sm-4 form-group form-control-label">
-                                                                                        <label for="paidAt">Paid at</label>
-                                                                                        <input type="date"
-                                                                                               class="form-control"
-                                                                                               id="paidAt"
-                                                                                               value="{{ installment.paid_at|date:'Y-m-d' }}"
-                                                                                               disabled>
-                                                                                    </div>
-                                                                                {% endif %}
-                                                                            </div>
-                                                                            <div class="form-group form-control-label">
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <div class="form-group form-control-label">
                                                                                 <label for="installmentEditInfoInput">Info</label>
                                                                                 <textarea type="date" class="form-control"
                                                                                           id="installmentEditInfoInput"
@@ -1105,7 +1101,6 @@
                                                                                 >{{ installment.payment_info }}</textarea>
                                                                             </div>
     
-                                                                        </form>
                                                                     </div>
                                                                     <div class="modal-footer pt-1">
                                                                         <button type="button" class="btn btn-secondary"
@@ -1121,10 +1116,6 @@
                                                                             Set as paid
                                                                         {% endif %}
                                                                         </a>
-{#                                                                        <button type="submit" class="btn btn-primary"#}
-{#                                                                                form="editInstallmentForm{{ installment.id }}">#}
-{#                                                                            Save#}
-{#                                                                        </button>#}
                                                                         <a href="{% url 'client_balance' client.slug %}#bill{{ bill.id }}&{{ installment.id }}" 
                                                                            class="btn btn-primary">
                                                                             Edit
@@ -1167,9 +1158,9 @@
                                                                             <br>
                                                                             This action can be undone.
                                                                         </p>
-                                                                        <form method="post"
-                                                                              id="paidInstallmentConfirmForm{{ installment.id }}"
-                                                                              action="{% url 'change_client_bill_installment_status' client.slug bill.id installment.id %}">
+                                                                        <form method="post" id="paidInstallmentConfirmForm{{ installment.id }}"
+                                                                              action="{% url 'change_client_bill_installment_status' client.slug bill.id installment.id %}" 
+                                                                              onsubmit="disableByID('paidInstallmentConfirmButton{{ installment.id }}')">
                                                                             {% csrf_token %}
     
                                                                             <input type="hidden" value="{{ sorted_by }}"
@@ -1243,6 +1234,7 @@
                                                                         </button>
                                                                         {% if installment.paid %}
                                                                             <button type="submit" class="btn btn-warning"
+                                                                                    id="paidInstallmentConfirmButton{{ installment.id }}"
                                                                                     form="paidInstallmentConfirmForm{{ installment.id }}">
                                                                                 Set as pending
                                                                             </button>
@@ -1289,9 +1281,9 @@
                                                                             <br>
                                                                             This action cannot be undone.
                                                                         </p>
-                                                                        <form method="post"
-                                                                              id="deleteInstallmentConfirmForm{{ installment.id }}"
-                                                                              action="{% url 'delete_client_bill_installment' client.slug bill.id installment.id %}">
+                                                                        <form method="post" id="deleteInstallmentConfirmForm{{ installment.id }}"
+                                                                              action="{% url 'delete_client_bill_installment' client.slug bill.id installment.id %}" 
+                                                                              onsubmit="disableByID('deleteInstallmentConfirmButton{{ installment.id }}')">
                                                                             {% csrf_token %}
                                                                             <input type="hidden" value="{{ sorted_by }}"
                                                                                    name="sort_by">
@@ -1333,6 +1325,7 @@
                                                                                 data-dismiss="modal">Cancel
                                                                         </button>
                                                                         <button type="submit" class="btn btn-danger"
+                                                                                id="deleteInstallmentConfirmButton{{ installment.id }}"
                                                                                 form="deleteInstallmentConfirmForm{{ installment.id }}">
                                                                             Delete
                                                                         </button>
@@ -1375,96 +1368,88 @@
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
-                                            <div class="modal-body py-0"
-                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <form id="editBillForm{{ bill.id }}" method="post"
-                                                      action="{% url 'edit_client_bill' client.slug bill.id %}"
-                                                      enctype="multipart/form-data"
-                                                      onsubmit=blockSubmit(event,'submitReceiveButton')>
-                                                    {% csrf_token %}
-                                                    <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                                    <input type="hidden" value="{{ sort_type }}"
-                                                           name="sort_type">
-                                                    <input type="hidden" value="{{ filters }}" name="filters">
-                                                    <input type="hidden" value="{{ client.slug }}"
-                                                           name="client_slug">
-                                                    <input type="hidden" value="True" name="client_page">
-                                                    
-                                                    {# OFFICE / REGIONAL #}
-                                                    <div class="row">
-                                                        <div class="col form-group form-control-label mb-3">
-                                                            <label for="beneficiaryDetails">Office</label>
-                                                            <input type="text" class="form-control" 
-                                                                   id="beneficiaryDetails" value="{{ bill.office.company_name }}" 
-                                                                   disabled>
-                                                        </div>
-                                                        <div class="col-6 form-group form-control-label mb-3">
-                                                            <label for="regional">Regional</label>
-                                                            <input type="text" id="regional" class="form-control" 
-                                                                   value="{{ bill.payer.name }}" disabled>
-                                                        </div>
+                                            <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                <input type="hidden" value="{{ sort_type }}"
+                                                       name="sort_type">
+                                                <input type="hidden" value="{{ filters }}" name="filters">
+                                                <input type="hidden" value="{{ client.slug }}"
+                                                       name="client_slug">
+                                                <input type="hidden" value="True" name="client_page">
+                                                
+                                                {# OFFICE / REGIONAL #}
+                                                <div class="row">
+                                                    <div class="col form-group form-control-label mb-3">
+                                                        <label for="beneficiaryDetails">Office</label>
+                                                        <input type="text" class="form-control" 
+                                                               id="beneficiaryDetails" value="{{ bill.office.company_name }}" 
+                                                               disabled>
                                                     </div>
-                                                    {# ORIGIN / METHOD #}
-                                                    <div class="row">
-                                                        <div class="col-6 form-group form-control-label mb-3">
-                                                            <label for="origin">Origin</label>
-                                                            <input type="text" id="origin" class="form-control" 
-                                                                   value="{{ bill.origin }}" disabled>
-                                                        </div>
-                                                        <div class="col-6 form-group form-control-label mb-3">
-                                                            <label for="categoryDetails">Category</label>
-                                                            <input type="text" class="form-control" id="categoryDetails" 
-                                                                   value="{{ bill.category }}" disabled>
-                                                        </div>
+                                                    <div class="col-6 form-group form-control-label mb-3">
+                                                        <label for="regional">Regional</label>
+                                                        <input type="text" id="regional" class="form-control" 
+                                                               value="{{ bill.payer.name }}" disabled>
                                                     </div>
-                                                    {# TOTAL / DUE DATE #}
-                                                    <div class="row">
-                                                        <div class="col form-group form-control-label">
-                                                            <label for="valueDetails{{ bill.id }}">Total</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="valueDetails{{ bill.id }}"
-                                                                   value="{{ bill.total }} ({{ bill.installments_number }}x)" disabled>
-                                                        </div>
-                                                        <div class="col form-group form-control-label"
-                                                             style="flex: 0 0 30%; max-width: 30%">
-                                                            <label for="methodDetails">Method</label>
-                                                            <input type="text" class="form-control" id="methodDetails"
-                                                                   value="{{ bill.method }}" disabled>
-                                                        </div>
-                                                        <div class="col form-group form-control-label"
-                                                             style="flex: 0 0 30%; max-width: 30%">
-                                                            <label for="billDueDateInputDetails">
-                                                                Due date
-                                                            </label>
-                                                            <input type="date" class="form-control"
-                                                                   id="billDueDateInputDetails"
-                                                                   value="{{ bill.due_date|date:'Y-m-d' }}" disabled>
-                                                        </div>
+                                                </div>
+                                                {# ORIGIN / METHOD #}
+                                                <div class="row">
+                                                    <div class="col-6 form-group form-control-label mb-3">
+                                                        <label for="origin">Origin</label>
+                                                        <input type="text" id="origin" class="form-control" 
+                                                               value="{{ bill.origin }}" disabled>
                                                     </div>
-                                                    {# CODE / PROOF #}
-                                                    {% if bill.proof or bill.code or bill.link %}
-                                                        <div class="row">
-                                                            {% if bill.code or bill.link %}
-                                                                <div class="col-auto form-group form-control-label my-3 pr-0 align-items-center d-flex">
-                                                                    <a href="{{ bill.link|default:'#' }}"
-                                                                       class="px-2 ml-1 mr-2 mb-2">
-                                                                        <i class="fas fa-link mr-1"></i> {{ bill.code|default:bill.link|truncatechars:15 }}
-                                                                    </a>
-                                                                </div>
-                                                            {% endif %}
-                                                            {% if bill.proof %}
-                                                                <div class="col my-3 px-2">
-                                                                    <a href="{% url 'download_client_proof' client.slug bill.id %}"
-                                                                       class="btn btn-sm btn-secondary px-2 ml-1 mr-2 mb-2 text-success"  
-                                                                       style="width: 100%">
-                                                                        <i class="fas fa-download mr-1"></i> Proof: {{ bill.proof|file_name_only_with_extension|truncatechars:35 }}
-                                                                    </a>
-                                                                </div>
-                                                            {% endif %}
-                                                        </div>
-                                                    {% endif %}
-
-                                                </form>
+                                                    <div class="col-6 form-group form-control-label mb-3">
+                                                        <label for="categoryDetails">Category</label>
+                                                        <input type="text" class="form-control" id="categoryDetails" 
+                                                               value="{{ bill.category }}" disabled>
+                                                    </div>
+                                                </div>
+                                                {# TOTAL / DUE DATE #}
+                                                <div class="row">
+                                                    <div class="col form-group form-control-label">
+                                                        <label for="valueDetails{{ bill.id }}">Total</label>
+                                                        <input type="text" class="form-control"
+                                                               id="valueDetails{{ bill.id }}"
+                                                               value="{{ bill.total }} ({{ bill.installments_number }}x)" disabled>
+                                                    </div>
+                                                    <div class="col form-group form-control-label"
+                                                         style="flex: 0 0 30%; max-width: 30%">
+                                                        <label for="methodDetails">Method</label>
+                                                        <input type="text" class="form-control" id="methodDetails"
+                                                               value="{{ bill.method }}" disabled>
+                                                    </div>
+                                                    <div class="col form-group form-control-label"
+                                                         style="flex: 0 0 30%; max-width: 30%">
+                                                        <label for="billDueDateInputDetails">
+                                                            Due date
+                                                        </label>
+                                                        <input type="date" class="form-control"
+                                                               id="billDueDateInputDetails"
+                                                               value="{{ bill.due_date|date:'Y-m-d' }}" disabled>
+                                                    </div>
+                                                </div>
+                                                {# CODE / PROOF #}
+                                                {% if bill.proof or bill.code or bill.link %}
+                                                    <div class="row">
+                                                        {% if bill.code or bill.link %}
+                                                            <div class="col-auto form-group form-control-label my-3 pr-0 align-items-center d-flex">
+                                                                <a href="{{ bill.link|default:'#' }}"
+                                                                   class="px-2 ml-1 mr-2 mb-2">
+                                                                    <i class="fas fa-link mr-1"></i> {{ bill.code|default:bill.link|truncatechars:15 }}
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if bill.proof %}
+                                                            <div class="col my-3 px-2">
+                                                                <a href="{% url 'download_client_proof' client.slug bill.id %}"
+                                                                   class="btn btn-sm btn-secondary px-2 ml-1 mr-2 mb-2 text-success"  
+                                                                   style="width: 100%">
+                                                                    <i class="fas fa-download mr-1"></i> Proof: {{ bill.proof|file_name_only_with_extension|truncatechars:35 }}
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                             <div class="modal-footer pb-4 pt-2">
                                                 {% if perms.home.change_bill or bill.proof %}
@@ -1524,9 +1509,9 @@
                                                     bill?
                                                     <br>
                                                     This action can be undone.</p>
-                                                <form method="post"
-                                                      id="paidConfirmForm{{ bill.id }}"
-                                                      action="{% url 'change_client_bill_status' client.slug bill.id %}">
+                                                <form method="post" id="paidConfirmForm{{ bill.id }}"
+                                                      action="{% url 'change_client_bill_status' client.slug bill.id %}" 
+                                                      onsubmit="disableByID('paidConfirmButton{{ bill.id }}')">
                                                     {% csrf_token %}
                                                 
                                                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
@@ -1590,11 +1575,13 @@
                                                 </button>
                                                 {% if bill.paid %}
                                                     <button type="submit" class="btn btn-warning"
+                                                            id="paidConfirmButton{{ bill.id }}"
                                                             form="paidConfirmForm{{ bill.id }}">
                                                         Set as pending
                                                     </button>
                                                 {% else %}
                                                     <button type="submit" class="btn btn-success"
+                                                            id="paidConfirmButton{{ bill.id }}"
                                                             form="paidConfirmForm{{ bill.id }}">
                                                         Set as paid
                                                     </button>
@@ -1633,9 +1620,9 @@
                                                     <br>
                                                     This action cannot be undone.
                                                 </p>
-                                                <form method="post"
-                                                      id="deleteConfirmForm{{ bill.id }}"
-                                                      action="{% url 'delete_client_bill' client.slug bill.id %}">
+                                                <form method="post" id="deleteConfirmForm{{ bill.id }}"
+                                                      action="{% url 'delete_client_bill' client.slug bill.id %}" 
+                                                      onsubmit="disableByID('deleteConfirmButton{{ bill.id }}')">
                                                     {% csrf_token %}
                                                     <input type="hidden" value="{{ sorted_by }}" name="sort_by">
                                                     <input type="hidden" value="{{ sort_type }}"
@@ -1698,6 +1685,7 @@
                                                         data-dismiss="modal">Cancel
                                                 </button>
                                                 <button type="submit" class="btn btn-danger"
+                                                        id="deleteConfirmButton{{ bill.id }}"
                                                         form="deleteConfirmForm{{ bill.id }}">
                                                     Delete
                                                 </button>
@@ -1742,7 +1730,8 @@
                 </button>
             </div>
             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form id="newPageForm" method="post" action="{% url 'create_project' %}">
+                <form id="newPageForm" method="post" action="{% url 'create_project' %}" 
+                      onsubmit="disableByID('newPageButton')">
                     {% csrf_token %}
                     <input type="hidden" name="client" value="{{ client.id }}">
                     <div class="row">
@@ -1796,7 +1785,7 @@
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
                     Cancel
                 </button>
-                <button type="submit" class="btn btn-primary" id="createButton" form="newPageForm">
+                <button type="submit" class="btn btn-primary" id="newPageButton" form="newPageForm">
                     Create
                 </button>
             </div>
@@ -1822,8 +1811,7 @@
             <div class="modal-body py-0"
                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                 <form action="{% url 'new_client_branch' client.slug %}" enctype="multipart/form-data"
-                      id="newRegionalUnitForm"
-                      method="post" onsubmit="">
+                      id="newRegionalUnitForm" method="post" onsubmit="disableByID('newRegionalUnitButton')">
                     {% csrf_token %}
                     <div class="form-group form-control-label">
                         <label for="regionalUnitNameInput">Name</label>
@@ -1869,7 +1857,7 @@
                         id="cancelButtonFile" type="button">
                     Cancel
                 </button>
-                <button class="btn btn-primary" form="newRegionalUnitForm" id="uploadButtonFile"
+                <button class="btn btn-primary" form="newRegionalUnitForm" id="newRegionalUnitButton"
                         type="submit">
                     Submit
                 </button>
@@ -1892,7 +1880,8 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="{% url 'edit_client' client.slug %}">
+            <form method="post" action="{% url 'edit_client' client.slug %}" 
+                  onsubmit="disableByID('editClientSubmitButton{{ client.id }}')">
                 {% csrf_token %}
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                     <div class="row">
@@ -1957,7 +1946,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary" id="editClientSubmitButton{{ client.id }}">
+                        Save changes
+                    </button>
                 </div>
             </form>
         </div>
@@ -1977,10 +1968,8 @@
             </div>
             <div class="modal-body py-0"
                  style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form id="pictureForm" method="post"
-                      action="{% url 'change_client_picture' client.slug %}"
-                      enctype="multipart/form-data"
-                      onsubmit="disableButtons()">
+                <form id="pictureForm" method="post" action="{% url 'change_client_picture' client.slug %}"
+                      enctype="multipart/form-data" onsubmit="disableByID('pictureUploadButton')">
                     {% csrf_token %}
                     <div class="form-group my-5 mb-0"
                          style="display: flex; justify-content: center">
@@ -2004,7 +1993,7 @@
                         id="cancelButton">Cancel
                 </button>
                 <button type="submit" class="btn btn-primary" form="pictureForm"
-                        id="uploadButton">Upload
+                        id="pictureUploadButton">Upload
                 </button>
             </div>
         </div>

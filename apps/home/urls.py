@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, re_path
-from apps.home.views import assets, collaborators, inventory, login, profile, projects, balance, clients, offices, meetings
+from apps.home.views import assets, collaborators, equipments, login, profile, projects, balance, clients, offices, meetings
 
 projects_list_urls = [
 
@@ -210,17 +210,17 @@ collaborators_list_urls = [
          name='download_qrcode_collaborator'),
 ]
 
-inventory_urls = [
+equipments_urls = [
 
-    path('inventory/equipments/', inventory.inventory_list, name='inventory_list'),
+    path('inventory/equipments/', equipments.inventory_list, name='inventory_list'),
 
-    path('inventory/equipments/new', inventory.inventory_list, name='new_equipment'),
+    path('inventory/equipments/new', equipments.inventory_list, name='new_equipment'),
 
-    path('inventory/equipments/id=<int:id>', inventory.inventory_list, name='equipment_details'),
+    path('inventory/equipments/id=<int:id>', equipments.inventory_list, name='equipment_details'),
 
-    path('inventory/equipments/delete=<int:id>', inventory.delete_equipment, name='delete_equipment'),
+    path('inventory/equipments/delete=<int:id>', equipments.delete_equipment, name='delete_equipment'),
 
-    path('inventory/equipments/download/qrcode=<int:equipment_id>', inventory.download_qrcode_inventory,
+    path('inventory/equipments/download/qrcode=<int:equipment_id>', equipments.download_qrcode_inventory,
          name='download_file_from_inventory'),
 ]
 
@@ -328,7 +328,7 @@ base_urls = [
 
 urlpatterns = [
     *projects_list_urls, *projects_page_urls, *assets_urls, *collaborators_page_urls, *collaborators_list_urls,
-    *balance_urls, *inventory_urls, *profile_urls, *clients_list_urls, *offices_urls, *client_page_urls,
+    *balance_urls, *equipments_urls, *profile_urls, *clients_list_urls, *offices_urls, *client_page_urls,
     *client_balance_urls, *client_documents_urls, *meetings_urls, *base_urls
 ]
 
