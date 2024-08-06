@@ -1,7 +1,7 @@
+import os
 import json
+import boto3
 import qrcode
-import random
-import string
 import requests
 from io import BytesIO
 from django.db import models
@@ -9,14 +9,17 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from djmoney.money import Money
 from urllib.parse import urljoin
+from django.conf import settings
+from core.settings import CORE_DIR
 from django.core.files import File
+from django.dispatch import receiver
 from django.utils.text import slugify
 from djmoney.models.fields import MoneyField
+from django.db.models.signals import post_save
 from apps.authentication.models import AuthEmail
 from picklefield.fields import PickledObjectField
 from django.contrib.auth.models import User, Group
 from apps.home.storage_backends import PublicMediaStorage
-from core.settings import CORE_DIR
 
 
 BANKS = json.load(open(f'{CORE_DIR}/apps/static/assets/banks.json', 'r', encoding='utf-8'))
@@ -75,10 +78,17 @@ def custom_upload_path_projects(instance, filename):
 
 
 def upload_path_bills(instance, filename):
-    if instance.client:
-        path = instance.client.name.replace(" ", "_")
-    elif instance.office:
-        path = instance.office.name.replace(" ", "_")
+    if isinstance(instance, BillProof) and instance.bill:
+        obj = instance.bill
+    elif isinstance(instance, Bill):
+        obj = instance
+    else:
+        return f'proofs/bills/temp/{filename}'
+
+    if obj.client:
+        path = obj.client.name.replace(" ", "_")
+    elif obj.office:
+        path = obj.office.company_name.replace(" ", "_")
     else:
         path = 'others'
 
@@ -546,7 +556,7 @@ class Branch(models.Model):
 class Bill(models.Model):
     # Foreign Keys and Relationships
     client = models.ForeignKey(Client, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
-    payer = models.ForeignKey(Branch, related_name='bills', on_delete=models.SET_NULL, null=True)
+    payer = models.ForeignKey(Branch, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
     office = models.ForeignKey(Office, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_bills', on_delete=models.SET_NULL, null=True)
 
@@ -637,6 +647,27 @@ class BillInstallment(models.Model):
     def save(self, *args, **kwargs):
         super().save()
         self.bill.save()
+
+
+class BillProof(models.Model):
+    bill = models.ForeignKey(Bill, related_name='proofs', on_delete=models.CASCADE, null=True)
+
+    file = models.FileField(upload_to=upload_path_bills, null=True, blank=True)
+
+    token = models.CharField(max_length=64, default='')
+
+    def __str__(self):
+        if self.bill:
+            return f'{self.bill.title} - {self.file.name}'
+        else:
+            return self.file.name
+
+    def delete(self, *args, **kwargs):
+        self.file.delete(save=False)
+        super(BillProof, self).delete(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
 
 class Document(models.Model):
@@ -826,3 +857,4 @@ class BankAccount(models.Model):
             self.bank_name = BANKS[self.bank_code]
 
         super().save(*args, **kwargs)
+

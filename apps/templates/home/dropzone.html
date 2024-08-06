@@ -1,0 +1,260 @@
+{% extends 'layouts/base-fullscreen-clean.html' %}
+
+{% block stylesheets %}
+
+    <style>
+        .pointer-hover:hover {
+            cursor: pointer;
+        }
+        .dropzone {
+            border: 0;
+            padding: 0 0;
+            min-height: 0;
+        }
+        .dropzone .dz-message{
+            margin: 0 0;
+        }
+        .dz-preview .dz-error-message {
+            display: none !important;
+        }
+        .dropzone .dz-preview {
+            min-height: 0;
+        }
+        .dropzone .dz-preview .dz-remove {
+            display: none;
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center" style="margin-left: 0; margin-right: 0;height: calc(100vh - 280px)">
+
+    <div class="col-lg-6 col-md-8 col-sm-10">
+    
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Dropzone</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'dropzone_create_object' %}"
+                      enctype="multipart/form-data"
+                      id="dropzoneFormTest" onsubmit="disableByID('submit-all')">
+                    {% csrf_token %}
+                    <input type="hidden" name="ping" value="FORMS SUBMIT">
+                    <div class="dropzone dropzone-multiple dz-clickable" data-toggle="dropzone"
+                         data-dropzone-multiple="" data-dropzone-url="{% url 'dropzone_upload' %}" id="myDropzone">
+                        <div class="dz-default dz-message"><span>Drop files here to upload</span></div>
+                        <ul class="dz-preview dz-preview-multiple list-group list-group-lg list-group-flush"></ul>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col text-right">
+                        <button class="btn btn-sm btn-primary" type="submit" id="submit-all">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Created</h3>
+            </div>
+            <div class="card-body p-0" style="min-height: 4rem; max-height: 11rem; overflow-y: auto;">
+                <ul class="list-group list-group-flush">
+                    {% for obj in objects %}
+                        <li class="list-group-item flex-column align-items-start py-3 px-4 border-bottom-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h4 class="mb-1">
+                                        <a href="{{ obj.path }}" target="_blank" class="text-inherit">{{ obj.file.name }}</a>
+                                    </h4>
+                                </div>
+                                <div class="col-auto text-right">
+                                    <a href="{% url 'dropzone_delete_object' obj.id %}" class="font-weight-light ml-2" style="font-size: 0.8125rem">
+                                        <i class="fas fa-times text-danger"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script src="/static/assets/vendor/dropzone/dist/min/dropzone.min.js"></script>
+
+<!-- Dropzone Initialization -->
+<script>
+
+    function previewExtension(file) {
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        // Define a mapping of file extensions to image URLs
+        const extensionImageMap = {
+            'rvt': '/static/assets/img/icons/extensions/1x/rvt.png',
+            'stp': '/static/assets/img/icons/extensions/1x/stp.png',
+            'igs': '/static/assets/img/icons/extensions/1x/igs.png',
+            'ifc': '/static/assets/img/icons/extensions/1x/ifc.png',
+            'sat': '/static/assets/img/icons/extensions/1x/sat.png',
+            'dxf': '/static/assets/img/icons/extensions/1x/dxf.png',
+            'dwg': '/static/assets/img/icons/extensions/1x/dwg.png',
+            'prt': '/static/assets/img/icons/extensions/1x/prt.png',
+            'catpart': '/static/assets/img/icons/extensions/1x/catpart.png',
+            'catproduct': '/static/assets/img/icons/extensions/1x/catproduct.png',
+            'cgr': '/static/assets/img/icons/extensions/1x/cgr.png',
+            'obj': '/static/assets/img/icons/extensions/1x/obj.png',
+            'stl': '/static/assets/img/icons/extensions/1x/stl.png',
+            'jt': '/static/assets/img/icons/extensions/1x/jt.png',
+            'dgn': '/static/assets/img/icons/extensions/1x/dgn.png',
+            'fbx': '/static/assets/img/icons/extensions/1x/fbx.png',
+            'sldprt': '/static/assets/img/icons/extensions/1x/sldprt.png',
+            'sldasm': '/static/assets/img/icons/extensions/1x/sldasm.png',
+            'rcp': '/static/assets/img/icons/extensions/1x/rcp.png',
+            'rcs': '/static/assets/img/icons/extensions/1x/rcs.png',
+            'pod': '/static/assets/img/icons/extensions/1x/pod.png',
+            'fls': '/static/assets/img/icons/extensions/1x/fls.png',
+            'las': '/static/assets/img/icons/extensions/1x/las.png',
+            'e57': '/static/assets/img/icons/extensions/1x/e57.png',
+            'py': '/static/assets/img/icons/extensions/1x/py.png',
+            'html': '/static/assets/img/icons/extensions/1x/html.png',
+            'css': '/static/assets/img/icons/extensions/1x/css.png',
+            'js': '/static/assets/img/icons/extensions/1x/js.png',
+            'cs': '/static/assets/img/icons/extensions/1x/cs.png',
+            'c': '/static/assets/img/icons/extensions/1x/c.png',
+            'cpp': '/static/assets/img/icons/extensions/1x/cpp.png',
+            'json': '/static/assets/img/icons/extensions/1x/json.png',
+            'xml': '/static/assets/img/icons/extensions/1x/xml.png',
+            'kt': '/static/assets/img/icons/extensions/1x/kt.png',
+            'kts': '/static/assets/img/icons/extensions/1x/kts.png',
+            'exe': '/static/assets/img/icons/extensions/1x/exe.png',
+            'zip': '/static/assets/img/icons/extensions/1x/zip.png',
+            'rar': '/static/assets/img/icons/extensions/1x/rar.png',
+            'assets': '/static/assets/img/icons/extensions/1x/assets.png',
+            'asset': '/static/assets/img/icons/extensions/1x/assets.png',
+            'ress': '/static/assets/img/icons/extensions/1x/ress.png',
+            'sqlite3': '/static/assets/img/icons/extensions/1x/sqlite3.png',
+            'xlsx': '/static/assets/img/icons/extensions/1x/xlsx.png',
+            'docx': '/static/assets/img/icons/extensions/1x/docx.png',
+            'pptx': '/static/assets/img/icons/extensions/1x/pptx.png',
+            'pdf': '/static/assets/img/icons/extensions/1x/pdf.png',
+            'ai': '/static/assets/img/icons/extensions/1x/ai.png',
+            'jpg': '/static/assets/img/icons/extensions/1x/jpg.png',
+            'jpeg': '/static/assets/img/icons/extensions/1x/jpeg.png',
+            'png': '/static/assets/img/icons/extensions/1x/png.png',
+            'gif': '/static/assets/img/icons/extensions/1x/gif.png',
+            'webp': '/static/assets/img/icons/extensions/1x/webp.png',
+            'ico': '/static/assets/img/icons/extensions/1x/ico.png',
+            'mp4': '/static/assets/img/icons/extensions/1x/mp4.png',
+            'avi': '/static/assets/img/icons/extensions/1x/avi.png',
+            'mkv': '/static/assets/img/icons/extensions/1x/mkv.png',
+            'wmv': '/static/assets/img/icons/extensions/1x/wmv.png',
+            'txt': '/static/assets/img/icons/extensions/1x/txt.png',
+            'x_t': '/static/assets/img/icons/extensions/1x/x_t.png',
+            'x_b': '/static/assets/img/icons/extensions/1x/x_b.png',
+            'apk': '/static/assets/img/icons/extensions/1x/apk.png',
+            // Add more extensions and URLs as needed
+        };
+
+        // Check if there's a corresponding image URL for the extension
+        if (extension in extensionImageMap) {
+            return '/static/assets/img/icons/extensions/1x/' + extension + '.png';
+        } else {
+            // If no specific image found, display a default image
+            return '/static/assets/img/icons/extensions/1x/default.png';
+        }
+    }
+        
+    Dropzone.autoDiscover = false;
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzoneElement = document.querySelector('#myDropzone');
+        const formElement = document.querySelector('#dropzoneFormTest');
+        const submitButton = document.querySelector('#submit-all');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        if (dropzoneElement) {
+            const myDropzone = new Dropzone(dropzoneElement, {
+                autoProcessQueue: false,
+                url: '{% url 'dropzone_upload' %}',
+                previewsContainer: '.dz-preview-multiple',
+                clickable: true,
+                addRemoveLinks: true,
+                thumbnailWidth: 80,
+                thumbnailHeight: 80,
+                headers: {
+                    "X-CSRFToken": csrfToken
+                },
+                previewTemplate: `
+                <li class="list-group-item px-0" style="border: 0">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="avatar">
+                                <img class="avatar-img rounded bg-white" src="" alt="..." data-dz-thumbnail>
+                            </div>
+                        </div>
+                        <div class="col ml--3">
+                            <h4 class="mb-1" data-dz-name>...</h4>
+                            <p class="small text-muted mb-0" data-dz-size>...</p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="dropdown">
+                                <a href="#" data-dz-remove>
+                                     <i class="fas fa-times text-danger pointer-hover"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            `,
+                init: function () {
+                    const dzInstance = this;
+
+                    dzInstance.on('addedfile', function (file) {
+                        const thumbnail = file.previewElement.querySelector("[data-dz-thumbnail]");
+                        thumbnail.src = previewExtension(file);
+                    });
+
+                    submitButton.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        
+                        submitButton.disabled = true;
+
+                        if (dzInstance.getQueuedFiles().length > 0) {
+                            dzInstance.processQueue();
+                            if (dzInstance.getUploadingFiles().length === 0) {
+                                formElement.submit();
+                            }
+                        } else {
+                            formElement.submit();
+                        }
+                    });
+
+                    dzInstance.on('sendingmultiple', function (file, xhr, formData) {
+                        formData.append("token", csrfToken);
+                    });
+
+                    dzInstance.on('queuecomplete', function () {
+                        formElement.submit();
+                    });
+                },
+                uploadMultiple: true,
+                parallelUploads: 100,
+            });
+        } else {
+            console.error('Dropzone element not found');
+        }
+    });
+</script>
+
+{% endblock %}

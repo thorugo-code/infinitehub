@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, re_path
-from apps.home.views import assets, collaborators, equipments, login, profile, projects, balance, clients, offices, meetings
+from apps.home.views import (
+    assets, collaborators, equipments, login, profile, projects, balance, clients, offices,
+    meetings, dropzone
+)
 
 projects_list_urls = [
 
@@ -320,6 +323,13 @@ meetings_urls = [
          name='meeting_delete_subtask'),
 ]
 
+dropzone_urls = [
+    path('dropzone/', dropzone.home, name='dropzone'),
+    path('dropzone/upload', dropzone.upload_proofs, name='dropzone_upload'),
+    path('dropzone/create-object', dropzone.create_object, name='dropzone_create_object'),
+    path('dropzone/delete-object-<int:id>', dropzone.delete_object, name='dropzone_delete_object'),
+]
+
 base_urls = [
     path('', login.index, name='home'),
     # Matches any html file
@@ -329,7 +339,7 @@ base_urls = [
 urlpatterns = [
     *projects_list_urls, *projects_page_urls, *assets_urls, *collaborators_page_urls, *collaborators_list_urls,
     *balance_urls, *equipments_urls, *profile_urls, *clients_list_urls, *offices_urls, *client_page_urls,
-    *client_balance_urls, *client_documents_urls, *meetings_urls, *base_urls
+    *client_balance_urls, *client_documents_urls, *meetings_urls, *dropzone_urls, *base_urls
 ]
 
 if settings.DEBUG:
