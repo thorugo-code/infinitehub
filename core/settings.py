@@ -1,6 +1,7 @@
 import os
-from decouple import config
 from unipath import Path
+from requests import get
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).parent
@@ -13,7 +14,7 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # load production server from .env
-ALLOWED_HOSTS = config('SERVER', default='127.0.0.1').split(',')
+ALLOWED_HOSTS = config('SERVER', default='127.0.0.1').split(',') + [get('https://api.ipify.org').content.decode('utf8')]
 
 # Static files S3 settings
 USE_S3 = config('S3', default=False, cast=bool)
@@ -27,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.home',
+    'apps.home.config.MyConfig',
     'apps.authentication',
     'apps.api',
     'apps.members',

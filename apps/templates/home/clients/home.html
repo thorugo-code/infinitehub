@@ -54,24 +54,6 @@
                                         <i class="fas fa-sort"></i>
                                     {% endif %}
                                 </a>
-{#                                <a href="#" class="btn btn-sm {% if filters is None %}btn-neutral{% else %}btn-primary{% endif %}" data-toggle="modal"#}
-{#                                   data-target="#filterModal">#}
-{#                                    <i class="fas fa-filter {% if filters is None %}{% else %}mr-0{% endif %}"></i>#}
-{#                                    {% if filters is not None %}#}
-{#                                        {% load filters %}#}
-{#                                        {% with filters_list=filters|split:'&' %}#}
-{#                                            {% for filter_item in filters_list %}#}
-{#                                                {% if 'office=' in filter_item %}#}
-{#                                                    <span>Office</span>#}
-{#                                                {% elif 'group=' in filter_item %}#}
-{#                                                    <span>#}
-{#                                                        {% if not filters|first_filter:'group' %} | {% endif %}Group#}
-{#                                                    </span>#}
-{#                                                {% endif %}#}
-{#                                            {% endfor %}#}
-{#                                        {% endwith %}#}
-{#                                    {% endif %}#}
-{#                                </a>#}
                                 {% if perms.home.add_client %}
                                     <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
                                        data-target="#newClientModal">

@@ -394,12 +394,7 @@ def delete_bill(request, bill_id):
         return render(request, 'home/page-404.html', context)
 
     if request.method == 'POST':
-        bill = Bill.objects.get(id=bill_id)
-        if bill.proof:
-            file_path = bill.proof
-            file_path.delete(save=False)
-
-        bill.delete()
+        Bill.objects.get(id=bill_id).delete()
 
     sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'

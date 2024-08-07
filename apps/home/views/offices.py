@@ -172,11 +172,7 @@ def delete(request, office_id):
     if not request.user.has_perm('home.delete_office'):
         return render(request, 'home/page-404.html')
 
-    office = Office.objects.get(id=office_id)
-    if office.avatar and 'placeholder.webp' not in office.avatar.name:
-        office.avatar.delete(save=False)
-
-    office.delete()
+    Office.objects.get(id=office_id).delete()
 
     return redirect('offices_home')
 
@@ -448,12 +444,7 @@ def delete_bill(request, slug, bill_id):
         }
         return render(request, 'home/page-404.html', context)
 
-    bill = Bill.objects.get(id=bill_id)
-    file = bill.proof
-    if file:
-        file.delete(save=False)
-
-    bill.delete()
+    Bill.objects.get(id=bill_id).delete()
 
     if request.POST.get('office_page', False):
         return redirect('office_details', slug=slug)
@@ -950,12 +941,7 @@ def delete_document(request, slug, document_id):
     if not request.user.has_perm('home.delete_document'):
         return render(request, 'home/page-404.html')
 
-    document = Document.objects.get(id=document_id)
-
-    if document.file:
-        document.file.delete(save=False)
-
-    document.delete()
+    Document.objects.get(id=document_id).delete()
 
     return redirect('office_documents', slug=slug)
 

@@ -75,10 +75,15 @@ def custom_upload_path_projects(instance, filename):
 
 
 def upload_path_bills(instance, filename):
-    if instance.client:
-        path = instance.client.name.replace(" ", "_")
-    elif instance.office:
-        path = instance.office.name.replace(" ", "_")
+    if isinstance(instance, Bill):
+        obj = instance
+    else:
+        obj = instance.bill
+
+    if obj.client:
+        path = obj.client.name.replace(" ", "_")
+    elif obj.office:
+        path = obj.office.company_name.replace(" ", "_")
     else:
         path = 'others'
 
@@ -466,6 +471,12 @@ class Office(models.Model):
 
     description = models.TextField(default='')
 
+    def delete(self, *args, **kwargs):
+        if 'placeholder.webp' not in self.avatar:
+            self.avatar.delete(save=False)
+
+        super(Office, self).delete(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         super().save()
 
@@ -507,6 +518,12 @@ class Client(models.Model):
 
     def __str__(self):
         return self.name
+
+    def delete(self, *args, **kwargs):
+        if 'placeholder.webp' not in self.avatar:
+            self.avatar.delete(save=False)
+
+        super(Client, self).delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         super().save()
@@ -587,6 +604,13 @@ class Bill(models.Model):
     def __str__(self):
         return self.title
 
+    def delete(self, *args, **kwargs):
+        self.proof.delete(save=False)
+        for proof in self.proofs.all():
+            proof.delete()
+
+        super(Bill, self).delete(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         if self.due_date:
             check_late = datetime.strptime(str(self.due_date), '%Y-%m-%d').date() < datetime.now().date()
@@ -639,6 +663,24 @@ class BillInstallment(models.Model):
         self.bill.save()
 
 
+class BillProof(models.Model):
+    bill = models.ForeignKey(Bill, related_name='proofs', on_delete=models.CASCADE, null=True)
+    file = models.FileField(upload_to=upload_path_bills, null=True, blank=True)
+
+    def __str__(self):
+        if self.bill:
+            return f'{self.bill.title} - {self.file.name}'
+        else:
+            return self.file.name
+
+    def delete(self, *args, **kwargs):
+        self.file.delete(save=False)
+        super(BillProof, self).delete(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
 class Document(models.Model):
     # Foreign Keys and Relationships
     user = models.ForeignKey(User, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
@@ -670,7 +712,8 @@ class Document(models.Model):
         return self.name
 
     def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
+        self.file.delete(save=False)
+        super(Document, self).delete(*args, **kwargs)
 
         if self.category == 'ASO':
             user_profile = Profile.objects.get(user=self.user)

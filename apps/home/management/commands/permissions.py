@@ -44,6 +44,10 @@ class Command(BaseCommand):
             'change_bankaccount',
             'delete_bankaccount',
             'view_bankaccount',
+            'add_billproof',
+            'change_billproof',
+            'delete_billproof',
+            'view_billproof',
         ] + collaborators_permissions_list
 
         staff_permissions_list = [

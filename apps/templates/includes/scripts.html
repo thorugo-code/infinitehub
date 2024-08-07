@@ -7,8 +7,13 @@
 <script>
 
     function disableByID(ID) {
-        const element = document.getElementById("cancelButton");
+        const element = document.getElementById(ID);
         element.setAttribute("disabled", "disabled");
+    }
+    
+    function enableByID(ID) {
+        const element = document.getElementById(ID);
+        element.removeAttribute("disabled");
     }
 
 </script>

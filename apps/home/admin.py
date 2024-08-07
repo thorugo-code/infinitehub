@@ -14,21 +14,6 @@ class UploadFileAdmin(admin.ModelAdmin):
     list_display = ('custom_name', 'file', 'uploaded_at')
 
 
-# class DocumentAdmin(admin.ModelAdmin):
-# class LinkAdmin(admin.ModelAdmin):
-# class BillInstallmentAdmin(admin.ModelAdmin):
-# class BillAdmin(admin.ModelAdmin):
-# class BranchAdmin(admin.ModelAdmin):
-# class ClientAdmin(admin.ModelAdmin):
-# class TaskAdmin(admin.ModelAdmin):
-# class SubTaskAdmin(admin.ModelAdmin):
-# class UploadedFileAdmin(admin.ModelAdmin):
-# class ProfileAdmin(admin.ModelAdmin):
-# class ProjectAdmin(admin.ModelAdmin):
-# class EquipmentsAdmin(admin.ModelAdmin):
-# class BankAccountAdmin(admin.ModelAdmin):
-
-
 admin.site.register(Equipments)
 admin.site.register(Project)
 admin.site.register(Profile)
@@ -44,3 +29,4 @@ admin.site.register(Document)
 admin.site.register(Link)
 admin.site.register(Meeting, MeetingAdmin)
 admin.site.register(BankAccount)
+admin.site.register(BillProof)

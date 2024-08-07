@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, re_path
-from apps.home.views import assets, collaborators, equipments, login, profile, projects, balance, clients, offices, meetings
+from apps.home.views import (
+    assets, collaborators, equipments, login, profile, projects, balance, clients, offices,
+    meetings
+)
 
 projects_list_urls = [
 
@@ -128,7 +131,11 @@ client_balance_urls = [
          clients.installment_delete, name='delete_client_bill_installment'),
 
     path('clients/<slug:slug>/balance/delete/<int:bill_id>', clients.delete_bill, name='delete_client_bill'),
-    path('clients/<slug:slug>/balance/download-bill=<int:bill_id>', clients.download_bill, name='download_client_proof'),
+    path('clients/<slug:slug>/balance/upload-proofs', clients.upload_proofs, name='upload_client_bill_proofs'),
+    path('clients/<slug:slug>/balance/delete-proof-<int:proof_id>', clients.delete_proof,
+         name='delete_client_bill_proof'),
+    path('clients/<slug:slug>/balance/download-bill=<int:bill_id>_<int:proof_id>', clients.download_bill,
+         name='download_client_proof'),
 
     path('clients/<slug:slug>/balance/order', clients.sort_and_filter_bills, name='sort_client_balance'),
     path('clients/<slug:slug>/balance/filter', clients.filter_bills, name='filter_client_balance'),

@@ -133,7 +133,6 @@
         <div class="col">
             <div class="accordion">
                 <div class="card shadow my-0">
-                
                     <div class="row">
                         <div class="col pr-0">
                             <div class="card-header" id="heading1" role="button" data-toggle="collapse"
@@ -151,7 +150,6 @@
                             </a>
                         </div>
                     </div>
-
                     <div id="collapse1" class="collapse" aria-labelledby="heading1" data-parent=".accordion">
                         <div class="card-body p-0">
                             <div class="table-responsive" style="min-height: 10rem; max-height: 20rem">
@@ -420,7 +418,6 @@
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
         </div>
@@ -1369,14 +1366,6 @@
                                                 </button>
                                             </div>
                                             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                                <input type="hidden" value="{{ sort_type }}"
-                                                       name="sort_type">
-                                                <input type="hidden" value="{{ filters }}" name="filters">
-                                                <input type="hidden" value="{{ client.slug }}"
-                                                       name="client_slug">
-                                                <input type="hidden" value="True" name="client_page">
-                                                
                                                 {# OFFICE / REGIONAL #}
                                                 <div class="row">
                                                     <div class="col form-group form-control-label mb-3">
@@ -1429,30 +1418,29 @@
                                                     </div>
                                                 </div>
                                                 {# CODE / PROOF #}
-                                                {% if bill.proof or bill.code or bill.link %}
-                                                    <div class="row">
-                                                        {% if bill.code or bill.link %}
-                                                            <div class="col-auto form-group form-control-label my-3 pr-0 align-items-center d-flex">
-                                                                <a href="{{ bill.link|default:'#' }}"
-                                                                   class="px-2 ml-1 mr-2 mb-2">
-                                                                    <i class="fas fa-link mr-1"></i> {{ bill.code|default:bill.link|truncatechars:15 }}
+                                                {% if bill.proofs or bill.code or bill.link %}
+                                                    {% if bill.code or bill.link %}
+                                                        <div class="form-group form-control-label my-3 pr-0 align-items-center d-flex">
+                                                            <a href="{{ bill.link|default:'#' }}">
+                                                                <i class="fas fa-link px-2"></i> {{ bill.code|default:bill.link|truncatechars:50 }}
+                                                            </a>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if bill.proofs %}
+                                                        {% for proof in bill.proofs.all %}
+                                                            <div class="mb-1">
+                                                                <a href="{% url 'download_client_proof' client.slug bill.id proof.id %}"
+                                                                   class="px-2 text-success">
+                                                                    <i class="fas fa-download text-sm"></i>
                                                                 </a>
+                                                                <span class="text-sm">{{ proof|file_name_only_with_extension|truncatechars:35 }}</span>
                                                             </div>
-                                                        {% endif %}
-                                                        {% if bill.proof %}
-                                                            <div class="col my-3 px-2">
-                                                                <a href="{% url 'download_client_proof' client.slug bill.id %}"
-                                                                   class="btn btn-sm btn-secondary px-2 ml-1 mr-2 mb-2 text-success"  
-                                                                   style="width: 100%">
-                                                                    <i class="fas fa-download mr-1"></i> Proof: {{ bill.proof|file_name_only_with_extension|truncatechars:35 }}
-                                                                </a>
-                                                            </div>
-                                                        {% endif %}
-                                                    </div>
+                                                        {% endfor %}
+                                                    {% endif %}
                                                 {% endif %}
                                             </div>
                                             <div class="modal-footer pb-4 pt-2">
-                                                {% if perms.home.change_bill or bill.proof %}
+                                                {% if perms.home.change_bill or bill.proofs %}
                                                     <button type="button" class="btn btn-secondary"
                                                             data-dismiss="modal">Cancel
                                                     </button>
@@ -1507,8 +1495,6 @@
                                                 <p class="text-center">Are you sure you want to change status of
                                                     this
                                                     bill?
-                                                    <br>
-                                                    This action can be undone.</p>
                                                 <form method="post" id="paidConfirmForm{{ bill.id }}"
                                                       action="{% url 'change_client_bill_status' client.slug bill.id %}" 
                                                       onsubmit="disableByID('paidConfirmButton{{ bill.id }}')">
@@ -1555,17 +1541,10 @@
                                                     </div>
                                                     <div class="form-group form-control-label">
                                                         <label for="installmentEditInfoInput">Info</label>
-                                                        <textarea type="date"
-                                                                  class="form-control"
+                                                        <textarea class="form-control"
                                                                   id="installmentEditInfoInput"
                                                                   name="payment_info"></textarea>
                                                     </div>
-                                                    {% if bill.proof %}
-                                                        <div class="align-items-center d-flex mb-2">
-                                                            <img src="/static/assets/img/icons/extensions/1x/{{ bill.proof.name|file_extension_icon }}" alt="" style="height: 18px">
-                                                            <span class="ml-2 text-sm">{{ bill.proof|file_name_only_with_extension }}</span>
-                                                        </div>
-                                                    {% endif %}
                                                 
                                                 </form>
                                             </div>
@@ -1672,12 +1651,14 @@
                                                                disabled>
                                                     </div>
                                                 </div>
-                                                {% if bill.proof %}
-                                                    <div class="align-items-center d-flex mb-2">
-                                                        <img src="/static/assets/img/icons/extensions/1x/{{ bill.proof.name|file_extension_icon }}"
+                                                {% if bill.proofs %}
+                                                    {% for proof in bill.proofs.all %}
+                                                    <div>
+                                                        <img src="/static/assets/img/icons/extensions/1x/{{ proof|file_extension_icon }}"
                                                              alt="" style="height: 18px">
-                                                        <span class="ml-2 text-sm">{{ bill.proof|file_name_only_with_extension }}</span>
+                                                        <span class="ml-2 text-sm">{{ proof|file_name_only_with_extension }}</span>
                                                     </div>
+                                                    {% endfor %}
                                                 {% endif %}
                                             </div>
                                             <div class="modal-footer pt-1">
@@ -2166,49 +2147,6 @@
         function clearTitle(element, link) {
             $(link).attr('data-original-title', element).tooltip('hide');
         }
-
-        function updateFileName(event) {
-            const fileInput = event.target;
-            const fileNamePlaceholder = document.getElementById('fileNamePlaceholder');
-
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name;
-                fileNamePlaceholder.textContent = fileName;
-            } else {
-                fileNamePlaceholder.textContent = '{#  FILE NAME  #}';
-            }
-        }
-        
-        function updateBillFileName(event, id = 0) {
-            const fileInput = event.target;
-            let fileInputLabel;
-            if (id > 0) {
-                fileInputLabel = document.getElementById(`fileInputLabel${id}`);
-            } else {
-                fileInputLabel = document.getElementById('fileInputLabel');
-            }
-
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name.slice(0, 60);
-                if (fileInput.files[0].name.length > 60) {
-                    fileInputLabel.textContent = fileName + '...';
-                } else {
-                    fileInputLabel.textContent = fileName;
-                }
-                fileInputLabel.classList.remove('btn-neutral');
-                fileInputLabel.classList.add('btn');
-                fileInputLabel.classList.add('btn-sm');
-                fileInputLabel.classList.add('btn-success');
-            } else {
-                fileInputLabel.textContent = 'Attach proof';
-                fileInputLabel.classList.remove('btn-success');
-                fileInputLabel.classList.add('btn');
-                fileInputLabel.classList.add('btn-sm');
-                fileInputLabel.classList.add('btn-neutral');
-            }
-        }
-
-        document.getElementById('documentInput').addEventListener('change', updateFileName);
 
     </script>
 

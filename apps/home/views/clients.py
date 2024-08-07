@@ -2,11 +2,10 @@ import json
 from datetime import datetime, timedelta
 from django.db.models import Q, Sum, F
 from django.shortcuts import render, redirect, get_object_or_404
-from apps.home.models import Profile, Client, Office, Document, Bill, BillInstallment, Branch
-from django.contrib.auth.models import User
+from apps.home.models import Profile, Client, Office, Document, Bill, BillInstallment, BillProof, Branch
 from apps.home.views.balance import INCOME_CATEGORIES, EXPENSE_CATEGORIES, unmask_money, check_late_bills
 from django.core.files.storage import default_storage
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from core.settings import CORE_DIR
 from djmoney.money import Money
 
@@ -639,8 +638,6 @@ def new_bill(request, slug):
             total=unmask_money(request.POST.get('total', ''), currency),
             # Integer Fields
             installments_number=request.POST.get('installments', 0),
-            # File Fields
-            proof=request.FILES.get('proof', None),
             # URL Fields
             link=request.POST.get('link', None),
         )
@@ -680,6 +677,12 @@ def new_bill(request, slug):
             bill.installments_frequency = 0
             bill.save()
 
+        for file in request.FILES.getlist('proofs'):
+            BillProof.objects.create(
+                bill=bill,
+                file=file,
+            ).save()
+
         sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
         sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
         filters = request.POST.get('filters', 'None')
@@ -704,12 +707,7 @@ def delete_bill(request, slug, bill_id):
         }
         return render(request, 'home/page-404.html', context)
 
-    bill = Bill.objects.get(id=bill_id)
-    file = bill.proof
-    if file:
-        file.delete(save=False)
-
-    bill.delete()
+    Bill.objects.get(id=bill_id).delete()
 
     if request.POST.get('client_page', False):
         return redirect('client_details', slug=slug)
@@ -755,74 +753,7 @@ def edit_bill(request, slug, bill_id):
         bill.link = request.POST.get('link', bill.link)
         bill.payment_info = request.POST.get('payment_info', bill.payment_info)
 
-        installments_number_from_form = int(request.POST.get('installments', 0))
-        installments_value_from_form = unmask_money(request.POST.get('installments_value', ''), currency)
-        installments_frequency_from_form = request.POST.get('installments_frequency', 30)
-
-        num_change = [
-            installments_number_from_form != bill.installments_number,
-            installments_number_from_form > 1,
-            installments_value_from_form > 0,
-        ]
-
-        val_change = [
-            installments_value_from_form != bill.installments.filter(paid=False).first(
-            ).value if bill.installments.filter(paid=False) else False,
-            installments_value_from_form > 0,
-        ]
-
-        freq_change = [
-            installments_frequency_from_form != bill.installments_frequency,
-            installments_value_from_form > 0,
-        ]
-
-        if all(freq_change) and bill.due_date is not None:
-            bill.installments_frequency = installments_frequency_from_form
-            for installment in bill.installments.all():
-                installment.due_date = datetime.strptime(
-                    str(bill.due_date), "%Y-%m-%d"
-                ) + timedelta(days=int(installments_frequency_from_form) * (installment.partial_id - 1))
-                installment.save()
-
-        if all(num_change):
-            installments = BillInstallment.objects.filter(bill=bill)
-            installments.delete()
-            bill.installments_number = installments_number_from_form
-            for i in range(1, installments_number_from_form + 1):
-                installment = BillInstallment(
-                    bill=bill,
-                    partial_id=i,
-                    value=installments_value_from_form,
-                    due_date=datetime.strptime(
-                        str(bill.due_date), "%Y-%m-%d"
-                    ) + timedelta(days=int(bill.installments_frequency) * (i - 1)) if bill.due_date else None,
-                )
-                installment.save()
-
-        elif num_change[0] and not num_change[1]:
-            installments = BillInstallment.objects.filter(bill=bill)
-            installments.delete()
-            bill.installments_number = 0
-            bill.installments_frequency = 0
-
-        elif not num_change[0] and all(val_change):
-            installments = BillInstallment.objects.filter(bill=bill)
-            for installment in installments:
-                installment.value = installments_value_from_form
-                installment.save()
-
-        if request.FILES.get('proof') and request.FILES.get('proof') != bill.proof and bill.proof:
-            file = bill.proof
-            if file:
-                file.delete(save=False)
-            bill.proof = request.FILES['proof']
-        else:
-            bill.proof = request.FILES.get('proof', bill.proof)
-
         bill.save()
-
-        if request.POST.get('client_page', False):
-            return redirect('client_details', slug=slug)
 
     sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
     sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
@@ -838,15 +769,14 @@ def edit_bill(request, slug, bill_id):
         return redirect('client_balance', slug=slug)
 
 
-def download_bill(request, slug, bill_id):
+def download_bill(request, slug, bill_id, proof_id):
     if not get_permission(request, 'view', 'bill'):
         context = {
             'user_profile': Profile.objects.get(user=request.user),
         }
         return render(request, 'home/page-404.html', context)
 
-    bill = Bill.objects.get(id=bill_id)
-    file_name = bill.proof.name
+    file_name = Bill.objects.get(id=bill_id).proofs.get(id=proof_id).file.name
     file_content = default_storage.open(file_name).read()
     response = HttpResponse(file_content, content_type='application/octet-stream')
     response['Content-Disposition'] = f'attachment; filename="{file_name.split("/")[-1]}"'
@@ -1077,6 +1007,60 @@ def filter_bills(request, slug):
         return redirect('client_balance', slug=slug)
     else:
         return redirect('filtered_client_balance', filters=filter_string, slug=slug)
+
+
+############################################
+
+
+def upload_proofs(request, slug):
+    if not get_permission(request, 'add', 'billproof'):
+        return render(request, 'home/page-404.html')
+
+    if request.method == "POST" and request.FILES:
+        files = request.FILES.getlist('proofs')
+        for file in files:
+            BillProof.objects.create(
+                file=file,
+                bill=Bill.objects.get(id=request.POST['bill_id'])
+            )
+
+        sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
+        sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
+        filters = request.POST.get('filters', 'None')
+
+        if sorted_by != '' and filters != 'None':
+            return redirect('sorted_filtered_client_balance', slug=slug,
+                            sorted_by=sorted_by, sort_type=sort_type, filters=filters)
+        if sorted_by not in ['', 'None']:
+            return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
+        elif filters != 'None':
+            return redirect('filtered_client_balance', slug=slug, filters=filters)
+        else:
+            return redirect('client_balance', slug=slug)
+
+    return redirect('client_balance', slug=slug)
+
+
+def delete_proof(request, slug, proof_id):
+    if not get_permission(request, 'delete', 'billproof'):
+        return render(request, 'home/page-404.html')
+
+    proof = BillProof.objects.get(id=proof_id)
+    proof.delete()
+
+    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
+    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
+    filters = request.POST.get('filters', 'None')
+
+    if sorted_by != '' and filters != 'None':
+        return redirect('sorted_filtered_client_balance', slug=slug,
+                        sorted_by=sorted_by, sort_type=sort_type, filters=filters)
+    if sorted_by not in ['', 'None']:
+        return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
+    elif filters != 'None':
+        return redirect('filtered_client_balance', slug=slug, filters=filters)
+    else:
+        return redirect('client_balance', slug=slug)
 
 
 ############################################
