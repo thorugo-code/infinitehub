@@ -29,7 +29,7 @@
                         <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                             <li class="breadcrumb-item">
                                 <a href="/">
-                                    <i class="fas fa-home"></i>
+                                    <i class="fas fa-home m-0"></i>
                                 </a>
                             </li>
                             <li class="breadcrumb-item">
@@ -100,7 +100,7 @@
                                 <a data-toggle="tooltip" data-placement="top" title="Copy" class="pointer-hover"
                                    onpointerdown="copyToClipboard('{{ client.contact_email }}', this)"
                                    onpointerleave="clearTitle('Copy', this)">
-                                    <i class="fas fa-envelope pr-2 font-weight-light text-blue"
+                                    <i class="fas fa-envelope pr-2 font-weight-light text-blue m-0"
                                        style="font-size: 90%"></i>
                                 </a>
                                 {{ client.contact_email }}
@@ -110,7 +110,7 @@
                                     <a data-toggle="tooltip" data-placement="top" title="Copy" class="pointer-hover"
                                        onpointerdown="copyToClipboard('{{ client.phone }}', this)"
                                        onpointerleave="clearTitle('Copy', this)">
-                                        <i class="fas fa-phone pr-2 text-blue" style="font-size: 90%"></i>
+                                        <i class="fas fa-phone pr-2 text-blue m-0" style="font-size: 90%"></i>
                                     </a>
                                     {{ client.phone }}
                                 </div>
@@ -120,7 +120,7 @@
                                     <a data-toggle="tooltip" data-placement="top" title="Copy" class="pointer-hover"
                                        onpointerdown="copyToClipboard('{{ client.location }}', this)"
                                        onpointerleave="clearTitle('Copy', this)">
-                                        <i class="fas fa-map-marker-alt pr-2 text-blue" style="font-size: 90%"></i>
+                                        <i class="fas fa-map-marker-alt pr-2 text-blue m-0" style="font-size: 90%"></i>
                                     </a>
                                     <span>{{ client.location }}</span>
                                 </div>
@@ -130,7 +130,7 @@
                                     <a data-toggle="tooltip" data-placement="top" title="Copy" class="pointer-hover"
                                        onpointerdown="copyToClipboard('{{ client.xml_email }}', this)"
                                        onpointerleave="clearTitle('Copy', this)">
-                                        <i class="fas fa-copy pr-2 font-weight-light text-blue"
+                                        <i class="fas fa-copy pr-2 font-weight-light text-blue m-0"
                                            style="font-size: 90%"></i>
                                     </a>
                                     {{ client.xml_email }}
@@ -237,7 +237,7 @@
                         {% elif sorted_by is not None %}
                             <span>{{ sorted_by|capfirst }}</span>
                         {% else %}
-                            <i class="fas fa-sort"></i>
+                            <i class="m-0 fas fa-sort"></i>
                         {% endif %}
                     </a>
                     <a class="btn btn-sm {% if filters is None %}btn-neutral{% else %}btn-primary{% endif %}"
@@ -304,7 +304,7 @@
                     </a>
                     <a class="btn btn-sm btn-neutral" data-toggle="modal" data-target="#newBillModal"
                        href="">
-                        <i class="fas fa-plus"></i>
+                        <i class="fas fa-plus m-0"></i>
                     </a>
                 </div>
             </div>
@@ -318,9 +318,9 @@
                             Title / Status
                             {% if sorted_by == 'title' %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -328,9 +328,9 @@
                             Code
                             {% if sorted_by == 'code' %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -338,9 +338,9 @@
                             Regional
                             {% if sorted_by == 'payer' %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -348,9 +348,9 @@
                             Expiration
                             {% if sorted_by == 'expiration' %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -358,9 +358,9 @@
                             Category
                             {% if sorted_by == 'category' %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -368,9 +368,9 @@
                             Office
                             {% if sorted_by == 'office' %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -378,9 +378,9 @@
                             Origin
                             {% if sorted_by == 'origin' %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -388,9 +388,9 @@
                             Method
                             {% if sorted_by == 'method' %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -398,9 +398,9 @@
                             Total
                             {% if sorted_by == 'total' or 'installment' in sorted_by %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -408,9 +408,9 @@
                             Created
                             {% if sorted_by == 'date' %}
                                 {% if sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up"></i>
+                                    <i class="m-0 fas fa-caret-up"></i>
                                 {% elif sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down"></i>
+                                    <i class="m-0 fas fa-caret-down"></i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -426,7 +426,7 @@
                                 <a class="pointer-hover accordion" data-toggle="collapse" 
                                    data-target="#collapseDetails{{ bill.id }}" aria-expanded="false" 
                                    aria-controls="collapseDetails{{ bill.id }}">
-                                    <i class="fas fa-chevron-down text-muted rotate"></i>
+                                    <i class="m-0 fas fa-chevron-down text-muted rotate"></i>
                                 </a>
                             {% endif %}
                         </td>
@@ -461,7 +461,7 @@
                         <td>
                             {% if bill.link %}
                                 <a href="{{ bill.link }}" target="_blank">
-                                    <i class="fas fa-link"
+                                    <i class="m-0 fas fa-link"
                                        style="font-size: 0.7rem"></i> {{ bill.code|default:'Link'|truncatechars:25 }}
                                 </a>
                             {% else %}
@@ -500,17 +500,17 @@
                             {% if bill.category in income_categories %}
                                 <a href="#" data-toggle="modal" data-target="#detailsBillModal{{ bill.id }}"
                                    class="text-dark">
-                                    <i class="fas fa-plus text-green" style="font-size: 0.7125rem"></i>
+                                    <i class="m-0 fas fa-plus text-green" style="font-size: 0.7125rem"></i>
                                 </a>
                             {% elif bill.category in expense_categories %}
                                 <a href="#" data-toggle="modal" data-target="#detailsBillModal{{ bill.id }}"
                                    class="text-dark">
-                                    <i class="fas fa-minus text-red" style="font-size: 0.7125rem"></i>
+                                    <i class="m-0 fas fa-minus text-red" style="font-size: 0.7125rem"></i>
                                 </a>
                             {% else %}
                                 <a href="#" data-toggle="modal" data-target="#detailsBillModal{{ bill.id }}"
                                    class="text-dark">
-                                    <i class="fas fa-question text-blue" style="font-size: 0.7125rem"></i>
+                                    <i class="m-0 fas fa-question text-blue" style="font-size: 0.7125rem"></i>
                                 </a>
                             {% endif %}
                             <span class="pl-1">{{ bill.category|default:'-'|truncatechars:20 }}</span>
@@ -536,7 +536,7 @@
                             <div class="dropdown">
                                 <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-ellipsis-v"></i>
+                                    <i class="m-0 fas fa-ellipsis-v"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                     <a class="dropdown-item" data-toggle="modal" href=""
@@ -585,28 +585,28 @@
                                                 <div class="col-auto p-0">
                                                     <a class="badge badge-sm badge-secondary" href="#" role="button"
                                                        data-toggle="modal" data-target="#editInstallment{{ installment.id }}">
-                                                        <i class="fas fa-cog"></i>
+                                                        <i class="m-0 fas fa-cog"></i>
                                                     </a>
                                                 </div>
                                                 {% if installment.paid %}
                                                     <div class="col-auto pl-2 pr-0">
                                                         <a class="badge badge-sm badge-success" href="" role="button"
                                                            data-toggle="modal" data-target="#paidInstallmentConfirm{{ installment.id }}">
-                                                            <i class="fas fa-check"></i>
+                                                            <i class="m-0 fas fa-check"></i>
                                                         </a>
                                                     </div>
                                                 {% else %}
                                                     <div class="col-auto pl-2 pr-0">
                                                         <a class="badge badge-sm badge-warning" href="" role="button"
                                                            data-toggle="modal" data-target="#paidInstallmentConfirm{{ installment.id }}">
-                                                            <i class="fas fa-hourglass-half"></i>
+                                                            <i class="m-0 fas fa-hourglass-half"></i>
                                                         </a>
                                                     </div>
                                                 {% endif %}
                                                 <div class="col-auto pl-2">
                                                     <a class="badge badge-sm badge-danger" href="#" role="button"
                                                        data-toggle="modal" data-target="#deleteInstallmentConfirm{{ installment.id }}">
-                                                        <i class="fas fa-trash"></i>
+                                                        <i class="m-0 fas fa-trash"></i>
                                                     </a>
                                                 </div>
                                                 <div class="col-auto">
@@ -925,10 +925,10 @@
                                                                        value="{{ installment.value }}" disabled>
                                                             </div>
                                                             <div class="col form-group form-control-label">
-                                                                <label for="billDueDateInput">Due
+                                                                <label for="installmentDueDateInput{{ installment.value }}">Due
                                                                     date</label>
                                                                 <input type="date" class="form-control"
-                                                                       id="billDueDateInput"
+                                                                       id="installmentDueDateInput{{ installment.value }}"
                                                                        name="bill_due_date" placeholder=""
                                                                        value="{{ installment.due_date|date:'Y-m-d' }}"
                                                                        disabled>
@@ -963,9 +963,11 @@
                                 <div class="modal-header mt-2 align-items-center">
                                     <h5 class="modal-title" style="margin-left: auto">
                                         {% if bill.category in income_categories %}
-                                            <i class="fas fa-plus text-green" style="font-size: 1rem"></i>
+                                            <i class="m-0 fas fa-plus text-green" style="font-size: 1rem"></i>
+                                        {% elif bill.category in expense_categories %}
+                                            <i class="m-0 fas fa-minus text-red" style="font-size: 1rem"></i>
                                         {% else %}
-                                            <i class="fas fa-minus text-red" style="font-size: 1rem"></i>
+                                            <i class="m-0 fas fa-question text-blue" style="font-size: 1rem"></i>
                                         {% endif %}
                                     </h5>
                                     <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
@@ -976,190 +978,247 @@
                                     </button>
                                 </div>
                                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                    <form id="editBillForm{{ bill.id }}" method="post" 
-                                          action="{% url 'edit_client_bill' client.slug bill.id %}"
-                                          enctype="multipart/form-data"
-                                          onsubmit=disableByID('editBillButton{{ bill.id }}')>
-                                        {% csrf_token %}
-                                        <input type="hidden" name="income" value="true">
-                                        <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                                        <input type="hidden" value="{{ sort_type }}" name="sort_type">
-                                        <input type="hidden" value="{{ filters }}" name="filters">
-                                        <input type="hidden" value="{{ client.slug }}" name="client_slug">
-
-                                        {# TITLE / CATEGORY #}
-                                        <div class="row">
-                                            <div class="col-6 form-group form-control-label mb-3">
-                                                <label for="nameDetails">Title</label>
-                                                <input class="form-control" id="nameDetails" name="title" value="{{ bill.title }}" {% if not perms.home.change_bill %}disabled{% endif %}>
-                                            </div>
-                                            <div class="col-6 form-group form-control-label mb-3">
-                                                <label for="categoryDetails">Category</label>
-                                                <select class="form-control" id="categoryDetails" name="category" {% if not perms.home.change_bill %}disabled{% endif %}>
-                                                    <option value=""></option>
-                                                    <optgroup label="Income (+)" class="text-green">
-                                                        {% for category in income_categories %}
-                                                            <option value="{{ category }}" class="text-dark" {% if bill.category == category %}selected{% endif %}>
-                                                                {{ category|capfirst }}
-                                                            </option>
-                                                        {% endfor %}
-                                                    </optgroup>
-                                                    <optgroup label="Expense (-)" class="text-red">
-                                                        {% for category in expense_categories %}
-                                                            <option value="{{ category }}" class="text-dark" {% if bill.category == category %}selected{% endif %}>
-                                                                {{ category|capfirst }}
-                                                            </option>
-                                                        {% endfor %}
-                                                    </optgroup>
-                                                </select>
-                                            </div>
-                                        </div> 
-                                        {# OFFICE / PAYER #}
-                                        <div class="row">
-                                            <div class="col form-group form-control-label mb-3">
-                                                <label for="beneficiaryDetails">Office</label>
-                                                <select class="form-control" id="beneficiaryDetails" name="office_id" {% if not perms.home.change_bill %}disabled{% endif %}>
-                                                    <option value=""></option>
-                                                    {% for office in offices %}
-                                                        <option value="{{ office.id }}" {% if bill.office.id == office.id %}selected{% endif %}>{{ office.company_name }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                            <div class="col-6 form-group form-control-label mb-3">
-                                                <label for="payer">Regional</label>
-                                                <select id="payer" name="payer_id" class="form-control">
-                                                    <option value=""></option>
-                                                    {% for payer in client.branches.all %}
-                                                        <option value="{{ payer.id }}" {% if bill.payer == payer %}selected{% endif %}>{{ payer.name }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                        </div> 
-                                        {# ORIGIN / METHOD / STATUS #}
-                                        <div class="row">
-                                            <div class="col-4 form-group form-control-label mb-3">
-                                                <label for="origin">Origin</label>
-                                                <select id="origin" name="origin" class="form-control">
-                                                    <option value=""></option>
-                                                    <option value="Individual" {% if bill.origin == 'Individual' %}selected{% endif %}>Individual</option>
-                                                    <option value="Sale" {% if bill.origin == 'Sale' %}selected{% endif %}>Sale</option>
-                                                    <option value="Service" {% if bill.origin == 'Service' %}selected{% endif %}>Service</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-4 form-group form-control-label mb-3">
-                                                <label for="methodDetails">Method</label>
-                                                <select class="form-control" id="methodDetails" name="method" {% if not perms.home.change_bill %}disabled{% endif %}>
-                                                    <option value=""></option>
-                                                    <option value="Bank slip" {% if bill.method == 'Bank slip' %}selected{% endif %}>Bank slip</option>
-                                                    <option value="Pix" {% if bill.method == 'Pix' %}selected{% endif %}>Pix</option>
-                                                    <option value="Transfer" {% if bill.method == 'Transfer' %}selected{% endif %}>Transfer</option>
-                                                    <option value="Credit card" {% if bill.method == 'Credit card' %}selected{% endif %}>Credit card</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-4 form-group form-control-label mb-3">
-                                                <label for="status">Status</label>
-                                                <select class="form-control" id="status" name="status">
-                                                    <option value="Paid" {% if bill.paid %}selected{% endif %}>Paid</option>
-                                                    <option value="Paid and reconciled" {% if bill.paid and bill.reconciled %}selected{% endif %}>Paid and reconciled</option>
-                                                    <option value="Pending" {% if not bill.paid %}selected{% endif %}>Pending</option>
-                                                </select>
-                                            </div>
-                                        </div> 
-                                        {# TOTAL / CURRENCY / DUE DATE #}
-                                        <div class="row">
-                                            <div class="col form-group form-control-label">
-                                                <label for="valueInputDetails{{ bill.id }}">Total</label>
-                                                <input inputmode="decimal" class="form-control"
-                                                       id="valueInputDetails{{ bill.id }}"
-                                                       name="total" placeholder="" value="{{ bill.total|without_currency }}" {% if not perms.home.change_bill %}disabled{% endif %}>
-                                            </div>
-                                            <div class="col form-group form-control-label mb-3"
-                                                 style="flex: 0 0 20%; max-width: 20%">
-                                                <label for="currencyDetails">Currency</label>
-                                                <select class="form-control" id="currencyDetails" name="currency" {% if not perms.home.change_bill %}disabled{% endif %}>
-                                                    <option value="BRL" {% if bill.currency == 'BRL' %}selected{% endif %}>BRL</option>
-                                                    {#<option value="USD">USD</option>#}
-                                                    {#<option value="EUR">EUR</option>#}
-                                                </select>
-                                            </div>
-                                            <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
-                                                <label for="billDueDateInputDetails">Due date</label>
-                                                <input type="date" class="form-control"
-                                                       id="billDueDateInputDetails"
-                                                       name="due_date" placeholder=""
-                                                       onchange="unblockSubmit(event,'editBillButton{{ bill.id }}')"
-                                                       value="{{ bill.due_date|date:'Y-m-d' }}" {% if not perms.home.change_bill %}disabled{% endif %}>
-                                            </div>
-                                        </div> 
-                                        {# CODE / LINK #}
-                                        <div class="row">
-                                            <div class="col-6 form-group form-control-label mb-3">
-                                                <label for="code">Code</label>
-                                                <input class="form-control" id="code" name="code" value="{{ bill.code|default:'' }}">
-                                            </div>
-                                            <div class="col-6 form-group form-control-label mb-3">
-                                                <label for="link">Link</label>
-                                                <input type="url" class="form-control" id="link"
-                                                       name="link" value="{{ bill.link|default:'' }}">
-                                            </div>
-                                        </div> 
-                                        {# PAYMENT INFO #}
-                                        {% if bill.paid %}
-                                            <div class="form-group form-control-label">
-                                                <label for="installmentEditInfoInput">Payment info</label>
-                                                <textarea class="form-control"
-                                                          id="installmentEditInfoInput"
-                                                          name="payment_info"
-                                                >{{ bill.payment_info }}</textarea>
-                                            </div>
-                                        {% endif %}
-                                        {# PROOF #}
-                                        {% if bill.proofs.all %}
-                                            <div class="mb-2">
-                                                <span class="form-group form-control-label">Proofs</span>
-                                                <a href="#" class="ml-1" data-dismiss="modal" data-toggle="modal" 
-                                                   data-target="#editProofsModal{{ bill.id }}">
-                                                    <i class="fas fa-cog text-sm"></i>
-                                                </a>
-                                            </div>
-                                            {% for proof in bill.proofs.all %}
-                                                <div class="mb-1">
-                                                    <a href="{% url 'download_client_proof' client.slug bill.id proof.id %}"
-                                                       class="px-2 text-sm text-success">
-                                                        <i class="fas fa-download"></i>
-                                                    </a>
-                                                    <span class="text-sm">
-                                                        {{ proof|file_name_only_with_extension|truncatechars:40 }}
-                                                    </span>
+                                    <div class="wizard-container">
+                                        <div class="wizard-card" data-color="red" id="wizard">
+                                            <form id="editBillForm{{ bill.id }}" method="post" 
+                                                  action="{% url 'edit_client_bill' client.slug bill.id %}"
+                                                  enctype="multipart/form-data"
+                                                  onsubmit=disableByID('editBillButton{{ bill.id }}')>
+                                                {% csrf_token %}
+                                                <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                                                <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                                                <input type="hidden" value="{{ filters }}" name="filters">
+                                                <input type="hidden" value="{{ client.slug }}" name="client_slug">
+                                            
+                                                <div class="wizard-navigation">
+                                                    <ul class="nav nav-pills m-auto" style="width: 70%">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link text-center p-2 active" href="#billInfos{{ bill.id }}" 
+                                                               data-toggle="tab" role="tab" aria-selected="false" disabled>
+                                                                Infos
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link text-center p-2" href="#billPayment{{ bill.id }}"
+                                                               data-toggle="tab" role="tab" disabled>
+                                                                Payment
+                                                            </a>
+                                                        </li>
+                                                    </ul>
                                                 </div>
-                                            {% endfor %}
-                                        {% else %}
-                                            <div class="form-group form-control-label my-3">
-                                                <input type="file" id="documentChangeInput{{ bill.id }}" style="display: none" name="proofs" multiple>
-                                                <label for="documentChangeInput{{ bill.id }}" id="fileInputLabel{{ bill.id }}" class="justify-content-center d-flex">
-                                                    <span class="btn btn-sm {% if bill.proof %}btn-success{% else %}btn-neutral{% endif %} align-items-center" style="width: 100%">
-                                                        {% if bill.proof %}{{ bill.proof|file_name_only_with_extension|truncatechars:40 }}{% else %}Attach proof{% endif %}
-                                                    </span>
-                                                </label>
-                                            </div>
-                                        {% endif %} 
-
-                                    </form>
+                                            
+                                                <div class="tab-content pt-4 mt-2 mb-3">
+                                                
+                                                    <div class="tab-pane active" id="billInfos{{ bill.id }}">
+                                                        {# TITLE / CATEGORY #}
+                                                        <div class="row">
+                                                            <div class="col-6 form-group form-control-label mb-3">
+                                                                <label for="nameDetails">Title</label>
+                                                                <input class="form-control" id="nameDetails" 
+                                                                       name="title" value="{{ bill.title }}" 
+                                                                       {% if not perms.home.change_bill %}disabled{% endif %}>
+                                                            </div>
+                                                            <div class="col-6 form-group form-control-label mb-3">
+                                                                <label for="categoryDetails">Category</label>
+                                                                <select class="form-control" id="categoryDetails" name="category" 
+                                                                        {% if not perms.home.change_bill %}disabled{% endif %}>
+                                                                    <option value=""></option>
+                                                                    <optgroup label="Income (+)" class="text-green">
+                                                                        {% for category in income_categories %}
+                                                                            <option value="{{ category }}" class="text-dark" {% if bill.category == category %}selected{% endif %}>
+                                                                                {{ category|capfirst }}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                    </optgroup>
+                                                                    <optgroup label="Expense (-)" class="text-red">
+                                                                        {% for category in expense_categories %}
+                                                                            <option value="{{ category }}" class="text-dark" {% if bill.category == category %}selected{% endif %}>
+                                                                                {{ category|capfirst }}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                    </optgroup>
+                                                                </select>
+                                                            </div>
+                                                        </div> 
+                                                        {# OFFICE / REGIONAL #}
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="beneficiaryDetails">Office</label>
+                                                                <select class="form-control" id="beneficiaryDetails" name="office_id" {% if not perms.home.change_bill %}disabled{% endif %}>
+                                                                    <option value=""></option>
+                                                                    {% for office in offices %}
+                                                                        <option value="{{ office.id }}" {% if bill.office.id == office.id %}selected{% endif %}>{{ office.company_name }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-6 form-group form-control-label mb-3">
+                                                                <label for="payer">Regional</label>
+                                                                <select id="payer" name="payer_id" class="form-control">
+                                                                    <option value=""></option>
+                                                                    {% for payer in client.branches.all %}
+                                                                        <option value="{{ payer.id }}" {% if bill.payer == payer %}selected{% endif %}>{{ payer.name }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div> 
+                                                        {# ORIGIN / CODE #}
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="origin">Origin</label>
+                                                                <select id="origin" name="origin" class="form-control">
+                                                                    <option value=""></option>
+                                                                    <option value="Individual" {% if bill.origin == 'Individual' %}selected{% endif %}>Individual</option>
+                                                                    <option value="Sale" {% if bill.origin == 'Sale' %}selected{% endif %}>Sale</option>
+                                                                    <option value="Service" {% if bill.origin == 'Service' %}selected{% endif %}>Service</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="code">Code</label>
+                                                                <input class="form-control" id="code" name="code" value="{{ bill.code|default:'' }}">
+                                                            </div>
+                                                        </div> 
+                                                        {# LINK #}
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="link">Link</label>
+                                                                <input type="url" class="form-control" id="link"
+                                                                       name="link" value="{{ bill.link|default:'' }}">
+                                                            </div>
+                                                        </div> 
+                                                    </div>
+                                                
+                                                    <div class="tab-pane" id="billPayment{{ bill.id }}">
+                                                        {# ISSUE DATE / DUE DATE / PAID AT #}
+                                                        <div class="row">
+                                                            <div class="col{% if bill.paid %}-4{% endif %} form-group form-control-label">
+                                                                <label for="billIssueDateInput">Issue date</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="billIssueDateInput"
+                                                                       onchange="enableByID('editBillButton{{ bill.id }}')"
+                                                                       name="issue_date" required
+                                                                       value="{{ bill.issue_date|date:'Y-m-d' }}">
+                                                            </div>
+                                                            <div class="col{% if bill.paid %}-4{% endif %} form-group form-control-label">
+                                                                <label for="billDueDateInputDetails">Due date</label>
+                                                                <input type="date" class="form-control"
+                                                                       id="billDueDateInputDetails"
+                                                                       name="due_date" required
+                                                                       onchange="enableByID('editBillButton{{ bill.id }}')"
+                                                                       value="{{ bill.due_date|date:'Y-m-d' }}" 
+                                                                       {% if not perms.home.change_bill or bill.installments.count > 0 %}disabled{% endif %}>
+                                                            </div>
+                                                            {% if bill.paid %}
+                                                                <div class="col-4 form-group form-control-label">
+                                                                    <label for="billIssueDateInput">Paid at</label>
+                                                                    <input type="date" class="form-control"
+                                                                           id="billIssueDateInput"
+                                                                           onchange="enableByID('newBillButton')"
+                                                                           name="paid_at" value="{{ bill.paid_at|date:'Y-m-d' }}" 
+                                                                           required>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        {# TOTAL / CURRENCY / METHOD #}
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label mb-3"
+                                                                 style="flex: 0 0 20%; max-width: 20%">
+                                                                <label for="currencyDetails">Currency</label>
+                                                                <select class="form-control" id="currencyDetails" 
+                                                                        name="currency" {% if not perms.home.change_bill or bill.installments.count > 0 %}disabled{% endif %}>
+                                                                    <option value="BRL" {% if bill.currency == 'BRL' %}selected{% endif %}>BRL</option>
+                                                                    {#<option value="USD">USD</option>#}
+                                                                    {#<option value="EUR">EUR</option>#}
+                                                                </select>
+                                                            </div>
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="valueInputDetails{{ bill.id }}">Total</label>
+                                                                <input inputmode="decimal" class="form-control"
+                                                                       id="valueInputDetails{{ bill.id }}"
+                                                                       name="total"
+                                                                       value="{{ bill.total|without_currency }}" 
+                                                                       {% if not perms.home.change_bill or bill.installments.count > 0 %}disabled{% endif %}>
+                                                            </div>
+                                                            <div class="col form-group form-control-label mb-3">
+                                                                <label for="methodDetails">Method</label>
+                                                                <select class="form-control" id="methodDetails" name="method" {% if not perms.home.change_bill %}disabled{% endif %}>
+                                                                    <option value=""></option>
+                                                                    <option value="Bank slip" {% if bill.method == 'Bank slip' %}selected{% endif %}>Bank slip</option>
+                                                                    <option value="Pix" {% if bill.method == 'Pix' %}selected{% endif %}>Pix</option>
+                                                                    <option value="Transfer" {% if bill.method == 'Transfer' %}selected{% endif %}>Transfer</option>
+                                                                    <option value="Credit card" {% if bill.method == 'Credit card' %}selected{% endif %}>Credit card</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        {# PAYMENT INFO #}
+                                                        {% if bill.paid %}
+                                                            <div class="form-group form-control-label">
+                                                                <label for="installmentEditInfoInput">Payment info</label>
+                                                                <textarea class="form-control"
+                                                                          id="installmentEditInfoInput"
+                                                                          name="payment_info"
+                                                                >{{ bill.payment_info }}</textarea>
+                                                            </div>
+                                                        {% endif %}
+                                                        {# PROOF #}
+                                                        {% if bill.proofs.all %}
+                                                            <div class="mb-2">
+                                                                <span class="form-group form-control-label">Proofs</span>
+                                                                <a href="#" class="ml-1" data-dismiss="modal" data-toggle="modal" 
+                                                                   data-target="#editProofsModal{{ bill.id }}">
+                                                                    <i class="m-0 fas fa-cog text-sm"></i>
+                                                                </a>
+                                                            </div>
+                                                            {% for proof in bill.proofs.all %}
+                                                                <div class="mb-1">
+                                                                    <a href="{% url 'download_client_proof' client.slug bill.id proof.id %}"
+                                                                       class="px-2 text-sm text-success">
+                                                                        <i class="m-0 fas fa-download"></i>
+                                                                    </a>
+                                                                    <span class="text-sm">
+                                                                        {{ proof|file_name_only_with_extension|truncatechars:40 }}
+                                                                    </span>
+                                                                </div>
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            <div class="form-group form-control-label mt-2">
+                                                                <input type="file" id="documentChangeInput{{ bill.id }}" style="display: none" name="proofs" multiple>
+                                                                <label for="documentChangeInput{{ bill.id }}" id="fileInputLabel{{ bill.id }}" class="justify-content-center d-flex">
+                                                                    <span class="btn btn-sm {% if bill.proof %}btn-success{% else %}btn-neutral{% endif %} align-items-center" style="width: 100%">
+                                                                        {% if bill.proof %}{{ bill.proof|file_name_only_with_extension|truncatechars:40 }}{% else %}Attach proof{% endif %}
+                                                                    </span>
+                                                                </label>
+                                                            </div>
+                                                        {% endif %} 
+                                                    </div>
+                                                    
+                                                </div>
+                                            
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="modal-footer pb-4 pt-2">
+                                <div class="modal-footer pb-4 pt-3">
                                     {% if perms.home.change_bill or bill.proof %}
                                         <button type="button" class="btn btn-secondary"
                                                 data-dismiss="modal">Cancel
                                         </button>
                                     {% endif %}
+                                    {% if perms.home.delete_bill %}
+                                        <a class="btn btn-danger" href="#"
+                                           data-dismiss="modal"
+                                           data-toggle="modal"
+                                           data-target="#deleteConfirm{{ bill.id }}">
+                                            Delete
+                                        </a>
+                                    {% endif %}
                                     {% if bill.paid and perms.home.change_bill %}
-                                        <a class="btn btn-warning ml-1 mr-2" href="" data-dismiss="modal"
+                                        <a class="btn btn-warning ml-1 mr-2" href="#" data-dismiss="modal"
                                            data-toggle="modal"
                                            data-target="#paidConfirm{{ bill.id }}">
                                             Set as pending
                                         </a>
                                     {% elif perms.home.change_bill %}
-                                        <a class="btn btn-success ml-1 mr-2" href="" data-dismiss="modal"
+                                        <a class="btn btn-success ml-1 mr-2" href="#" data-dismiss="modal"
                                            data-toggle="modal"
                                            data-target="#paidConfirm{{ bill.id }}">
                                             Set as paid
@@ -1184,7 +1243,7 @@
                             <div class="modal-content">
                                 <div class="modal-header mt-2 align-items-center">
                                     <h5 class="modal-title" style="margin-left: auto">
-                                        <i class="fas fa-paperclip text-blue" style="font-size: 1rem"></i>
+                                        <i class="m-0 fas fa-paperclip text-blue" style="font-size: 1rem"></i>
                                     </h5>
                                     <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
                                           id="editProofsModal{{ bill.id }}Label">Proofs</span>
@@ -1212,7 +1271,7 @@
                                                     <div class="col-auto">
                                                         <a href="#" data-dismiss="modal" data-toggle="modal" 
                                                            data-target="#deleteProofConfirmModal{{ proof.id }}">
-                                                            <i class="fas fa-times text-danger pointer-hover"></i>
+                                                            <i class="m-0 fas fa-times text-danger pointer-hover"></i>
                                                         </a>
                                                     </div>
                                                 </div>
@@ -1440,10 +1499,10 @@
                                                    value="{{ bill.total }}" disabled>
                                         </div>
                                         <div class="col form-group form-control-label">
-                                            <label for="billDueDateInput">Due
+                                            <label for="billDueDateInput{{ bill.id }}">Due
                                                 date</label>
                                             <input type="date" class="form-control"
-                                                   id="billDueDateInput"
+                                                   id="billDueDateInput{{ bill.id }}"
                                                    name="bill_due_date" placeholder=""
                                                    value="{{ bill.due_date|date:'Y-m-d' }}"
                                                    disabled>
@@ -1493,7 +1552,7 @@
         <div class="modal-content">
             <div class="modal-header mt-2 align-items-center">
                 <h5 class="modal-title" style="margin-left: auto">
-                    <i class="fas fa-plus text-blue" style="font-size: 1rem"></i>
+                    <i class="m-0 fas fa-plus text-blue" style="font-size: 1rem"></i>
                 </h5>
                 <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
                       id="newPageModalLabel">Bills</span>
@@ -1503,183 +1562,228 @@
                 </button>
             </div>
             <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                <form id="newBillForm" method="post" action="{% url 'new_client_bill' client.slug %}"
-                      enctype="multipart/form-data"
-                      onsubmit=disableByID('newBillButton')>
-                    {% csrf_token %}
-                    <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                    <input type="hidden" value="{{ sort_type }}" name="sort_type">
-                    <input type="hidden" value="{{ filters }}" name="filters">
-
-                    {# TITLE / CATEGORY #}
-                    <div class="row">
-                        <div class="col-6 form-group form-control-label mb-3">
-                            <label for="name">Title</label>
-                            <input class="form-control" id="name" name="title">
-                        </div>
-                        <div class="col-6 form-group form-control-label mb-3">
-                            <label for="category">Category</label>
-                            <select class="form-control" id="category" name="category">
-                                <option value=""></option>
-                                <optgroup label="Income (+)" class="text-green">
-                                    {% for category in income_categories %}
-                                        <option value="{{ category }}" class="text-dark">
-                                            {{ category|capfirst }}
-                                        </option>
-                                    {% endfor %}
-                                </optgroup>
-                                <optgroup label="Expense (-)" class="text-red">
-                                    {% for category in expense_categories %}
-                                        <option value="{{ category }}" class="text-dark">
-                                            {{ category|capfirst }}
-                                        </option>
-                                    {% endfor %}
-                                </optgroup>
-                            </select>
-
-                        </div>
-                    </div>
-                    {# OFFICE / PAYER #}
-                    <div class="row">
-                        <div class="col form-group form-control-label">
-                            <label for="beneficiary">Office</label>
-                            <select class="form-control" id="beneficiary" name="office_id">
-                                <option value=""></option>
-                                {% for office in offices %}
-                                    <option value="{{ office.id }}">{{ office.company_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-6 form-group form-control-label mb-3">
-                            <label for="payer">Regional</label>
-                            <select id="payer" name="payer_id" class="form-control">
-                                <option value=""></option>
-                                {% for payer in client.branches.all %}
-                                    <option value="{{ payer.id }}">{{ payer.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div> 
-                    {# ORIGIN / METHOD / STATUS #}
-                    <div class="row">
-                        <div class="col-4 form-group form-control-label mb-3">
-                            <label for="origin">Origin</label>
-                            <select id="origin" name="origin" class="form-control">
-                                <option value=""></option>
-                                <option value="Individual">Individual</option>
-                                <option value="Sale">Sale</option>
-                                <option value="Service">Service</option>
-                            </select>
-                        </div>
-                        <div class="col-4 form-group form-control-label">
-                            <label for="billMethodInput">Method</label>
-                            <select class="form-control" id="billMethodInput" name="method">
-                                <option value=""></option>
-                                <option value="Bank slip">Bank slip</option>
-                                <option value="Pix">Pix</option>
-                                <option value="Transfer">Transfer</option>
-                                <option value="Credit card">Credit card</option>
-                            </select>
-                        </div>
-                        <div class="col-4 form-group form-control-label mb-3">
-                            <label for="status">Status</label>
-                            <select class="form-control" id="status" name="status">
-                                <option value="Paid">Paid</option>
-                                <option value="Paid and reconciled">Paid and reconciled</option>
-                                <option value="Pending" selected>Pending</option>
-                            </select>
-                        </div>
-                    </div> 
-                    {# TOTAL / CURRENCY / DUE DATE #}
-                    <div class="row">
-                        <div class="col form-group form-control-label">
-                            <label for="valueInput">Total</label>
-                            <input inputmode="decimal" class="form-control" id="valueInput" name="total" placeholder="">
-                        </div>
-                        <div class="col form-group form-control-label mb-3"
-                             style="flex: 0 0 20%; max-width: 20%">
-                            <label for="currency">Currency</label>
-                            <select class="form-control" id="currency" name="currency">
-                                <option value="BRL">BRL</option>
-                                {#<option value="USD">USD</option>#}
-                                {#<option value="EUR">EUR</option>#}
-                            </select>
-                        </div>
-                        <div class="col form-group form-control-label" style="flex: 0 0 40%; max-width: 40%">
-                            <label for="billDueDateInput">Due date</label>
-                            <input type="date" class="form-control"
-                                   id="billDueDateInput"
-                                   name="due_date" placeholder=""
-                                   onchange="unblockSubmit(event,'submitReceiveButton')">
-                        </div>
-                    </div> 
-                    {# CODE / LINK #}
-                    <div class="row">
-                        <div class="col-6 form-group form-control-label mb-3">
-                            <label for="code">Code</label>
-                            <input class="form-control" id="code" name="code">
-                        </div>
-                        <div class="col-6 form-group form-control-label mb-3">
-                            <label for="link">Link</label>
-                            <input type="url" class="form-control" id="link" name="link">
-                        </div>
-                    </div> 
-                    <div class="mt-2 form-group form-control-label align-items-center" style="display: flex">
-                        <label class="mb-0 mr-3">Installments</label>
-                        <label class="custom-toggle">
-                            <input type="checkbox" onchange="blockInstallmentsInputs()">
-                            <span class="custom-toggle-slider rounded-circle" data-label-off="No"
-                                  data-label-on="Yes"></span>
-                        </label>
-                    </div>
-                    {# INSTALLMENTS #}
-                    <div class="row">
-                        <div class="col-3 form-group form-control-label">
-                            <label for="billInstallmentsNumberMethodInput">Nº</label>
-                            <select class="form-control" id="billInstallmentsNumberMethodInput"
-                                    name="installments" disabled>
-                                <script>
-                                    for (let i = 1; i <= 24; i++) {
-                                        document.write(`<option value="${i}">${i}x</option>`);
-                                    }
-                                </script>
-                            </select>
-                        </div>
-                        <div class="col-5 form-group form-control-label">
-                            <label for="billInstallmentsValueInput">Value</label>
-                            <input inputmode="decimal" class="form-control"
-                                   id="billInstallmentsValueInput"
-                                   name="installments_value" placeholder="" disabled>
-                        </div>
-                        <div class="col-4 form-group form-control-label">
-                            <label for="billInstallmentsFrequencyInput">Frequency</label>
-                            <div class="input-group input-group-merge">
-                                <input inputmode="decimal" class="form-control"
-                                       id="billInstallmentsFrequencyInput"
-                                       name="installments_frequency" placeholder="" disabled>
-                                <div class="input-group-append">
-                                    <span class="input-group-text" id="billInstallmentsFrequencyInputAppend" style="background-color: #f1f1f1;">days</span>
+                <div class="wizard-container">
+                    <div class="wizard-card" data-color="red" id="wizard">
+                        <form id="newBillForm" method="post" action="{% url 'new_client_bill' client.slug %}"
+                              enctype="multipart/form-data" 
+                              onsubmit=disableByID('newBillButton')>
+                            {% csrf_token %}
+                            <input type="hidden" value="{{ sorted_by }}" name="sort_by">
+                            <input type="hidden" value="{{ sort_type }}" name="sort_type">
+                            <input type="hidden" value="{{ filters }}" name="filters">
+                        
+                            <div class="wizard-navigation">
+                                <ul class="nav nav-pills m-auto" style="width: 70%">
+                                    <li class="nav-item">
+                                        <a class="nav-link text-center p-2 active" href="#billInfos" 
+                                           data-toggle="tab" role="tab" aria-selected="false" disabled>
+                                            Infos
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-center p-2" href="#billPayment"
+                                           data-toggle="tab" role="tab" disabled>
+                                            Payment
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        
+                            <div class="tab-content pt-4 mt-2">
+                                <div class="tab-pane active" id="billInfos">
+                                    {# TITLE / CATEGORY #}
+                                    <div class="row">
+                                        <div class="col-6 form-group form-control-label mb-3">
+                                            <label for="name">Title</label>
+                                            <input class="form-control" id="name" name="title">
+                                        </div>
+                                        <div class="col-6 form-group form-control-label mb-3">
+                                            <label for="category">Category</label>
+                                            <select class="form-control" id="category" name="category">
+                                                <option value=""></option>
+                                                <optgroup label="Income (+)" class="text-green">
+                                                    {% for category in income_categories %}
+                                                        <option value="{{ category }}" class="text-dark">
+                                                            {{ category|capfirst }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </optgroup>
+                                                <optgroup label="Expense (-)" class="text-red">
+                                                    {% for category in expense_categories %}
+                                                        <option value="{{ category }}" class="text-dark">
+                                                            {{ category|capfirst }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {# OFFICE / REGIONAL #}
+                                    <div class="row">
+                                        <div class="col form-group form-control-label">
+                                            <label for="beneficiary">Office</label>
+                                            <select class="form-control" id="beneficiary" name="office_id">
+                                                <option value=""></option>
+                                                {% for office in offices %}
+                                                    <option value="{{ office.id }}">{{ office.company_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-6 form-group form-control-label mb-3">
+                                            <label for="payer">Regional</label>
+                                            <select id="payer" name="payer_id" class="form-control">
+                                                <option value=""></option>
+                                                {% for payer in client.branches.all %}
+                                                    <option value="{{ payer.id }}">{{ payer.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div> 
+                                    {# ORIGIN / CODE #}
+                                    <div class="row">
+                                        <div class="col form-group form-control-label mb-3">
+                                            <label for="origin">Origin</label>
+                                            <select id="origin" name="origin" class="form-control">
+                                                <option value=""></option>
+                                                <option value="Individual">Individual</option>
+                                                <option value="Sale">Sale</option>
+                                                <option value="Service">Service</option>
+                                            </select>
+                                        </div>
+                                        <div class="col form-group form-control-label mb-3">
+                                            <label for="code">Code</label>
+                                            <input class="form-control" id="code" name="code">
+                                        </div>
+                                    </div> 
+                                    {# LINK #}
+                                    <div class="row">
+                                        <div class="col form-group form-control-label mb-3">
+                                            <label for="link">Link</label>
+                                            <input type="url" class="form-control" id="link" name="link">
+                                        </div>
+                                    </div> 
                                 </div>
+                            
+                                <div class="tab-pane" id="billPayment">
+                                    <div class="mt-2 form-group form-control-label align-items-center" style="display: flex">
+                                        <label class="mb-0 mr-3">Installments</label>
+                                        <label class="custom-toggle">
+                                            <input type="checkbox" onchange="blockInstallmentsInputs()">
+                                            <span class="custom-toggle-slider rounded-circle" data-label-off="No"
+                                                  data-label-on="Yes"></span>
+                                        </label>
+                                    </div>
+                                    {# ISSUE DATE / DUE DATE #}
+                                    <div class="row">
+                                        <div class="col form-group form-control-label">
+                                            <label for="billIssueDateInput">Issue date</label>
+                                            <input type="date" class="form-control"
+                                                   id="billIssueDateInput"
+                                                   onchange="enableByID('newBillButton')"
+                                                   name="issue_date" required>
+                                        </div>
+                                        <div class="col form-group form-control-label">
+                                            <label for="billDueDateInput">Due date</label>
+                                            <input type="date" class="form-control"
+                                                   id="billDueDateInput"
+                                                   onchange="enableByID('newBillButton')"
+                                                   name="due_date" required>
+                                        </div>
+                                    </div>
+                                    {# INSTALLMENTS #}
+                                    <div class="row">
+                                        <div class="col-3 form-group form-control-label">
+                                            <label for="billInstallmentsNumberMethodInput">Nº</label>
+                                            <select class="form-control" id="billInstallmentsNumberMethodInput"
+                                                    name="installments" disabled>
+                                                <script>
+                                                    for (let i = 1; i <= 24; i++) {
+                                                        document.write(`<option value="${i}">${i}x</option>`);
+                                                    }
+                                                </script>
+                                            </select>
+                                        </div>
+                                        <div class="col-5 form-group form-control-label">
+                                            <label for="billInstallmentsValueInput">Value</label>
+                                            <input inputmode="decimal" class="form-control"
+                                                   id="billInstallmentsValueInput"
+                                                   name="installments_value" placeholder="" disabled>
+                                        </div>
+                                        <div class="col-4 form-group form-control-label">
+                                            <label for="billInstallmentsFrequencyInput">Frequency</label>
+                                            <div class="input-group input-group-merge">
+                                                <input inputmode="decimal" class="form-control"
+                                                       id="billInstallmentsFrequencyInput"
+                                                       name="installments_frequency" placeholder="" disabled>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text" id="billInstallmentsFrequencyInputAppend" style="background-color: #f1f1f1;">days</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {# TOTAL / CURRENCY / METHOD #}
+                                    <div class="row">
+                                        <div class="col form-group form-control-label mb-3"
+                                             style="flex: 0 0 20%; max-width: 20%">
+                                            <label for="currency">Currency</label>
+                                            <select class="form-control" id="currency" name="currency">
+                                                <option value="BRL">BRL</option>
+                                                {#<option value="USD">USD</option>#}
+                                                {#<option value="EUR">EUR</option>#}
+                                            </select>
+                                        </div>
+                                        <div class="col form-group form-control-label">
+                                            <label for="valueInput">Total</label>
+                                            <input inputmode="decimal" class="form-control" 
+                                                   id="valueInput" name="total">
+                                        </div>
+                                        <div class="col form-group form-control-label">
+                                            <label for="billMethodInput">Method</label>
+                                            <select class="form-control" id="billMethodInput" name="method">
+                                                <option value=""></option>
+                                                <option value="Bank slip">Bank slip</option>
+                                                <option value="Pix">Pix</option>
+                                                <option value="Transfer">Transfer</option>
+                                                <option value="Credit card">Credit card</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {# PROOF #}
+                                    <div class="form-group form-control-label my-3">
+                                        <input type="file" id="documentInput" style="display: none" name="proofs" multiple>
+                                        <label for="documentInput" id="fileInputLabel" class="justify-content-center d-flex">
+                                            <span class="btn btn-sm btn-neutral align-items-center" style="width: 100%">
+                                                Attach proof
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </form>
+                        <div class="wizard-footer card-footer border-0 mb-2">
+                            <div class="row">
+                                <div class="mr-auto">
+                                    <button type="button" class="btn btn-secondary ml--2" data-dismiss="modal">Cancel</button>
+                                </div>
+                                <div class="ml-auto">
+                                    <input type="button"
+                                           class="btn btn-previous btn-fill btn-secondary btn-wd ml--2 disabled"
+                                           name="previous" value="Previous" style="display: none;">
+                                    <input type="button" class="btn btn-next btn-fill btn-primary btn-wd mr--2"
+                                           name="next"
+                                           value="Next">
+                                    <button type="submit" class="btn btn-finish btn-fill btn-primary btn-wd mr--2"
+                                            name="finish" form="newBillForm" id="newBillButton"
+                                            value="Finish" style="display: none;">
+                                        Submit
+                                    </button>
+                                </div>
+                                <div class="clearfix"></div>
                             </div>
                         </div>
                     </div>
-                    {# PROOF #}
-                    <div class="form-group form-control-label my-3">
-                        <input type="file" id="documentInput" style="display: none" name="proofs" multiple>
-                        <label for="documentInput" id="fileInputLabel" class="justify-content-center d-flex">
-                            <span class="btn btn-sm btn-neutral align-items-center" style="width: 100%">
-                                Attach proof
-                            </span>
-                        </label>
-                    </div>
-
-                </form>
-            </div>
-            <div class="modal-footer pt-2 pb-4">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary" form="newBillForm" id="newBillButton">
-                    Submit
-                </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2092,6 +2196,8 @@
 
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
+
+    <script src="/static/assets/js/wizard.js"></script>
     
     <script src="/static/assets/vendor/clipboard/dist/clipboard.min.js"></script>
 
@@ -2108,17 +2214,30 @@
             let installmentsValue = document.getElementById("billInstallmentsValueInput");
             let installmentsFrequency = document.getElementById("billInstallmentsFrequencyInput");
             let installmentsFrequencyAppend = document.getElementById("billInstallmentsFrequencyInputAppend");
+            let totalValue = document.getElementById("valueInput");
+            let dueDate = document.getElementById("billDueDateInput");
 
             if (installmentsNumber.disabled === true) {
                 installmentsNumber.disabled = false;
                 installmentsValue.disabled = false;
                 installmentsFrequency.disabled = false;
                 installmentsFrequencyAppend.style.backgroundColor = "#ffffff";
+                totalValue.disabled = true;
+                totalValue.value = '';
+                dueDate.value = '';
+                dueDate.disabled = true;
+                dueDate.required = false;
             } else {
                 installmentsNumber.disabled = true;
+                installmentsNumber.value = 1;
                 installmentsValue.disabled = true;
+                installmentsValue.value = '';
                 installmentsFrequency.disabled = true;
+                installmentsFrequency.value = '';
                 installmentsFrequencyAppend.style.backgroundColor = "#f1f1f1";
+                totalValue.disabled = false;
+                dueDate.disabled = false;
+                dueDate.required = true;
             }
         }
 

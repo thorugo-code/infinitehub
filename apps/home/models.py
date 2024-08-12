@@ -520,7 +520,7 @@ class Client(models.Model):
         return self.name
 
     def delete(self, *args, **kwargs):
-        if 'placeholder.webp' not in self.avatar:
+        if 'placeholder.webp' not in self.avatar.name:
             self.avatar.delete(save=False)
 
         super(Client, self).delete(*args, **kwargs)
@@ -577,6 +577,7 @@ class Bill(models.Model):
     # Date Fields
     created_at = models.DateField(auto_now_add=True)
     due_date = models.DateField(blank=True, null=True)
+    issue_date = models.DateField(blank=True, null=True)
     paid_at = models.DateField(blank=True, null=True)
 
     # Money Fields

@@ -27,6 +27,39 @@ def get_permission(request, permission_type, model='client'):
     return request.user.has_perm(f'home.{permission_type}_{model}')
 
 
+def process_filters(request, page, slug, filters=None, order=None):
+    if order is not None:
+        sort_type = order
+    else:
+        sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
+
+    # if page == 'balance':
+    #     sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
+    # elif page == 'documents':
+    #     sort_type = 'asc' if request.POST.get('asc', None) else 'desc'
+    # else:
+    #     sort_type = None
+
+    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
+    if filters is None:
+        filters_list = request.POST.get('filters', 'None')
+    elif filters == '%':
+        filters_list = 'None'
+    else:
+        filters_list = filters
+
+    if sorted_by not in ['', 'None'] and filters_list != 'None':
+        return redirect(f'sorted_filtered_client_{page}', slug=slug,
+                        sorted_by=sorted_by, sort_type=sort_type, filters=filters_list)
+
+    if sorted_by not in ['', 'None']:
+        return redirect(f'sorted_client_{page}', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
+    elif filters_list != 'None':
+        return redirect(f'filtered_client_{page}', slug=slug, filters=filters_list)
+    else:
+        return redirect(f'client_{page}', slug=slug)
+
+
 ############################################
 
 
@@ -82,12 +115,14 @@ def delete(request, slug):
     client = Client.objects.get(slug=slug)
     client.delete()
 
-    return redirect('clients_home')
+    return sort(request)
 
 
 def sort(request):
     sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
     sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
+    if sort_type == 'desc':
+        sort_type = request.POST.get('sort_type', 'desc') if request.POST.get('sort_type', 'desc') != 'None' else 'desc'
     filters = request.POST.get('filters', 'None')
 
     if sorted_by != '' and filters != 'None':
@@ -392,19 +427,7 @@ def new_document(request, slug, doc_id=None):
         document.save()
 
         if redirect_to == 'client_documents':
-            sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-            sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
-            filters = request.POST.get('filters', 'None')
-
-            if sorted_by not in ['', 'None'] and filters != 'None':
-                return redirect('sorted_filtered_client_documents', slug=slug,
-                                sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-            elif sorted_by not in ['', 'None']:
-                return redirect('sorted_client_documents', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
-            elif filters != 'None':
-                return redirect('filtered_client_documents', slug=slug, filters=filters)
-            else:
-                return redirect('client_documents', slug=slug)
+            return process_filters(request, 'documents', slug)
 
     return redirect(redirect_to, slug=client.slug)
 
@@ -423,19 +446,7 @@ def delete_document(request, slug, document_id):
         document.delete()
 
         if redirect_to == 'client_documents':
-            sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-            sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
-            filters = request.POST.get('filters', 'None')
-
-            if sorted_by not in ['', 'None'] and filters != 'None':
-                return redirect('sorted_filtered_client_documents', slug=slug,
-                                sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-            elif sorted_by not in ['', 'None']:
-                return redirect('sorted_client_documents', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
-            elif filters != 'None':
-                return redirect('filtered_client_documents', slug=slug, filters=filters)
-            else:
-                return redirect(redirect_to, slug=slug)
+            return process_filters(request, 'documents', slug)
 
     return redirect('client_details', slug=slug)
 
@@ -454,19 +465,10 @@ def download_document(request, slug, document_id):
 
 
 def sort_and_filter_documents(request, slug):
-    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
-    filters = request.POST.get('filters', 'None')
-
-    if sorted_by not in ['', 'None'] and filters != 'None':
-        return redirect('sorted_filtered_client_documents', slug=slug,
-                        sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    elif sorted_by not in ['', 'None']:
-        return redirect('sorted_client_documents', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
-    elif filters != 'None':
-        return redirect('filtered_client_documents', slug=slug, filters=filters)
-    else:
-        return redirect('client_documents', slug=slug)
+    return process_filters(
+        request, 'documents', slug,
+        order='asc' if request.POST.get('asc', None) else 'desc'
+    )
 
 
 def filter_documents_objects(filters, slug):
@@ -525,19 +527,7 @@ def filter_documents(request, slug):
     filter_string = filter_string.replace('/', '-')
     filter_string = filter_string[:-2] if filter_string.endswith('&%') else filter_string
 
-    if request.POST['sort_by'] != 'None' and filter_string != '%':
-        return redirect('sorted_filtered_client_documents', slug=slug,
-                        sorted_by=request.POST['sort_by'].replace('_', '-'),
-                        sort_type=request.POST['sort_type'],
-                        filters=filter_string)
-    elif filter_string == '%' and request.POST['sort_by'] != 'None':
-        return redirect('sorted_client_documents', slug=slug,
-                        sorted_by=request.POST['sort_by'].replace('_', '-'),
-                        sort_type=request.POST['sort_type'])
-    elif filter_string == '%':
-        return redirect('client_documents', slug=slug)
-    else:
-        return redirect('filtered_client_documents', filters=filter_string, slug=slug)
+    return process_filters(request, 'documents', slug, filter_string)
 
 
 ############################################
@@ -634,6 +624,7 @@ def new_bill(request, slug):
             code=request.POST.get('code', ''),
             # Date Fields
             due_date=request.POST.get('due_date', None) if request.POST.get('due_date', None) != '' else None,
+            issue_date=request.POST['issue_date'],
             # Money Fields
             total=unmask_money(request.POST.get('total', ''), currency),
             # Integer Fields
@@ -642,31 +633,22 @@ def new_bill(request, slug):
             link=request.POST.get('link', None),
         )
 
-        status = request.POST.get('status', 'Pending')
-        if 'Paid' in status:
-            bill.paid = True
-            bill.paid_at = datetime.now()
-
-        if 'reconciled' in status:
-            bill.reconciled = True
-
         bill.save()
 
-        if int(request.POST.get('installments', 1)) > 1 and request.POST.get('installments_value'):
-            installments = request.POST.get('installments')
+        if int(bill.installments_number) > 1 and request.POST.get('installments_value'):
             installments_value = unmask_money(request.POST.get('installments_value', ''), currency)
             bill.installments_frequency = request.POST.get('installments_frequency', 0)
             if bill.installments_frequency == '':
                 bill.installments_frequency = 0
 
-            for i in range(1, int(installments) + 1):
+            for i in range(1, int(bill.installments_number) + 1):
                 installment = BillInstallment(
                     bill=bill,
                     partial_id=i,
                     value=installments_value,
                     due_date=datetime.strptime(
-                        str(bill.due_date), "%Y-%m-%d"
-                    ) + timedelta(days=int(bill.installments_frequency) * (i - 1)) if bill.due_date else None,
+                        str(bill.issue_date), "%Y-%m-%d"
+                    ) + timedelta(days=int(bill.installments_frequency) * i) if bill.issue_date else None,
                 )
                 installment.save()
 
@@ -683,19 +665,7 @@ def new_bill(request, slug):
                 file=file,
             ).save()
 
-        sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-        sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
-        filters = request.POST.get('filters', 'None')
-
-        if sorted_by != '' and filters != 'None':
-            return redirect('sorted_filtered_client_balance', slug=slug,
-                            sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-        if sorted_by not in ['', 'None']:
-            return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
-        elif filters != 'None':
-            return redirect('filtered_client_balance', slug=slug, filters=filters)
-        else:
-            return redirect('client_balance', slug=slug)
+        return process_filters(request, 'balance', slug)
 
     return redirect('client_balance', slug=slug)
 
@@ -712,19 +682,7 @@ def delete_bill(request, slug, bill_id):
     if request.POST.get('client_page', False):
         return redirect('client_details', slug=slug)
 
-    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
-    filters = request.POST.get('filters', 'None')
-
-    if sorted_by != '' and filters != 'None':
-        return redirect('sorted_filtered_client_balance', slug=slug,
-                        sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    if sorted_by not in ['', 'None']:
-        return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
-    elif filters != 'None':
-        return redirect('filtered_client_balance', slug=slug, filters=filters)
-    else:
-        return redirect('client_balance', slug=slug)
+    return process_filters(request, 'balance', slug)
 
 
 def edit_bill(request, slug, bill_id):
@@ -736,8 +694,11 @@ def edit_bill(request, slug, bill_id):
 
     bill = Bill.objects.get(id=bill_id)
     if request.method == 'POST':
-        due_date = request.POST.get('due_date', bill.due_date)
         currency = request.POST.get('currency', 'USD')
+        due_date = request.POST.get('due_date', bill.due_date)
+        issue_date = request.POST.get('issue_date', bill.issue_date)
+        paid_at = request.POST.get('paid_at', bill.paid_at)
+
         bill.client = Client.objects.get(slug=request.POST['client_slug'])
         bill.payer = Branch.objects.get(id=request.POST['payer_id']) if request.POST.get(
             'payer_id') else bill.payer if request.POST.get('payer_id') != '' else None
@@ -747,26 +708,23 @@ def edit_bill(request, slug, bill_id):
         bill.category = request.POST.get('category', bill.category)
         bill.method = request.POST.get('method', bill.method)
         bill.origin = request.POST.get('origin', bill.origin)
-        bill.due_date = due_date if due_date != '' else None
         bill.total = unmask_money(request.POST['total'], currency) if request.POST.get('total') else bill.total
         bill.code = request.POST.get('code', bill.code)
         bill.link = request.POST.get('link', bill.link)
+        bill.issue_date = issue_date if issue_date != '' else None
+        bill.due_date = due_date if due_date != '' else None
+        bill.paid_at = paid_at if paid_at != '' else None
         bill.payment_info = request.POST.get('payment_info', bill.payment_info)
 
         bill.save()
 
-    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
-    filters = request.POST.get('filters', 'None')
+        for file in request.FILES.getlist('proofs'):
+            BillProof.objects.create(
+                bill=bill,
+                file=file,
+            ).save()
 
-    if sorted_by != '' and filters != 'None':
-        return redirect('sorted_filtered_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    if sorted_by not in ['', 'None']:
-        return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
-    elif filters != 'None':
-        return redirect('filtered_client_balance', slug=slug, filters=filters)
-    else:
-        return redirect('client_balance', slug=slug)
+    return process_filters(request, 'balance', slug)
 
 
 def download_bill(request, slug, bill_id, proof_id):
@@ -819,35 +777,14 @@ def change_status(request, slug, bill_id):
     if request.POST.get('client_page', False):
         return redirect('client_details', slug=slug)
 
-    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
-    filters = request.POST.get('filters', 'None')
-
-    if sorted_by != '' and filters != 'None':
-        return redirect('sorted_filtered_client_balance', slug=slug,
-                        sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    if sorted_by not in ['', 'None']:
-        return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
-    elif filters != 'None':
-        return redirect('filtered_client_balance', slug=slug, filters=filters)
-    else:
-        return redirect('client_balance', slug=slug)
+    return process_filters(request, 'balance', slug)
 
 
 def sort_and_filter_bills(request, slug):
-    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
-    filters = request.POST.get('filters', 'None')
-
-    if sorted_by != '' and filters != 'None':
-        return redirect('sorted_filtered_client_balance', slug=slug,
-                        sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    if sorted_by not in ['', 'None']:
-        return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
-    elif filters != 'None':
-        return redirect('filtered_client_balance', slug=slug, filters=filters)
-    else:
-        return redirect('client_balance', slug=slug)
+    return process_filters(
+        request, 'balance', slug,
+        order='asc' if request.POST.get('asc', None) else 'desc'
+    )
 
 
 def filter_bill_objects(filters, slug):
@@ -994,19 +931,7 @@ def filter_bills(request, slug):
     filter_string = filter_string.replace('/', '-')
     filter_string = filter_string[:-2] if filter_string.endswith('&%') else filter_string
 
-    if request.POST['sort_by'] != 'None' and filter_string != '%':
-        return redirect('sorted_filtered_client_balance',
-                        sorted_by=request.POST['sort_by'].replace('_', '-'),
-                        sort_type=request.POST['sort_type'],
-                        filters=filter_string, slug=slug)
-    elif filter_string == '%' and request.POST['sort_by'] != 'None':
-        return redirect('sorted_client_balance',
-                        sorted_by=request.POST['sort_by'].replace('_', '-'),
-                        sort_type=request.POST['sort_type'], slug=slug)
-    elif filter_string == '%':
-        return redirect('client_balance', slug=slug)
-    else:
-        return redirect('filtered_client_balance', filters=filter_string, slug=slug)
+    return process_filters(request, 'balance', slug, filter_string)
 
 
 ############################################
@@ -1122,35 +1047,29 @@ def installment_edit(request, slug, bill_id, installment_id):
 
     currency = request.POST.get('currency', 'BRL')
 
-    current = BillInstallment.objects.get(id=installment_id)
+    installment = BillInstallment.objects.get(id=installment_id)
     bill = Bill.objects.get(id=bill_id)
 
-    prev_installment_value = current.value if current.value else 0
     new_installment_value = unmask_money(request.POST.get('installment_value', 0), currency)
-    due_date = request.POST.get('installment_due_date', current.due_date)
-    installment_payment_info = request.POST.get('installment_info', current.payment_info)
+    due_date = request.POST.get('installment_due_date', installment.due_date)
+    installment_payment_info = request.POST.get('installment_info', installment.payment_info)
 
-    current.value = new_installment_value
-    current.due_date = due_date if due_date != '' else None
-    current.payment_info = installment_payment_info
-    current.save()
+    installment.value = new_installment_value
+    installment.due_date = due_date if due_date != '' else None
+    installment.payment_info = installment_payment_info
+    installment.save()
 
-    if prev_installment_value != new_installment_value:
-        bill.total -= prev_installment_value
-        bill.total += Money(new_installment_value, currency=bill.total.currency)
-        bill.save()
-
-    if current.due_date is None:
+    if installment.due_date is None:
         try:
-            current.bill.due_date = current.bill.installments.filter(
+            installment.bill.due_date = installment.bill.installments.filter(
                 paid=False, due_date__isnull=False).order_by('due_date').first().due_date
         except AttributeError:
             try:
-                current.bill.due_date = current.bill.installments.filter(paid=False).order_by('due_date').last().due_date
+                installment.bill.due_date = installment.bill.installments.filter(paid=False).order_by('due_date').last().due_date
             except AttributeError:
-                current.bill.due_date = current.bill.installments.order_by('due_date').last().due_date
+                installment.bill.due_date = installment.bill.installments.order_by('due_date').last().due_date
 
-        current.bill.save()
+        installment.bill.save()
 
     elif bill.due_date is None or BillInstallment.objects.get(id=installment_id).due_date < bill.due_date:
         bill.due_date = due_date if due_date != '' else None
@@ -1176,27 +1095,18 @@ def installment_delete(request, slug, bill_id, installment_id):
         return render(request, 'home/page-404.html')
 
     installment = BillInstallment.objects.get(id=installment_id)
-
-    installment.bill.total -= installment.value
-    installment.bill.installments_number -= 1
-    installment.bill.due_date = installment.bill.installments.filter(paid=False).order_by('due_date').first().due_date
-    if installment.paid:
-        installment.bill.partial -= installment.value
-
     installment.delete()
 
-    if installment.bill.installments_number == 1:
-        installment.bill.installments_number = 0
-
-    last_due_date = installment.bill.installments.all().order_by('due_date')
-    if last_due_date.filter(paid=False).count() >= 1:
-        installment.bill.due_date = last_due_date.filter(paid=False).first().due_date
+    ordered_installments = installment.bill.installments.all().order_by('due_date')
+    unpaid = ordered_installments.filter(paid=False)
+    if unpaid.count() >= 1:
+        installment.bill.due_date = unpaid.first().due_date
     else:
-        installment.bill.due_date = last_due_date.last().due_date
+        installment.bill.due_date = ordered_installments.last().due_date
 
     installment.bill.save()
 
-    for i, installment in enumerate(BillInstallment.objects.filter(bill__id=bill_id).order_by('due_date')):
+    for i, installment in enumerate(ordered_installments):
         installment.partial_id = i + 1
         installment.save()
 

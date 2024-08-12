@@ -301,6 +301,8 @@
                                                   onsubmit="disableByID('deleteClientConfirmButton{{ client.id }}');
                                                   disableByID('deleteClientCancelButton{{ client.id }}')">
                                                 {% csrf_token %}
+                                                <input type="hidden" name="sort_by" value="{{ sorted_by }}">
+                                                <input type="hidden" name="sort_type" value="{{ sort_type }}">
                                             </form>
                                         </div>
                                         <div class="modal-footer">
