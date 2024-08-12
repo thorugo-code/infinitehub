@@ -1075,19 +1075,32 @@ def installment_edit(request, slug, bill_id, installment_id):
         bill.due_date = due_date if due_date != '' else None
         bill.save()
 
-    sorted_by = request.POST['sort_by'] if request.POST.get('sort_by', False) else ''
-    sort_type = request.POST.get('sort_type', None) if request.POST.get('sort_type', None) != 'None' else None
-    filters = request.POST.get('filters', 'None')
+    return process_filters(request, 'balance', slug)
 
-    if sorted_by not in ['', 'None'] and filters != 'None':
-        return redirect('sorted_filtered_client_balance', slug=slug,
-                        sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    if sorted_by not in ['', 'None']:
-        return redirect('sorted_client_balance', slug=slug, sorted_by=sorted_by, sort_type=sort_type)
-    elif filters != 'None':
-        return redirect('filtered_client_balance', slug=slug, filters=filters)
-    else:
-        return redirect('client_balance', slug=slug)
+
+def installments_edit_all(request, slug, bill_id):
+    if not get_permission(request, 'change', 'bill'):
+        return render(request, 'home/page-404.html')
+
+    currency = request.POST.get('currency', 'BRL')
+
+    values = {key: value for key, value in request.POST.items() if key.startswith('installment_value')}
+    due_dates = {key: value for key, value in request.POST.items() if key.startswith('installment_due_date')}
+
+    for value, due_date in zip(values.items(), due_dates.items()):
+        installment_id = value[0].split('_')[2]
+        value = unmask_money(value[1], currency)
+        due_date = due_date[1] if due_date[1] != '' else None
+        installment = BillInstallment.objects.get(id=installment_id)
+
+        if (Money(value, currency=currency) != installment.value or
+                datetime.strptime(due_date, '%Y-%m-%d').date() != installment.due_date):
+
+            installment.value = value
+            installment.due_date = due_date
+            installment.save()
+
+    return process_filters(request, 'balance', slug)
 
 
 def installment_delete(request, slug, bill_id, installment_id):

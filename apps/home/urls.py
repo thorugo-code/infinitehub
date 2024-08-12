@@ -125,6 +125,8 @@ client_balance_urls = [
 
     path('clients/<slug:slug>/balance/bill=<int:bill_id>/edit=<int:installment_id>',
          clients.installment_edit, name='edit_client_bill_installment'),
+    path('clients/<slug:slug>/balance/bill=<int:bill_id>/edit-installments', clients.installments_edit_all,
+         name='edit_client_bill_all_installments'),
     path('clients/<slug:slug>/balance/bill=<int:bill_id>/change-status=<int:installment_id>',
          clients.installment_change_status, name='change_client_bill_installment_status'),
     path('clients/<slug:slug>/balance/bill=<int:bill_id>/delete=<int:installment_id>',

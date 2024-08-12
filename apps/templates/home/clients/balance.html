@@ -575,90 +575,37 @@
                         </td>
                     </tr>
 
-                    <tr>
-                        <td colspan="14" class="p-0 border-0">
-                            <div aria-labelledby="collapseDetailsLabel{{ bill.id }}" data-parent=".accordion" id="collapseDetails{{ bill.id }}" class="collapse">
-                                <ul class="list-group list-group-flush list border-top">
-                                    {% for installment in bill.installments.all %}
+                    <!-- Installments Collapse -->
+                    {% if bill.installments.count > 0 %}
+                        <tr>
+                            <td colspan="14" class="p-0 border-0">
+                                <div aria-labelledby="collapseDetailsLabel{{ bill.id }}" data-parent=".accordion" id="collapseDetails{{ bill.id }}" class="collapse">
+                                    <ul class="list-group list-group-flush list border-top">
+                                        
                                         <li class="list-group-item px-4 border-0">
-                                            <div class="row mx-0 align-items-center">
-                                                <div class="col-auto p-0">
-                                                    <a class="badge badge-sm badge-secondary" href="#" role="button"
-                                                       data-toggle="modal" data-target="#editInstallment{{ installment.id }}">
-                                                        <i class="m-0 fas fa-cog"></i>
-                                                    </a>
-                                                </div>
-                                                {% if installment.paid %}
-                                                    <div class="col-auto pl-2 pr-0">
-                                                        <a class="badge badge-sm badge-success" href="" role="button"
-                                                           data-toggle="modal" data-target="#paidInstallmentConfirm{{ installment.id }}">
-                                                            <i class="m-0 fas fa-check"></i>
-                                                        </a>
-                                                    </div>
-                                                {% else %}
-                                                    <div class="col-auto pl-2 pr-0">
-                                                        <a class="badge badge-sm badge-warning" href="" role="button"
-                                                           data-toggle="modal" data-target="#paidInstallmentConfirm{{ installment.id }}">
-                                                            <i class="m-0 fas fa-hourglass-half"></i>
-                                                        </a>
-                                                    </div>
-                                                {% endif %}
-                                                <div class="col-auto pl-2">
-                                                    <a class="badge badge-sm badge-danger" href="#" role="button"
-                                                       data-toggle="modal" data-target="#deleteInstallmentConfirm{{ installment.id }}">
-                                                        <i class="m-0 fas fa-trash"></i>
-                                                    </a>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <small>ID:</small>
-                                                    <h5 class="mb-0">{{ installment.partial_id }}/{{ bill.installments.count }}</h5>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <small>Value:</small>
-                                                    <h5 class="mb-0">{{ installment.value }}</h5>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <small>Due Date:</small>
-                                                    {% if installment.due_date|time_to_date < 10 and not installment.paid %}
-                                                        <h5 class="mb-0 text-warning">
-                                                    {% elif installment.due_date|time_to_date < 0 and not installment.paid %}
-                                                        <h5 class="mb-0 text-danger">
-                                                    {% elif installment.paid %}
-                                                        <h5 class="mb-0 text-success">
-                                                    {% else %}
-                                                        <h5 class="mb-0">
-                                                    {% endif %}
-                                                    {{ installment.due_date|date:"d/m/y"|default:"-" }}</h5>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <small>Paid At:</small>
-                                                    {% if installment.paid %}
-                                                        <h5 class="mb-0">{{ installment.paid_at|date:"d/m/y" }}</h5>
-                                                    {% elif installment.due_date|time_to_date < 10 %}
-                                                        <h5 class="mb-0 text-warning">Pending</h5>
-                                                    {% elif installment.due_date|time_to_date < 0 %}
-                                                        <h5 class="mb-0 text-danger">Late</h5>
-                                                    {% else %}
-                                                        <h5 class="mb-0">Pending</h5>
-                                                    {% endif %}
-                                                </div>
-                                                <div class="col"></div>
-                                            </div>
+                                            <a href="" class="btn btn-sm btn-secondary" data-toggle="modal" 
+                                               data-target="#editAllInstallments{{ bill.id }}">
+                                                <i class="mr-1 fas fa-cog text-blue"></i>
+                                                <span class="text-blue">Edit all</span>
+                                            </a>
                                         </li>
-
-                                        <!-- Edit Installment Modal -->
-                                        <div class="modal fade" id="editInstallment{{ installment.id }}"
+                                    
+                                        <!-- Edit All Installments Modal -->
+                                        <div class="modal fade" id="editAllInstallments{{ bill.id }}"
                                              tabindex="-1" role="dialog"
-                                             aria-labelledby="editInstallmentLabel{{ installment.id }}"
+                                             aria-labelledby="editAllInstallmentsLabel{{ bill.id }}"
                                              aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered" role="document">
                                                 <div class="modal-content">
-                                                    <div class="modal-header mt-2" style="justify-content: center">
-                                                        <span class="my-1"
-                                                              style="margin: auto; font-size: 1.2rem"
-                                                              id="editInstallmentModalLabel{{ installment.id }}">
-                                                            ({{ installment.partial_id }}/{{ installment.bill.installments.count }}) 
-                                                            {{ installment.bill.title|truncatechars:30 }} 
+                                                    <div class="modal-header mt-2 align-items-center">
+                                                        <h5 class="modal-title" style="margin-left: auto">
+                                                            <i class="m-0 fas fa-file-invoice-dollar text-blue"
+                                                               style="font-size: 1.2rem"></i>
+                                                        </h5>
+                                                        <span class="ml-3 my-1"
+                                                              style="margin-right: auto; font-size: 1.2rem"
+                                                              id="editAllInstallmentsModalLabel{{ bill.id }}">
+                                                            Installments
                                                         </span>
                                                         <button type="button" class="close mt--4"
                                                                 style="margin-left: -30px"
@@ -669,291 +616,435 @@
                                                     </div>
                                                     <div class="modal-body py-0"
                                                          style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                        <form method="post" id="editInstallmentForm{{ installment.id }}"
-                                                              action="{% url 'edit_client_bill_installment' client.slug bill.id installment.id %}" 
-                                                              onsubmit="disableByID('editInstallmentButton{{ installment.id }}')">
+                                                        <p class="text-center">Edit all installments of "{{ bill.title }}"</p>
+                                                        <form method="post" id="editAllInstallmentsForm{{ bill.id }}"
+                                                              action="{% url 'edit_client_bill_all_installments' client.slug bill.id %}" 
+                                                              onsubmit="disableByID('editAllInstallmentsButton{{ bill.id }}')">
                                                             {% csrf_token %}
-
+    
                                                             <input type="hidden" value="{{ sorted_by }}"
                                                                    name="sort_by">
                                                             <input type="hidden" value="{{ sort_type }}"
                                                                    name="sort_type">
                                                             <input type="hidden" value="{{ filters }}"
                                                                    name="filters">
-
-                                                            <div class="row">
-                                                                <div class="col-sm form-group form-control-label">
-                                                                    <label for="installment_value_{{ installment.id }}">Value</label>
-                                                                    <input inputmode="decimal"
-                                                                           class="form-control" id="installment_value_{{ installment.id }}"
-                                                                           name="installment_value"
-                                                                           value="{{ installment.value|without_currency }}">
-                                                                </div>
-                                                                <div class="col-sm-4 form-group form-control-label">
-                                                                    <label for="dueDate">Due date</label>
-                                                                    <input type="date" class="form-control"
-                                                                           id="dueDate" name="installment_due_date"
-                                                                           value="{{ installment.due_date|date:'Y-m-d' }}">
-                                                                </div>
-                                                                {% if installment.paid %}
-                                                                    <div class="col-sm-4 form-group form-control-label">
-                                                                        <label for="paidAt">Paid at</label>
-                                                                        <input type="date"
-                                                                               class="form-control"
-                                                                               id="paidAt"
-                                                                               value="{{ installment.paid_at|date:'Y-m-d' }}"
-                                                                               disabled>
+    
+                                                            {% for installment in bill.installments.all %}
+                                                                <div class="row">
+                                                                    <div class="col-2 form-group form-control-label">
+                                                                        <label for="installment_id_{{ bill.id }}">ID</label>
+                                                                        <input type="text" id="installment_id_{{ bill.id }}" 
+                                                                               class="form-control" disabled
+                                                                               value="{{ installment.partial_id }}/{{ bill.installments_number }}">
                                                                     </div>
-                                                                {% endif %}
-                                                            </div>
-                                                            <div class="form-group form-control-label">
-                                                                <label for="installmentEditInfoInput">Info</label>
-                                                                <textarea type="date"
-                                                                          class="form-control"
-                                                                          id="installmentEditInfoInput"
-                                                                          name="installment_info"
-                                                                >{{ installment.payment_info }}</textarea>
-                                                            </div>
-
+                                                                    <div class="col-6 form-group form-control-label">
+                                                                        <label for="installment_value_{{ installment.id }}">Value</label>
+                                                                        <input inputmode="decimal"
+                                                                               class="form-control" id="installment_value_{{ installment.id }}"
+                                                                               name="installment_value_{{ installment.id }}"
+                                                                               value="{{ installment.value|without_currency }}">
+                                                                    </div>
+                                                                    <div class="col-4 form-group form-control-label">
+                                                                        <label for="dueDate">Due date</label>
+                                                                        <input type="date" class="form-control"
+                                                                               id="dueDate" name="installment_due_date_{{ installment.id }}"
+                                                                               value="{{ installment.due_date|date:'Y-m-d' }}">
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
                                                         </form>
                                                     </div>
-                                                    <div class="modal-footer pt-1">
-                                                        <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Cancel
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary ml-auto"
+                                                                data-dismiss="modal">
+                                                            Close
                                                         </button>
-                                                        <a href="#" target="_blank" data-dismiss="modal" data-toggle="modal"
-                                                           data-target="#paidInstallmentConfirm{{ installment.id }}" 
-                                                        {% if installment.paid %}
-                                                           class="btn btn-warning">
-                                                            Set as pending
-                                                        {% else %}
-                                                           class="btn btn-success">
-                                                            Set as paid
-                                                        {% endif %}
-                                                        </a>
-                                                        <button type="submit" class="btn btn-primary"
-                                                                id="editInstallmentButton{{ installment.id }}"
-                                                                form="editInstallmentForm{{ installment.id }}">
+                                                        <button type="submit" form="editAllInstallmentsForm{{ bill.id }}"
+                                                                class="btn btn-primary" id="editAllInstallmentsButton{{ bill.id }}">
                                                             Save
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        <!-- Change status Modal -->
-                                        <div class="modal fade"
-                                             id="paidInstallmentConfirm{{ installment.id }}"
-                                             tabindex="-1"
-                                             role="dialog"
-                                             aria-labelledby="paidInstallmentConfirmLabel{{ installment.id }}"
-                                             aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header mt-2">
-                                                        <h5 class="modal-title my-1"
-                                                            style="margin-left: auto">
-                                                            <i class="ni ni-fat-delete text-blue"
-                                                               style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                        </h5>
-                                                        <span class="ml-3 my-1"
-                                                              style="margin-right: auto; font-size: 1.2rem"
-                                                              id="paidConfirmModalLabel{{ installment.id }}">Are you sure?</span>
-                                                        <button type="button" class="close mt--4"
-                                                                style="margin-left: -30px"
-                                                                data-dismiss="modal"
-                                                                aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
+                                    
+                                        {% for installment in bill.installments.all %}
+                                            
+                                            <li class="list-group-item px-4 border-0">
+                                                <div class="row mx-0 align-items-center">
+                                                    <div class="col-auto p-0">
+                                                        <a class="badge badge-sm badge-secondary" href="#" role="button"
+                                                           data-toggle="modal" data-target="#editInstallment{{ installment.id }}">
+                                                            <i class="m-0 fas fa-cog"></i>
+                                                        </a>
                                                     </div>
-                                                    <div class="modal-body py-0"
-                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                        <p class="text-center">Are you sure you want to
-                                                            change status of this
-                                                            bill?
-                                                            <br>
-                                                            This action can be undone.
-                                                        </p>
-                                                        <form method="post" id="paidInstallmentConfirmForm{{ installment.id }}"
-                                                              action="{% url 'change_client_bill_installment_status' client.slug bill.id installment.id %}" 
-                                                              onsubmit="disableByID('paidInstallmentConfirmButton{{ installment.id }}')">
-                                                            {% csrf_token %}
-
-                                                            <input type="hidden" value="{{ sorted_by }}"
-                                                                   name="sort_by">
-                                                            <input type="hidden" value="{{ sort_type }}"
-                                                                   name="sort_type">
-                                                            <input type="hidden" value="{{ filters }}"
-                                                                   name="filters">
-
+                                                    {% if installment.paid %}
+                                                        <div class="col-auto pl-2 pr-0">
+                                                            <a class="badge badge-sm badge-success" href="" role="button"
+                                                               data-toggle="modal" data-target="#paidInstallmentConfirm{{ installment.id }}">
+                                                                <i class="m-0 fas fa-check"></i>
+                                                            </a>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="col-auto pl-2 pr-0">
+                                                            <a class="badge badge-sm badge-warning" href="" role="button"
+                                                               data-toggle="modal" data-target="#paidInstallmentConfirm{{ installment.id }}">
+                                                                <i class="m-0 fas fa-hourglass-half"></i>
+                                                            </a>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="col-auto pl-2">
+                                                        <a class="badge badge-sm badge-danger" href="#" role="button"
+                                                           data-toggle="modal" data-target="#deleteInstallmentConfirm{{ installment.id }}">
+                                                            <i class="m-0 fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <small>ID:</small>
+                                                        <h5 class="mb-0">{{ installment.partial_id }}/{{ bill.installments.count }}</h5>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <small>Value:</small>
+                                                        <h5 class="mb-0">{{ installment.value }}</h5>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <small>Due Date:</small>
+                                                        {% if installment.due_date|time_to_date < 10 and not installment.paid %}
+                                                            <h5 class="mb-0 text-warning">
+                                                        {% elif installment.due_date|time_to_date < 0 and not installment.paid %}
+                                                            <h5 class="mb-0 text-danger">
+                                                        {% elif installment.paid %}
+                                                            <h5 class="mb-0 text-success">
+                                                        {% else %}
+                                                            <h5 class="mb-0">
+                                                        {% endif %}
+                                                        {{ installment.due_date|date:"d/m/y"|default:"-" }}</h5>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <small>Paid At:</small>
+                                                        {% if installment.paid %}
+                                                            <h5 class="mb-0">{{ installment.paid_at|date:"d/m/y" }}</h5>
+                                                        {% elif installment.due_date|time_to_date < 10 %}
+                                                            <h5 class="mb-0 text-warning">Pending</h5>
+                                                        {% elif installment.due_date|time_to_date < 0 %}
+                                                            <h5 class="mb-0 text-danger">Late</h5>
+                                                        {% else %}
+                                                            <h5 class="mb-0">Pending</h5>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="col"></div>
+                                                </div>
+                                            </li>
+    
+                                            <!-- Edit Installment Modal -->
+                                            <div class="modal fade" id="editInstallment{{ installment.id }}"
+                                                 tabindex="-1" role="dialog"
+                                                 aria-labelledby="editInstallmentLabel{{ installment.id }}"
+                                                 aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header mt-2" style="justify-content: center">
+                                                            <span class="my-1"
+                                                                  style="margin: auto; font-size: 1.2rem"
+                                                                  id="editInstallmentModalLabel{{ installment.id }}">
+                                                                ({{ installment.partial_id }}/{{ installment.bill.installments.count }}) 
+                                                                {{ installment.bill.title|truncatechars:30 }} 
+                                                            </span>
+                                                            <button type="button" class="close mt--4"
+                                                                    style="margin-left: -30px"
+                                                                    data-dismiss="modal"
+                                                                    aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body py-0"
+                                                             style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                            <form method="post" id="editInstallmentForm{{ installment.id }}"
+                                                                  action="{% url 'edit_client_bill_installment' client.slug bill.id installment.id %}" 
+                                                                  onsubmit="disableByID('editInstallmentButton{{ installment.id }}')">
+                                                                {% csrf_token %}
+    
+                                                                <input type="hidden" value="{{ sorted_by }}"
+                                                                       name="sort_by">
+                                                                <input type="hidden" value="{{ sort_type }}"
+                                                                       name="sort_type">
+                                                                <input type="hidden" value="{{ filters }}"
+                                                                       name="filters">
+    
+                                                                <div class="row">
+                                                                    <div class="col-sm form-group form-control-label">
+                                                                        <label for="installment_value_{{ installment.id }}">Value</label>
+                                                                        <input inputmode="decimal"
+                                                                               class="form-control" id="installment_value_{{ installment.id }}"
+                                                                               name="installment_value"
+                                                                               value="{{ installment.value|without_currency }}">
+                                                                    </div>
+                                                                    <div class="col-sm-4 form-group form-control-label">
+                                                                        <label for="dueDate">Due date</label>
+                                                                        <input type="date" class="form-control"
+                                                                               id="dueDate" name="installment_due_date"
+                                                                               value="{{ installment.due_date|date:'Y-m-d' }}">
+                                                                    </div>
+                                                                    {% if installment.paid %}
+                                                                        <div class="col-sm-4 form-group form-control-label">
+                                                                            <label for="paidAt">Paid at</label>
+                                                                            <input type="date"
+                                                                                   class="form-control"
+                                                                                   id="paidAt"
+                                                                                   value="{{ installment.paid_at|date:'Y-m-d' }}"
+                                                                                   disabled>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="form-group form-control-label">
+                                                                    <label for="installmentEditInfoInput">Info</label>
+                                                                    <textarea type="date"
+                                                                              class="form-control"
+                                                                              id="installmentEditInfoInput"
+                                                                              name="installment_info"
+                                                                    >{{ installment.payment_info }}</textarea>
+                                                                </div>
+    
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer pt-1">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-dismiss="modal">Cancel
+                                                            </button>
+                                                            <a href="#" target="_blank" data-dismiss="modal" data-toggle="modal"
+                                                               data-target="#paidInstallmentConfirm{{ installment.id }}" 
+                                                            {% if installment.paid %}
+                                                               class="btn btn-warning">
+                                                                Set as pending
+                                                            {% else %}
+                                                               class="btn btn-success">
+                                                                Set as paid
+                                                            {% endif %}
+                                                            </a>
+                                                            <button type="submit" class="btn btn-primary"
+                                                                    id="editInstallmentButton{{ installment.id }}"
+                                                                    form="editInstallmentForm{{ installment.id }}">
+                                                                Save
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Change status Modal -->
+                                            <div class="modal fade"
+                                                 id="paidInstallmentConfirm{{ installment.id }}"
+                                                 tabindex="-1"
+                                                 role="dialog"
+                                                 aria-labelledby="paidInstallmentConfirmLabel{{ installment.id }}"
+                                                 aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header mt-2">
+                                                            <h5 class="modal-title my-1"
+                                                                style="margin-left: auto">
+                                                                <i class="ni ni-fat-delete text-blue"
+                                                                   style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                            </h5>
+                                                            <span class="ml-3 my-1"
+                                                                  style="margin-right: auto; font-size: 1.2rem"
+                                                                  id="paidConfirmModalLabel{{ installment.id }}">Are you sure?</span>
+                                                            <button type="button" class="close mt--4"
+                                                                    style="margin-left: -30px"
+                                                                    data-dismiss="modal"
+                                                                    aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body py-0"
+                                                             style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                            <p class="text-center">Are you sure you want to
+                                                                change status of this
+                                                                bill?
+                                                                <br>
+                                                                This action can be undone.
+                                                            </p>
+                                                            <form method="post" id="paidInstallmentConfirmForm{{ installment.id }}"
+                                                                  action="{% url 'change_client_bill_installment_status' client.slug bill.id installment.id %}" 
+                                                                  onsubmit="disableByID('paidInstallmentConfirmButton{{ installment.id }}')">
+                                                                {% csrf_token %}
+    
+                                                                <input type="hidden" value="{{ sorted_by }}"
+                                                                       name="sort_by">
+                                                                <input type="hidden" value="{{ sort_type }}"
+                                                                       name="sort_type">
+                                                                <input type="hidden" value="{{ filters }}"
+                                                                       name="filters">
+    
+                                                                <div class="row">
+                                                                    <div class="col-sm-8 form-group form-control-label mb-3">
+                                                                        <label for="name">Title</label>
+                                                                        <input class="form-control" id="name"
+                                                                               value="{{ installment.bill.title }} ({{ installment.partial_id }}/{{ installment.bill.installments.count }})"
+                                                                               disabled>
+                                                                    </div>
+                                                                    <div class="col-sm-4 form-group form-control-label">
+                                                                        <label for="dueDate">Due date</label>
+                                                                        <input type="date" class="form-control"
+                                                                               id="dueDate"
+                                                                               value="{{ installment.due_date|date:'Y-m-d' }}"
+                                                                               disabled>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm form-group form-control-label">
+                                                                        <label for="total">Total</label>
+                                                                        <input inputmode="decimal"
+                                                                               class="form-control" id="total"
+                                                                               value="{{ installment.value }}"
+                                                                               disabled>
+                                                                    </div>
+                                                                    {% if installment.paid %}
+                                                                        <div class="col-sm form-group form-control-label">
+                                                                            <label for="paidAt">Paid at</label>
+                                                                            <input type="date"
+                                                                                   class="form-control"
+                                                                                   id="paidAt"
+                                                                                   value="{{ installment.paid_at|date:'Y-m-d' }}"
+                                                                                   disabled>
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <div class="col-sm form-group form-control-label">
+                                                                            <label for="billPaidInput">Paid
+                                                                                at</label>
+                                                                            <input type="date"
+                                                                                   class="form-control"
+                                                                                   id="billPaidInput"
+                                                                                   name="bill_paid_at" required
+                                                                                   autofocus>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="form-group form-control-label">
+                                                                    <label for="installmentEditInfoInput">Info</label>
+                                                                    <textarea type="date"
+                                                                              class="form-control"
+                                                                              id="installmentEditInfoInput"
+                                                                              name="installment_info"
+                                                                              {% if installment.paid %}disabled{% endif %}
+                                                                    >{{ installment.payment_info }}</textarea>
+                                                                </div>
+    
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer pt-1">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-dismiss="modal">Cancel
+                                                            </button>
+                                                            {% if installment.paid %}
+                                                                <button type="submit" class="btn btn-warning"
+                                                                        id="paidInstallmentConfirmButton{{ installment.id }}"
+                                                                        form="paidInstallmentConfirmForm{{ installment.id }}">
+                                                                    Set as pending
+                                                                </button>
+                                                            {% else %}
+                                                                <button type="submit" class="btn btn-success"
+                                                                        id="paidInstallmentConfirmButton{{ installment.id }}"
+                                                                        form="paidInstallmentConfirmForm{{ installment.id }}">
+                                                                    Set as paid
+                                                                </button>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+    
+                                            <!-- Delete Modal -->
+                                            <div class="modal fade"
+                                                 id="deleteInstallmentConfirm{{ installment.id }}"
+                                                 tabindex="-1"
+                                                 role="dialog" aria-labelledby="deleteInstallmentConfirmLabel{{ installment.id }}"
+                                                 aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header mt-2">
+                                                            <h5 class="modal-title my-1"
+                                                                style="margin-left: auto">
+                                                                <i class="ni ni-fat-delete text-blue"
+                                                                   style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                                            </h5>
+                                                            <span class="ml-3 my-1"
+                                                                  style="margin-right: auto; font-size: 1.2rem"
+                                                                  id="deleteInstallmentConfirmModalLabel{{ installment.id }}">Are you sure?</span>
+                                                            <button type="button" class="close mt--4"
+                                                                    style="margin-left: -30px"
+                                                                    data-dismiss="modal"
+                                                                    aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body py-0"
+                                                             style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                            <p class="text-center">Are you sure you want to
+                                                                delete this
+                                                                installment?
+                                                                <br>
+                                                                This action cannot be undone.
+                                                            </p>
+                                                            <form method="post" id="deleteInstallmentConfirmForm{{ installment.id }}"
+                                                                  action="{% url 'delete_client_bill_installment' client.slug bill.id installment.id %}" 
+                                                                  onsubmit="disableByID('deleteInstallmentConfirmButton{{ installment.id }}')">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" value="{{ sorted_by }}"
+                                                                       name="sort_by">
+                                                                <input type="hidden" value="{{ sort_type }}"
+                                                                       name="sort_type">
+                                                                <input type="hidden" value="{{ filters }}"
+                                                                       name="filters">
+                                                            </form>
                                                             <div class="row">
-                                                                <div class="col-sm-8 form-group form-control-label mb-3">
+                                                                <div class="col form-group form-control-label mb-3">
                                                                     <label for="name">Title</label>
                                                                     <input class="form-control" id="name"
-                                                                           value="{{ installment.bill.title }} ({{ installment.partial_id }}/{{ installment.bill.installments.count }})"
-                                                                           disabled>
+                                                                           name="bill_name"
+                                                                           value="{{ installment.bill.title }} ({{ installment.partial_id }}/{{ bill.installments_number }})" disabled>
                                                                 </div>
-                                                                <div class="col-sm-4 form-group form-control-label">
-                                                                    <label for="dueDate">Due date</label>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col form-group form-control-label">
+                                                                    <label for="billTotalInfo">Value</label>
+                                                                    <input inputmode="decimal"
+                                                                           class="form-control"
+                                                                           id="billTotalInfo"
+                                                                           name="bill_total" placeholder=""
+                                                                           value="{{ installment.value }}" disabled>
+                                                                </div>
+                                                                <div class="col form-group form-control-label">
+                                                                    <label for="installmentDueDateInput{{ installment.value }}">Due
+                                                                        date</label>
                                                                     <input type="date" class="form-control"
-                                                                           id="dueDate"
+                                                                           id="installmentDueDateInput{{ installment.value }}"
+                                                                           name="bill_due_date" placeholder=""
                                                                            value="{{ installment.due_date|date:'Y-m-d' }}"
                                                                            disabled>
                                                                 </div>
                                                             </div>
-                                                            <div class="row">
-                                                                <div class="col-sm form-group form-control-label">
-                                                                    <label for="total">Total</label>
-                                                                    <input inputmode="decimal"
-                                                                           class="form-control" id="total"
-                                                                           value="{{ installment.value }}"
-                                                                           disabled>
-                                                                </div>
-                                                                {% if installment.paid %}
-                                                                    <div class="col-sm form-group form-control-label">
-                                                                        <label for="paidAt">Paid at</label>
-                                                                        <input type="date"
-                                                                               class="form-control"
-                                                                               id="paidAt"
-                                                                               value="{{ installment.paid_at|date:'Y-m-d' }}"
-                                                                               disabled>
-                                                                    </div>
-                                                                {% else %}
-                                                                    <div class="col-sm form-group form-control-label">
-                                                                        <label for="billPaidInput">Paid
-                                                                            at</label>
-                                                                        <input type="date"
-                                                                               class="form-control"
-                                                                               id="billPaidInput"
-                                                                               name="bill_paid_at" required
-                                                                               autofocus>
-                                                                    </div>
-                                                                {% endif %}
-                                                            </div>
-                                                            <div class="form-group form-control-label">
-                                                                <label for="installmentEditInfoInput">Info</label>
-                                                                <textarea type="date"
-                                                                          class="form-control"
-                                                                          id="installmentEditInfoInput"
-                                                                          name="installment_info"
-                                                                          {% if installment.paid %}disabled{% endif %}
-                                                                >{{ installment.payment_info }}</textarea>
-                                                            </div>
-
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer pt-1">
-                                                        <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Cancel
-                                                        </button>
-                                                        {% if installment.paid %}
-                                                            <button type="submit" class="btn btn-warning"
-                                                                    id="paidInstallmentConfirmButton{{ installment.id }}"
-                                                                    form="paidInstallmentConfirmForm{{ installment.id }}">
-                                                                Set as pending
+                                                        </div>
+                                                        <div class="modal-footer pt-1">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-dismiss="modal">Cancel
                                                             </button>
-                                                        {% else %}
-                                                            <button type="submit" class="btn btn-success"
-                                                                    id="paidInstallmentConfirmButton{{ installment.id }}"
-                                                                    form="paidInstallmentConfirmForm{{ installment.id }}">
-                                                                Set as paid
+                                                            <button type="submit" class="btn btn-danger"
+                                                                    id="deleteInstallmentConfirmButton{{ installment.id }}"
+                                                                    form="deleteInstallmentConfirmForm{{ installment.id }}">
+                                                                Delete
                                                             </button>
-                                                        {% endif %}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        <!-- Delete Modal -->
-                                        <div class="modal fade"
-                                             id="deleteInstallmentConfirm{{ installment.id }}"
-                                             tabindex="-1"
-                                             role="dialog" aria-labelledby="deleteInstallmentConfirmLabel{{ installment.id }}"
-                                             aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header mt-2">
-                                                        <h5 class="modal-title my-1"
-                                                            style="margin-left: auto">
-                                                            <i class="ni ni-fat-delete text-blue"
-                                                               style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                                        </h5>
-                                                        <span class="ml-3 my-1"
-                                                              style="margin-right: auto; font-size: 1.2rem"
-                                                              id="deleteInstallmentConfirmModalLabel{{ installment.id }}">Are you sure?</span>
-                                                        <button type="button" class="close mt--4"
-                                                                style="margin-left: -30px"
-                                                                data-dismiss="modal"
-                                                                aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body py-0"
-                                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                        <p class="text-center">Are you sure you want to
-                                                            delete this
-                                                            installment?
-                                                            <br>
-                                                            This action cannot be undone.
-                                                        </p>
-                                                        <form method="post" id="deleteInstallmentConfirmForm{{ installment.id }}"
-                                                              action="{% url 'delete_client_bill_installment' client.slug bill.id installment.id %}" 
-                                                              onsubmit="disableByID('deleteInstallmentConfirmButton{{ installment.id }}')">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" value="{{ sorted_by }}"
-                                                                   name="sort_by">
-                                                            <input type="hidden" value="{{ sort_type }}"
-                                                                   name="sort_type">
-                                                            <input type="hidden" value="{{ filters }}"
-                                                                   name="filters">
-                                                        </form>
-                                                        <div class="row">
-                                                            <div class="col form-group form-control-label mb-3">
-                                                                <label for="name">Title</label>
-                                                                <input class="form-control" id="name"
-                                                                       name="bill_name"
-                                                                       value="{{ installment.bill.title }} ({{ installment.partial_id }}/{{ bill.installments_number }})" disabled>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="billTotalInfo">Value</label>
-                                                                <input inputmode="decimal"
-                                                                       class="form-control"
-                                                                       id="billTotalInfo"
-                                                                       name="bill_total" placeholder=""
-                                                                       value="{{ installment.value }}" disabled>
-                                                            </div>
-                                                            <div class="col form-group form-control-label">
-                                                                <label for="installmentDueDateInput{{ installment.value }}">Due
-                                                                    date</label>
-                                                                <input type="date" class="form-control"
-                                                                       id="installmentDueDateInput{{ installment.value }}"
-                                                                       name="bill_due_date" placeholder=""
-                                                                       value="{{ installment.due_date|date:'Y-m-d' }}"
-                                                                       disabled>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer pt-1">
-                                                        <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Cancel
-                                                        </button>
-                                                        <button type="submit" class="btn btn-danger"
-                                                                id="deleteInstallmentConfirmButton{{ installment.id }}"
-                                                                form="deleteInstallmentConfirmForm{{ installment.id }}">
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
+    
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
 
                     <!-- Details Modal -->
                     <div class="modal fade" id="detailsBillModal{{ bill.id }}" tabindex="-1" role="dialog"
