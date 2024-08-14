@@ -612,11 +612,13 @@ def submit_task(request, slug):
     project = Project.objects.get(slug=slug)
 
     if request.method == 'POST':
+        deadline = request.POST.get('taskDeadline', None)
+
         task = Task(
             project=project,
             title=request.POST.get('taskTitle'),
             description=request.POST.get('taskDescription'),
-            deadline=request.POST.get('taskDeadline'),
+            deadline=deadline if deadline != '' else None,
             priority=int(request.POST.get('taskPriority')),
             created_by=request.user,
             owner=User.objects.get(id=request.POST['taskOwner']) if request.POST.get('taskOwner') else None
