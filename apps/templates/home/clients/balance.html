@@ -732,6 +732,18 @@
                                                             <h5 class="mb-0">Pending</h5>
                                                         {% endif %}
                                                     </div>
+                                                    <div class="col-auto">
+                                                        <small>Invoice:</small>
+                                                        <h5 class="mb-0">{{ installment.invoice|default:'-' }}</h5>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <small>Receipt:</small>
+                                                        <h5 class="mb-0">{{ installment.receipt|default:'-' }}</h5>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <small>Authentication key:</small>
+                                                        <h5 class="mb-0">{{ installment.authentication_key|default:'-' }}</h5>
+                                                    </div>
                                                     <div class="col"></div>
                                                 </div>
                                             </li>
@@ -793,6 +805,21 @@
                                                                                    id="paidAt"
                                                                                    value="{{ installment.paid_at|date:'Y-m-d' }}"
                                                                                    disabled>
+                                                                        </div>
+                                                                        <div class="col-sm-6 form-group form-control-label">
+                                                                            <label for="invoice">Invoice</label>
+                                                                            <input class="form-control" id="invoice" name="invoice"
+                                                                                   value="{{ installment.invoice|default:'' }}">
+                                                                        </div>
+                                                                        <div class="col-sm-6 form-group form-control-label">
+                                                                            <label for="receipt">Receipt</label>
+                                                                            <input class="form-control" id="receipt" name="receipt"
+                                                                                   value="{{ installment.receipt|default:'' }}">
+                                                                        </div>
+                                                                        <div class="col-sm-12 form-group form-control-label">
+                                                                            <label for="authentication_key">Authentication key</label>
+                                                                            <input class="form-control" id="authentication_key" name="authentication_key"
+                                                                                   value="{{ installment.authentication_key|default:'' }}">
                                                                         </div>
                                                                     {% endif %}
                                                                 </div>
@@ -892,7 +919,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="row">
-                                                                    <div class="col-sm form-group form-control-label">
+                                                                    <div class="col-sm-8 form-group form-control-label">
                                                                         <label for="total">Total</label>
                                                                         <input inputmode="decimal"
                                                                                class="form-control" id="total"
@@ -900,7 +927,7 @@
                                                                                disabled>
                                                                     </div>
                                                                     {% if installment.paid %}
-                                                                        <div class="col-sm form-group form-control-label">
+                                                                        <div class="col-sm-4 form-group form-control-label">
                                                                             <label for="paidAt">Paid at</label>
                                                                             <input type="date"
                                                                                    class="form-control"
@@ -909,7 +936,7 @@
                                                                                    disabled>
                                                                         </div>
                                                                     {% else %}
-                                                                        <div class="col-sm form-group form-control-label">
+                                                                        <div class="col-sm-4 form-group form-control-label">
                                                                             <label for="billPaidInput">Paid
                                                                                 at</label>
                                                                             <input type="date"
@@ -917,6 +944,21 @@
                                                                                    id="billPaidInput"
                                                                                    name="bill_paid_at" required
                                                                                    autofocus>
+                                                                        </div>
+                                                                        <div class="col-sm-6 form-group form-control-label">
+                                                                            <label for="invoice">Invoice</label>
+                                                                            <input class="form-control" id="invoice" 
+                                                                                   name="invoice">
+                                                                        </div>
+                                                                        <div class="col-sm-6 form-group form-control-label">
+                                                                            <label for="receipt">Receipt</label>
+                                                                            <input class="form-control" id="receipt" 
+                                                                                   name="receipt">
+                                                                        </div>
+                                                                        <div class="col-sm-12 form-group form-control-label">
+                                                                            <label for="authentication_key">Authentication key</label>
+                                                                            <input class="form-control" id="authentication_key" 
+                                                                                   name="authentication_key">
                                                                         </div>
                                                                     {% endif %}
                                                                 </div>
@@ -1242,6 +1284,23 @@
                                                         </div>
                                                         {# PAYMENT INFO #}
                                                         {% if bill.paid %}
+                                                            <div class="row">
+                                                                <div class="col-sm form-group form-control-label">
+                                                                    <label for="invoice">Invoice</label>
+                                                                    <input class="form-control" id="invoice" name="invoice"
+                                                                           value="{{ bill.invoice|default:'' }}">
+                                                                </div>
+                                                                <div class="col-sm form-group form-control-label">
+                                                                    <label for="receipt">Receipt</label>
+                                                                    <input class="form-control" id="receipt" name="receipt"
+                                                                           value="{{ bill.receipt|default:'' }}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group form-control-label">
+                                                                <label for="authentication_key">Authentication key</label>
+                                                                <input class="form-control" id="authentication_key" name="authentication_key"
+                                                                       value="{{ bill.authentication_key|default:'' }}">
+                                                            </div>
                                                             <div class="form-group form-control-label">
                                                                 <label for="installmentEditInfoInput">Payment info</label>
                                                                 <textarea class="form-control"
@@ -1481,6 +1540,22 @@
                                                 </div>
                                             {% endif %}
                                         </div>
+                                        {% if not bill.paid %}
+                                            <div class="row">
+                                                <div class="col form-group form-control-label">
+                                                    <label for="invoice">Invoice</label>
+                                                    <input class="form-control" id="invoice" name="invoice">
+                                                </div>
+                                                <div class="col form-group form-control-label">
+                                                    <label for="receipt">Receipt</label>
+                                                    <input class="form-control" id="receipt" name="receipt">
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-control-label">
+                                                <label for="authentication_key">Authentication key</label>
+                                                <input class="form-control" id="authentication_key" name="authentication_key">
+                                            </div>
+                                        {% endif %}
                                         <div class="form-group form-control-label">
                                             <label for="installmentEditInfoInput">Info</label>
                                             <textarea type="date"

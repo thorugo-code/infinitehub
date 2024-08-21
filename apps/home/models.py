@@ -573,6 +573,9 @@ class Bill(models.Model):
     origin = models.CharField(max_length=100, null=True, blank=True)
     category = models.CharField(max_length=100, null=True, blank=True)
     code = models.CharField(max_length=100, null=True, blank=True)
+    invoice = models.CharField(max_length=100, null=True, blank=True)
+    receipt = models.CharField(max_length=100, null=True, blank=True)
+    authentication_key = models.CharField(max_length=100, null=True, blank=True)
 
     # Date Fields
     created_at = models.DateField(auto_now_add=True)
@@ -641,6 +644,11 @@ class Bill(models.Model):
 class BillInstallment(models.Model):
     # Foreign Keys and Relationships
     bill = models.ForeignKey(Bill, related_name='installments', on_delete=models.CASCADE)
+
+    # Char Fields
+    invoice = models.CharField(max_length=100, null=True, blank=True)
+    receipt = models.CharField(max_length=100, null=True, blank=True)
+    authentication_key = models.CharField(max_length=100, null=True, blank=True)
 
     # Date Fields
     due_date = models.DateField(null=True, blank=True)

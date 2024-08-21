@@ -714,6 +714,9 @@ def edit_bill(request, slug, bill_id):
         bill.issue_date = issue_date if issue_date != '' else None
         bill.due_date = due_date if due_date != '' else None
         bill.paid_at = paid_at if paid_at != '' else None
+        bill.invoice = request.POST.get('invoice', bill.invoice)
+        bill.receipt = request.POST.get('receipt', bill.receipt)
+        bill.authentication_key = request.POST.get('authentication_key', bill.authentication_key)
         bill.payment_info = request.POST.get('payment_info', bill.payment_info)
 
         bill.save()
@@ -750,6 +753,9 @@ def change_status(request, slug, bill_id):
 
     if not bill.paid:
         bill.paid_at = request.POST.get('bill_paid_at', datetime.now())
+        bill.invoice = request.POST.get('invoice', None)
+        bill.receipt = request.POST.get('receipt', None)
+        bill.authentication_key = request.POST.get('authentication_key', None)
         bill.payment_info = request.POST.get('payment_info', '')
         bill.paid = True
         if bill.installments_number > 1:
@@ -1003,6 +1009,9 @@ def installment_change_status(request, slug, bill_id, installment_id):
         current.paid_at = None
 
     current.paid = not current.paid
+    current.invoice = request.POST.get('invoice', None)
+    current.receipt = request.POST.get('receipt', None)
+    current.authentication_key = request.POST.get('authentication_key', None)
     current.payment_info = request.POST.get('installment_info', current.payment_info)
     current.save()
 
@@ -1052,11 +1061,13 @@ def installment_edit(request, slug, bill_id, installment_id):
 
     new_installment_value = unmask_money(request.POST.get('installment_value', 0), currency)
     due_date = request.POST.get('installment_due_date', installment.due_date)
-    installment_payment_info = request.POST.get('installment_info', installment.payment_info)
 
     installment.value = new_installment_value
     installment.due_date = due_date if due_date != '' else None
-    installment.payment_info = installment_payment_info
+    installment.invoice = request.POST.get('invoice', installment.invoice)
+    installment.receipt = request.POST.get('receipt', installment.receipt)
+    installment.authentication_key = request.POST.get('authentication_key', installment.authentication_key)
+    installment.payment_info = request.POST.get('installment_info', installment.payment_info)
     installment.save()
 
     if installment.due_date is None:
