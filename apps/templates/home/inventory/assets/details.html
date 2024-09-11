@@ -344,9 +344,11 @@
                                             <span class="name mb-0 text-sm"
                                                   style="font-weight: 400; color: #525f7f">
                                                 {% if file.file.name|file_extension_icon == 'default.png' %}
-                                                    {{ file|truncatechars:50 }}
+                                                    {{ file.custom_name|default:file.file|file_name_only_with_extension|truncatechars:50 }}
+                                                {% elif file.custom_name %}
+                                                    {{ file.custom_name|truncatechars:50 }}
                                                 {% else %}
-                                                    {{ file|file_name_only|truncatechars:50 }}
+                                                    {{ file.file|file_name_only|truncatechars:50 }}
                                                 {% endif %}
                                             </span>
                                         </a>
@@ -363,7 +365,9 @@
                                         {{ file.project.title|truncatechars:30 }}
                                     </td>
                                     <td>
+                                        {% if file.project %}
                                         {{ file.project.client.name|default:file.project.client_str|truncatechars:30 }}
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {{ file.file.size|filesizeformat }}
