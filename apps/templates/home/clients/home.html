@@ -3,11 +3,180 @@
 {% block title %} Clients {% endblock title %}
 
 {% block stylesheets %}
+    
     <style>
+
         .pointer-hover:hover {
             cursor: pointer;
         }
+        div.dt-container div.dt-layout-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin: 0.75em 0;
+        }
+        div.dt-container select.dt-input {
+            width: auto;
+            display: inline-block;
+            height: calc(.45em + 1.25rem + 5px);
+            font-size: .875rem;
+            transition: all .15s ease-in-out;
+            border-radius: .25rem;
+            color: #8898aa;
+            border: 1px solid #dee2e6;
+            background-clip: padding-box;
+            box-shadow: 0 3px 2px rgba(233, 236, 239, .05);
+        }
+        div.dt-container .dt-input {
+            margin-right: .5rem;
+            font-weight: lighter;
+        }
+        div.dt-container .dt-input:focus {
+            outline: none;
+            border-color: #5e72e4;
+        }
+        div.dt-container label {
+            font-weight: lighter;
+        }
+        div.dt-container .dt-info {
+            font-weight: lighter;
+            font-size: 0.875rem;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        div.dt-container div.dt-layout-table {
+            margin-bottom: -.75rem;
+        }
+        div.dt-container div.dt-layout-table > div {
+            display: block !important;
+        }
+        div.dt-container div.dt-layout-full {
+            width: 100%;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
+            justify-content: flex-start;
+            margin-right: auto;
+            padding-left: 1.5rem;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
+            justify-content: flex-end;
+            margin-left: auto;
+            padding-right: 1.5rem;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        div.dt-container div.dt-search label {
+            position: relative;
+            display: none;
+        }
+        div.dt-container div.dt-search input {
+            font-size: .875rem;
+            color: #495057;
+            border: 1px solid #e9ecef;
+            border-radius: .5rem;
+        }
+        div.dt-container div.dt-search input:focus {
+            outline: none;
+        }
+        div.dt-container div.dt-search input.dt-input {
+            padding: 6px 12px;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc, table.dataTable thead > tr > th.dt-orderable-desc, table.dataTable thead > tr > td.dt-orderable-asc, table.dataTable thead > tr > td.dt-orderable-desc {
+            cursor: pointer;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc, table.dataTable thead > tr > th.dt-orderable-desc, table.dataTable thead > tr > th.dt-ordering-asc, table.dataTable thead > tr > th.dt-ordering-desc, table.dataTable thead > tr > td.dt-orderable-asc, table.dataTable thead > tr > td.dt-orderable-desc, table.dataTable thead > tr > td.dt-ordering-asc, table.dataTable thead > tr > td.dt-ordering-desc {
+            position: relative;
+            padding-right: 30px;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order {
+            position: absolute;
+            right: 12px;
+            top: 0;
+            bottom: 0;
+            width: 12px;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:after, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:before, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            left: 0;
+            opacity: 0.125;
+            line-height: 9px;
+            font-size: 0.8em;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before {
+            position: absolute;
+            display: block;
+            bottom: 50%;
+            content: "▲";
+            content: "▲" / "";
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:after, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:before, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            left: 0;
+            opacity: 0.125;
+            line-height: 9px;
+            font-size: 0.8em;
+        }
+        table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            position: absolute;
+            display: block;
+            top: 50%;
+            content: "▼";
+            content: "▼" / "";
+        }
+        table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            opacity: 0.6;
+        }
+        table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            opacity: 0.6;
+        }
+        .image-column .dt-column-order::before {
+            display: none !important;
+        }
+        .dataTable th:hover {
+            outline: none !important;
+        }
+        .dt-paging-button {
+            padding: 0;
+            margin: 0 3px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 0.875rem;
+            line-height: 1.25;
+            color: #8898aa;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+        }
+        .dt-paging-button.current {
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+            z-index: 3;
+            color: #fff;
+            background-color: #0071c2;
+            border-color: #0071c2;
+        }
+        .dt-paging-button:focus {
+            outline: 0;
+        }
+        .dt-paging-button:hover:not(.current) {
+            z-index: 2;
+            color: #8898aa;
+            text-decoration: none;
+            background-color: #dee2e6;
+            border-color: #dee2e6;
+        }
+
     </style>
+
 {% endblock stylesheets %}
 
 {% block content %}
@@ -33,300 +202,480 @@
 
     <!-- Page content -->
     <div class="container-fluid mt--6">
-        <div class="row" style="min-height: 670px">
-            <div class="col">
-                <div class="card">
-                    <!-- Card header -->
-                    <div class="card-header border-0">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h3 class="mb-0">Clients</h3>
+
+        {% if perms.home.add_client %}
+            <div class="row" style="min-height: 20vh">
+                <div class="col-lg-7">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4 class="mb-0">Upcoming transactions</h4>
+                                </div>
+                                <div class="col-md-6 d-flex justify-content-end align-items-center text-dark">
+                                    <i class="far fa-calendar-alt mr-2"></i>
+                                    <small>60 days</small>
+                                </div>
                             </div>
-                            <div class="col text-right">
-                                <a href="#" class="btn btn-sm {% if sorted_by is None %}btn-neutral{% else %}btn-primary{% endif %}" data-toggle="modal"
-                                   data-target="#sortModal">
-                                    {% if sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down mr-0"></i>{% elif sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up mr-0"></i>{% endif %}
-                                    {% if sorted_by is not None %}
-                                        <span>{{ sorted_by|capfirst }}</span>
-                                    {% else %}
-                                        <i class="fas fa-sort"></i>
-                                    {% endif %}
-                                </a>
-                                {% if perms.home.add_client %}
-                                    <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
-                                       data-target="#newClientModal">
-                                        <i class="fas fa-plus"></i>
-                                    </a>
-                                {% endif %}
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group" style="height: 495px; overflow-y: auto">
+                                {% for bill in upcoming_bills|dictsort:"due_date" %}
+
+                                    <li class="list-group-item border-0 justify-content-between px-0 pb-0 border-radius-lg">
+                                        <div class="d-flex px-4">
+                                            <div class="d-flex align-items-center">
+                                                {% if bill.category in income_categories %}
+                                                    <a href="#" data-toggle="modal" data-target="#detailsBillModal{{ bill.id }}"
+                                                       class="btn btn-icon-only btn-rounded btn-outline-success mb-0 mr-3 p-3 btn-sm d-flex align-items-center justify-content-center">
+                                                        <i class="fas fa-arrow-up"></i></a>
+                                                {% else %}
+                                                    <a href="#" data-toggle="modal" data-target="#detailsBillModal{{ bill.id }}"
+                                                       class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 mr-3 p-3 btn-sm d-flex align-items-center justify-content-center">
+                                                        <i class="fas fa-arrow-down"></i></a>
+                                                {% endif %}
+                                                <div class="d-flex flex-column">
+                                                    <h6 class="mb-1 text-dark text-sm">{{ bill.title }}</h6>
+                                                    <span class="text-xs">{{ bill.client.name }}</span>
+                                                    <span class="text-xs {% if bill.due_date|time_to_date < 0 %}text-danger{% elif bill.due_date|time_to_date < 10 %}text-warning{% endif %}">{{ bill.due_date|date:"d/m/Y" }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center {% if bill.category in income_categories %}text-success{% else %}text-danger{% endif %} text-gradient text-sm font-weight-bold ml-auto">
+                                                {% if bill.installments.count > 1 %}
+                                                    <span class="d-block">
+                                                        <span class="text-xs d-block text-black-50">
+                                                            ({{ bill.installments.all|installments_paid:'False'|order_by:'due_date'|first|get_attr:'partial_id' }}/{{ bill.installments_number }})
+                                                        </span>
+                                                        {{ bill.installments.all|installments_paid:'False'|order_by:'due_date'|first|get_attr:'value' }}
+                                                    </span>
+                                                {% else %}
+                                                    {{ bill.total }}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <hr class="horizontal dark mt-3 mb-2">
+                                    </li>
+
+                                    <!-- Details Modal -->
+                                    <div class="modal fade" id="detailsBillModal{{ bill.id }}" tabindex="-1"
+                                         role="dialog"
+                                         aria-labelledby="detailsBillModal{{ bill.id }}Label" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header mt-2 align-items-center">
+                                                    <h5 class="modal-title" style="margin-left: auto">
+                                                        {% if bill.category in income_categories %}
+                                                            <i class="fas fa-plus text-green"
+                                                               style="font-size: 1rem"></i>
+                                                        {% else %}
+                                                            <i class="fas fa-minus text-danger"
+                                                               style="font-size: 1rem"></i>
+                                                        {% endif %}
+                                                    </h5>
+                                                    <span class="ml-3 my-1"
+                                                          style="margin-right: auto; font-size: 1.2rem"
+                                                          id="detailsBillModal{{ bill.id }}Label">{% if bill.title != '' %}
+                                                        {{ bill.title|truncatechars:25 }}{% else %}
+                                                        Bill{% endif %}</span>
+                                                    <button type="button" class="close mt--4"
+                                                            style="margin-left: -30px"
+                                                            data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    {# CLIENT #}
+                                                    <div class="form-group form-control-label mb-3">
+                                                        <label for="clientDetails">Client</label>
+                                                        <input type="text" class="form-control"
+                                                               id="clientDetails" value="{{ bill.client.name }}"
+                                                               disabled>
+                                                    </div>
+                                                    {# OFFICE / REGIONAL #}
+                                                    <div class="row">
+                                                        <div class="col-6 form-group form-control-label mb-3">
+                                                            <label for="regional">Regional</label>
+                                                            <input type="text" id="regional" class="form-control"
+                                                                   value="{{ bill.payer.name }}" disabled>
+                                                        </div>
+                                                        <div class="col form-group form-control-label mb-3">
+                                                            <label for="beneficiaryDetails">Office</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="beneficiaryDetails" value="{{ bill.office.company_name }}"
+                                                                   disabled>
+                                                        </div>
+                                                    </div>
+                                                    {# TOTAL / DUE DATE #}
+                                                    <div class="row">
+                                                        <div class="col form-group form-control-label">
+                                                            <label for="valueDetails{{ bill.id }}">Total</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="valueDetails{{ bill.id }}"
+                                                                   value="{{ bill.total }}{% if bill.installments.count > 1 %} ({{ bill.installments_number }}x){% endif %}" disabled>
+                                                        </div>
+                                                        <div class="col form-group form-control-label"
+                                                             style="flex: 0 0 30%; max-width: 30%">
+                                                            <label for="methodDetails">Method</label>
+                                                            <input type="text" class="form-control" id="methodDetails"
+                                                                   value="{{ bill.method }}" disabled>
+                                                        </div>
+                                                        <div class="col form-group form-control-label"
+                                                             style="flex: 0 0 30%; max-width: 30%">
+                                                            <label for="billDueDateInputDetails">
+                                                                Due date
+                                                            </label>
+                                                            <input type="date" class="form-control"
+                                                                   id="billDueDateInputDetails"
+                                                                   value="{{ bill.due_date|date:'Y-m-d' }}" disabled>
+                                                        </div>
+                                                    </div>
+                                                    {# CODE / PROOF #}
+                                                    {% if bill.code or bill.link %}
+                                                        {% if bill.code or bill.link %}
+                                                            <div class="form-group form-control-label mb-3 pr-0 align-items-center d-flex">
+                                                                <a href="{{ bill.link|default:'#' }}">
+                                                                    <i class="fas fa-link px-2"></i> {{ bill.code|default:bill.link|truncatechars:50 }}
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    {% if bill.installments_number > 1 %}
+                                                        {# INSTALLMENTS / DUE DATE #}
+                                                        <div class="row">
+                                                            <div class="col form-group form-control-label">
+                                                                <label for="valueDetails{{ bill.id }}">Nearest installment ({{ bill.installments.all|installments_paid:'False'|order_by:'due_date'|first|get_attr:'partial_id' }}/{{ bill.installments_number }})</label>
+                                                                <input type="text" class="form-control"
+                                                                       id="valueDetails{{ bill.id }}"
+                                                                       value="{{ bill.installments.all|installments_paid:'False'|order_by:'due_date'|first|get_attr:'value' }}"
+                                                                       disabled>
+                                                            </div>
+                                                            <div class="col-4 form-group form-control-label"
+                                                                 style="flex: 0 0 30%; max-width: 30%">
+                                                                <label for="billDueDateInputDetails">
+                                                                    Due date
+                                                                </label>
+                                                                <input type="date" class="form-control"
+                                                                       id="billDueDateInputDetails"
+                                                                       value="{{ bill.due_date|date:'Y-m-d' }}" disabled>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="modal-footer pb-4 pt-2">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">Cancel
+                                                    </button>
+                                                    {% if perms.home.change_bill %}
+                                                        {% if bill.installments_number > 1 %}
+                                                            <a href="{% url 'client_balance' bill.client.slug %}#bill{{ bill.id }}&{{ bill.installments.all|installments_paid:'False'|order_by:'due_date'|first|get_attr:'id' }}"
+                                                               target="_blank"
+                                                               class="btn btn-outline-primary">
+                                                                See Inst.
+                                                            </a>
+                                                        {% endif %}
+                                                        <a href="{% url 'client_balance' bill.client.slug %}#bill{{ bill.id }}"
+                                                           target="_blank"
+                                                           class="btn btn-primary">
+                                                            See bill
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="card-footer py-1 border-0"></div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card bg-gradient-success" style="min-width: 0">
+                                <div class="card-body p-3">
+                                    <div class="numbers">
+                                        <p class="text-white text-uppercase text-sm mb-0">Received</p>
+                                        <h4 class="text-white font-weight-bolder mb-0">
+                                            {{ last_six_months_received }}
+                                        </h4>
+                                        <span class="text-xs text-white-50">Last 6 months</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card bg-gradient-danger" style="min-width: 0">
+                                <div class="card-body p-3">
+                                    <div class="numbers">
+                                        <p class="text-white text-uppercase text-sm mb-0">Paid</p>
+                                        <h4 class="text-white font-weight-bolder mb-0">
+                                            {{ last_six_months_paid }}
+                                        </h4>
+                                        <span class="text-xs text-white-50">Last 6 months</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Light table -->
-                    <table id="projectsListTable" class="table-responsive table align-items-center table-flush"
-                           style="height: 45rem">
-                        <thead class="thead-light">
-                        <tr>
-                            <th scope="col" style="width: 0"></th>
-                            {% if perms.home.change_client %}
-                                <th scope="col" class="pl-0" style="width: 35%">Name
-                                    {% if sorted_by == 'name' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'name' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                    {% if sorted_by == 'area' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'area' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
-                                <th scope="col" style="width: 15%">CNPJ</th>
-                                <th scope="col" style="width: 25%">Contact</th>
-                                <th scope="col" style="width: 20%">XML</th>
-                            {% else %}
-                                <th scope="col" class="pl-0" style="width: 40%">Name
-                                    {% if sorted_by == 'name' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'name' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                    {% if sorted_by == 'area' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'area' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
-                                <th scope="col" style="width: 25%">CNPJ</th>
-                                <th scope="col" style="width: 35%">Contact</th>
-                            {% endif %}
-                            <th scope="col" style="width: 0"></th>
-                        </tr>
-                        </thead>
-                        <tbody class="list">
-                        {% load filters %}
-                        {% for client in clients %}
-                            <tr>
-                                <th scope="row" class="py-3">
-                                    <a {% if user_profile.user.username|check_group:'collaborator' and perms.home.view_client and not perms.home.change_client %}
-                                           href="" data-dismiss="modal" data-toggle="modal"
-                                           data-target="#detailsClientModal{{ client.id }}"
-                                       {% elif perms.home.change_client and client.contact_email and client.office %}
-                                           href="{% url 'client_details' client.slug %}"
-                                       {% endif %}
-                                    class="media align-items-center">
-                                        <div class="avatar rounded-circle">
-                                            <img
-                                                style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
-                                                alt="Image placeholder"
-                                                src="{{ client.avatar.url }}">
-                                        </div>
-                                    </a>
-                                </th>
-                                <th scope="row" class="py-3 pl-0">
-                                    <a {% if user_profile.user.username|check_group:'collaborator' and perms.home.view_client and not perms.home.change_client %}
-                                           href="" data-dismiss="modal" data-toggle="modal"
-                                           data-target="#detailsClientModal{{ client.id }}"
-                                       {% elif perms.home.change_client %}
-                                           href="{% url 'client_details' client.slug %}"
-                                       {% endif %}
-                                    class="media align-items-center">
-                                        <div class="media-body">
-                                            <span class="name mb-0 text-sm"
-                                                  style="font-weight: 400; color: #525f7f">
-                                                {{ client.name|truncatechars:40 }}
-                                            </span>
-                                            <span class="d-block text-muted font-weight-light">
-                                                {{ client.area|truncatechars:30 }}
-                                        </div>
-                                    </a>
-                                </th>
-                                <td>
-                                    <span>{{ client.cnpj }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ client.contact_email|truncatechars:30 }}</span>
-                                    <span class="d-block {% if client.contact_email %}font-weight-light{% endif %}" style="font-size: 90%">{{ client.phone }}</span>
-                                </td>
-                                {% if perms.home.change_client %}
-                                    <td>
-                                        {% if client.xml_email %}
-                                        <span>
-                                            <a data-toggle="tooltip" data-placement="top" title="Copy" class="pointer-hover"
-                                               onpointerdown="copyToClipboard('{{ client.xml_email }}', this)" onpointerleave="clearTitle('Copy', this)">
-                                                <i class="fas fa-copy mr-1 font-weight-light text-blue" style="font-size: 90%"></i>
-                                            </a>
-                                            {{ client.xml_email|truncatechars:30 }}
-                                        </span>
-                                        {% endif %}
-                                    </td>
-                                {% endif %}
-                                <td class="text-right">
-                                    <div class="dropdown">
-                                        <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
-                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                            <a {% if user_profile.user.username|check_group:'collaborator' and perms.home.view_client and not perms.home.change_client %}
-                                                   href="" data-dismiss="modal" data-toggle="modal"
-                                                   data-target="#detailsClientModal{{ client.id }}"
-                                               {% elif perms.home.change_client %}
-                                                   href="{% url 'client_details' client.slug %}"
-                                               {% endif %}
-                                            class="dropdown-item">
-                                                Open
-                                            </a>
-                                            {% if perms.home.delete_client %}
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item text-danger" href="" data-dismiss="modal"
-                                                   data-toggle="modal"
-                                                   data-target="#deleteConfirm{{ client.id }}">Delete</a>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            {% if perms.home.view_client %}
-                                <!-- Details Modal -->
-                                <div class="modal fade" id="detailsClientModal{{ client.id }}" tabindex="-1" role="dialog"
-                                 aria-labelledby="detailsClientModal{{ client.id }}Label" aria-hidden="true">
-                                <div class="modal-dialog my-6" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header mt-2 align-items-center">
-                                            <h5 class="modal-title" style="margin-left: auto">
-                                                <i class="fas fa-user-tie text-blue" style="font-size: 1.5rem"></i>
-                                            </h5>
-                                            <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
-                                                  id="detailsClientModal{{ client.id }}Label">{{ client.name|truncatechars:30 }}</span>
-                                            <button type="button" class="close mt--4" style="margin-left: -30px"
-                                                    data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <div class="form-group form-control-label">
-                                                <label for="name">Name</label>
-                                                <input type="text" class="form-control" id="name" name="name"
-                                                       placeholder="Client name" value="{{ client.name }}" disabled>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-7 form-group form-control-label mb-3">
-                                                    <label for="area">Area</label>
-                                                    <input type="text" class="form-control" id="area"
-                                                           name="area" placeholder="Client area of activity"
-                                                           value="{{ client.area }}" disabled>
-                                                </div>
-                                                <div class="col-5 form-group form-control-label mb-3">
-                                                    <label for="cnpj">CNPJ</label>
-                                                    <input type="text" class="form-control" id="cnpj" name="cnpj"
-                                                           value="{{ client.cnpj }}" disabled>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-5 form-group form-control-label">
-                                                    <label for="phone">Phone</label>
-                                                    <input type="text" id="phone" name="phone"
-                                                           class="form-control" value="{{ client.phone }}" disabled>
-                                                </div>
-                                                <div class="col-sm-7 form-group form-control-label">
-                                                    <label for="area">Email</label>
-                                                    <input type="email" id="area" name="email"
-                                                           class="form-control" value="{{ client.contact_email }}" disabled>
-                                                </div>
-                                            </div>
-                                            <div class="form-group form-control-label">
-                                                <label for="address">Address</label>
-                                                <input type="text" class="form-control"
-                                                       id="address"
-                                                       name="address" value="{{ client.location }}" disabled>
-                                            </div>
-                                            <div class="form-group form-control-label">
-                                                <label for="about">About</label>
-                                                <textarea rows="2" class="form-control" id="about" name="about"
-                                                          disabled>{{ client.description }}</textarea>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer pt-1"></div>
-                                    </div>
-                                </div>
+                    <div class="card z-index-2">
+                        <div class="card-header pb-2 border-0">
+                            <h4>Last 6 months</h4>
+                        </div>
+                        <div class="card-body px-3 pt-2 pb-3">
+                            <div class="chart">
+                                <canvas id="line-chart-inputs-outputs" class="chart-canvas"></canvas>
                             </div>
-                            {% endif %}
-
-                            {% if perms.home.delete_client %}
-                                <!-- Delete Modal -->
-                                <div class="modal fade" id="deleteConfirm{{ client.id }}" tabindex="-1"
-                                 role="dialog" aria-labelledby="deleteConfirmLabel{{ client.id }}"
-                                 aria-hidden="true">
-                                <div class="modal-dialog my-6" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header mt-2">
-                                            <h5 class="modal-title my-1" style="margin-left: auto">
-                                                <i class="ni ni-fat-delete text-blue"
-                                                   style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                                            </h5>
-                                            <span class="ml-3 my-1"
-                                                  style="margin-right: auto; font-size: 1.2rem"
-                                                  id="deleteConfirmModalLabel{{ project.id }}">Are you sure?</span>
-                                            <button type="button" class="close mt--4"
-                                                    style="margin-left: -30px" data-dismiss="modal"
-                                                    aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-
-                                        <div class="mt-4 pb-4"
-                                             style="display: flex; justify-content: center">
-                                            <div style="z-index: 1; width: 150px; height: 150px; background-color: #adb5bd00">
-                                                <img
-                                                        id="imagePreviewModal"
-                                                        class="rounded-circle"
-                                                        style="max-width: 100%; height: 100%; object-fit: cover;"
-                                                        alt="Image placeholder"
-                                                        src="{{ client.avatar.url }}">
-                                            </div>
-                                        </div>
-                                        <span class="mb-2 text-center" style="font-size: 1.1rem"
-                                              id="deleteConfirmModalLabel{{ client.id }}">{{ client.name|truncatechars:30 }}</span>
-                                        <div class="modal-body py-0"
-                                             style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <p class="text-center">Are you sure you want to delete this
-                                                client?
-                                                <br>
-                                                This action cannot be undone.
-                                            <form method="post" id="deleteConfirmForm{{ client.id }}"
-                                                  action="{% url 'delete_client' client.slug %}" 
-                                                  onsubmit="disableByID('deleteClientConfirmButton{{ client.id }}');
-                                                  disableByID('deleteClientCancelButton{{ client.id }}')">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="sort_by" value="{{ sorted_by }}">
-                                                <input type="hidden" name="sort_type" value="{{ sort_type }}">
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" id="deleteClientCancelButton{{ client.id }}"
-                                                    data-dismiss="modal">Cancel
-                                            </button>
-                                            <button type="submit" class="btn btn-danger" id="deleteClientConfirmButton{{ client.id }}"
-                                                    form="deleteConfirmForm{{ client.id }}">Delete
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="card-footer py-1 border-0">
+                        </div>
                     </div>
                 </div>
-
             </div>
+        {% endif %}
+
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h4 class="mb-0">Clients</h4>
+                    </div>
+                    <div class="col text-right">
+                        {% if perms.home.add_client %}
+                            <a href="#" class="btn btn-sm btn-neutral" data-toggle="modal"
+                               data-target="#newClientModal">
+                                <i class="fas fa-plus"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="clients_table" class="table-responsive table align-items-center table-flush">
+                    <thead class="thead-light">
+                    <tr>
+                        <th scope="col" style="width: 0">ID</th>
+                        {% if perms.home.change_client %}
+                            <th scope="col" style="width: 35%">Name</th>
+                            <th scope="col" style="width: 20%">CNPJ</th>
+                            <th scope="col" style="width: 20%">Contact</th>
+                            <th scope="col" style="width: 20%">XML</th>
+                        {% else %}
+                            <th scope="col" style="width: 40%">Name</th>
+                            <th scope="col" style="width: 30%">CNPJ</th>
+                            <th scope="col" style="width: 30%">Contact</th>
+                        {% endif %}
+                        <th scope="col" style="width: 0"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="list">
+                    {% load filters %}
+                    {% for client in clients %}
+                        <tr>
+                            <td>
+                                <span class="{% if not client.identification %}d-none{% endif %}">{{ client.identification }}</span>
+                            </td>
+                            <th scope="row" class="py-3">
+                                <a {% if user_profile.user.username|check_group:'collaborator' and perms.home.view_client and not perms.home.change_client %}
+                                       href="" data-dismiss="modal" data-toggle="modal"
+                                       data-target="#detailsClientModal{{ client.id }}"
+                                   {% elif perms.home.change_client %}
+                                       href="{% url 'client_details' client.slug %}"
+                                   {% endif %}
+                                class="media align-items-center">
+                                    <div class="media-body">
+                                        <span class="name mb-0 text-sm"
+                                              style="font-weight: 400; color: #525f7f">
+                                            {{ client.name|truncatechars:40 }}
+                                        </span>
+                                        <span class="d-block text-muted font-weight-light">
+                                            {{ client.area|truncatechars:30 }}
+                                    </div>
+                                </a>
+                            </th>
+                            <td>
+                                <span>{{ client.cnpj }}</span>
+                            </td>
+                            <td>
+                                <span>{{ client.contact_email|truncatechars:30 }}</span>
+                                <span class="d-block {% if client.contact_email %}font-weight-light{% endif %}" style="font-size: 90%">{{ client.phone }}</span>
+                            </td>
+                            {% if perms.home.change_client %}
+                                <td>
+                                    {% if client.xml_email %}
+                                    <span>
+                                        <a data-toggle="tooltip" data-placement="top" title="Copy" class="pointer-hover"
+                                           onpointerdown="copyToClipboard('{{ client.xml_email }}', this)" onpointerleave="clearTitle('Copy', this)">
+                                            <i class="fas fa-copy mr-1 font-weight-light text-blue" style="font-size: 90%"></i>
+                                        </a>
+                                        {{ client.xml_email|truncatechars:30 }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                            <td class="text-right">
+                                <div class="dropdown">
+                                    <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
+                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                        <a {% if user_profile.user.username|check_group:'collaborator' and perms.home.view_client and not perms.home.change_client %}
+                                               href="" data-dismiss="modal" data-toggle="modal"
+                                               data-target="#detailsClientModal{{ client.id }}"
+                                           {% elif perms.home.change_client %}
+                                               href="{% url 'client_details' client.slug %}"
+                                           {% endif %}
+                                        class="dropdown-item">
+                                            Open
+                                        </a>
+                                        {% if perms.home.delete_client %}
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item text-danger" href="" data-dismiss="modal"
+                                               data-toggle="modal"
+                                               data-target="#deleteConfirm{{ client.id }}">Delete</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        {% if perms.home.view_client %}
+                            {# <!-- Details Modal --> #}
+                            <div class="modal fade" id="detailsClientModal{{ client.id }}" tabindex="-1" role="dialog"
+                             aria-labelledby="detailsClientModal{{ client.id }}Label" aria-hidden="true">
+                            <div class="modal-dialog my-6" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header mt-2 align-items-center">
+                                        <h5 class="modal-title" style="margin-left: auto">
+                                            <i class="fas fa-user-tie text-blue" style="font-size: 1.5rem"></i>
+                                        </h5>
+                                        <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
+                                              id="detailsClientModal{{ client.id }}Label">{{ client.name|truncatechars:30 }}</span>
+                                        <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                        <div class="form-group form-control-label">
+                                            <label for="name">Name</label>
+                                            <input type="text" class="form-control" id="name" name="name"
+                                                   placeholder="Client name" value="{{ client.name }}" disabled>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-7 form-group form-control-label mb-3">
+                                                <label for="area">Area</label>
+                                                <input type="text" class="form-control" id="area"
+                                                       name="area" placeholder="Client area of activity"
+                                                       value="{{ client.area }}" disabled>
+                                            </div>
+                                            <div class="col-5 form-group form-control-label mb-3">
+                                                <label for="cnpj">CNPJ</label>
+                                                <input type="text" class="form-control" id="cnpj" name="cnpj"
+                                                       value="{{ client.cnpj }}" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-5 form-group form-control-label">
+                                                <label for="phone">Phone</label>
+                                                <input type="text" id="phone" name="phone"
+                                                       class="form-control" value="{{ client.phone }}" disabled>
+                                            </div>
+                                            <div class="col-sm-7 form-group form-control-label">
+                                                <label for="area">Email</label>
+                                                <input type="email" id="area" name="email"
+                                                       class="form-control" value="{{ client.contact_email }}" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-control-label">
+                                            <label for="address">Address</label>
+                                            <input type="text" class="form-control"
+                                                   id="address"
+                                                   name="address" value="{{ client.location }}" disabled>
+                                        </div>
+                                        <div class="form-group form-control-label">
+                                            <label for="about">About</label>
+                                            <textarea rows="2" class="form-control" id="about" name="about"
+                                                      disabled>{{ client.description }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer pt-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if perms.home.delete_client %}
+                            {# <!-- Delete Modal --> #}
+                            <div class="modal fade" id="deleteConfirm{{ client.id }}" tabindex="-1"
+                             role="dialog" aria-labelledby="deleteConfirmLabel{{ client.id }}"
+                             aria-hidden="true">
+                            <div class="modal-dialog my-6" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header mt-2">
+                                        <h5 class="modal-title my-1" style="margin-left: auto">
+                                            <i class="ni ni-fat-delete text-blue"
+                                               style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
+                                        </h5>
+                                        <span class="ml-3 my-1"
+                                              style="margin-right: auto; font-size: 1.2rem"
+                                              id="deleteConfirmModalLabel{{ project.id }}">Are you sure?</span>
+                                        <button type="button" class="close mt--4"
+                                                style="margin-left: -30px" data-dismiss="modal"
+                                                aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="mt-4 pb-4"
+                                         style="display: flex; justify-content: center">
+                                        <div style="z-index: 1; width: 150px; height: 150px; background-color: #adb5bd00">
+                                            <img
+                                                    id="imagePreviewModal"
+                                                    class="rounded-circle"
+                                                    style="max-width: 100%; height: 100%; object-fit: cover;"
+                                                    alt="Image placeholder"
+                                                    src="{{ client.avatar.url }}">
+                                        </div>
+                                    </div>
+                                    <span class="mb-2 text-center" style="font-size: 1.1rem"
+                                          id="deleteConfirmModalLabel{{ client.id }}">{{ client.name|truncatechars:30 }}</span>
+                                    <div class="modal-body py-0"
+                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                        <p class="text-center">Are you sure you want to delete this
+                                            client?
+                                            <br>
+                                            This action cannot be undone.
+                                        <form method="post" id="deleteConfirmForm{{ client.id }}"
+                                              action="{% url 'delete_client' client.slug %}" 
+                                              onsubmit="disableByID('deleteClientConfirmButton{{ client.id }}');
+                                              disableByID('deleteClientCancelButton{{ client.id }}')">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="sort_by" value="{{ sorted_by }}">
+                                            <input type="hidden" name="sort_type" value="{{ sort_type }}">
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" id="deleteClientCancelButton{{ client.id }}"
+                                                data-dismiss="modal">Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-danger" id="deleteClientConfirmButton{{ client.id }}"
+                                                form="deleteConfirmForm{{ client.id }}">Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer py-1 border-0"></div>
         </div>
+
     </div>
 
     <!-- Sort Modal -->
@@ -491,8 +840,31 @@
 
 {% endblock content %}
 
-<!-- Specific JS goes HERE -->
 {% block javascripts %}
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+
+            $('#clients_table').DataTable({
+                pageLength: 10,
+                ordering: true,
+                searching: true,
+                columnDefs: [
+                    { 
+                        targets: -1,
+                        orderable: false 
+                    }
+                ]
+            });
+
+            $('.dt-search input.dt-input').attr('placeholder', 'Search:');
+
+        });
+    </script>
+    
     <script>
         document.getElementById('newclientcnpj').addEventListener('input', function (event) {
             let input = event.target;
@@ -515,7 +887,6 @@
 
         function copyToClipboard(element, link) {
             navigator.clipboard.writeText(element).then(function () {
-                // Update the tooltip title using Bootstrap Tooltip method
                 $(link).attr('data-original-title', 'Copied!').tooltip('show');
             }).catch(function (err) {
                 console.error('Unable to copy to clipboard', err);
@@ -586,6 +957,83 @@
             }
         }
         
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('line-chart-inputs-outputs').getContext('2d');
+
+            // Create gradients
+            const inputGradient = ctx.createLinearGradient(0, 0, 0, 400);
+            inputGradient.addColorStop(0, 'rgb(45, 206, 137, 0.4)');
+            inputGradient.addColorStop(1, 'rgba(45, 206, 137, 0)');
+
+            const outputGradient = ctx.createLinearGradient(0, 0, 0, 400);
+            outputGradient.addColorStop(0, 'rgba(255, 99, 132, 0.4)');
+            outputGradient.addColorStop(1, 'rgba(255, 99, 132, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [
+                        '{{ months_list.0|default:0 }}', '{{ months_list.1|default:0 }}', '{{ months_list.2|default:0 }}', 
+                        '{{ months_list.3|default:0 }}', '{{ months_list.4|default:0 }}', '{{ months_list.5|default:0 }}'
+                    ],
+                    datasets: [
+                        {
+                            label: 'Received',
+                            data: [
+                                '{{ received_list.0|default:0 }}', '{{ received_list.1|default:0 }}', '{{ received_list.2|default:0 }}', 
+                                '{{ received_list.3|default:0 }}', '{{ received_list.4|default:0 }}', '{{ received_list.5|default:0 }}'
+                            ],
+                            borderColor: 'rgb(45,206,137)',
+                            backgroundColor: inputGradient,
+                            fill: true
+                        },
+                        {
+                            label: 'Paid',
+                            data: [
+                                '{{ paid_list.0|default:0 }}', '{{ paid_list.1|default:0 }}', '{{ paid_list.2|default:0 }}', 
+                                '{{ paid_list.3|default:0 }}', '{{ paid_list.4|default:0 }}', '{{ paid_list.5|default:0 }}'
+                            ],
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: outputGradient,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            display: false,
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
     </script>
     
 {% endblock javascripts %}

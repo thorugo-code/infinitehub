@@ -65,6 +65,7 @@
                         <div class="col-md align-items-center" style="display: flex;">
                             <div class="pl-2 row">
                                 <span class="h3 p-0 m-0 pl-4">
+                                    <small class="font-weight-light text-muted">({{ client.identification|default:" " }})</small>
                                     <span>{{ client.name }}</span>
                                     <small class="d-block h5 font-weight-light text-muted">{{ client.area|default:'Client Area' }}</small>
                                     {% if client.description %}
@@ -156,6 +157,7 @@
                                 <table class="table align-items-center table-flush">
                                     <thead class="thead-light">
                                     <tr>
+                                        <th scope="col" style="width: 0">ID</th>
                                         <th scope="col" style="width: 30%">Name</th>
                                         <th scope="col" style="width: 20%">Documents</th>
                                         <th scope="col" style="width: 20%">Bills</th>
@@ -169,8 +171,14 @@
                                     <tbody>
                                     {% for branch in client.branches.all %}
                                         <tr>
+                                            <td>
+                                                <a href="#" class="text-dark" data-toggle="modal" 
+                                                   data-target="#detailsBranchModal{{ branch.id }}">
+                                                    {{ branch.identification|default:'' }}
+                                                </a>
+                                            </td>
                                             <th scope="row">
-                                                <a href="" class="text-dark" data-toggle="modal" 
+                                                <a href="#" class="text-dark" data-toggle="modal" 
                                                    data-target="#detailsBranchModal{{ branch.id }}">
                                                     {{ branch.name }}
                                                 </a>
@@ -245,12 +253,19 @@
                                                                   enctype="multipart/form-data" id="editRegionalUnitForm{{ branch.id }}"
                                                                   method="post" onsubmit="disableByID('editRegionalUnitButton{{ branch.id }}')">
                                                                 {% csrf_token %}
-                                                                <div class="form-group form-control-label">
-                                                                    <label for="regionalUnitNameInput">Name</label>
-                                                                    <input class="form-control"
-                                                                           id="regionalUnitNameInput"
-                                                                           name="name" type="text"
-                                                                           value="{{ branch.name|default:'' }}">
+                                                                <div class="row">
+                                                                    <div class="col-3 form-group form-control-label mb-3">
+                                                                        <label for="ID">ID</label>
+                                                                        <input type="number" class="form-control" id="ID" name="ID"
+                                                                               placeholder="ID" value="{{ branch.identification|default:'' }}">
+                                                                    </div>
+                                                                    <div class="col form-group form-control-label">
+                                                                        <label for="regionalUnitNameInput">Name</label>
+                                                                        <input class="form-control"
+                                                                               id="regionalUnitNameInput"
+                                                                               name="name" type="text"
+                                                                               value="{{ branch.name|default:'' }}">
+                                                                    </div>
                                                                 </div>
                                                                 <div class="row">
                                                                     <div class="col-sm-4">
@@ -810,7 +825,7 @@
             </div>
         
             <!-- Bills in progress card -->
-            <div class="card shadow" style="min-height: 19.5rem; max-height: 31.45rem"> {# height: calc(100% - 200px) #}
+            <div class="card shadow" style="min-height: 19.5rem; max-height: 31.45rem"> 
                 <div class="card-header">
                     <div class="row">
                         <div class="col">
@@ -1914,24 +1929,24 @@
                 {% csrf_token %}
                 <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                     <div class="row">
-                        <div class="col-7 form-group form-control-label mb-3">
+                        <div class="col-3 form-group form-control-label mb-3">
+                            <label for="ID">ID</label>
+                            <input type="number" class="form-control" id="ID" name="ID"
+                                   placeholder="ID" value="{{ client.identification|default:'' }}">
+                        </div>
+                        <div class="col-9 form-group form-control-label mb-3">
                             <label for="name">Name</label>
                             <input type="text" class="form-control" id="name" name="name"
                                    placeholder="Client name" value="{{ client.name }}">
                         </div>
-                        <div class="col-5 form-group form-control-label mb-3">
+                    </div>
+                    <div class="row">
+                        <div class="col-5 form-group form-control-label">
                             <label for="newclientcnpj">CNPJ</label>
                             <input type="text" class="form-control" id="newclientcnpj" name="cnpj"
                                    placeholder="00.000.000/0000-00" value="{{ client.cnpj }}">
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-7 form-group form-control-label">
-                            <label for="area">Area</label>
-                            <input type="text" class="form-control"
-                                   id="area" name="area" placeholder="Client area of activity" value="{{ client.area }}">
-                        </div>
-                        <div class="col-5 form-group form-control-label">
                             <label for="office">Office</label>
                             <select type="text" class="form-control"
                                    id="office" name="office">
@@ -1944,11 +1959,18 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group form-control-label">
-                        <label for="address">Address</label>
-                        <input type="text" class="form-control"
-                               id="address"
-                               name="address" placeholder="Client address" value="{{ client.location }}">
+                    <div class="row">
+                        <div class="col-5 form-group form-control-label">
+                            <label for="area">Area</label>
+                            <input type="text" class="form-control"
+                                   id="area" name="area" placeholder="Client area of activity" value="{{ client.area }}">
+                        </div>
+                        <div class="col-7 form-group form-control-label">
+                            <label for="address">Address</label>
+                            <input type="text" class="form-control"
+                                   id="address"
+                                   name="address" placeholder="Client address" value="{{ client.location }}">
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-7 form-group form-control-label">

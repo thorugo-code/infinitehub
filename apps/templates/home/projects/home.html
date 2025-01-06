@@ -193,6 +193,9 @@
                                         {% if project.client %}
                                             <span class="client">{{ project.client.name|truncatechars:25 }}</span>
                                             <span class="d-block text-muted" style="font-size: 0.7rem">
+                                                {{ project.client_branch.name|truncatechars:25 }}
+                                            </span>
+                                            <span class="d-block text-muted" style="font-size: 0.7rem">
                                                 {{ project.client.area }}
                                             </span>
                                         {% elif project.client_str %}
@@ -501,15 +504,6 @@
                         </div>
                         <div class="row">
                             <div class="col form-group form-control-label mb-3">
-                                <label for="manager">Manager</label>
-                                <select class="form-control" id="manager" name="manager">
-                                    <option value=""></option>
-                                    {% for collaborator in collaborators %}
-                                        <option value="{{ collaborator.id }}">{{ collaborator.user.get_full_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col form-group form-control-label mb-3">
                                 <label for="client">Client</label>
                                 <select class="form-control" id="client" name="client">
                                     <option value=""></option>
@@ -518,6 +512,21 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                            <div class="col form-group form-control-label mb-3">
+                                <label for="branch">Regional</label>
+                                <select class="form-control" id="branch" name="branch" disabled>
+                                    <option value=""></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group form-control-label mb-3">
+                            <label for="manager">Manager</label>
+                            <select class="form-control" id="manager" name="manager">
+                                <option value=""></option>
+                                {% for collaborator in collaborators %}
+                                    <option value="{{ collaborator.id }}">{{ collaborator.user.get_full_name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="form-group form-control-label mb-3">
                             <label for="choices-collaborators">
@@ -781,6 +790,7 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     
     <script>
+    
         document.addEventListener('DOMContentLoaded', function () {
             let tagsInput = document.getElementById('choices-collaborators');
 
@@ -797,7 +807,46 @@
                 removeItemButton: true,
                 maxItemCount: 20,
             });
+
+            const clientSelect = document.getElementById('client');
+            const branchSelect = document.getElementById('branch');
+
+            clientSelect.addEventListener('change', function () {
+                const clientId = this.value;
+                
+                branchSelect.innerHTML = '<option value="" disabled>Loading...</option>';
+                
+                if (clientId) {
+                    fetch(`{% url 'clients_branches' %}?client_id=${clientId}`)
+                        .then(response => response.json())
+                        .then(branches => {
+                            if (branches.length >= 1) {
+                                branchSelect.innerHTML = '<option value=""></option>';
+                                
+                                branches.forEach(branch => {
+                                    const option = document.createElement('option');
+                                    option.value = branch.id;
+                                    option.textContent = branch.name;
+                                    branchSelect.appendChild(option);
+                                });
+                                
+                                branchSelect.disabled = false;
+                            } else {
+                                branchSelect.disabled = true;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            branchSelect.innerHTML = '<option value="" disabled>Error loading regionals</option>';
+                        });
+                } else {
+                    branchSelect.innerHTML = '<option value="" disabled></option>';
+                    branchSelect.disabled = true;
+                }
+            });
+            
         });
+        
     </script>
     
     <script>

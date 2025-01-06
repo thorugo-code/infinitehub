@@ -330,3 +330,16 @@ def index_of(value, arg):
             return None
     else:
         return None
+
+
+@register.filter(name='installments_paid')
+def installments_paid(value, arg: bool):
+    if isinstance(value, QuerySet):
+        return value.filter(paid=arg)
+    else:
+        return None
+
+
+@register.filter(name='get_attr')
+def get_attr(value, arg):
+    return getattr(value, arg)

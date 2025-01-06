@@ -1,7 +1,5 @@
 import json
 import qrcode
-import random
-import string
 import requests
 from io import BytesIO
 from django.db import models
@@ -174,6 +172,7 @@ class Project(models.Model):
     # Foreign Keys and Relationships
     manager = models.ForeignKey(User, related_name='managed_projects', on_delete=models.SET_NULL, null=True)
     client = models.ForeignKey('Client', related_name='projects', on_delete=models.SET_NULL, null=True)
+    client_branch = models.ForeignKey('Branch', related_name='projects', on_delete=models.SET_NULL, null=True)
     office = models.ForeignKey('Office', related_name='projects', on_delete=models.SET_NULL, null=True)
     created_by = models.ForeignKey(User, related_name='created_projects', on_delete=models.SET_NULL, null=True)
     assigned_to = models.ManyToManyField(User, related_name='assigned_projects')
@@ -202,6 +201,7 @@ class Project(models.Model):
 
     # Integer Fields
     completition = models.IntegerField(default=0)
+    identification = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -504,6 +504,9 @@ class Client(models.Model):
     # Foreign Keys and Relationships
     office = models.ForeignKey(Office, related_name='clients', on_delete=models.SET_NULL, null=True)
 
+    # Integer Fields
+    identification = models.IntegerField(default=None, null=True, blank=True)
+
     # Char Fields
     name = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=100)
@@ -554,6 +557,9 @@ class Branch(models.Model):
     state = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     address = models.CharField(max_length=200)
+
+    # Integer Fields
+    identification = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.name} ({self.client.name})'

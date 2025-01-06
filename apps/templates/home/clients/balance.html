@@ -75,6 +75,7 @@
                         <div class="col-md align-items-center" style="display: flex;">
                             <div class="pl-2 row">
                             <span class="h3 p-0 m-0 pl-4">
+                                <small class="font-weight-light text-muted">({{ client.identification|default:" " }})</small>
                                 <span>{{ client.name }}</span>
                                 <small class="d-block h5 font-weight-light text-muted">{{ client.area|default:'Client Area' }}</small>
                                 {% if client.description %}
@@ -153,7 +154,7 @@
                         <div class="col">
                             <h5 class="card-title text-uppercase text-muted mb-0 text-white">Received</h5>
                             <span class="h3 font-weight-bold mb-0 text-white">
-                            {{ received|default:'0.00' }} / {{ income|default:'0.00' }}
+                            {{ received|default:'0.00' }}
                         </span>
                         </div>
                     </div>
@@ -167,7 +168,7 @@
                         <div class="col">
                             <h5 class="card-title text-uppercase text-muted mb-0 text-white">Paid</h5>
                             <span class="h3 font-weight-bold mb-0 text-white">
-                            {{ paid|default:'0.00' }} / {{ expense|default:'0.00' }}
+                            {{ paid|default:'0.00' }}
                         </span>
                         </div>
                     </div>

@@ -1,14 +1,14 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
-from django.views.decorators.http import require_POST
-from apps.home.models import Project, UploadedFile, Profile, Task, Client, Link, SubTask
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator
 from datetime import datetime
 from django.db.models import Q
-from django.core.files.storage import default_storage
 from django.urls import reverse
 from urllib.parse import urlencode
+from django.core.paginator import Paginator
+from django.contrib.auth.models import User
+from django.http import HttpResponse, JsonResponse
+from django.core.files.storage import default_storage
+from django.views.decorators.http import require_POST
+from django.shortcuts import render, redirect, get_object_or_404
+from apps.home.models import Project, UploadedFile, Profile, Task, Client, Link, SubTask
 
 
 def change_archive(request, slug, situation_page=None):
@@ -149,6 +149,12 @@ def get_paginated_projects(request, projects=None, situation=None, sorted_by=Non
     return paginator, projects
 
 
+def client_branches(request):
+    client_id = request.GET.get('client_id')
+    branches = Client.objects.get(id=client_id).branches.values('id', 'name')
+    return JsonResponse(list(branches), safe=False)
+
+
 #####################################################
 
 
@@ -185,6 +191,7 @@ def create_project(request):
         # Retrieve form data
         title = request.POST['title']
         client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
+        client_branch = client.branches.get(id=request.POST['branch']) if request.POST.get('branch') else None
         country = request.POST['country']
         manager = request.POST.get('manager', None)
         start_date = request.POST['start_date']
@@ -199,11 +206,11 @@ def create_project(request):
         else:
             manager = Profile.objects.get(id=manager).user
 
-        # Create a new Project instance and save it to the database
         project = Project(
             title=title,
             manager=manager,
             client=client,
+            client_branch=client_branch,
             country=country,
             start_date=start_date,
             deadline=deadline,
@@ -519,12 +526,14 @@ def edit(request, slug):
 
         project.title = request.POST.get('title', project.title)
         project.client = Client.objects.get(id=request.POST['client']) if request.POST.get('client') else None
+        project.client_branch = project.client.branches.get(id=request.POST['branch']) if request.POST.get('branch') else None
         project.manager = Profile.objects.get(id=request.POST['manager']).user if request.POST.get('manager') else None
         project.country = request.POST.get('country', project.country)
         project.start_date = start_date if start_date != '' else None
         project.deadline = deadline if deadline != '' else None
         project.about = request.POST.get('about', project.about)
         project.assigned_to.clear()
+
         for collaborator_id in request.POST.getlist("collaborators-choice"):
             project.assigned_to.add(Profile.objects.get(id=collaborator_id).user)
 

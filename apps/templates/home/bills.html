@@ -42,31 +42,9 @@
                                     <h5 class="card-title text-uppercase text-muted mb-0 text-white">Received</h5>
                                     <span class="h2 font-weight-bold mb-0 text-white">{% if received_value == 0 %}
                                         {{ currency_symbol }}
-                                        0.0{% endif %}{{ received_value }} / {% if to_receive_value == 0 %}
-                                        {{ currency_symbol }}0.0{% endif %}{{ to_receive_value }}</span>
-                                    {#                                    <div class="progress progress-xs mt-3 mb-0">#}
-                                    {#                                        <div class="progress-bar bg-success" role="progressbar"#}
-                                    {#                                             aria-valuenow="{{ received_percentage }}"#}
-                                    {#                                             aria-valuemin="0" aria-valuemax="100"#}
-                                    {#                                             style="width: {{ received_percentage }}%;">#}
-                                    {#                                        </div>#}
-                                    {#                                    </div>#}
+                                        0.0{% endif %}{{ received_value }}</span>
                                 </div>
-                                {#                                <div class="col-auto">#}
-                                {#                                    <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown"#}
-                                {#                                            aria-haspopup="true" aria-expanded="false">#}
-                                {#                                        <i class="fas fa-ellipsis-h"></i>#}
-                                {#                                    </button>#}
-                                {#                                    <div class="dropdown-menu dropdown-menu-right">#}
-                                {#                                        <a class="dropdown-item" href="#">Action</a>#}
-                                {#                                        <a class="dropdown-item" href="#">Another action</a>#}
-                                {#                                        <a class="dropdown-item" href="#">Something else here</a>#}
-                                {#                                    </div>#}
-                                {#                                </div>#}
                             </div>
-{#                            <p class="mt-3 mb-0 text-sm">#}
-{#                                <a href="#" class="text-nowrap text-white font-weight-600">See details</a>#}
-{#                            </p>#}
                         </div>
                     </div>
                 </div>
@@ -77,14 +55,7 @@
                                 <div class="col">
                                     <h5 class="card-title text-uppercase text-muted mb-0 text-white">Paid</h5>
                                     <span class="h2 font-weight-bold mb-0 text-white">{% if paid_value == 0 %}
-                                        {{ currency_symbol }}0.0{% endif %}{{ paid_value }} / {% if to_pay_value == 0 %}
-                                        {{ currency_symbol }}0.0{% endif %}{{ to_pay_value }}</span>
-                                    {#                                    <div class="progress progress-xs mt-3 mb-0">#}
-                                    {#                                        <div class="progress-bar bg-success" role="progressbar"#}
-                                    {#                                             aria-valuenow="{{ paid_percentage }}"#}
-                                    {#                                             aria-valuemin="0" aria-valuemax="100"#}
-                                    {#                                             style="width: {{ paid_percentage }}%;"></div>#}
-                                    {#                                    </div>#}
+                                        {{ currency_symbol }}0.0{% endif %}{{ paid_value }}</span>
                                 </div>
                             </div>
                         </div>

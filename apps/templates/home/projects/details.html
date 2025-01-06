@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %} {% block title %} Project {% endblock title %}
 
 {% block stylesheets %}
+    
     <style>
         .rotate {
             transition: transform 0.3s ease;
@@ -9,6 +10,7 @@
             transform: rotate(180deg);
         }
     </style>
+    
 {% endblock stylesheets %}
 
 {% block content %}
@@ -55,6 +57,9 @@
                         {% elif project.client_str %}
                             <i class="text-white ml-1">"{{ project.client_str }}"</i>
                         {% endif %}
+                        <span class="ml-1 d-block text-sm mt--1">
+                            {{ project.client_branch.name }}
+                        </span>
                     </p>
                 </div>
             </div>
@@ -96,13 +101,13 @@
                     </div>
                     <div class="card-body" style="padding: 2rem">
                         {% if edit_mode %}
-                            <div class="form-group form-control-label px-3">
-                                <label class="form-control-label" for="title">Title</label>
-                                <input type="text" id="title" name="title" class="form-control"
-                                       placeholder="Client's name" value="{{ project.title }}">
-                            </div>
                             <div class="row px-3">
-                                <div class="col-lg-6">
+                                <div class="col-lg-7 form-group form-control-label px-3">
+                                    <label class="form-control-label" for="title">Title</label>
+                                    <input type="text" id="title" name="title" class="form-control"
+                                           placeholder="Client's name" value="{{ project.title }}">
+                                </div>
+                                <div class="col-lg-5">
                                     <div class="form-group form-control-label mb-3">
                                         <label for="manager">Manager</label>
                                         <select class="form-control" id="manager" name="manager">
@@ -114,31 +119,43 @@
                                         </select>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row px-3">
                                 <div class="col-lg-6">
                                     <div class="form-group form-control-label">
                                         <label for="client" class="form-control-label">Client</label>
-                                        {% if edit_mode %}
-                                            <select class="form-control" id="client" name="client">
-                                                {% if not project.client and project.client_str %}
-                                                    <option value="" disabled
-                                                            selected>{{ project.client.name|default:project.client_str|truncatechars:25 }}</option>
-                                                {% else %}
-                                                    <option value=""></option>
-                                                {% endif %}
-                                                {% for client in clients %}
-                                                    <option value="{{ client.id }}"
-                                                            {% if project.client == client %}selected{% endif %}>
-                                                        {{ client.name }}
+                                        <select class="form-control" id="client" name="client">
+                                            {% if not project.client and project.client_str %}
+                                                <option value="" disabled
+                                                        selected>{{ project.client.name|default:project.client_str|truncatechars:25 }}</option>
+                                            {% else %}
+                                                <option value=""></option>
+                                            {% endif %}
+                                            {% for client in clients %}
+                                                <option value="{{ client.id }}"
+                                                        {% if project.client == client %}selected{% endif %}>
+                                                    {{ client.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group form-control-label">
+                                        <label for="branch" class="form-control-label">Regional</label>
+                                        <select class="form-control" id="branch" name="branch">
+                                            {% if not project.client %}
+                                                <option value="" disabled selected></option>
+                                            {% else %}
+                                                <option value=""></option>
+                                                {% for branch in project.client.branches.all %}
+                                                    <option value="{{ branch.id }}"
+                                                            {% if project.client_branch == branch %}selected{% endif %}>
+                                                        {{ branch.name }}
                                                     </option>
                                                 {% endfor %}
-                                            </select>
-                                        {% else %}
-                                            <input type="text" id="client" name="client"
-                                                   class="form-control"
-                                                   placeholder="Client's name"
-                                                   value="{{ project.client.name|default:project.client_str|truncatechars:25 }}"
-                                                   disabled>
-                                        {% endif %}
+                                            {% endif %}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -1957,6 +1974,51 @@
             }
         });
 
+    </script>
+    
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const clientSelect = document.getElementById('client');
+            const branchSelect = document.getElementById('branch');
+
+            clientSelect.addEventListener('change', function () {
+                const clientId = this.value;
+                
+                branchSelect.innerHTML = '<option value="" disabled>Loading...</option>';
+                
+                if (clientId) {
+                    fetch(`{% url 'clients_branches' %}?client_id=${clientId}`)
+                        .then(response => response.json())
+                        .then(branches => {
+                            if (branches.length >= 1) {
+                                branchSelect.innerHTML = '<option value=""></option>';
+                                
+                                branches.forEach(branch => {
+                                    const option = document.createElement('option');
+                                    option.value = branch.id;
+                                    option.textContent = branch.name;
+                                    branchSelect.appendChild(option);
+                                });
+                                
+                                branchSelect.disabled = false;
+                            } else {
+                                branchSelect.disabled = true;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            branchSelect.innerHTML = '<option value="" disabled>Error loading regionals</option>';
+                        });
+                } else {
+                    branchSelect.innerHTML = '<option value="" disabled></option>';
+                    branchSelect.disabled = true;
+                }
+            });
+            
+        });
+        
     </script>
 
 {% endblock javascripts %}

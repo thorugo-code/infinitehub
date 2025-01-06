@@ -8,13 +8,11 @@ from apps.home.views import (
 
 projects_list_urls = [
 
-    path('projects/create', projects.create_project, name='create_project'),
-    path('projects/<slug:slug>/', projects.details, name='project_details'),
-
     path("projects/", projects.home, name="project_list"),
+    path('projects/create', projects.create_project, name='create_project'),
+    path('projects/clients-branches/', projects.client_branches, name='clients_branches'),
     path("projects/sub/<str:situation>/", projects.home, name="project_list"),
 
-    path('projects/<slug:slug>/delete', projects.delete, name='delete_project'),
     path('projects/working/archive=<slug:slug>/redirect-to=<str:situation_page>', projects.change_archive,
          name='archive_project'),
     path('projects/archive/unarchive=<slug:slug>/redirect-to=<str:situation_page>', projects.change_archive,
@@ -29,6 +27,10 @@ projects_list_urls = [
     path('projects/filters:<str:filters>', projects.home, name='filtered_projects'),
     path('projects/order:<str:sorted_by>-<str:sort_type>/filters:<str:filters>', projects.home,
          name='sorted_filtered_projects'),
+
+    path('projects/<slug:slug>/', projects.details, name='project_details'),
+    path('projects/<slug:slug>/delete', projects.delete, name='delete_project'),
+
 ]
 
 projects_page_urls = [

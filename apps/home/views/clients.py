@@ -10,6 +10,13 @@ from core.settings import CORE_DIR
 from djmoney.money import Money
 
 
+MONTHS = {
+    'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4,
+    'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8,
+    'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12,
+}
+
+
 def check_expired_documents():
     expired_documents = Document.objects.filter(Q(expiration__lt=datetime.now().date()) & Q(expired=False))
     for doc in expired_documents:
@@ -72,13 +79,77 @@ def home(request, filters=None, sorted_by=None, sort_type=None):
     clients = filter_clients_objects(request, filters)
     clients = sort_clients_objects(clients, sorted_by, sort_type)
 
+    upcoming_query = (
+        Q(client__in=clients) &
+        Q(paid=False) &
+        Q(due_date__lte=datetime.now().date() + timedelta(days=60))
+    )
+
+    current_month_index = datetime.now().month
+    current_year = datetime.now().year
+    start_month_index = (current_month_index - 6 + 12) % 12
+    months_numbers = [(start_month_index + i) % 12 + 1 for i in range(6)]
+
+    received_list = []
+    paid_list = []
+
+    for month in months_numbers:
+        year = current_year
+        if month > current_month_index:
+            year -= 1
+
+        query = (Q(paid_at__month=month) & Q(paid_at__year=year))
+
+        at_sight = Bill.objects.filter(
+            query & Q(installments_number=0) & Q(client__in=clients)
+        ).distinct()
+
+        income_bills = at_sight.filter(category__in=INCOME_CATEGORIES)
+        expense_bills = at_sight.filter(category__in=EXPENSE_CATEGORIES)
+
+        received_at_sight = sum([bill.partial for bill in income_bills])
+        paid_at_sight = sum([bill.partial for bill in expense_bills])
+
+        received_list.append(received_at_sight)
+        paid_list.append(paid_at_sight)
+
+        with_installments = Bill.objects.filter(
+            (query | Q(partial__lt=F('total'))) & Q(installments_number__gt=1) & Q(client__in=clients)
+        ).distinct()
+
+        income_bills_installments = with_installments.filter(category__in=INCOME_CATEGORIES)
+        expense_bills_installments = with_installments.filter(category__in=EXPENSE_CATEGORIES)
+
+        received_installments = sum([
+            installment.value
+            for bill in income_bills_installments
+            for installment in bill.installments.filter(paid_at__month=month, paid_at__year=year)
+        ])
+
+        paid_installments = sum([
+            installment.value
+            for bill in expense_bills_installments
+            for installment in bill.installments.filter(paid_at__month=month, paid_at__year=year)
+        ])
+
+        received_list[-1] += received_installments
+        paid_list[-1] += paid_installments
+
     context = {
+        'upcoming_bills': Bill.objects.filter(upcoming_query).distinct(),
         'user_profile': Profile.objects.get(user=request.user),
         'clients': clients,
         'offices': Office.objects.all(),
         'filters': filters,
         'sorted_by': sorted_by,
         'sort_type': sort_type,
+        'months_list': [list(MONTHS.keys())[(start_month_index + i) % 12] for i in range(6)],
+        'received_list': [str(received)[2:].replace(',', '') for received in received_list],
+        'paid_list': [str(paid)[2:].replace(',', '') for paid in paid_list],
+        'income_categories': INCOME_CATEGORIES,
+        'expense_categories': EXPENSE_CATEGORIES,
+        'last_six_months_received': sum(received_list),
+        'last_six_months_paid': sum(paid_list),
     }
 
     return render(request, 'home/clients/home.html', context)
@@ -216,6 +287,7 @@ def details(request, slug):
     client = Client.objects.get(slug=slug)
 
     if request.method == 'POST':
+        client.identification = request.POST.get('ID', client.identification)
         client.name = request.POST.get('name', client.name)
         client.cnpj = request.POST.get('cnpj', client.cnpj)
         client.area = request.POST.get('area', client.area)
@@ -343,6 +415,7 @@ def edit_branch(request, slug, branch_id):
     branch = Branch.objects.get(id=branch_id)
 
     if request.method == 'POST':
+        branch.identification = request.POST.get('ID', branch.identification)
         branch.name = request.POST.get('name', branch.name)
         branch.country = request.POST.get('country', branch.country)
         branch.state = request.POST.get('state', branch.state)
