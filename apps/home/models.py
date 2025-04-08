@@ -5,8 +5,10 @@ from io import BytesIO
 from django.db import models
 from bs4 import BeautifulSoup
 from datetime import datetime
+from django.db.models import Q
 from djmoney.money import Money
 from urllib.parse import urljoin
+from core.settings import CORE_DIR
 from django.core.files import File
 from django.utils.text import slugify
 from djmoney.models.fields import MoneyField
@@ -14,7 +16,8 @@ from apps.authentication.models import AuthEmail
 from picklefield.fields import PickledObjectField
 from django.contrib.auth.models import User, Group
 from apps.home.storage_backends import PublicMediaStorage
-from core.settings import CORE_DIR
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 
 BANKS = json.load(open(f'{CORE_DIR}/apps/static/assets/banks.json', 'r', encoding='utf-8'))
@@ -107,6 +110,75 @@ def custom_upload_path_documents(instance, filename):
 ############################################################
 
 
+class Category(models.Model):
+    @staticmethod
+    def valid_content_types():
+        content_types = ContentType.objects.filter(app_label='home').exclude(model='category')
+        valid_cts = [
+            ct.id for ct in content_types
+            if ct.model_class() and hasattr(ct.model_class(), 'category')
+        ]
+        return {'id__in': valid_cts} if valid_cts else {}
+
+    model = models.ForeignKey(
+        ContentType,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to=~Q(model='category') & Q(app_label='home'),
+    )
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    subcategories = GenericRelation(
+        'SubCategory',
+        content_type_field='content_type',
+        object_id_field='object_id',
+    )
+
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+
+    def __str__(self):
+        return self.name.capitalize()
+
+    def save(self, *args, **kwargs):
+        self._meta.get_field('model').remote_field.limit_choices_to = self.valid_content_types()
+        super().save(*args, **kwargs)
+
+
+class SubCategory(models.Model):
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        limit_choices_to=Q(app_label='home', model='category') | Q(app_label='home', model='subcategory'),
+    )
+    object_id = models.PositiveIntegerField()
+    parent = GenericForeignKey('content_type', 'object_id')
+
+    subcategories = GenericRelation(
+        'self',
+        content_type_field='content_type',
+        object_id_field='object_id',
+    )
+
+    class Meta:
+        verbose_name = 'SubCategory'
+        verbose_name_plural = 'SubCategories'
+
+    def __str__(self):
+        return f"{self.name.capitalize()} (Child of: {self.parent})"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+############################################################
+
+
 class Equipments(models.Model):
     acquisition_date = models.DateField(default=datetime.now)
     name = models.CharField(max_length=100, default='Untitled')
@@ -117,6 +189,10 @@ class Equipments(models.Model):
     custom_id = models.CharField(max_length=100, default='')
     qrcode = models.ImageField(upload_to=f'qrcodes/equipments/{datetime.now().strftime("%Y")}/',
                                default='placeholder.webp')
+
+    class Meta:
+        verbose_name = 'Equipment'
+        verbose_name_plural = 'Equipments'
 
     def __str__(self):
         return self.name
@@ -166,6 +242,7 @@ class Equipments(models.Model):
         super(Equipments, self).save(*args, **kwargs)
 
 
+# TODO: Add a category field
 class Project(models.Model):
     slug = models.SlugField(max_length=100, default='')
 
@@ -202,6 +279,10 @@ class Project(models.Model):
     # Integer Fields
     completition = models.IntegerField(default=0)
     identification = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Project'
+        verbose_name_plural = 'Projects'
 
     def __str__(self):
         return self.title
@@ -284,6 +365,10 @@ class Profile(models.Model):
     instagram = models.URLField(null=True, blank=True)
     twitter = models.URLField(null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
+
     def __str__(self):
         return self.user.username
 
@@ -329,10 +414,16 @@ class Profile(models.Model):
             pass
 
 
+# TODO: Convert category to ForeignKey and delete category field
 class UploadedFile(models.Model):
     project = models.ForeignKey(Project, related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
     client = models.ForeignKey('Client', related_name='uploaded_files', on_delete=models.SET_NULL, null=True)
-    uploaded_by = models.ForeignKey(User, related_name='uploaded_files', on_delete=models.SET_NULL, default=1, null=True)
+    uploaded_by = models.ForeignKey(
+        User, related_name='uploaded_files', on_delete=models.SET_NULL, default=1, null=True
+    )
+    foreignkey_category = models.ForeignKey(
+        Category, related_name='uploaded_files', on_delete=models.SET_NULL, null=True, default=None
+    )
 
     file = models.FileField(upload_to=custom_upload_path_projects, max_length=500)
 
@@ -344,6 +435,10 @@ class UploadedFile(models.Model):
     value = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', default=0)
 
     description = models.TextField(default='')
+
+    class Meta:
+        verbose_name = 'Project File'
+        verbose_name_plural = 'Project Files'
 
     def __str__(self):
         return self.file.name
@@ -409,6 +504,10 @@ class Task(models.Model):
 
     owner = models.ForeignKey(User, related_name='user_tasks', on_delete=models.SET_NULL, null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Task'
+        verbose_name_plural = 'Tasks'
+
     def __str__(self):
         return self.title
 
@@ -438,6 +537,10 @@ class SubTask(models.Model):
     created_by = models.ForeignKey(User, related_name='created_subtasks', on_delete=models.SET_NULL, default=1, null=True)
 
     owner = models.ForeignKey(User, related_name='user_subtasks', on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'SubTask'
+        verbose_name_plural = 'SubTasks'
 
     def __str__(self):
         return self.title
@@ -470,6 +573,10 @@ class Office(models.Model):
     pcmso = models.DateField(null=True, blank=True, default=None)
 
     description = models.TextField(default='')
+
+    class Meta:
+        verbose_name = 'Office'
+        verbose_name_plural = 'Offices'
 
     def delete(self, *args, **kwargs):
         if 'placeholder.webp' not in self.avatar:
@@ -519,6 +626,10 @@ class Client(models.Model):
     # Text Fields
     description = models.TextField()
 
+    class Meta:
+        verbose_name = 'Client'
+        verbose_name_plural = 'Clients'
+
     def __str__(self):
         return self.name
 
@@ -561,17 +672,28 @@ class Branch(models.Model):
     # Integer Fields
     identification = models.IntegerField(null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Client Branch'
+        verbose_name_plural = 'Client Branches'
+
     def __str__(self):
         return f'{self.name} ({self.client.name})'
 
 
 # TODO: Add currency
+# TODO: Change category field to ForeignKey
 class Bill(models.Model):
     # Foreign Keys and Relationships
     client = models.ForeignKey(Client, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
     payer = models.ForeignKey(Branch, related_name='bills', on_delete=models.SET_NULL, null=True)
     office = models.ForeignKey(Office, related_name='bills', on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_bills', on_delete=models.SET_NULL, null=True)
+    foreignkey_category = models.ForeignKey(
+        Category, related_name='bills', on_delete=models.SET_NULL, null=True, default=None
+    )
+    foreignkey_subcategory = models.ForeignKey(
+        SubCategory, related_name='bills', on_delete=models.SET_NULL, null=True, default=None
+    )
 
     # Char Fields
     title = models.CharField(max_length=100)
@@ -610,6 +732,10 @@ class Bill(models.Model):
 
     # Text Fields
     payment_info = models.TextField(default='')
+
+    class Meta:
+        verbose_name = 'Bill'
+        verbose_name_plural = 'Bills'
 
     def __str__(self):
         return self.title
@@ -670,6 +796,10 @@ class BillInstallment(models.Model):
     # Text Fields
     payment_info = models.TextField(default='')
 
+    class Meta:
+        verbose_name = 'Bill Installment'
+        verbose_name_plural = 'Bill Installments'
+
     def __str__(self):
         return f'[{self.partial_id}/{self.bill.installments}] {self.bill.title} - {self.due_date}'
 
@@ -681,6 +811,10 @@ class BillInstallment(models.Model):
 class BillProof(models.Model):
     bill = models.ForeignKey(Bill, related_name='proofs', on_delete=models.CASCADE, null=True)
     file = models.FileField(upload_to=upload_path_bills, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Bill Proof'
+        verbose_name_plural = 'Bill Proofs'
 
     def __str__(self):
         if self.bill:
@@ -696,14 +830,19 @@ class BillProof(models.Model):
         super().save(*args, **kwargs)
 
 
+# TODO: Convert category to ForeignKey and delete category field
 class Document(models.Model):
     # Foreign Keys and Relationships
     user = models.ForeignKey(User, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
     client = models.ForeignKey(Client, related_name='documents', on_delete=models.CASCADE, null=True, default=None)
     office = models.ForeignKey(Office, related_name='documents', on_delete=models.SET_NULL, null=True, default=None)
     branch = models.ForeignKey(Branch, related_name='documents', on_delete=models.SET_NULL, null=True, default=None)
-    uploaded_by = models.ForeignKey(User, related_name='uploaded_documents', on_delete=models.SET_NULL, null=True,
-                                    default=None)
+    foreignkey_category = models.ForeignKey(
+        Category, related_name='documents', on_delete=models.SET_NULL, null=True, default=None
+    )
+    uploaded_by = models.ForeignKey(
+        User, related_name='uploaded_documents', on_delete=models.SET_NULL, null=True, default=None
+    )
 
     # Char Fields
     category = models.CharField(max_length=50)
@@ -723,6 +862,10 @@ class Document(models.Model):
     # File Fields
     file = models.FileField(upload_to=custom_upload_path_documents, max_length=500, blank=True, null=True)
 
+    class Meta:
+        verbose_name = 'Document'
+        verbose_name_plural = 'Documents'
+
     def __str__(self):
         return self.name
 
@@ -732,21 +875,30 @@ class Document(models.Model):
 
         if self.category == 'ASO':
             user_profile = Profile.objects.get(user=self.user)
-            aso_files = sorted(Document.objects.filter(user=self.user, category__iexact='ASO'), key=lambda x: x.expiration)
+            aso_files = sorted(
+                Document.objects.filter(user=self.user, category__iexact='ASO'),
+                key=lambda x: x.expiration
+            )
             last_aso = aso_files[-1] if aso_files else None
             user_profile.aso = last_aso.expiration if aso_files else None
             user_profile.save()
 
         elif self.category == 'PGR':
             office = Office.objects.get(id=self.office.id)
-            pgr_files = sorted(Document.objects.filter(office=self.office, category__iexact='PGR'), key=lambda x: x.expiration)
+            pgr_files = sorted(
+                Document.objects.filter(office=self.office, category__iexact='PGR'),
+                key=lambda x: x.expiration
+            )
             last_pgr = pgr_files[-1] if pgr_files else None
             office.pgr = last_pgr.expiration if pgr_files else None
             office.save()
 
         elif self.category == 'PCMSO':
             office = Office.objects.get(id=self.office.id)
-            pcmso_files = sorted(Document.objects.filter(office=self.office, category__iexact='PCMSO'), key=lambda x: x.expiration)
+            pcmso_files = sorted(
+                Document.objects.filter(office=self.office, category__iexact='PCMSO'),
+                key=lambda x: x.expiration
+            )
             last_pcmso = pcmso_files[-1] if pcmso_files else None
             office.pcmso = last_pcmso.expiration if pcmso_files else None
             office.save()
@@ -801,6 +953,10 @@ class Link(models.Model):
     title = models.CharField(max_length=100)
     icon = models.CharField(max_length=100, blank=True, null=True)
 
+    class Meta:
+        verbose_name = 'Link'
+        verbose_name_plural = 'Links'
+
     def __str__(self):
         return self.path
 
@@ -854,6 +1010,10 @@ class Meeting(models.Model):
 
     url = models.URLField()
 
+    class Meta:
+        verbose_name = 'Meeting'
+        verbose_name_plural = 'Meetings'
+
 
 class BankAccount(models.Model):
     # Foreign Keys and Relationships
@@ -875,6 +1035,10 @@ class BankAccount(models.Model):
             ('PJ', 'Pessoa Jurídica')
         ),
     )
+
+    class Meta:
+        verbose_name = 'Bank Account'
+        verbose_name_plural = 'Bank Accounts'
 
     def __str__(self):
         return f'{self.bank_name} - {self.agency} - {self.account}'
