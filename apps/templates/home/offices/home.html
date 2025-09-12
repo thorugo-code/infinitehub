@@ -56,7 +56,9 @@
                     <thead class="thead-light">
                         <tr>
                             <th scope="col" style="width: 0"></th>
-                            <th scope="col" style="width: 40%" class="pl-0">Name</th>
+                            <th scope="col" style="width: 30%" class="pl-0">Name</th>
+                            <th scope="col" style="width: 20%" class="pl-0">IM</th>
+
                             <th scope="col" style="width: 30%">CNPJ</th>
                             <th scope="col" style="width: 30%">Address</th>
                             {#                            <th scope="col" style="width: 10%">Projects</th>#}
@@ -92,6 +94,11 @@
                                         </span>
                                     {% endif %}
                                 </a>
+                            </th>
+                            <th scope="row" class="pl-0">
+                                {% if office.municipal_inscription %}
+                                <span>{{ office.municipal_inscription|default:'-'}}</span>
+                                {% endif %}
                             </th>
                             <td>
                                 <span>{{ office.cnpj }}</span>

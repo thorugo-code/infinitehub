@@ -414,10 +414,12 @@ def fill_collaborator_initial_infos(request, slug):
     identification = request.POST.get('identification', collaborator.identification)
     admission = request.POST.get('admission', collaborator.admission)
     cpf = request.POST.get('cpf', collaborator.cpf)
+    cnpj= request.POST.get('cnpj', collaborator.cnpj)
 
     collaborator.identification = identification if identification else collaborator.identification
     collaborator.admission = admission if admission and admission != '' else collaborator.admission
     collaborator.cpf = cpf if cpf else collaborator.cpf
+    collaborator.cnpj = cnpj if cnpj else collaborator.cnpj
 
     collaborator.save()
 
