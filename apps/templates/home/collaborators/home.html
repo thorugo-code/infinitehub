@@ -93,6 +93,7 @@
                                 {% endif %}
                             </th>
                             <th scope="col" class="py-2" style="width: 0"></th>
+
                             {% if perms.home.view_document %} <!-- Admins (with perm) -->
                                 <th scope="col" class="py-2" style="width: 15%">Name
                                     {% if sorted_by == 'name' and sort_type == 'desc' %}
@@ -104,7 +105,7 @@
                                 <th scope="col" class="py-2" style="width: 15%">Contact</th>
                                 <th scope="col" class="py-2" style="width: 15%">CNPJ</th>
                                 <th scope="col" class="py-2" style="width: 15%">CPF</th>
-                                <th scope="col" class="py-2" style="width: 15%">Position
+                                <th scope="col" class="py-2" style="width: 10%">Position
                                     {% if sorted_by == 'position' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
                                     {% elif sorted_by == 'position' and sort_type == 'asc' %}
@@ -125,6 +126,14 @@
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
+                                
+                                <th scope="col" class="py-2" style="width: 10%">Birthday
+                                    {% if sorted_by == 'birthday' and sort_type == 'desc' %}
+                                        <i class="fas fa-caret-down ml-1"></i>
+                                    {% elif sorted_by == 'birthday' and sort_type == 'asc' %}
+                                        <i class="fas fa-caret-up ml-1"></i>
+                                    {% endif %}
+                                </th>
                             {% else %} <!-- Comum user (not perm) -->
                                 <th scope="col" class="py-2" style="width: 35%">Name
                                     {% if sorted_by == 'name' and sort_type == 'desc' %}
@@ -134,35 +143,27 @@
                                     {% endif %}
                                 </th>
                                 <th scope="col" class="py-2" style="width: 25%">Contact</th>
-                                <th scope="col" class="py-2" style="width: 15%">Position
+                                <th scope="col" class="py-2" style="width: 25%">Position
                                     {% if sorted_by == 'position' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
                                     {% elif sorted_by == 'position' and sort_type == 'asc' %}
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
-                                <th scope="col" class="py-2" style="width: 10%">Admission</th>
                             {% endif %}
-                            <th scope="col" class="py-2" style="width: 10%">Birthday
-                                {% if sorted_by == 'birthday' and sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down ml-1"></i>
-                                {% elif sorted_by == 'birthday' and sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up ml-1"></i>
-                                {% endif %}
-                            </th>
                             <th scope="col" class="py-2" style="width: 5%">Status</th>
                             <th scope="col" class="py-2" style="width: 0"></th>
                         </tr>
                         </thead>
                         <tbody class="list">
                         {% load filters %}
-                        {% for collab in collaborators %}
+                        {% for collab in collaborators %} 
                             <tr>
                                 <td class="font-weight-300 {% if collab.identification is not None %}pl-3 pr-2{% else %}px-0{% endif %}"
                                     style="font-size: 0.7rem; text-align: center">
                                     <span>{% if collab.identification is not None %}{{ collab.identification }}{% endif %}</span>
                                 </td>
-                                <td class="py-3 px-2">
+                                <td class="py-3 px-2"> <!-- profile photo -->
                                     <a {% if collab == user_profile and not perms.home.view_document %}
                                         href="{% url 'profile' %}"
                                     {% elif perms.home.add_document %}
@@ -219,13 +220,13 @@
                                     <td>
                                         <span>{{ collab.cpf|default:'-' }}</span>
                                     </td>
+                                    <td>
+                                        <span>{{ collab.position|default:'-' }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ collab.admission|date:'d/m/Y'|default:'-' }}</span>
+                                    </td>
                                 {% endif %}
-                                <td>
-                                    <span>{{ collab.position|default:'-' }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ collab.admission|date:'d/m/Y'|default:'-' }}</span>
-                                </td>
                                 {% if perms.home.view_document %}
                                     <td>
                                         <span>{{ collab.aso|date:'d/m/Y'|default:'-' }}</span>

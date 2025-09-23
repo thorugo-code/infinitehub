@@ -35,13 +35,13 @@
                             </div>
                             <div class="wizard-navigation mx-lg-8 mx-sm-5 mx-5">
                                 <ul class="nav nav-pills">
-                                    <li class="nav-item" style="width: 25%">
+                                    <li class="nav-item" style="width: 50%">
                                         <a class="nav-link text-center active" href="#info" data-toggle="tab"
                                            role="tab" aria-selected="false" disabled>
                                             Basic Info
                                         </a>
                                     </li>
-                                    <li class="nav-item" style="width: 25%">
+                                    <!--li class="nav-item" style="width: 25%">
                                         <a class="nav-link text-center" href="#address" data-toggle="tab" role="tab"
                                            disabled>
                                             Address
@@ -53,8 +53,8 @@
                                            aria-selected="true" disabled>
                                             Professional
                                         </a>
-                                    </li>
-                                    <li class="nav-item" style="width: 25%">
+                                    </li-->
+                                    <li class="nav-item" style="width: 50%">
                                         <a class="nav-link text-center" href="#social" data-toggle="tab"
                                            role="tab"
                                            aria-selected="true" disabled>
@@ -62,7 +62,7 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </div>
+                            </div><hr>
                             <div class="tab-content card-body">
                                 <div class="tab-pane active" id="info">
                                     <div class="row justify-content-center py-0 py-lg-5 pt-sm-3 px-lg-5">
@@ -109,14 +109,27 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row justify-content-center">
+                                    </div><hr>
+                                    <!--div class="row justify-content-center">
                                         <div class="col-lg-10 mx-md-2 mr-lg-2">
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane" id="address">
-                                    <div class="row justify-content-center py-0 py-lg-5 py-sm-3">
+                                <div class="tab-pane" id="address"-->
+
+                                <!-- CEP search -->
+                                    <div class="row justify-content-center">
+                                        <div class="cep-search">
+                                            <div class="form-group form-control-label bmd-form-group">
+                                            <label for="cep-place">CEP</label>
+                                                <div style="display: flex; gap: 5px; align-items: center;">
+                                                    <input type="text" name="cep-place" class="form-control" id="cep-place" placeholder="Search CEP" maxlength="9">
+                                                    <button type="button" id="cep-search-btn" class="btn btn-outline-secondary border-2">Search</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row justify-content-center py-0 py-lg-2 py-sm-3">
                                         <div class="col-sm-7">
                                             <div class="form-group form-control-label bmd-form-group">
                                                 <label class="bmd-label-static" for="street">Street</label>
@@ -363,9 +376,6 @@
                 cityDropdown.disabled = true;
             }
         }
-    </script>
-
-    <script>
         document.getElementById('phone').addEventListener('input', function (event) {
             let input = event.target;
             let inputValue = input.value.replace(/\D/g, '');
@@ -410,7 +420,33 @@
             cityDropdown.value = userCity;
         });
         
+        // Busca CEP e preenche campos de endereço
+        document.getElementById('cep-search-btn').addEventListener('click', function () {
+            const cepInput = document.getElementById('cep-place');
+            let cep = cepInput.value.replace(/\D/g, '');
+            if (cep.length !== 8) {
+                alert('CEP inválido. Digite 8 números.');
+                return;
+            }
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        alert('CEP não encontrado.');
+                        return;
+                    }
+                    document.getElementById('street').value = data.logradouro || '';
+                    document.getElementById('city').innerHTML = `<option value="${data.localidade}" selected>${data.localidade}</option>`;
+                    document.getElementById('state').innerHTML = `<option value="${data.uf}" selected>${data.uf}</option>`;
+                    document.getElementById('country').innerHTML = `<option value="Brasil" selected>Brasil</option>`;
+                    document.getElementById('street-no').focus();
+                    document.getElementById('state').disabled = false;
+                    document.getElementById('city').disabled = false;
+                })
+                .catch(() => {
+                    alert('Erro ao buscar CEP.');
+                });
+        });
     </script>
 
 {% endblock javascript %}
-

@@ -236,20 +236,28 @@ class Project(models.Model):
 
 
 class Profile(models.Model):
+    from core import settings
     slug = models.SlugField(max_length=100, default='')
-
+ 
     # Foreign Keys and Relationships
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     office = models.ForeignKey('Office', related_name="collaborators", on_delete=models.SET_NULL, null=True)
     authentication = models.ForeignKey(AuthEmail, related_name='profile', on_delete=models.CASCADE, null=True)
+ 
+ 
+    if not settings.DEBUG:
+        avatar = models.ImageField(
+            upload_to='profile_pics',
+            default='placeholder.webp',
+            storage=PublicMediaStorage()
+        )
+    else:
+        avatar = models.ImageField(
+            upload_to='profile_pics',
+            default='placeholder.webp',
+        )
 
-    # File Fields
-    avatar = models.ImageField(upload_to='profile_pics',
-                               default='placeholder.webp',
-                               storage=PublicMediaStorage())
-    qrcode = models.ImageField(upload_to=f'qrcodes/members/',
-                               storage=PublicMediaStorage(),
-                               null=True, blank=True)
+    qrcode = models.ImageField(upload_to=f'qrcodes/members/', storage=PublicMediaStorage(), null=True, blank=True)
 
     # Char Fields
     cpf = models.CharField(max_length=20, default='')
