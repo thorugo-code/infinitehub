@@ -29,6 +29,7 @@ def details(request):
 
     context = {
         'tasks_count': all_tasks.count(),
+        'user': Profile.objects.get(user=user),
         'user_profile': Profile.objects.get(user=user),
         'shared_documents': shared_documents,
         'tasks': sorted(tasks_to_do, key=lambda x: x.deadline if x.deadline else datetime.date.max),
@@ -38,6 +39,9 @@ def details(request):
         'completed_projects': projects_completed.count(),
         'completed_projects_percentage': (projects_completed.count() / all_projects.count()) * 100 if all_projects.count() > 0 else 0,
         'segment': 'profile',
+        "offices": Office.objects.all(),
+        "world": json.load(open(f'{CORE_DIR}/apps/static/assets/world.json', 'r', encoding='utf-8')),
+        
     }
 
     return render(request, 'home/profile/home.html', context)
@@ -104,7 +108,7 @@ def edit(request):
             "edit_profile": True,
         }
 
-        return render(request, "home/profile/wizard.html", context)
+        return render(request, "home/profile/home.html", context)
 
 
 def delete_file(request, file_id):
