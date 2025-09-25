@@ -179,7 +179,7 @@
     </div>
 
     {% if user_profile.about != '' %}
-        <div class="h4 font-weight-500 my-1 mb-1 py-1 text-white">
+        <div class="h4 font-weight-500 text-white">
             <i>"{{ user_profile.about }}"</i>
         </div>
     {% else %}
@@ -250,7 +250,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body" style="min-height: 21rem; max-height: 28.5rem; overflow-y: auto;">
+                        <div class="card-body" style="min-height: 21rem; max-height: 28.5rem; overflow-y: auto; padding: 0;">
                             <ul class="list-group list-group-flush pr-2" data-toggle="checklist" >
                                 {% for task in tasks %}
                                     <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-3 border-top-0">
@@ -760,93 +760,100 @@
                     </div>
                 </div>
             </div>
-            <div class="table-responsive" style="height: 12rem; overflow-y: auto">
-                <table class="table align-items-center table-flush">
-                    <tbody>
-                    {% for document in shared_documents %}
-                        <tr>
-                            <th scope="row" class="p-2 align-items-center">
-                                <a class="align-items-center" style="display: flex"
-                                   data-target="#watchDocumentModal{{ document.id }}" data-toggle="modal"
-                                   href="">
-                                    <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                         alt="{{ document.name }}" class="px-3" style="height: 18px">
-                                    <span class="text-black-50">{{ document.name|truncatechars:38 }}</span>
-                                </a>
-                            </th>
-                            <td class="text-right pr-4 align-items-center">
-                                <a href="{% url 'download_collaborator_document' document.id %}">
-                                    <i class="fas fa-download text-success" style="font-size: 0.7125rem"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <!-- Watch File Modal -->
-                        <div aria-hidden="true"
-                         aria-labelledby="watchDocumentModalLabel{{ document.id }}"
-                         class="modal fade" id="watchDocumentModal{{ document.id }}"
-                         role="dialog"
-                         tabindex="-1">
-                        <div class="modal-dialog my-6" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header mt-2 mb--1">
-                                    <h5 class="modal-title my-1"
-                                        style="margin-left: auto">
-                                        <i></i>
-                                    </h5>
-                                    <span class="ml-3 my-1"
-                                          id="newPageModalLabel{{ document.id }}"
-                                          style="margin-right: auto; font-size: 1.2rem"></span>
-                                    <button aria-label="Close" class="close mt--4"
-                                            data-dismiss="modal"
-                                            style="margin-left: -30px"
-                                            type="button">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body py-0"
-                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                    <div class="form-group mt--1"
-                                         style="display: flex; justify-content: center">
-                                        <img alt="New File" id="filePreviewModal{{ document.id }}"
-                                             src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                             style="height: 130px"/>
-                                    </div>
-                                    <div class="form-group form-control-label justify-content-center" style="display: flex">
-                                        <span class="h5 mb-0 text-muted font-weight-light">
-                                            uploaded: {{ document.uploaded_by.first_name }}
-                                            {% if document.uploaded_by %}-{% endif %}
-                                            {{ document.uploaded_at|date:'d/m/Y' }}
-                                        </span>
-                                    </div>
-                                    <div class="form-group form-control-label">
-                                        <label for="fileName{{ document.id }}"
-                                               style="font-size:0.8125rem; font-weight:600">Name</label>
-                                        <input class="form-control" id="fileName{{ document.id }}" disabled
-                                               type="text" value="{{ document.name }}" name="name">
-                                    </div>
-                                    <div class="form-group form-control-label">
-                                        <label for="fileDescription{{ document.id }}"
-                                               style="font-size:0.8125rem; font-weight:600">Description</label>
-                                        <textarea class="form-control" name="description" disabled
-                                                  id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button class="btn btn-secondary" data-dismiss="modal"
-                                            type="button">Cancel
-                                    </button>
-                                    <a class="btn btn-success" data-toggle="tooltip" data-original-title="Download"
-                                       href="{% url 'download_collaborator_document' document.id %}">
-                                        Download
+                <div class="table-responsive" style="height: 12rem; overflow-y: auto">
+                    {% if shared_documents and shared_documents|length > 0 %}
+                    <table class="table align-items-center table-flush">
+                        <tbody>
+                        {% for document in shared_documents %}
+                            <tr>
+                                <th scope="row" class="p-2 align-items-center">
+                                    <a class="align-items-center" style="display: flex"
+                                       data-target="#watchDocumentModal{{ document.id }}" data-toggle="modal"
+                                       href="">
+                                        <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                             alt="{{ document.name }}" class="px-3" style="height: 18px">
+                                        <span class="text-black-50">{{ document.name|truncatechars:38 }}</span>
                                     </a>
+                                </th>
+                                <td class="text-right pr-4 align-items-center">
+                                    <a href="{% url 'download_collaborator_document' document.id %}">
+                                        <i class="fas fa-download text-success" style="font-size: 0.7125rem"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <!-- Watch File Modal -->
+                            <div aria-hidden="true"
+                             aria-labelledby="watchDocumentModalLabel{{ document.id }}"
+                             class="modal fade" id="watchDocumentModal{{ document.id }}"
+                             role="dialog"
+                             tabindex="-1">
+                            <div class="modal-dialog my-6" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header mt-2 mb--1">
+                                        <h5 class="modal-title my-1"
+                                            style="margin-left: auto">
+                                            <i></i>
+                                        </h5>
+                                        <span class="ml-3 my-1"
+                                              id="newPageModalLabel{{ document.id }}"
+                                              style="margin-right: auto; font-size: 1.2rem"></span>
+                                        <button aria-label="Close" class="close mt--4"
+                                                data-dismiss="modal"
+                                                style="margin-left: -30px"
+                                                type="button">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body py-0"
+                                         style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                        <div class="form-group mt--1"
+                                             style="display: flex; justify-content: center">
+                                            <img alt="New File" id="filePreviewModal{{ document.id }}"
+                                                 src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                 style="height: 130px"/>
+                                        </div>
+                                        <div class="form-group form-control-label justify-content-center" style="display: flex">
+                                            <span class="h5 mb-0 text-muted font-weight-light">
+                                                uploaded: {{ document.uploaded_by.first_name }}
+                                                {% if document.uploaded_by %}-{% endif %}
+                                                {{ document.uploaded_at|date:'d/m/Y' }}
+                                            </span>
+                                        </div>
+                                        <div class="form-group form-control-label">
+                                            <label for="fileName{{ document.id }}"
+                                                   style="font-size:0.8125rem; font-weight:600">Name</label>
+                                            <input class="form-control" id="fileName{{ document.id }}" disabled
+                                                   type="text" value="{{ document.name }}" name="name">
+                                        </div>
+                                        <div class="form-group form-control-label">
+                                            <label for="fileDescription{{ document.id }}"
+                                                   style="font-size:0.8125rem; font-weight:600">Description</label>
+                                            <textarea class="form-control" name="description" disabled
+                                                      id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" data-dismiss="modal"
+                                                type="button">Cancel
+                                        </button>
+                                        <a class="btn btn-success" data-toggle="tooltip" data-original-title="Download"
+                                           href="{% url 'download_collaborator_document' document.id %}">
+                                            Download
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <i class="fas fa-exclamation-circle fa-2x mb-2"></i><br>
+                        No documents available or you do not have permission to view them.
                     </div>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                    {% endif %}
+                </div>
             <div class="card-footer py-1" style="border-top: 0 !important"></div>
         </div>
     </div> <!-- End documents -->
