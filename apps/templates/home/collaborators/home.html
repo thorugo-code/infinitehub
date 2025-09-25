@@ -5,7 +5,7 @@
 {% block content %}
     
     {% load filters %}
-
+    <!-- Page header -->
     <div class="header bg-primary pb-6">
         <div class="container-fluid">
             <div class="header-body">
@@ -14,7 +14,7 @@
                         <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                                 <li class="breadcrumb-item">
-                                    <a href="/apps/static">
+                                    <a href="{% url 'home' %}"> <!-- Correct place-->
                                         <i class="fas fa-home"></i>
                                     </a>
                                 </li>
@@ -35,10 +35,10 @@
                     <!-- Card header -->
                     <div class="card-header">
                         <div class="row align-items-center">
-                            <div class="col">
+                            <div class="col"> <!-- Title Card -->
                                 <h3 class="mb-0">Collaborators</h3>
                             </div>
-                            <div class="col text-right">
+                            <div class="col text-right"> <!-- Filters -->
                                 <a href="#" class="btn btn-sm {% if sorted_by is None %}btn-neutral{% else %}btn-primary{% endif %}" data-toggle="modal"
                                    data-target="#sortCollaboratorsModal">
                                     {% if sort_type == 'desc' %}
@@ -80,10 +80,11 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Light table -->
+
+                    <!-- Table filter and options -->
                     <table id="projectsListTable" class="table-responsive table align-items-center table-flush"
                            style="height: 45rem">
-                        <thead class="thead-light">
+                        <thead class="thead-light"> 
                         <tr>
                             <th scope="col" class="p-2" style="width: 0;{% if sorted_by == 'id' %}text-align: center{% endif %}">
                                 {% if sorted_by == 'id' and sort_type == 'desc' %}
@@ -92,9 +93,10 @@
                                     <i class="fas fa-caret-up ml-1"></i>
                                 {% endif %}
                             </th>
-                            <th scope="col" class="py-2" style="width: 0"></th>
+                            <th scope="col" class="py-2" style="width: 0"></th> <!-- Navbar Options -->
 
                             {% if perms.home.view_document %} <!-- Admins (with perm) -->
+                            
                                 <th scope="col" class="py-2" style="width: 15%">Name
                                     {% if sorted_by == 'name' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
@@ -102,9 +104,11 @@
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
+
                                 <th scope="col" class="py-2" style="width: 15%">Contact</th>
                                 <th scope="col" class="py-2" style="width: 15%">CNPJ</th>
                                 <th scope="col" class="py-2" style="width: 15%">CPF</th>
+
                                 <th scope="col" class="py-2" style="width: 10%">Position
                                     {% if sorted_by == 'position' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
@@ -112,6 +116,7 @@
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
+
                                 <th scope="col" class="py-2" style="width: 10%">Admission
                                     {% if sorted_by == 'admission' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
@@ -119,6 +124,7 @@
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
+
                                 <th scope="col" class="py-2" style="width: 10%">ASO
                                     {% if sorted_by == 'aso' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
@@ -134,7 +140,9 @@
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
+
                             {% else %} <!-- Comum user (not perm) -->
+
                                 <th scope="col" class="py-2" style="width: 35%">Name
                                     {% if sorted_by == 'name' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
@@ -142,7 +150,9 @@
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
+
                                 <th scope="col" class="py-2" style="width: 25%">Contact</th>
+
                                 <th scope="col" class="py-2" style="width: 25%">Position
                                     {% if sorted_by == 'position' and sort_type == 'desc' %}
                                         <i class="fas fa-caret-down ml-1"></i>
@@ -150,17 +160,20 @@
                                         <i class="fas fa-caret-up ml-1"></i>
                                     {% endif %}
                                 </th>
+
                             {% endif %}
+
                             <th scope="col" class="py-2" style="width: 5%">Status</th>
                             <th scope="col" class="py-2" style="width: 0"></th>
                         </tr>
                         </thead>
-                        <tbody class="list">
+
+                        <tbody class="list"> <!-- Table Content with data -->
                         {% load filters %}
                         {% for collab in collaborators %} 
                             <tr>
                                 <td class="font-weight-300 {% if collab.identification is not None %}pl-3 pr-2{% else %}px-0{% endif %}"
-                                    style="font-size: 0.7rem; text-align: center">
+                                    style="font-size: 0.7rem; text-align: center"> <!-- ID -->
                                     <span>{% if collab.identification is not None %}{{ collab.identification }}{% endif %}</span>
                                 </td>
                                 <td class="py-3 px-2"> <!-- profile photo -->
@@ -184,6 +197,7 @@
                                         </div>
                                     </a>
                                 </td>
+                                <!-- Name and others -->
                                 <th scope="row" class="py-3">
                                     <a {% if collab == user_profile and not perms.home.view_document %}
                                         href="{% url 'profile' %}"
@@ -210,9 +224,15 @@
                                             <i class="fas fa-qrcode pr-1"></i>
                                         </a>
                                     {% endif %}
+
                                     <span class="h5 font-weight-normal">{{ collab.user.username|email_tag }}</span>
-                                    <span class="d-block font-weight-light" style="font-size: 90%">{{ collab.phone|default:'' }}</span>
+                                    <span class="d-block font-weight-light" style="font-size: 90%">
+                                        {% if collab.phone %}
+                                        {{ collab.phone|default:'' }}
+                                        {% endif %}
+                                    </span>
                                 </td>
+
                                 {% if perms.home.view_document %}
                                     <td>
                                         <span>{{ collab.cnpj|default:'-' }}</span>
@@ -226,18 +246,22 @@
                                     <td>
                                         <span>{{ collab.admission|date:'d/m/Y'|default:'-' }}</span>
                                     </td>
-                                {% endif %}
-                                {% if perms.home.view_document %}
                                     <td>
                                         <span>{{ collab.aso|date:'d/m/Y'|default:'-' }}</span>
                                         {% if collab.aso %}
                                             <span class="d-block {% if collab.aso|time_to_date <= 0 %}text-danger{% elif collab.aso|time_to_date <= 30 %}text-warning{% else %}text-success{% endif %}">({{ collab.aso|time_to_date }} days)</span>
                                         {% endif %}
                                     </td>
-                                {% endif %}
+                                    <td>
+                                        <span>{{ collab.birthday|date:'d/m/Y'|default:'-' }}</span>
+                                    </td>
+
+                                {% else %}
                                 <td>
-                                    <span>{{ collab.birthday|date:'d/m/Y'|default:'-' }}</span>
+                                    <span>{{ collab.position|default:'-' }}</span>
                                 </td>
+                                {% endif %}
+                                
                                 <td>
                                     {% if collab.user.is_active %}
                                     <span class="badge badge-dot">
@@ -250,7 +274,10 @@
                                         <span class="status">disabled</span>
                                     </span>
                                     {% endif %}
+
                                 </td>
+
+                                <!-- Dropdown -->
                                 <td class="text-right px-2">
                                     <div class="dropdown">
                                         <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
@@ -350,7 +377,7 @@
                                                     <span>{{ collab.user.get_full_name }}</span>
                                                     <small class="d-block h5 font-weight-light text-muted">{{ collab.position|default:'' }}</small>
                                                 </h5>
-                                                {% if collaborator.admission %}
+                                                {% if collab.admission %}
                                                     <div class="mt-3">
                                                         Admission: {{ collab.admission|date:'d/m/Y' }}
                                                     </div>
@@ -360,7 +387,9 @@
                                                 </div>
                                                 {% if collab.phone %}
                                                     <div class="h5 font-weight-300 mt--2 pb-2">
-                                                        {{ collab.phone }}
+                                                        {% if collab.phone %}
+                                                            {{ collab.phone }}
+                                                        {% endif %}
                                                     </div>
                                                 {% endif %}
                                                 {% if user_profile.user.username|check_group:'collaborator' %}
@@ -375,7 +404,9 @@
                                                 {% endif %}
                                                 {% if collab.about != '' %}
                                                     <div class="h4 font-weight-500 mt-4 pt-2 pb-5">
-                                                        <i>"{{ collab.about }}"</i>
+                                                        {% if collab.about %}
+                                                            <i>"{{ collab.about }}"</i>
+                                                        {% endif %}
                                                     </div>
                                                 {% endif %}
 
@@ -721,6 +752,7 @@
         </div>
     </div>
     
+    <!-- Footer -->
     <div class="container-fluid">
         {% include "includes/footer.html" %}
     </div>

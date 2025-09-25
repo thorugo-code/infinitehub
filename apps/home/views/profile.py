@@ -80,6 +80,7 @@ def edit(request):
         profile.city = request.POST.get('city', profile.city)
         profile.state = request.POST.get('state', profile.state)
         profile.country = request.POST.get('country', profile.country)
+        profile.cep = request.POST.get('cep', profile.cep)
         profile.about = request.POST.get('about', profile.about)
         profile.first_access = False
         profile.avatar = request.FILES.get('avatar', profile.avatar)

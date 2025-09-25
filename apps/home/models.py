@@ -261,6 +261,7 @@ class Profile(models.Model):
 
     # Char Fields
     cpf = models.CharField(max_length=20, default='')
+    cep = models.CharField(max_length=8, default='')
     cnpj = models.CharField(max_length=14, default='')
     street = models.CharField(max_length=150, default='')
     street_number = models.CharField(max_length=20, default='')

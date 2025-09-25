@@ -4,14 +4,12 @@
 
 {% block stylesheets %}
 <style>
-    /* Header */
     .header {
         position: relative;
         min-height: 400px;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        /* Mantém o conteúdo no final da área azul */
         align-items: center;
         padding-bottom: 1rem;
         color: white;
@@ -27,7 +25,6 @@
         z-index: 1;
     }
 
-    /* Tabs abaixo do header */
     .header .nav-tabs {
         border: none;
         margin-top: 3rem;
@@ -66,7 +63,6 @@
         font-weight: bold;
     }
 
-    /* Cards de experiência */
     .card-experience {
         border: 1px solid #e0e0e0;
         border-radius: 8px;
@@ -109,7 +105,10 @@
         margin-right: 0.25rem;
     }
 
-    /* Botão de compartilhamento */
+    .nav-tabs .nav-link {
+        border: none;
+    }
+
     .profile-actions {
         position: absolute;
         top: 1rem;
@@ -118,7 +117,6 @@
         gap: 0.5rem;
     }
 
-    /* Modals */
     .modal .avatar img {
         width: 200px;
         height: 200px;
@@ -148,7 +146,7 @@
     </a>
 
     <!-- Name badges -->
-    <h2 class="text-white">{{ user.user.get_full_name }}</h2>
+
     <div class="badges">
         {% if user.user.username|check_group:'admin' %}
         <span class="badge badge-danger">Admin</span>
@@ -162,6 +160,32 @@
         <span class="badge badge-warning">Financial</span>
         {% endif %}
     </div>
+
+        <h2 class="text-white">{{ user.user.get_full_name }}</h2>
+
+    {% if user_profile.phone %}
+        <div class="h5 font-weight-300 mt--2 pb-2 text-white">
+            {{ user_profile.phone }}
+        </div>
+    {% endif %}
+
+    <div class="h5 font-weight-400 text-white">
+    {% if user_profile.street != '' and user_profile.city != '' and user_profile.state != '' and user_profile.country != '' %}
+        <div><i class="fas fa-map-marker-alt mr-1 text-white-50"></i>
+            {{ user_profile.street }}, {{ user_profile.street_number }}
+            - {{ user_profile.city }}, {{ user_profile.state }}, {{ user_profile.country }}
+        </div>
+    {% endif %}
+    </div>
+
+    {% if user_profile.about != '' %}
+        <div class="h4 font-weight-500 my-1 mb-1 py-1 text-white">
+            <i>"{{ user_profile.about }}"</i>
+        </div>
+    {% else %}
+        <div class="py-1"></div>
+    {% endif %}
+    <!-- Tabs -->
 
     <!-- Navbar -->
     <ul class="nav nav-tabs" id="mainNav" role="tablist">
@@ -180,7 +204,7 @@
 <div class="tab-content mt-3" id="mainNavContent">
 
     <div class="tab-pane fade show active" id="projects" role="tabpanel" aria-labelledby="projects-tab"><!--Conteúdo Projects-->
-        <main class="container py-4">
+        <main class="container">
             <div class="row">
                 <div class="col-md">
                     <div class="card shadow">
@@ -226,7 +250,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body p-0 pb-2" style="min-height: 20.5rem; max-height: 28.5rem; overflow-y: auto;">
+                        <div class="card-body" style="min-height: 21rem; max-height: 28.5rem; overflow-y: auto;">
                             <ul class="list-group list-group-flush pr-2" data-toggle="checklist" >
                                 {% for task in tasks %}
                                     <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-3 border-top-0">
@@ -828,7 +852,7 @@
     </div> <!-- End documents -->
 
     <div class="tab-pane fade" id="about" role="tabpanel" aria-labelledby="about-tab"><!--Conteúdo About-->
-        <div class="content mt-2 mt-3 mb-3 pb-3 pt-2">
+        <div class="content mb-3 pb-3">
             <div class="container-fluid">
                 <div class="col-md-10 col-12 mr-auto ml-auto">
                     <div class="wizard-container">
@@ -836,7 +860,7 @@
                             <form action="{% if edit_profile %}{% url 'send_edit_profile' %}{% else %}{% url 'send_profile_infos' %}{% endif %}" 
                                 method="post" id="profileForm" enctype="multipart/form-data" onsubmit="disableByID('profileFormSubmitButton')">
                                 {% csrf_token %}
-                                <div class="wizard-navigation mx-lg-10 mx-sm-6 pt-4">
+                                <div class="wizard-navigation mx-lg-10 mx-sm-6 pt-3 pb-4">
                                     <ul class="nav nav-pills justify-content-center">
                                         <li class="nav-item" style="width: 30%">
                                             <a class="nav-link text-center active" href="#info" data-toggle="tab"
@@ -854,22 +878,21 @@
                                     </ul>
                                 </div>
 
-                                <hr>
+                                <hr class="p-0 m-0">
 
                                 <div class="tab-content card-body px-5">
                                     <div class="tab-pane active" id="info">
                                         <div class="row justify-content-center py-0 py-lg-5 pt-sm-3">
-                                            <div class="col-lg-3 col-md-4 mr-sm-4">
+                                            <div class="col-lg-3 col-md-4 mr-sm-4  mb-5">
                                                 <div class="card-profile-image align-items-center justify-content-center"
                                                     style="background-color: #adb5bd00; height: 180px; display: flex">
                                                     <input type="file" id="profilePictureInput" style="display: none"
                                                         accept="image/*" name="avatar">
                                                     <label for="profilePictureInput">
                                                         <img class="rounded-circle pointer-hover"
-                                                            style="margin-top: 15px; min-width: 200px; height: 200px; object-fit: cover; background-color: #fff; z-index: 1"
+                                                            style="margin-top: 15px;border: #1a245b 2px solid; min-width: 200px; height: 200px; object-fit: cover; background-color: #fff; z-index: 1"
                                                             id="profilePictureAvatar"
-                                                            src="{{ user.avatar.url|default:'/static/assets/img/icons/placeholder.webp' }}"
-                                                            alt="Profile Picture">
+                                                            src="{{ user.avatar.url|default:'/static/assets/img/icons/placeholder.webp' }}"     >
                                                     </label>
                                                 </div>
                                             </div>
@@ -911,7 +934,7 @@
                                             <div class="col-12 col-lg-6 mb-3">
                                                 <label for="cep-place" class="form-label">CEP</label>
                                                 <div class="d-flex" style="gap:0.5rem; align-items:center;">
-                                                    <input type="text" id="cep-place" name="cep-place" class="form-control" placeholder="Search CEP" maxlength="9">
+                                                    <input type="text" id="cep-place" name="cep-place" class="form-control" value="{{ user.cep }}" placeholder="{{ user.cep }}" maxlength="9">
                                                     <button type="button" id="cep-search-btn" class="btn btn-outline-secondary border-2">Search</button>
                                                 </div>
                                             </div>
@@ -921,15 +944,15 @@
                                         <div class="row form-section">
                                             <div class="col-12 col-lg-6 mb-3">
                                                 <label for="street" class="form-label">Street</label>
-                                                <input type="text" id="street" name="street" class="form-control" required value="{{ user.street }}">
+                                                <input type="text" id="street" name="street" class="form-control" value="{{ user.street }}">
                                             </div>
                                             <div class="col-6 col-lg-3 mb-3">
                                                 <label for="street-no" class="form-label">Nº</label>
-                                                <input type="number" id="street-no" name="street_number" class="form-control" required value="{{ user.street_number }}">
+                                                <input type="number" id="street-no" name="street_number" class="form-control" value="{{ user.street_number }}">
                                             </div>
                                             <div class="col-6 col-lg-3 mb-3">
                                                 <label for="country" class="form-label">Country</label>
-                                                <select id="country" name="country" class="form-control" onchange="loadStates()" required>
+                                                <select id="country" name="country" class="form-control" onchange="loadStates()">
                                                     <option value="" disabled selected></option>
                                                     {% for country in world %}
                                                         <option value="{{ country }}" {% if context.user.country == country %}selected{% endif %}>{{ country }}</option>

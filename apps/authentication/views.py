@@ -369,6 +369,7 @@ def fill_profile(request):
         profile.street = request.POST.get('street', profile.street)
         profile.street_number = request.POST.get('street_number', profile.street_number)
         profile.city = request.POST.get('city', profile.city)
+        profile.cep = request.POST.get('cep', profile.cep)
         profile.state = request.POST.get('state', profile.state)
         profile.country = request.POST.get('country', profile.country)
         profile.about = request.POST.get('about', profile.about)
