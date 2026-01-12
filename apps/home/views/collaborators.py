@@ -63,21 +63,21 @@ def get_permission(request, permission_type, model='bill'):
     return request.user.has_perm(f'home.{permission_type}_{model}')
 
 
-def page_list(request, filters=None, sorted_by=None, sort_type=None):
+def page_list(request):
+    # if not get_permission(request, 'add', 'document'):
+    #     context = {
+    #         'user_profile': Profile.objects.get(user=request.user),
+    #     }
+    #     return render(request, 'home/page-404.html', context)
+
     check_expired_documents()
 
-    collaborators = filter_collaborators_objects(request, filters)
-    collaborators = sort_collaborators_objects(collaborators, sorted_by, sort_type)
-
-    collaborators = list(collaborators)
+    collaborators = Profile.objects.all()
 
     min_aso_date = sorted(collaborators, key=lambda collaborator: collaborator.aso if collaborator.aso else datetime.date.max)[0].aso if len(collaborators) > 0 else 0
     max_aso_date = sorted(collaborators, key=lambda collaborator: collaborator.aso if collaborator.aso else datetime.date.min)[-1].aso if len(collaborators) > 0 else 0
 
     context = {
-        'sorted_by': sorted_by.replace('-', '_') if sorted_by else None,
-        'sort_type': sort_type.replace('-', '_') if sort_type else None,
-        'filters': filters,
         'collaborators': collaborators,
         'user_profile': Profile.objects.get(user=request.user),
         'offices': Office.objects.all(),
@@ -253,171 +253,18 @@ def filter_docs(request, slug):
         return redirect('filtered_documents', filters=filter_string, slug=slug)
 
 
-def filter_collaborators(request):
-    office = request.POST['office']
-    group = request.POST['group']
-    disabled = request.POST.get('disabled_filter', None)
-    active = request.POST.get('active_filter', None)
-
-    filter_list = [
-        f'office={office}' if office != 'all' else '%',
-        f'group={group}' if group != 'all' else '%',
-        f'disabled=off' if not disabled else '%',
-        f'active=off' if not active else '%',
-    ]
-
-    filter_string = '&'.join(filter_list)
-    if filter_string.startswith('%&'):
-        filter_string = filter_string[2:]
-    if filter_string.endswith('&'):
-        filter_string = filter_string[:-1]
-
-    filter_string = filter_string.replace('%&', '')
-    filter_string = filter_string.replace('/', '-')
-    filter_string = filter_string[:-2] if filter_string.endswith('&%') else filter_string
-
-    if request.POST['sort_by'] != 'None' and filter_string != '%':
-        return redirect('sorted_filtered_collaborators',
-                        sorted_by=request.POST['sort_by'].replace('_', '-'),
-                        sort_type=request.POST['sort_type'],
-                        filters=filter_string)
-    elif filter_string == '%' and request.POST['sort_by'] != 'None':
-        return redirect('sorted_collaborators',
-                        sorted_by=request.POST['sort_by'].replace('_', '-'),
-                        sort_type=request.POST['sort_type'])
-    elif filter_string == '%':
-        return redirect('collaborators_list')
-    else:
-        return redirect('filtered_collaborators', filters=filter_string)
-
-
-def sort_collaborators(request):
-    sorted_by = request.POST['sort_by'].replace('_', '-') if request.POST.get('sort_by', False) else ''
-    sort_type = 'asc' if request.POST.get('asc', False) else 'desc'
-    filters = request.POST.get('filters', 'None')
-
-    if sorted_by == 'identification':
-        sorted_by = 'id'
-
-    if sorted_by != '' and filters != 'None':
-        return redirect('sorted_filtered_collaborators', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    elif sorted_by != '':
-        return redirect('sorted_collaborators', sorted_by=sorted_by, sort_type=sort_type)
-    elif filters != 'None':
-        return redirect('filtered_collaborators', filters=filters)
-    else:
-        return redirect('collaborators_list')
-
-
-def filter_collaborators_objects(request, filters):
-    if request.user.is_staff:
-        collaborators = Profile.objects.filter(user__username__endswith='@infinitefoundry.com').order_by('user__first_name')
-    else:
-        # Remove admin users from collaborators list
-        collaborators = Profile.objects.filter(user__username__endswith='@infinitefoundry.com').exclude(user__username__in=[
-            'admin@infinitefoundry.com'])
-
-    groups = {
-        'admin': [
-            'admin@infinitefoundry.com',
-            'vitorhugo@infinitefoundry.com',
-        ],
-        'financial': [
-            'joaoeisinger@infinitefoundry.com',
-            'dieynieleandrade@infinitefoundry.com',
-        ]
-    }
-
-    if filters:
-        filters_list = filters.split('&')
-
-        office, group = 'all', 'all'
-        from_date, to_date = None, None
-        disabled, active = True, True
-
-        for item in filters_list:
-            office = item.split('=')[1] if item.startswith('office') else office
-            group = item.split('=')[1] if item.startswith('group') else group
-            from_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith(
-                'from') else from_date
-            to_date = datetime.datetime.strptime(item.split('=')[1], '%Y-%m-%d') if item.startswith('to') else to_date
-            disabled = False if item.startswith('disabled') else disabled
-            active = False if item.startswith('active') else active
-
-        if office != 'all':
-            collaborators = collaborators.filter(office=office if office else None)
-
-        if group != 'all':
-            collaborators = collaborators.filter(user__username__in=groups[group])
-
-        if to_date is not None:
-            collaborators = collaborators.filter(birthday__lte=to_date)
-
-        if from_date is not None:
-            collaborators = collaborators.filter(birthday__gte=from_date)
-
-        if not disabled:
-            collaborators = collaborators.filter(user__is_active=True)
-
-        if not active:
-            collaborators = collaborators.filter(user__is_active=False)
-
-    return collaborators
-
-
-def sort_collaborators_objects(collaborators, sorted_by, sort_type):
-    if sorted_by is not None:
-        sorted_by = sorted_by.replace('-', '_')
-    else:
-        sorted_by = ''
-
-    if sorted_by == 'birthday':
-        if sort_type == 'asc':
-            collaborators = sorted(collaborators, key=lambda
-                collaborator: collaborator.birthday if collaborator.birthday else datetime.date.max)
-        else:
-            collaborators = sorted(collaborators, key=lambda
-                collaborator: collaborator.birthday if collaborator.birthday else datetime.date.min)
-    elif sorted_by == 'aso':
-        if sort_type == 'asc':
-            collaborators = sorted(collaborators, key=lambda
-                collaborator: collaborator.aso if collaborator.aso else datetime.date.max)
-        else:
-            collaborators = sorted(collaborators, key=lambda
-                collaborator: collaborator.aso if collaborator.aso else datetime.date.min)
-    elif sorted_by == 'admission':
-        if sort_type == 'asc':
-            collaborators = sorted(collaborators, key=lambda
-                collaborator: collaborator.admission if collaborator.admission else datetime.date.max)
-        else:
-            collaborators = sorted(collaborators, key=lambda
-                collaborator: collaborator.admission if collaborator.admission else datetime.date.min)
-    elif sorted_by == 'id':
-        if sort_type == 'asc':
-            collaborators = sorted(collaborators, key=lambda
-                collaborator: collaborator.identification if collaborator.identification is not None else float('inf'))
-        else:
-            collaborators = sorted(collaborators, key=lambda
-                collaborator: collaborator.identification if collaborator.identification is not None else -1)
-    else:
-        collaborators = sorted(collaborators, key=lambda collaborator: getattr(collaborator, sorted_by, ''))
-
-    if sort_type == 'desc':
-        collaborators = reversed(collaborators)
-
-    return collaborators
-
-
 def fill_collaborator_initial_infos(request, slug):
     collaborator = Profile.objects.get(slug=slug)
 
     identification = request.POST.get('identification', collaborator.identification)
     admission = request.POST.get('admission', collaborator.admission)
     cpf = request.POST.get('cpf', collaborator.cpf)
+    cnpj = request.POST.get('cnpj', collaborator.cnpj)
 
     collaborator.identification = identification if identification else collaborator.identification
     collaborator.admission = admission if admission and admission != '' else collaborator.admission
     collaborator.cpf = cpf if cpf else collaborator.cpf
+    collaborator.cnpj = cnpj if cnpj else collaborator.cnpj
 
     collaborator.save()
 

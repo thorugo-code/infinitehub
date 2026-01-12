@@ -38,6 +38,9 @@ def details(request):
         'completed_projects': projects_completed.count(),
         'completed_projects_percentage': (projects_completed.count() / all_projects.count()) * 100 if all_projects.count() > 0 else 0,
         'segment': 'profile',
+        "offices": Office.objects.all(),
+        "world": json.load(open(f'{CORE_DIR}/apps/static/assets/world.json', 'r', encoding='utf-8')),
+        
     }
 
     return render(request, 'home/profile/home.html', context)
@@ -63,6 +66,7 @@ def change_picture(request):
 
 def edit(request):
     if request.method == "POST":
+        print(request.POST)
         user_object = User.objects.get(username=request.user.username)
 
         user_object.first_name = request.POST['first_name'].title()
@@ -76,6 +80,7 @@ def edit(request):
         profile.city = request.POST.get('city', profile.city)
         profile.state = request.POST.get('state', profile.state)
         profile.country = request.POST.get('country', profile.country)
+        profile.cep = request.POST.get('cep', profile.cep)
         profile.about = request.POST.get('about', profile.about)
         profile.first_access = False
         profile.avatar = request.FILES.get('avatar', profile.avatar)
@@ -104,7 +109,7 @@ def edit(request):
             "edit_profile": True,
         }
 
-        return render(request, "home/profile/wizard.html", context)
+        return render(request, "home/profile/home.html", context)
 
 
 def delete_file(request, file_id):

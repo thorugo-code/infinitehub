@@ -8578,8 +8578,6 @@ button.bg-darker:focus {
 }
 
 .fixed-bottom {
-< ul class = "navbar-nav navbar-item-fixed-bottom" style = "background: #fff" > < li class = "nav-item" > < a class = "nav-link {% if 'profile' in segment %} active {% endif %}" href = "/profile.html" > < span class = "avatar navbar-vertical-avatar-sm rounded-circle" style = "margin-right: 12px" > < img alt = "Image placeholder" src = "/static/assets/img/theme/team-4.jpg" > < / span > < span class = "nav-link-text" > Profile < / span > < / a > < / li > < li class = "nav-item" > < a class = "nav-link" href = "{% url 'logout' %}" > < i class = "ni ni-button-power text-red" > < / i > < span class = "nav-link-text" > Logout < / span > < / a > < / li > < / ul > position: fixed;
-    right: 0;
     bottom: 0;
     left: 0;
     z-index: 1030;

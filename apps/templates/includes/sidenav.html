@@ -93,12 +93,14 @@
                     {% endif %}
                 
                     <!-- Collaborators items -->
+{#                    {% if perms.home.add_document %}#}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'collaborators_list' %}">
                             <i class="fas fa-user-friends text-yellow" style="opacity: 90%"></i>
                             <span class="nav-link-text">Collaborators</span>
                         </a>
                     </li>
+{#                    {% endif %}#}
                 
                     <!-- Meetings items -->
                     <li class="nav-item">

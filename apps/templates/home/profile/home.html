@@ -1,323 +1,141 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %} Profile {% endblock title %}
+{% block title %}Profile{% endblock title %}
 
 {% block stylesheets %}
     <style>
-        .rotate {
-            transition: transform 0.3s ease;
+
+        .header {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 1rem;
+            color: white;
         }
-        .rotate.down {
-            transform: rotate(180deg);
+
+        .header .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            margin-bottom: 0.5rem;
+            z-index: 1;
         }
+
+        .modal .avatar img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
     </style>
-{% endblock stylesheets %} 
+{% endblock stylesheets %}
 
 {% block content %}
-    
     {% load filters %}
 
-    <!-- Header -->
-    <div class="header pb-6 d-flex align-items-center"
-         style="min-height: 600px">
-        <!-- Mask -->
-        <span class="mask profile-background-svg"></span>
-        <!-- Header container -->
-        <div class="container-fluid d-flex align-items-center">
-            <div class="row mb-9">
-                <div class="col-lg-7 col-md-10 col-sm-9 col-8 ml-lg-6 ml-4">
-                    <h1 class="display-2 text-white">
-                        Hello!
-                    </h1>
-                    <h1 class="display-3 text-white">
-                        {{ user_profile.user.first_name }},
-                        <p class="text-white mt-0 mb-5">
-                            This is your profile page.
-                            You can see the progress you've made
-                            with your work and manage your personal informations.
-                        </p>
-                    </h1>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Page content -->
-    <div class="container-fluid" style="margin-top: -17rem">
-        <div class="row">
+    <div class="header profile-background-svg">
 
-            <div class="col-xl-4 order-xl-1">
-            
-                <!-- Profile Picture Card -->
-                <div class="card card-profile">
-                    <div class="row mx-0 my-3">
-                        <div class="col-auto text-right">
-                            <a class="btn btn-sm btn-neutral" href="{% url 'edit_profile' %}" target="_blank" 
-                               data-toggle="tooltip" data-original-title="Edit">
-                                <i class="fas fa-cog"></i>
-                            </a>
-                        </div>
-                        {% if user_profile.qrcode %}
-                            <div class="col text-right">
-                                <a class="btn btn-sm btn-neutral" href="#"
-                                   data-toggle="modal" data-target="#shareModal">
-                                    <i class="fas fa-share-alt"></i>
-                                </a>
-                            </div>
+        <div class="container-fluid mt-4">
+
+            <div class="row mx-4">
+                <div class="d-flex col-lg-4 col-xl-3 text-center justify-content-center py-4">
+                    <!-- Profile Photo -->
+                    <a href="#" data-toggle="modal" data-target="#profilePictureModal"
+                       class="d-flex align-items-center">
+                        <img src="{{ user_profile.avatar.url }}" class="profile-image">
+                    </a>
+                </div>
+                <div class="col-lg-8 col-xl-9 d-flex flex-column justify-content-center text-center text-md-left py-5">
+
+                    <h1 class="mb-0 text-white">{{ user_profile.user.get_full_name }}</h1>
+                    <div class="badges text-sm mb-3">
+                        {% if user_profile.user.username|check_group:'admin' %}
+                            <span class="badge badge-danger">Admin</span>
+                        {% endif %}
+                        {% if user_profile.user.username|check_group:'collaborator' %}
+                            <span class="badge badge-info">Collaborator</span>
+                        {% else %}
+                            <span class="badge badge-primary">External</span>
+                        {% endif %}
+                        {% if user_profile.user.username|check_group:'finance' %}
+                            <span class="badge badge-warning">Financial</span>
                         {% endif %}
                     </div>
-                    <div class="row justify-content-center mt-5 pt-5">
-                        <div class="col-lg-12">
-                            <div class="card-profile-image"
-                                 style="background-color: #adb5bd00">
-                                <a href="#" data-toggle="modal" data-target="#profilePictureModal">
-                                    <img class="rounded-circle"
-                                         style="min-width: 180px; height: 180px; object-fit: cover; background-color: #fff; z-index: 1"
-                                         src="{{ user_profile.avatar.url }}"
-                                         alt="{{ user_profile.user.first_name }}">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body pt-3">
-                        <div class="row">
-                            <div class="col">
-                                <div class="card-profile-stats d-flex justify-content-center mt-6 pb-2">
-                                    <div class="pb-2">
-                                        {% if user_profile.user.username|check_group:'admin' %}
-                                            <small class="badge badge-md badge-danger">Admin</small>
-                                        {% endif %}
-                                        {% if user_profile.user.username|check_group:'collaborator' %}
-                                            <small class="badge badge-md badge-info">Collaborator</small>
-                                        {% else %}
-                                            <small class="badge badge-md badge-primary">External</small>
-                                        {% endif %}
-                                        {% if user_profile.user.username|check_group:'finance' %}
-                                            <small class="badge badge-md badge-warning">Financial</small>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <h5 class="h3 title py-3">
-                                <span>{{ user_profile.user.get_full_name }}</span>
-                                <small class="d-block h5 font-weight-light text-muted">{{ user_profile.position|default:'' }}</small>
-                            </h5>
-                            <div class="h5 mt-2">
-                                {{ user_profile.user.username }}
-                            </div>
-                            {% if user_profile.phone %}
-                                <div class="h5 font-weight-300 mt--2 pb-2">
-                                    {{ user_profile.phone }}
-                                </div>
-                            {% endif %}
-                            <div class="h5 font-weight-400">
-                                {% if user_profile.street != '' and user_profile.city != '' and user_profile.state != '' and user_profile.country != '' %}
-                                    <div><i class="fas fa-map-marker-alt mr-1 text-black-50"></i>
-                                        {{ user_profile.street }}, {{ user_profile.street_number }}
-                                        - {{ user_profile.city }}, {{ user_profile.state }}, {{ user_profile.country }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            {% if user_profile.about != '' %}
-                                <div class="h4 font-weight-500 my-3 mb-3 py-4">
-                                    <i>"{{ user_profile.about }}"</i>
-                                </div>
-                            {% else %}
-                                <div class="py-3"></div>
-                            {% endif %}
 
-                            <div class="row justify-content-center" style="width: 108%;">
-                                {% if user_profile.website %}
-                                    <div class="col-1 px-0 mx-1">
-                                        <a href="{{ user_profile.website }}" target="_blank" data-toggle="tooltip" data-original-title="Website">
-                                            <i class="fas fa-globe"></i>
-                                        </a>
-                                    </div>
-                                {% endif %}
-                                {% if user_profile.facebook %}
-                                    <div class="col-1 px-0 mx-1">
-                                        <a href="{{ user_profile.facebook }}" target="_blank" data-toggle="tooltip" data-original-title="Facebook">
-                                            <i class="fab fa-facebook-square"></i>
-                                        </a>
-                                    </div>
-                                {% endif %}
-                                {% if user_profile.twitter %}
-                                    <div class="col-1 px-0 mx-1">
-                                        <a href="{{ user_profile.twitter }}" target="_blank" data-toggle="tooltip" data-original-title="Twitter">
-                                            <i class="fab fa-twitter-square"></i>
-                                        </a>
-                                    </div>
-                                {% endif %}
-                                {% if user_profile.instagram %}
-                                    <div class="col-1 px-0 mx-1">
-                                        <a href="{{ user_profile.instagram }}" target="_blank" data-toggle="tooltip" data-original-title="Instagram">
-                                            <i class="fab fa-instagram"></i>
-                                        </a>
-                                    </div>
-                                {% endif %}
-                                {% if user_profile.linkedin %}
-                                    <div class="col-1 px-0 mx-1">
-                                        <a href="{{ user_profile.linkedin }}" target="_blank" data-toggle="tooltip" data-original-title="LinkedIn">
-                                            <i class="fab fa-linkedin"></i>
-                                        </a>
-                                    </div>
-                                {% endif %}
-                            </div>
-
+                    {% if user_profile.phone %}
+                        <div class="h5 font-weight-300 text-white">
+                            {{ user_profile.phone }}
                         </div>
-                    </div>
+                    {% endif %}
+
+                    {% if user_profile.street != '' and user_profile.city != '' and user_profile.state != '' and user_profile.country != '' %}
+                        <div class="h5 font-weight-400 text-white">
+                            <i class="fas fa-map-marker-alt mr-1 text-white"></i>
+                            {{ user_profile.street }}, {{ user_profile.street_number }}
+                            - {{ user_profile.city }}, {{ user_profile.state }}, {{ user_profile.country }}
+                        </div>
+                    {% endif %}
+
+                    {% if user_profile.about != '' %}
+                        <div class="h4 font-weight-500 text-white">
+                            <i>"{{ user_profile.about }}"</i>
+                        </div>
+                    {% else %}
+                        <div class="py-1"></div>
+                    {% endif %}
+
+                    {% if user_profile.qrcode %}
+                        <a class="btn btn-sm btn-white text-primary mr-lg-auto mx-auto mx-lg-0" href="#"
+                           data-toggle="modal" data-target="#shareModal">
+                            Share <i class="fas fa-share-alt ml-1"></i>
+                        </a>
+                    {% endif %}
+
                 </div>
-            
-                <!-- Documents Card -->
-                <div class="card shadow">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h3 class="mb-0">Documents</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-responsive" style="height: 12rem; overflow-y: auto">
-                        <table class="table align-items-center table-flush">
-                            <tbody>
-                            {% for document in shared_documents %}
-                                <tr>
-                                    <th scope="row" class="p-2 align-items-center">
-                                        <a class="align-items-center" style="display: flex"
-                                           data-target="#watchDocumentModal{{ document.id }}" data-toggle="modal"
-                                           href="">
-                                            <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                 alt="{{ document.name }}" class="px-3" style="height: 18px">
-                                            <span class="text-black-50">{{ document.name|truncatechars:38 }}</span>
-                                        </a>
-                                    </th>
-                                    <td class="text-right pr-4 align-items-center">
-                                        <a href="{% url 'download_collaborator_document' document.id %}">
-                                            <i class="fas fa-download text-success" style="font-size: 0.7125rem"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-
-                                <!-- Watch File Modal -->
-                                <div aria-hidden="true"
-                                 aria-labelledby="watchDocumentModalLabel{{ document.id }}"
-                                 class="modal fade" id="watchDocumentModal{{ document.id }}"
-                                 role="dialog"
-                                 tabindex="-1">
-                                <div class="modal-dialog my-6" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header mt-2 mb--1">
-                                            <h5 class="modal-title my-1"
-                                                style="margin-left: auto">
-                                                <i></i>
-                                            </h5>
-                                            <span class="ml-3 my-1"
-                                                  id="newPageModalLabel{{ document.id }}"
-                                                  style="margin-right: auto; font-size: 1.2rem"></span>
-                                            <button aria-label="Close" class="close mt--4"
-                                                    data-dismiss="modal"
-                                                    style="margin-left: -30px"
-                                                    type="button">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body py-0"
-                                             style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <div class="form-group mt--1"
-                                                 style="display: flex; justify-content: center">
-                                                <img alt="New File" id="filePreviewModal{{ document.id }}"
-                                                     src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
-                                                     style="height: 130px"/>
-                                            </div>
-                                            <div class="form-group form-control-label justify-content-center" style="display: flex">
-                                                <span class="h5 mb-0 text-muted font-weight-light">
-                                                    uploaded: {{ document.uploaded_by.first_name }}
-                                                    {% if document.uploaded_by %}-{% endif %}
-                                                    {{ document.uploaded_at|date:'d/m/Y' }}
-                                                </span>
-                                            </div>
-                                            <div class="form-group form-control-label">
-                                                <label for="fileName{{ document.id }}"
-                                                       style="font-size:0.8125rem; font-weight:600">Name</label>
-                                                <input class="form-control" id="fileName{{ document.id }}" disabled
-                                                       type="text" value="{{ document.name }}" name="name">
-                                            </div>
-                                            <div class="form-group form-control-label">
-                                                <label for="fileDescription{{ document.id }}"
-                                                       style="font-size:0.8125rem; font-weight:600">Description</label>
-                                                <textarea class="form-control" name="description" disabled
-                                                          id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button class="btn btn-secondary" data-dismiss="modal"
-                                                    type="button">Cancel
-                                            </button>
-                                            <a class="btn btn-success" data-toggle="tooltip" data-original-title="Download"
-                                               href="{% url 'download_collaborator_document' document.id %}">
-                                                Download
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer py-1" style="border-top: 0 !important"></div>
-                </div>
-            
             </div>
-        
-            <div class="col-xl-8 order-xl-1">
-            
-                <!-- Info Cards -->
-                <div class="card-deck">
-                    <div class="card bg-gradient-default" style="height: 85%; min-width: 0">
-                        <div class="card-body p-4">
-                            <h5 class="card-title text-uppercase text-muted mb-0 text-white">
-                                Completed tasks
-                            </h5>
-                            <span class="h2 font-weight-bold mb-0 text-white">{{ completed_tasks }}/{{ user_profile.user.user_tasks.all.count }}</span>
-                            <div class="progress progress-xs mt-4 mb-0 text-sm">
-                                <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ completed_tasks_percentage }}"
-                                     aria-valuemin="0" aria-valuemax="100" style="width: {{ completed_tasks_percentage }}%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card bg-gradient-blue" style="height: 85%; min-width: 0">
-                        <div class="card-body p-4">
-                            <h5 class="card-title text-uppercase text-muted mb-0 text-white">Completed Projects</h5>
-                            <span class="h2 font-weight-bold mb-0 text-white">{{ completed_projects }}/{{ user_profile.user.assigned_projects.all.count }}</span>
-                            <div class="progress progress-xs mt-4 mb-0 text-sm">
-                                <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ completed_projects_percentage }}"
-                                     aria-valuemin="0" aria-valuemax="100" style="width: {{ completed_projects_percentage }}%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Files Card -->
+
+        </div>
+    </div>
+
+    <div class="container-fluid d-flex justify-content-center mt-4">
+        <ul class="nav nav-pills w-100" id="mainNav" role="tablist">
+            <li class="nav-item text-center col-4 pl-0">
+                <a class="nav-link active px-3" id="projects-tab" data-toggle="tab" href="#projects" role="tab"
+                   aria-controls="projects" aria-selected="True">
+                    Projects
+                </a>
+            </li>
+            <li class="nav-item text-center col-4">
+                <a class="nav-link px-3" id="documents-tab" data-toggle="tab" href="#documents" role="tab"
+                   aria-controls="documents" aria-selected="false">
+                    Documents
+                </a>
+            </li>
+            <li class="nav-item text-center col-4 pr-0">
+                <a class="nav-link px-3" id="about-tab" data-toggle="tab" href="#about" role="tab" aria-controls="about"
+                   aria-selected="false">
+                    About
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="tab-content mt-3" id="mainNavContent">
+
+        <div class="tab-pane fade show active" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+            <main class="container-fluid mt-4">
                 <div class="card">
                     <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col">
                                 <h3 class="mb-0">Files</h3>
                             </div>
-                            {#                                    <div class="col text-right">#}
-                            {#                                        <a class="btn btn-sm btn-neutral" data-target="#sortModal" data-toggle="modal"#}
-                            {#                                           href="#">#}
-                            {#                                            <i class="fas fa-sort"></i>#}
-                            {#                                        </a>#}
-                            {#                                        <a class="btn btn-sm btn-neutral" data-target="#filterModal" data-toggle="modal"#}
-                            {#                                           href="#">#}
-                            {#                                            <i class="fas fa-filter"></i>#}
-                            {#                                        </a>#}
-                            {#                                    </div>#}
                         </div>
                     </div>
                     <div class="card-body px-4 pb-4 pt-0">
@@ -474,7 +292,7 @@
                                             <div class="modal-body py-0"
                                                  style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                 <form method="post" id="deleteConfirmForm{{ uploaded_file.pk }}"
-                                                      action="{% url 'delete_file_from_profile' uploaded_file.pk %}" 
+                                                      action="{% url 'delete_file_from_profile' uploaded_file.pk %}"
                                                       onsubmit="disableButtons('deleteConfirmButton{{ uploaded_file.pk }}')">
                                                     {% csrf_token %}
                                                     <div class="form-group mt-4"
@@ -499,7 +317,6 @@
                                                 <button type="button" class="btn btn-secondary"
                                                         data-dismiss="modal">Cancel
                                                 </button>
-
                                                 <button type="submit" class="btn btn-danger"
                                                         id="deleteConfirmButton{{ uploaded_file.pk }}"
                                                         form="deleteConfirmForm{{ uploaded_file.pk }}">
@@ -513,17 +330,14 @@
                         </div>
                     </div>
                 </div>
-            
                 <div class="row">
-                
-                    <!-- Projects Card -->
                     <div class="col-md">
                         <div class="card shadow">
                             <div class="card-header">
                                 <h3 class="mb-0 text-capitalize">Projects</h3>
                             </div>
                             <div class="card-body p-0 pb-2">
-                                <ul class="list-group list-group-flush list" 
+                                <ul class="list-group list-group-flush list"
                                     style="min-height: 20.5rem; max-height: 28.5rem; overflow: auto">
                                     {% for project in projects %}
                                         <li class="list-group-item border-top-0 px-4 mx-2 py-3">
@@ -535,10 +349,15 @@
                                                     </a>
                                                 </div>
                                                 <div class="col">
-                                                    <a href="{% url 'project_details' project.slug %}" class="text-muted"><h5 class="mb-0">{{ project.title }}</h5></a>
-                                                    <a href="{% url 'project_details' project.slug %}" class="text-muted"><h6 class="font-weight-light">{{ project.client.name|default:project.client_str }}</h6></a>
+                                                    <a href="{% url 'project_details' project.slug %}"
+                                                       class="text-muted"><h5 class="mb-0">{{ project.title }}</h5></a>
+                                                    <a href="{% url 'project_details' project.slug %}"
+                                                       class="text-muted"><h6
+                                                            class="font-weight-light">{{ project.client.name|default:project.client_str }}</h6>
+                                                    </a>
                                                     <div class="progress progress-xs mb-0">
-                                                        <div class="progress-bar {% if project.completition >= 80 and project.deadline|time_to_date > 0 %}bg-success{% elif project.completition >= 40 and project.deadline|time_to_date > 0 %}bg-info{% elif project.completition >= 10 and project.deadline|time_to_date > 0 %}bg-yellow{% else %}bg-red{% endif %}" role="progressbar"
+                                                        <div class="progress-bar {% if project.completition >= 80 and project.deadline|time_to_date > 0 %}bg-success{% elif project.completition >= 40 and project.deadline|time_to_date > 0 %}bg-info{% elif project.completition >= 10 and project.deadline|time_to_date > 0 %}bg-yellow{% else %}bg-red{% endif %}"
+                                                             role="progressbar"
                                                              aria-valuenow="{{ project.completition }}"
                                                              aria-valuemin="0" aria-valuemax="100"
                                                              style="width: {{ project.completition }}%;"></div>
@@ -551,8 +370,6 @@
                             </div>
                         </div>
                     </div>
-                
-                    <!-- Tasks Card -->
                     <div class="col-md">
                         <div class="card shadow">
                             <div class="card-header">
@@ -562,8 +379,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-body p-0 pb-2" style="min-height: 20.5rem; max-height: 28.5rem; overflow-y: auto;">
-                                <ul class="list-group list-group-flush pr-2" data-toggle="checklist" >
+                            <div class="card-body p-0"
+                                 style="min-height: 21rem; max-height: 28.5rem; overflow-y: auto">
+                                <ul class="list-group list-group-flush pr-2" data-toggle="checklist">
                                     {% for task in tasks %}
                                         <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-3 border-top-0">
                                             <div class="checklist-item checklist-item-{% if task.priority == 1 %}success{% elif task.priority == 2 %}medium{% elif task.priority == 3 %}danger{% else %}info{% endif %} {% if task.completed %}checklist-item-checked{% endif %}"
@@ -582,42 +400,43 @@
                                                 </a>
                                                 {% if task.subtasks.count > 0 %}
                                                     <div class="col-auto p-0">
-                                                        <a class="pointer-hover accordion" data-toggle="collapse" 
-                                                           data-target="#collapseDetails{{ task.id }}" aria-expanded="false" 
+                                                        <a class="pointer-hover accordion" data-toggle="collapse"
+                                                           data-target="#collapseDetails{{ task.id }}"
+                                                           aria-expanded="false"
                                                            aria-controls="collapseDetails{{ task.id }}">
-                                                            <i class="fas fa-chevron-down text-muted rotate" style="font-size: 0.9rem"></i>
+                                                            <i class="fas fa-chevron-down text-muted rotate"
+                                                               style="font-size: 0.9rem"></i>
                                                         </a>
                                                     </div>
                                                 {% endif %}
                                             </div>
                                         </li>
-
                                         <!-- Subtasks Collapse -->
                                         <div class="collapse" id="collapseDetails{{ task.id }}">
                                             <ul class="list-group list-group-flush" data-toggle="checklist">
                                                 {% for subtask in task.subtasks.all %}
                                                     <li class="checklist-entry list-group-item flex-column align-items-start py-3 px-4 border-top-0">
-                                                        <div class="checklist-item 
-                                                            {% if subtask.priority == 1 %} 
-                                                                checklist-item-success 
-                                                            {% elif subtask.priority == 2 %} 
-                                                                checklist-item-medium 
-                                                            {% elif subtask.priority == 3 %}
-                                                                checklist-item-danger 
-                                                            {% else %} 
-                                                                checklist-item-info 
-                                                            {% endif %}
-                                                            {% if subtask.completed %}
-                                                                checklist-item-checked
-                                                            {% endif %}">
+                                                        <div class="checklist-item
+                                                        {% if subtask.priority == 1 %} 
+                                                            checklist-item-success 
+                                                        {% elif subtask.priority == 2 %} 
+                                                            checklist-item-medium 
+                                                        {% elif subtask.priority == 3 %}
+                                                            checklist-item-danger 
+                                                        {% else %} 
+                                                            checklist-item-info 
+                                                        {% endif %}
+                                                        {% if subtask.completed %}
+                                                            checklist-item-checked
+                                                        {% endif %}">
                                                             <a class="col p-0" href="#" data-toggle="modal"
                                                                data-target="#subtaskDetails{{ subtask.id }}">
                                                                 <div class="checklist-info">
                                                                     <h5 class="checklist-title mb-0 {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}">{{ subtask.title }}</h5>
                                                                     <small class="{% if subtask.priority == 1 %}
-                                                                        text-success {% elif subtask.priority == 2 %} 
-                                                                        text-medium {% elif subtask.priority == 3 %}
-                                                                        text-danger {% else %} text-info {% endif %}">
+                                                                    text-success {% elif subtask.priority == 2 %} 
+                                                                    text-medium {% elif subtask.priority == 3 %}
+                                                                    text-danger {% else %} text-info {% endif %}">
                                                                         {% if subtask.priority == 1 %}
                                                                             Low {% elif subtask.priority == 2 %}
                                                                             Medium {% elif subtask.priority == 3 %}
@@ -632,7 +451,6 @@
                                                             </a>
                                                         </div>
                                                     </li>
-
                                                     <!-- Sub Task Details Modal -->
                                                     <div class="modal fade" id="subtaskDetails{{ subtask.id }}"
                                                          tabindex="-1"
@@ -645,27 +463,28 @@
                                                                     <h5 class="modal-title my-1"
                                                                         style="margin-left: auto">
                                                                         <i class="fas fa-circle {% if subtask.priority == 1 %}
-                                                                            text-success{% elif subtask.priority == 2 %}
-                                                                            text-medium{% elif subtask.priority == 3 %}
-                                                                            text-danger{% else %}
-                                                                            text-info{% endif %}"
+                                                                        text-success{% elif subtask.priority == 2 %}
+                                                                        text-medium{% elif subtask.priority == 3 %}
+                                                                        text-danger{% else %}
+                                                                        text-info{% endif %}"
                                                                            style="font-size: 0.9rem">
                                                                         </i>
                                                                     </h5>
                                                                     <span class="ml-3 my-1 {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}"
                                                                           style="margin-right: auto; font-size: 1.2rem"
                                                                           id="newFileModalLabel">
-                                                                        {{ subtask.title|truncatechars:'30' }}
-                                                                        <i class="fas fa-code-branch ml-1"
-                                                                           style="font-size: 1rem"></i>
-                                                                    </span>
+                                                                    {{ subtask.title|truncatechars:'30' }}
+                                                                    <i class="fas fa-code-branch ml-1"
+                                                                       style="font-size: 1rem"></i>
+                                                                </span>
                                                                     <button type="button" class="close mt--4"
                                                                             style="margin-left: -30px"
                                                                             data-dismiss="modal" aria-label="Close">
                                                                         <span aria-hidden="true">&times;</span>
                                                                     </button>
                                                                 </div>
-                                                                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                                <div class="modal-body py-0"
+                                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
                                                                     {% if request.user != subtask.owner %}
                                                                         <div class="form-group form-control-label">
                                                                             <label for="taskTitleEdit">Title</label>
@@ -680,21 +499,24 @@
                                                                                 <label for="taskOwnerEdit">Owner</label>
                                                                                 <input type="text" class="form-control"
                                                                                        id="taskOwnerEdit" placeholder=""
-                                                                                       value="{{ subtask.owner.get_full_name }}" disabled>
+                                                                                       value="{{ subtask.owner.get_full_name }}"
+                                                                                       disabled>
                                                                             </div>
                                                                         {% else %}
                                                                             <div class="form-group form-control-label col-sm">
                                                                                 <label for="taskTitleEdit">Title</label>
                                                                                 <input type="text" class="form-control"
                                                                                        id="taskTitleEdit" placeholder=""
-                                                                                       value="{{ subtask.title }}" disabled>
+                                                                                       value="{{ subtask.title }}"
+                                                                                       disabled>
                                                                             </div>
                                                                         {% endif %}
                                                                         <div class="form-group form-control-label col-sm-auto">
                                                                             <label for="taskDeadlineEdit">Deadline</label>
                                                                             <input type="date" id="taskDeadlineEdit"
                                                                                    class="form-control {% if not subtask.completed and subtask.deadline|time_to_date < 0 %}text-danger{% endif %}"
-                                                                                   value="{{ subtask.deadline|date:"Y-m-d" }}" disabled>
+                                                                                   value="{{ subtask.deadline|date:"Y-m-d" }}"
+                                                                                   disabled>
                                                                         </div>
                                                                     </div>
                                                                     <div class="form-group mb-2 form-control-label">
@@ -702,7 +524,8 @@
                                                                         <textarea class="form-control"
                                                                                   id="taskDescriptionEdit"
                                                                                   name="taskDescriptionEdit"
-                                                                                  rows="2" disabled>{{ subtask.description }}</textarea>
+                                                                                  rows="2"
+                                                                                  disabled>{{ subtask.description }}</textarea>
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
@@ -712,20 +535,21 @@
                                                                             id="cancelEditTaskButton">
                                                                         Cancel
                                                                     </button>
-                                                                    <a href="{% url 'project_details' task.project.slug %}#task{{ task.id }}sub{{ subtask.id }}" class="btn btn-primary">
+                                                                    <a href="{% url 'project_details' task.project.slug %}#task{{ task.id }}sub{{ subtask.id }}"
+                                                                       class="btn btn-primary">
                                                                         Edit
                                                                     </a>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                 {% endfor %}
                                             </ul>
                                         </div>
 
                                         <!-- Task Details Modal -->
-                                        <div class="modal fade" id="taskDetails{{ task.id }}" tabindex="-1" role="dialog"
+                                        <div class="modal fade" id="taskDetails{{ task.id }}" tabindex="-1"
+                                             role="dialog"
                                              aria-labelledby="taskDetails{{ task.id }}Label" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered" role="document">
                                                 <div class="modal-content">
@@ -742,7 +566,8 @@
                                                         <span class="ml-3 my-1 {% if not task.completed and task.deadline|time_to_date < 0 %}text-danger{% endif %}"
                                                               style="margin-right: auto; font-size: 1.2rem"
                                                               id="newFileModalLabel">{{ task.title|truncatechars:'30' }}</span>
-                                                        <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                        <button type="button" class="close mt--4"
+                                                                style="margin-left: -30px"
                                                                 data-dismiss="modal" aria-label="Close">
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
@@ -772,7 +597,8 @@
                                                                     <label for="taskOwner">Owner</label>
                                                                     <input type="text" class="form-control"
                                                                            id="taskOwner" placeholder=""
-                                                                           value="{{ task.owner.get_full_name }}" disabled>
+                                                                           value="{{ task.owner.get_full_name }}"
+                                                                           disabled>
                                                                 </div>
                                                             </div>
                                                         {% endif %}
@@ -785,7 +611,8 @@
                                                         </div>
                                                         {% if task.subtasks.count > 0 %}
                                                             <div class="form-group m-0 form-control-label">
-                                                                <label><i class="fas fa-code-branch pr-2"></i>Subtasks</label>
+                                                                <label><i
+                                                                        class="fas fa-code-branch pr-2"></i>Subtasks</label>
                                                             </div>
                                                             <ul class="list-group list-group-flush px-4"
                                                                 data-toggle="checklist">
@@ -805,7 +632,8 @@
                                                                         {% if subtask.completed %}
                                                                             checklist-item-checked
                                                                         {% endif %}">
-                                                                            <a class="col p-0" href="#" data-dismiss="modal"
+                                                                            <a class="col p-0" href="#"
+                                                                               data-dismiss="modal"
                                                                                data-toggle="modal"
                                                                                data-target="#subtaskDetails{{ subtask.id }}"
                                                                                onclick="addShowClass('collapseDetails' + {{ task.id }})">
@@ -834,36 +662,295 @@
                                                         {% endif %}
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                        <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">
                                                             Cancel
                                                         </button>
-                                                        <a href="{% url 'project_details' task.project.slug %}#task{{ task.id }}" class="btn btn-primary">
+                                                        <a href="{% url 'project_details' task.project.slug %}#task{{ task.id }}"
+                                                           class="btn btn-primary">
                                                             Edit
                                                         </a>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-
                                     {% endfor %}
                                 </ul>
                             </div>
+                            <div class="card-footer py-1" style="border-top: 0 !important">
                         </div>
                     </div>
-                
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
+            <div class="container-fluid mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Documents</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        {% if shared_documents and shared_documents|length > 0 %}
+                            <table class="table-responsive table align-items-center table-flush" id="documents-table">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col" data-sort="name" style="width: 100%">File</th>
+                                        <th scope="col" style="width: 0"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for document in shared_documents %}
+                                    <tr>
+                                        <th scope="row" class="p-2 align-items-center">
+                                            <a class="align-items-center" style="display: flex"
+                                               data-target="#watchDocumentModal{{ document.id }}" data-toggle="modal"
+                                               href="">
+                                                <img src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                     alt="{{ document.name }}" class="px-3" style="height: 18px">
+                                                <span class="text-black-50">{{ document.name|truncatechars:50 }}</span>
+                                            </a>
+                                        </th>
+                                        <td class="text-right pr-4 align-items-center">
+                                            <a href="{% url 'download_collaborator_document' document.id %}">
+                                                <i class="fas fa-download text-success" style="font-size: 0.7125rem"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <!-- Watch File Modal -->
+                                    <div aria-hidden="true"
+                                         aria-labelledby="watchDocumentModalLabel{{ document.id }}"
+                                         class="modal fade" id="watchDocumentModal{{ document.id }}"
+                                         role="dialog"
+                                         tabindex="-1">
+                                        <div class="modal-dialog my-6" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header mt-2 mb--1">
+                                                    <h5 class="modal-title my-1"
+                                                        style="margin-left: auto">
+                                                        <i></i>
+                                                    </h5>
+                                                    <span class="ml-3 my-1"
+                                                          id="newPageModalLabel{{ document.id }}"
+                                                          style="margin-right: auto; font-size: 1.2rem"></span>
+                                                    <button aria-label="Close" class="close mt--4"
+                                                            data-dismiss="modal"
+                                                            style="margin-left: -30px"
+                                                            type="button">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body py-0"
+                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    <div class="form-group mt--1"
+                                                         style="display: flex; justify-content: center">
+                                                        <img alt="New File" id="filePreviewModal{{ document.id }}"
+                                                             src="/static/assets/img/icons/extensions/1x/{{ document.file.name|file_extension_icon }}"
+                                                             style="height: 130px"/>
+                                                    </div>
+                                                    <div class="form-group form-control-label justify-content-center"
+                                                         style="display: flex">
+                                                <span class="h5 mb-0 text-muted font-weight-light">
+                                                    uploaded: {{ document.uploaded_by.first_name }}
+                                                    {% if document.uploaded_by %}-{% endif %}
+                                                    {{ document.uploaded_at|date:'d/m/Y' }}
+                                                </span>
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileName{{ document.id }}"
+                                                               style="font-size:0.8125rem; font-weight:600">Name</label>
+                                                        <input class="form-control" id="fileName{{ document.id }}" disabled
+                                                               type="text" value="{{ document.name }}" name="name">
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="fileDescription{{ document.id }}"
+                                                               style="font-size:0.8125rem; font-weight:600">Description</label>
+                                                        <textarea class="form-control" name="description" disabled
+                                                                  id="fileDescription{{ document.id }}">{{ document.description }}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-secondary" data-dismiss="modal"
+                                                            type="button">Cancel
+                                                    </button>
+                                                    <a class="btn btn-success" data-toggle="tooltip"
+                                                       data-original-title="Download"
+                                                       href="{% url 'download_collaborator_document' document.id %}">
+                                                        Download
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="p-4 text-center text-muted">
+                                <i class="fas fa-exclamation-circle fa-2x mb-2"></i><br>
+                                No documents available or you do not have permission to view them.
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer py-1 border-0"></div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Footer -->
-    <div class="container-fluid">
-        {% include "includes/footer.html" %}
+
+        <div class="tab-pane fade" id="about" role="tabpanel" aria-labelledby="about-tab">
+            <div class="container-fluid mt-4">
+                <div class="card">
+                    <form action="{% url 'send_edit_profile' %}"
+                          method="post" id="profileForm" enctype="multipart/form-data"
+                          onsubmit="disableByID('profileFormSubmitButton')">
+                        {% csrf_token %}
+                        <div class="tab-content card-body px-5">
+                            <div class="tab-pane active" id="info">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="first-name" class="form-label form-control-label">First
+                                            Name</label>
+                                        <input type="text" class="form-control" id="first-name"
+                                               name="first_name" required
+                                               value="{{ user_profile.user.first_name }}">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="last-name" class="form-label form-control-label">Last Name</label>
+                                        <input type="text" class="form-control" id="last-name"
+                                               name="last_name" required
+                                               value="{{ user_profile.user.last_name }}">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="birthday" class="form-label form-control-label">Birthday</label>
+                                        <input type="date" id="birthday" name="birthday"
+                                               class="form-control" required
+                                               value="{{ user_profile.birthday|date:'Y-m-d' }}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="phone" class="form-label form-control-label">Phone</label>
+                                        <input type="text" id="phone" name="phone"
+                                               class="form-control" required
+                                               value="{{ user_profile.phone }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="position" class="form-label form-control-label">Position</label>
+                                        <input id="position" name="position" class="form-control"
+                                               required value="{{ user_profile.position }}">
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row form-section flex-row-reverse">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="cep-place" class="form-label form-control-label">CEP</label>
+                                        <div class="d-flex" style="gap:0.5rem; align-items:center;">
+                                            <input type="text" id="cep-place" name="cep"
+                                                   class="form-control" value="{{ user_profile.cep }}"
+                                                   placeholder="{{ user_profile.cep }}" maxlength="9">
+                                            <button type="button" id="cep-search-btn"
+                                                    class="btn btn-primary border-2">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 mb-3">
+                                        <div class="row form-section">
+                                            <div class="col-md-8">
+                                                <label for="street" class="form-label form-control-label">Street</label>
+                                                <input type="text" id="street" name="street" class="form-control"
+                                                       value="{{ user_profile.street }}" disabled>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="street-no" class="form-label form-control-label">Nº</label>
+                                                <input type="number" id="street-no" name="street_number"
+                                                       class="form-control" value="{{ user_profile.street_number }}" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row form-section">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="country" class="form-label form-control-label">Country</label>
+                                        <input id="country" name="country" class="form-control"
+                                               value="{{ user_profile.country }}" disabled>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="state" class="form-label form-control-label">State</label>
+                                        <input id="state" name="state" class="form-control"
+                                               value="{{ user_profile.state }}" disabled>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="city" class="form-label form-control-label">City</label>
+                                        <input id="city" name="city" class="form-control"
+                                               value="{{ user_profile.city }}" disabled>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row form-section">
+                                    <div class="col-12 text-lg-start mx-auto">
+                                    <label class="form-label form-control-label">Social</label>
+                                        <div class="input-group py-2">
+                                            <span class="input-group-text"><i
+                                                    class="fas fa-globe"></i></span>
+                                            <input class="form-control" id="website" name="website"
+                                                   type="url" placeholder="Your website"
+                                                   value="{{ user_profile.website|default:"" }}">
+                                        </div>
+                                        <div class="input-group py-2">
+                                            <span class="input-group-text"><i
+                                                    class="fab fa-linkedin"></i></span>
+                                            <input class="form-control" id="linkedin" name="linkedin"
+                                                   type="url" placeholder="LinkedIn"
+                                                   value="{{ user_profile.linkedin|default:"" }}">
+                                        </div>
+                                        <div class="input-group py-2">
+                                                        <span class="input-group-text"><i
+                                                                class="fab fa-facebook-square"></i></span>
+                                            <input class="form-control" id="facebook" name="facebook"
+                                                   type="url" placeholder="Facebook"
+                                                   value="{{ user_profile.facebook|default:"" }}">
+                                        </div>
+                                        <div class="input-group py-2">
+                                                        <span class="input-group-text"><i
+                                                                class="fab fa-instagram"></i></span>
+                                            <input class="form-control" id="instagram" name="instagram"
+                                                   type="url" placeholder="Instagram"
+                                                   value="{{ user_profile.instagram|default:"" }}">
+                                        </div>
+                                        <div class="input-group pt-2">
+                                                        <span class="input-group-text"><i
+                                                                class="fab fa-twitter-square"></i></span>
+                                            <input class="form-control" id="twitter" name="twitter"
+                                                   type="url" placeholder="Twitter"
+                                                   value="{{ user_profile.twitter|default:"" }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mt-4">
+                                <div class="col d-flex justify-content-end">
+                                    <button type="submit"
+                                            class="btn btn-success"
+                                            id="profileFormSubmitButton" form="profileForm">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Profile Picture Modal -->
     <div class="modal fade" id="profilePictureModal" tabindex="-1" role="dialog"
-         aria-labelledby="profilePictureModalLabel" aria-hidden="true">
+         aria-labelledby="profilePictureModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog my-6" role="document">
             <div class="modal-content">
                 <div class="modal-header mt-2">
@@ -872,52 +959,45 @@
                     </h5>
                     <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
                           id="profilePictureModalLabel">{{ user_profile.user.first_name }}</span>
-                    <button type="button" class="close mt--4" style="margin-left: -30px"
-                            data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close mt--4" style="margin-left: -30px" data-dismiss="modal"
+                            aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body py-0"
-                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
                     <form id="profilePictureForm" method="post" action="{% url 'change_profile_picture' %}"
                           enctype="multipart/form-data" onsubmit="disableByID('uploadButton')">
                         {% csrf_token %}
-                        <div class="form-group mt-7 mb-0"
-                             style="display: flex; justify-content: center">
+                        <div class="form-group mt-7 mb-0" style="display: flex; justify-content: center">
                             <div class="avatar card-profile-image"
                                  style="z-index: 1; width: 200px; height: 200px; background-color: #adb5bd00">
-                                <img
-                                        id="imagePreviewModal"
-                                        class="rounded-circle mt-7"
-                                        style="max-width: 100%; height: 100%; object-fit: cover;"
-                                        alt="Image placeholder"
-                                        src="{{ user_profile.avatar.url }}">
+                                <img id="imagePreviewModal" class="rounded-circle mt-7"
+                                     style="max-width: 100%; height: 100%; object-fit: cover;" alt="Image placeholder"
+                                     src="{{ user_profile.avatar.url }}">
                             </div>
                         </div>
                         <div class="form-group form-control-label">
                             <label for="fileInput">Select file</label>
-                            <input type="file" class="form-control-file" id="fileInput"
-                                   name="profilePicture" accept="image/*"
-                                   onchange="previewImage(event); enableButtons()">
+                            <input type="file" class="form-control-file" id="fileInput" name="profilePicture"
+                                   accept="image/*" onchange="previewImage(event); enableButtons()">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
-                            id="cancelButton">Cancel
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelButton">Cancel
                     </button>
-                    <button type="submit" class="btn btn-primary" form="profilePictureForm"
-                            id="uploadButton" disabled>Upload
+                    <button type="submit" class="btn btn-primary" form="profilePictureForm" id="uploadButton" disabled>
+                        Upload
                     </button>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <!-- Share Modal -->
     {% if user_profile.qrcode %}
-        <div class="modal fade" id="shareModal" tabindex="-1" role="dialog"
-             aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel"
+             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" style="max-width: 500px" role="document">
                 <div class="modal-content">
                     <div class="modal-header align-items-center">
@@ -926,22 +1006,17 @@
                         </h5>
                         <h5 class="modal-title ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
                             id="shareModalLabel">{{ user_profile.user.get_full_name }}</h5>
-                        <button type="button" class="close mt--4" style="margin-left: -30px"
-                                data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close mt--4" style="margin-left: -30px" data-dismiss="modal"
+                                aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body py-0"
-                         style="padding-left: 2.5rem; padding-right: 2.5rem">
-                        <div class="form-group mt-4 mb-0"
-                             style="display: flex; justify-content: center">
+                    <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                        <div class="form-group mt-4 mb-0" style="display: flex; justify-content: center">
                             <div style="z-index: 1; width: 250px; height: 250px; background-color: #adb5bd00">
-                                <img
-                                        id="imagePreviewModal"
-                                        class=""
-                                        style="max-width: 100%; height: 100%; object-fit: cover;"
-                                        alt="Image placeholder"
-                                        src="{{ user_profile.qrcode.url }}">
+                                <img id="imagePreviewModal" class=""
+                                     style="max-width: 100%; height: 100%; object-fit: cover;"
+                                     alt="Image placeholder" src="{{ user_profile.qrcode.url }}">
                             </div>
                         </div>
                     </div>
@@ -955,75 +1030,137 @@
         </div>
     {% endif %}
 
+
+    <div class="container-fluid">
+        {% include "includes/footer.html" %}
+    </div>
 {% endblock content %}
 
-<!-- Specific JS goes HERE -->
 {% block javascripts %}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
 
     <script>
+        $(document).ready(function() {
 
-        function previewImage(event) {
-            const preview = document.getElementById('imagePreviewModal');
-            const fileInput = event.target;
-
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                }
-
-                reader.readAsDataURL(fileInput.files[0]);
-            }
-        }
-
-        function enableButtons() {
-            const cancelButton = document.getElementById("cancelButton");
-            const uploadButton = document.getElementById("uploadButton");
-
-            cancelButton.removeAttribute("disabled");
-            uploadButton.removeAttribute("disabled");
-        }
-
-        function disableButtons() {
-            const cancelButton = document.getElementById("cancelButton");
-            const uploadButton = document.getElementById("uploadButton");
-
-            cancelButton.setAttribute("disabled", "disabled");
-            uploadButton.setAttribute("disabled", "disabled");
-        }
-
-        function addShowClass(element_id) {
-            let element = document.getElementById(element_id);
-            element.classList.add('show');
-            element.focus();
-            
-            let toggleElement = document.querySelector(`[data-target="#${element_id}"]`);
-            if (toggleElement) {
-                let icon = toggleElement.querySelector('.rotate');
-                if (icon) {
-                    icon.classList.add('down');
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            let collapseElements = document.querySelectorAll('[data-toggle="collapse"]');
-
-            collapseElements.forEach(function (element) {
-                element.addEventListener('click', function (event) {
-                    let target = document.querySelector(this.getAttribute('data-target'));
-                    let icon = this.querySelector('.rotate');
-
-                    if (target.classList.contains('show')) {
-                        icon.classList.remove('down');
-                    } else {
-                        icon.classList.add('down');
+            $('#documents-table').DataTable({
+                pageLength: 10,
+                ordering: true,
+                searching: true,
+                columnDefs: [
+                    {
+                        targets: -1,
+                        orderable: false
                     }
-                });
+                ]
             });
-        });
 
+            $('.dt-search input.dt-input').attr('placeholder', 'Search');
+
+        });
     </script>
-    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            function $(id) {
+                return document.getElementById(id);
+            }
+
+            const profileInput = $('profilePictureInput');
+            const profilePreview = $('profilePictureAvatar');
+            if (profileInput && profilePreview) {
+                profileInput.addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function (evt) {
+                        profilePreview.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const modalFileInput = $('fileInput');
+            const modalPreview = $('imagePreviewModal');
+            const uploadBtn = $('uploadButton');
+            const cancelBtn = $('cancelButton');
+
+            function previewProfilePictureModal(event) {
+                if (!modalPreview) return;
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => modalPreview.src = e.target.result;
+                reader.readAsDataURL(file);
+            }
+
+            function enableModalButtons() {
+                if (uploadBtn) uploadBtn.removeAttribute('disabled');
+                if (cancelBtn) cancelBtn.removeAttribute('disabled');
+            }
+
+            if (modalFileInput) {
+                modalFileInput.addEventListener('change', function (e) {
+                    previewProfilePictureModal(e);
+                    enableModalButtons();
+                });
+            }
+
+            const phone = $('phone');
+            if (phone) {
+                phone.addEventListener('input', function (event) {
+                    let v = event.target.value.replace(/\D/g, '');
+                    if (v.length === 0) event.target.value = '';
+                    else if (v.length <= 3) event.target.value = v;
+                    else if (v.length <= 6) event.target.value = v.replace(/^(\d{3})(\d{0,3})/, '$1 $2');
+                    else if (v.length <= 9) event.target.value = v.replace(/^(\d{3})(\d{3})(\d{0,3})/, '$1 $2 $3');
+                    else if (v.length <= 10) event.target.value = v.replace(/^(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                    else if (v.length <= 11) event.target.value = v.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                    else if (v.length <= 12) event.target.value = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{3})/, '+$1 $2 $3 $4');
+                    else event.target.value = v.replace(/^(\d{2})(\d{2})(\d{5})(\d{4}).*/, '+$1 ($2) $3 $4');
+                });
+            }
+
+            const countryDropdown = $('country');
+            const stateDropdown = $('state');
+            const cityDropdown = $('city');
+            const streetInput = $('street');
+            const streetNumberInput = $('street-no');
+
+            const cepBtn = $('cep-search-btn');
+            if (cepBtn) {
+                cepBtn.addEventListener('click', function () {
+                    const cepInput = $('cep-place');
+                    if (!cepInput) return;
+                    let cep = cepInput.value.replace(/\D/g, '');
+                    if (cep.length !== 8) {
+                        alert('CEP inválido. Digite 8 números.');
+                        return;
+                    }
+                    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.erro) {
+                                alert('CEP não encontrado.');
+                                return;
+                            }
+                            streetInput.value = data.logradouro || '';
+                            streetInput.disabled = false;
+                            cityDropdown.value = data.localidade;
+                            cityDropdown.disabled = false;
+                            stateDropdown.value = data.uf;
+                            stateDropdown.disabled = false;
+                            countryDropdown.value = data.ibge ? 'Brasil' : '';
+                            countryDropdown.disabled = false;
+                            streetNumberInput.disabled = false;
+                            streetNumberInput.required = true;
+                            streetNumberInput.focus();
+                        })
+                        .catch(() => alert('Erro ao buscar CEP.'));
+                });
+            }
+        });
+    </script>
 {% endblock javascripts %}

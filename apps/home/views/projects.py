@@ -28,39 +28,34 @@ def change_archive(request, slug, situation_page=None):
 
     if sorted_by not in ['', 'None'] and filters != 'None':
         if page != 'None':
-            query_params = urlencode({'page': page})
             url = reverse('sorted_filtered_projects',
-                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type, 'filters': filters}) + '?' + query_params
+                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type, 'filters': filters})
             return redirect(url)
         else:
             return redirect('sorted_filtered_projects', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
     elif sorted_by not in ['', 'None']:
         if page != 'None':
-            query_params = urlencode({'page': page})
             url = reverse('sorted_projects',
-                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type}) + '?' + query_params
+                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type})
             return redirect(url)
         else:
             return redirect('sorted_projects', sorted_by=sorted_by, sort_type=sort_type)
     elif filters != 'None':
         if page != 'None':
-            query_params = urlencode({'page': page})
             url = reverse('filtered_projects',
-                          kwargs={'filters': filters}) + '?' + query_params
+                          kwargs={'filters': filters})
             return redirect(url)
         else:
             return redirect('filtered_projects', filters=filters)
     else:
         if situation_page is None or situation_page == 'None':
             if page != 'None':
-                query_params = urlencode({'page': page})
-                url = reverse('project_list') + '?' + query_params
+                url = reverse('project_list')
                 return redirect(url)
             else:
                 return redirect('project_list')
         elif page != 'None':
-            query_params = urlencode({'page': page})
-            url = reverse('project_list', kwargs={'situation': situation_page}) + '?' + query_params
+            url = reverse('project_list', kwargs={'situation': situation_page})
             return redirect(url)
         else:
             return redirect('project_list', situation=situation_page)
@@ -83,45 +78,40 @@ def change_project_status(request, slug, situation_page=None):
 
     if sorted_by not in ['', 'None'] and filters != 'None':
         if page != 'None':
-            query_params = urlencode({'page': page})
             url = reverse('sorted_filtered_projects',
-                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type, 'filters': filters}) + '?' + query_params
+                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type, 'filters': filters})
             return redirect(url)
         else:
             return redirect('sorted_filtered_projects', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
     elif sorted_by not in ['', 'None']:
         if page != 'None':
-            query_params = urlencode({'page': page})
             url = reverse('sorted_projects',
-                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type}) + '?' + query_params
+                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type})
             return redirect(url)
         else:
             return redirect('sorted_projects', sorted_by=sorted_by, sort_type=sort_type)
     elif filters != 'None':
         if page != 'None':
-            query_params = urlencode({'page': page})
             url = reverse('filtered_projects',
-                          kwargs={'filters': filters}) + '?' + query_params
+                          kwargs={'filters': filters})
             return redirect(url)
         else:
             return redirect('filtered_projects', filters=filters)
     else:
         if situation_page is None or situation_page == 'None':
             if page != 'None':
-                query_params = urlencode({'page': page})
-                url = reverse('project_list') + '?' + query_params
+                url = reverse('project_list')
                 return redirect(url)
             else:
                 return redirect('project_list')
         elif page != 'None':
-            query_params = urlencode({'page': page})
-            url = reverse('project_list', kwargs={'situation': situation_page}) + '?' + query_params
+            url = reverse('project_list', kwargs={'situation': situation_page})
             return redirect(url)
         else:
             return redirect('project_list', situation=situation_page)
 
 
-def get_paginated_projects(request, projects=None, situation=None, sorted_by=None, sort_type=None, page=None):
+def get_projects(projects=None, situation=None):
     if projects is None:
         projects_list = Project.objects.all()
     else:
@@ -134,19 +124,7 @@ def get_paginated_projects(request, projects=None, situation=None, sorted_by=Non
     elif situation == 'finished':
         projects_list = projects_list.filter(finished=True)
 
-    if sorted_by is not None and sorted_by == 'client':
-        projects_list = projects_list.order_by(f'{"-" if sort_type == "desc" else ""}client__name')
-    elif sorted_by is not None and sorted_by == 'performance':
-        projects_list = projects_list.order_by(f'{"-" if sort_type == "desc" else ""}completition')
-    elif sorted_by is not None:
-        projects_list = projects_list.order_by(f'{"-" if sort_type == "desc" else ""}{sorted_by}')
-
-    paginator = Paginator(projects_list, 6)
-    if page is None or page == 'None':
-        page = request.GET.get('page')
-
-    projects = paginator.get_page(page)
-    return paginator, projects
+    return projects_list
 
 
 def client_branches(request):
@@ -158,16 +136,12 @@ def client_branches(request):
 #####################################################
 
 
-def home(request, situation=None, filters=None, sorted_by=None, sort_type=None, page=None):
+def home(request, situation=None, filters=None):
     user_profile = Profile.objects.get(user=request.user)
     projects = filter_project_objects(filters)
 
     if situation is not None:
-        paginator, projects = get_paginated_projects(request, projects, situation=situation,
-                                                     sorted_by=sorted_by, sort_type=sort_type, page=page)
-    else:
-        paginator, projects = get_paginated_projects(request, projects,
-                                                     sorted_by=sorted_by, sort_type=sort_type, page=page)
+        projects = get_projects(situation=situation)
 
     context = {
         'projects_list': projects,
@@ -177,8 +151,6 @@ def home(request, situation=None, filters=None, sorted_by=None, sort_type=None, 
         'collaborators': Profile.objects.filter(user__username__endswith='@infinitefoundry.com').exclude(
             user__username__startswith='admin@'),
         'segment': 'projects',
-        'sorted_by': sorted_by,
-        'sort_type': sort_type,
         'filters': filters,
     }
 
@@ -261,39 +233,34 @@ def delete(request, slug, situation_page=None):
 
         if sorted_by not in ['', 'None'] and filters != 'None':
             if page != 'None':
-                query_params = urlencode({'page': page})
                 url = reverse('sorted_filtered_projects',
-                              kwargs={'sorted_by': sorted_by, 'sort_type': sort_type, 'filters': filters}) + '?' + query_params
+                              kwargs={'sorted_by': sorted_by, 'sort_type': sort_type, 'filters': filters})
                 return redirect(url)
             else:
                 return redirect('sorted_filtered_projects', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
         elif sorted_by not in ['', 'None']:
             if page != 'None':
-                query_params = urlencode({'page': page})
                 url = reverse('sorted_projects',
-                              kwargs={'sorted_by': sorted_by, 'sort_type': sort_type}) + '?' + query_params
+                              kwargs={'sorted_by': sorted_by, 'sort_type': sort_type})
                 return redirect(url)
             else:
                 return redirect('sorted_projects', sorted_by=sorted_by, sort_type=sort_type)
         elif filters != 'None':
             if page != 'None':
-                query_params = urlencode({'page': page})
                 url = reverse('filtered_projects',
-                              kwargs={'filters': filters}) + '?' + query_params
+                              kwargs={'filters': filters})
                 return redirect(url)
             else:
                 return redirect('filtered_projects', filters=filters)
         else:
             if situation_page is None or situation_page == 'None':
                 if page != 'None':
-                    query_params = urlencode({'page': page})
-                    url = reverse('project_list') + '?' + query_params
+                    url = reverse('project_list')
                     return redirect(url)
                 else:
                     return redirect('project_list')
             elif page != 'None':
-                query_params = urlencode({'page': page})
-                url = reverse('project_list', kwargs={'situation': situation_page}) + '?' + query_params
+                url = reverse('project_list', kwargs={'situation': situation_page})
                 return redirect(url)
             else:
                 return redirect('project_list', situation=situation_page)
@@ -302,39 +269,10 @@ def delete(request, slug, situation_page=None):
 
 
 def sort_and_filter_projects(request):
-    sorted_by = request.POST.get('sort_by', '')
-    sort_type = 'asc' if request.POST.get('asc') else 'desc'
     filters = request.POST.get('filters', 'None')
-    page = request.POST.get('page', 'None')
 
-    if sorted_by not in ['', 'None'] and filters != 'None':
-        if page != 'None':
-            query_params = urlencode({'page': page})
-            url = reverse('sorted_filtered_projects',
-                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type, 'filters': filters}) + '?' + query_params
-            return redirect(url)
-        else:
-            return redirect('sorted_filtered_projects', sorted_by=sorted_by, sort_type=sort_type, filters=filters)
-    elif sorted_by not in ['', 'None']:
-        if page != 'None':
-            query_params = urlencode({'page': page})
-            url = reverse('sorted_projects',
-                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type}) + '?' + query_params
-            return redirect(url)
-        else:
-            return redirect('sorted_projects', sorted_by=sorted_by, sort_type=sort_type)
-    elif filters != 'None':
-        if page != 'None':
-            query_params = urlencode({'page': page})
-            url = reverse('filtered_projects',
-                          kwargs={'filters': filters}) + '?' + query_params
-            return redirect(url)
-        else:
-            return redirect('filtered_projects', filters=filters)
-    elif page != 'None':
-        query_params = urlencode({'page': page})
-        url = reverse('project_list') + '?' + query_params
-        return redirect(url)
+    if filters != 'None':
+        return redirect('filtered_projects', filters=filters)
     else:
         return redirect('project_list')
 
@@ -438,7 +376,6 @@ def filter_projects(request):
             f'finished=off' if not finished else '%',
         ]
 
-    # Convert the list to a string with appropriate format, avoiding empty values
     filter_string = '&'.join(filter_list)
     if filter_string.startswith('%&'):
         filter_string = filter_string[2:]
@@ -455,31 +392,27 @@ def filter_projects(request):
 
     if sorted_by not in ['', 'None'] and filter_string != 'None':
         if page != 'None':
-            query_params = urlencode({'page': page})
             url = reverse('sorted_filtered_projects',
-                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type, 'filters': filter_string}) + '?' + query_params
+                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type, 'filters': filter_string})
             return redirect(url)
         else:
             return redirect('sorted_filtered_projects', sorted_by=sorted_by, sort_type=sort_type, filters=filter_string)
     elif sorted_by not in ['', 'None']:
         if page != 'None':
-            query_params = urlencode({'page': page})
             url = reverse('sorted_projects',
-                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type}) + '?' + query_params
+                          kwargs={'sorted_by': sorted_by, 'sort_type': sort_type})
             return redirect(url)
         else:
             return redirect('sorted_projects', sorted_by=sorted_by, sort_type=sort_type)
     elif filter_string != 'None':
         if page != 'None':
-            query_params = urlencode({'page': page})
             url = reverse('filtered_projects',
-                          kwargs={'filters': filter_string}) + '?' + query_params
+                          kwargs={'filters': filter_string})
             return redirect(url)
         else:
             return redirect('filtered_projects', filters=filter_string)
     elif page != 'None':
-        query_params = urlencode({'page': page})
-        url = reverse('project_list') + '?' + query_params
+        url = reverse('project_list')
         return redirect(url)
     else:
         return redirect('project_list')

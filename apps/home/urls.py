@@ -20,7 +20,6 @@ projects_list_urls = [
     path('projects/change-status=<slug:slug>/redirect-to=<str:situation_page>', projects.change_project_status,
          name='change_project_status'),
 
-    path('projects/order', projects.sort_and_filter_projects, name='sort_projects'),
     path('projects/filter', projects.filter_projects, name='filter_projects'),
 
     path('projects/order:<str:sorted_by>-<str:sort_type>', projects.home, name='sorted_projects'),
@@ -203,10 +202,6 @@ collaborators_list_urls = [
     path('collaborators/', collaborators.page_list, name='collaborators_list'),
 
     path('collaborators/change=<int:collab_id>', collaborators.change_status, name='collaborator_change_status'),
-
-    path('collaborators/order/', collaborators.sort_collaborators, name='sort_collaborators'),
-
-    path('collaborators/filter/', collaborators.filter_collaborators, name='filter_collaborators'),
 
     path('collaborators/order:<str:sorted_by>-<str:sort_type>', collaborators.page_list, name='sorted_collaborators'),
 

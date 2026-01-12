@@ -20,6 +20,179 @@
     <!-- Argon CSS -->
     <link rel="stylesheet" href="/static/assets/css/argon.css?v=1.2.0" type="text/css">
 
+    <style>
+
+        .pointer-hover:hover {
+            cursor: pointer;
+        }
+        div.dt-container div.dt-layout-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin: 0.75em 0;
+        }
+        div.dt-container select.dt-input {
+            width: auto;
+            display: inline-block;
+            height: calc(.45em + 1.25rem + 5px);
+            font-size: .875rem;
+            transition: all .15s ease-in-out;
+            border-radius: .25rem;
+            color: #8898aa;
+            border: 1px solid #dee2e6;
+            background-clip: padding-box;
+            box-shadow: 0 3px 2px rgba(233, 236, 239, .05);
+        }
+        div.dt-container .dt-input {
+            margin-right: .5rem;
+            font-weight: lighter;
+        }
+        div.dt-container .dt-input:focus {
+            outline: none;
+            border-color: #5e72e4;
+        }
+        div.dt-container label {
+            font-weight: lighter;
+        }
+        div.dt-container .dt-info {
+            font-weight: lighter;
+            font-size: 0.875rem;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        div.dt-container div.dt-layout-table {
+            margin-bottom: -.75rem;
+        }
+        div.dt-container div.dt-layout-table > div {
+            display: block !important;
+        }
+        div.dt-container div.dt-layout-full {
+            width: 100%;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
+            justify-content: flex-start;
+            margin-right: auto;
+            padding-left: 1.5rem;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
+            justify-content: flex-end;
+            margin-left: auto;
+            padding-right: 1.5rem;
+        }
+        div.dt-container div.dt-layout-row div.dt-layout-cell {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        div.dt-container div.dt-search label {
+            position: relative;
+            display: none;
+        }
+        div.dt-container div.dt-search input {
+            font-size: .875rem;
+            color: #495057;
+            border: 1px solid #e9ecef;
+            border-radius: .5rem;
+        }
+        div.dt-container div.dt-search input:focus {
+            outline: none;
+        }
+        div.dt-container div.dt-search input.dt-input {
+            padding: 6px 12px;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc, table.dataTable thead > tr > th.dt-orderable-desc, table.dataTable thead > tr > td.dt-orderable-asc, table.dataTable thead > tr > td.dt-orderable-desc {
+            cursor: pointer;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc, table.dataTable thead > tr > th.dt-orderable-desc, table.dataTable thead > tr > th.dt-ordering-asc, table.dataTable thead > tr > th.dt-ordering-desc, table.dataTable thead > tr > td.dt-orderable-asc, table.dataTable thead > tr > td.dt-orderable-desc, table.dataTable thead > tr > td.dt-ordering-asc, table.dataTable thead > tr > td.dt-ordering-desc {
+            position: relative;
+            padding-right: 30px;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order {
+            position: absolute;
+            right: 12px;
+            top: 0;
+            bottom: 0;
+            width: 12px;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:after, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:before, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            left: 0;
+            opacity: 0.125;
+            line-height: 9px;
+            font-size: 0.8em;
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before {
+            position: absolute;
+            display: block;
+            bottom: 50%;
+            content: "▲";
+            content: "▲" / "";
+        }
+        table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:after, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:before, table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-asc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:before, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            left: 0;
+            opacity: 0.125;
+            line-height: 9px;
+            font-size: 0.8em;
+        }
+        table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-orderable-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            position: absolute;
+            display: block;
+            top: 50%;
+            content: "▼";
+            content: "▼" / "";
+        }
+        table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            opacity: 0.6;
+        }
+        table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after, table.dataTable thead > tr > td.dt-ordering-asc span.dt-column-order:before, table.dataTable thead > tr > td.dt-ordering-desc span.dt-column-order:after {
+            opacity: 0.6;
+        }
+        .image-column .dt-column-order::before {
+            display: none !important;
+        }
+        .dataTable th:hover {
+            outline: none !important;
+        }
+        .dt-paging-button {
+            padding: 0;
+            margin: 0 3px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 0.875rem;
+            line-height: 1.25;
+            color: #8898aa;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+        }
+        .dt-paging-button.current {
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+            z-index: 3;
+            color: #fff;
+            background-color: #0071c2;
+            border-color: #0071c2;
+        }
+        .dt-paging-button:focus {
+            outline: 0;
+        }
+        .dt-paging-button:hover:not(.current) {
+            z-index: 2;
+            color: #8898aa;
+            text-decoration: none;
+            background-color: #dee2e6;
+            border-color: #dee2e6;
+        }
+
+    </style>
+
     <!-- Specific CSS goes HERE -->
     {% block stylesheets %}{% endblock stylesheets %}
 
@@ -44,6 +217,7 @@
 
 <script src="/static/assets/js/argon.js?v=1.2.0"></script>
 <script src="/static/assets/js/sidenav.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
 
 </body>
 

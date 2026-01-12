@@ -1,4 +1,5 @@
 {% extends 'layouts/base-fullscreen-clean.html' %}
+{% load static %}
 
 {% block title %} Profile {% endblock title %}
 
@@ -117,49 +118,48 @@
                                 </div>
                                 <div class="tab-pane" id="address">
                                     <div class="row justify-content-center py-0 py-lg-5 py-sm-3">
+                                        <div class="col-sm-10">
+                                            <div class="form-group form-control-label bmd-form-group">
+                                                <label for="cep-place" class="form-label form-control-label">CEP</label>
+                                                <div class="d-flex" style="gap:0.5rem; align-items:center;">
+                                                    <input type="text" id="cep-place" name="cep"
+                                                           class="form-control" maxlength="9">
+                                                    <button type="button" id="cep-search-btn"
+                                                            class="btn btn-primary border-2">
+                                                        <i class="fas fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="col-sm-7">
                                             <div class="form-group form-control-label bmd-form-group">
                                                 <label class="bmd-label-static" for="street">Street</label>
-                                                <input type="text" class="form-control" id="street" name="street"
-                                                       autofocus="" required="" value="{{ user.street }}">
+                                                <input type="text" class="form-control" id="street" name="street" disabled>
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
                                             <div class="form-group form-control-label bmd-form-group">
                                                 <label class="bmd-label-static" for="street-no">Nº</label>
                                                 <input type="number" class="form-control" id="street-no"
-                                                       name="street_number" autofocus="" required=""
-                                                       value="{{ user.street_number }}">
+                                                       name="street_number" disabled>
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
                                             <div class="form-group form-control-label select-wizard">
                                                 <label for="country">Country</label>
-                                                <select id="country" name="country" class="form-control"
-                                                        onchange="loadStates()" autofocus="" required="">
-                                                    <option value="" disabled selected></option>
-                                                    {% for country in world %}
-                                                        <option value="{{ country }}"
-                                                                {% if context.user.country == country %}selected{% endif %}>{{ country }}</option>
-                                                    {% endfor %}
-                                                </select>
+                                                <input id="country" name="country" class="form-control" disabled>
                                             </div>
                                         </div>
                                         <div class="col-sm-3">
                                             <div class="form-group form-control-label bmd-form-group">
                                                 <label for="state">State</label>
-                                                <select id="state" name="state" class="form-control" disabled
-                                                        onchange="loadCities()">
-                                                    <option value="" disabled selected></option>
-                                                </select>
+                                                <input id="state" name="state" class="form-control" disabled>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group form-control-label bmd-form-group">
                                                 <label for="city">City</label>
-                                                <select id="city" name="city" class="form-control" disabled>
-                                                    <option value="" disabled selected></option>
-                                                </select>
+                                                <input id="city" name="city" class="form-control" disabled>
                                             </div>
                                         </div>
                                     </div>
@@ -280,7 +280,7 @@
 <!-- Specific JS goes HERE -->
 {% block javascript %}
 
-    <script src="/static/assets/js/wizard.js"></script>
+    <script src="{% static 'assets/js/wizard.js' %}"></script>
 
     <script>
     
@@ -302,67 +302,50 @@
     </script>
 
     <script>
-        const jsonData = {{ world|safe }};
-        const countryDropdown = document.getElementById('country');
-        const stateDropdown = document.getElementById('state');
-        const cityDropdown = document.getElementById('city');
-
-        // Populate the country dropdown
-        for (const country in jsonData) {
-            const option = document.createElement('option');
-            option.value = country;
-            option.text = country;
-            countryDropdown.add(option);
-        }
-
-        function loadStates() {
-            // Clear existing options
-            stateDropdown.innerHTML = '<option value="" disabled selected></option>';
-
-            const selectedCountry = countryDropdown.value;
-
-            if (selectedCountry && jsonData[selectedCountry]) {
-                // Enable the state dropdown
-                stateDropdown.disabled = false;
-
-                // Populate the state dropdown
-                for (const state in jsonData[selectedCountry]) {
-                    console.log(state);
-                    const option = document.createElement('option');
-                    option.value = state;
-                    option.text = state;
-                    stateDropdown.add(option);
-                }
-            } else {
-                // If no country is selected, disable the state and city dropdowns
-                stateDropdown.disabled = true;
-                cityDropdown.disabled = true;
+        document.addEventListener('DOMContentLoaded', function () {
+            function $(id) {
+                return document.getElementById(id);
             }
-        }
 
-        function loadCities() {
-            // Clear existing options
-            cityDropdown.innerHTML = '<option value="" disabled selected></option>';
+            const countryDropdown = $('country');
+            const stateDropdown = $('state');
+            const cityDropdown = $('city');
+            const streetInput = $('street');
+            const streetNumberInput = $('street-no');
 
-            const selectedCountry = countryDropdown.value;
-            const selectedState = stateDropdown.value;
-
-            if (selectedCountry && selectedState && jsonData[selectedCountry][selectedState]) {
-                // Enable the city dropdown
-                cityDropdown.disabled = false;
-
-                // Populate the city dropdown
-                for (const city of jsonData[selectedCountry][selectedState]) {
-                    const option = document.createElement('option');
-                    option.value = city;
-                    option.text = city;
-                    cityDropdown.add(option);
-                }
-            } else {
-                // If no country or state is selected, disable the city dropdown
-                cityDropdown.disabled = true;
+            const cepBtn = $('cep-search-btn');
+            if (cepBtn) {
+                cepBtn.addEventListener('click', function () {
+                    const cepInput = $('cep-place');
+                    if (!cepInput) return;
+                    let cep = cepInput.value.replace(/\D/g, '');
+                    if (cep.length !== 8) {
+                        alert('CEP inválido. Digite 8 números.');
+                        return;
+                    }
+                    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.erro) {
+                                alert('CEP não encontrado.');
+                                return;
+                            }
+                            streetInput.value = data.logradouro || '';
+                            streetInput.disabled = false;
+                            cityDropdown.value = data.localidade;
+                            cityDropdown.disabled = false;
+                            stateDropdown.value = data.uf;
+                            stateDropdown.disabled = false;
+                            countryDropdown.value = data.ibge ? 'Brasil' : '';
+                            countryDropdown.disabled = false;
+                            streetNumberInput.disabled = false;
+                            streetNumberInput.required = true;
+                            streetNumberInput.focus();
+                        })
+                        .catch(() => alert('Erro ao buscar CEP.'));
+                });
             }
-        }
+        });
     </script>
 
     <script>
@@ -390,26 +373,6 @@
                 input.value = inputValue.replace(/^(\d{2})(\d{2})(\d{5})(\d{4}).*/, '+$1 ($2) $3 $4');
             }
         });
-    </script>
-
-    <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const userCountry = '{{ user.country }}';
-            const userState = '{{ user.state }}';
-            const userCity = '{{ user.city }}';
-
-            countryDropdown.value = userCountry;
-
-            loadStates();
-
-            stateDropdown.value = userState;
-
-            loadCities();
-
-            cityDropdown.value = userCity;
-        });
-        
     </script>
 
 {% endblock javascript %}

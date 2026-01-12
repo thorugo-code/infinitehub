@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 import os
 
 
-def get_paginated_files(request, category=None):
+def get_files(category=None):
     if category is None:
         files_list = UploadedFile.objects.all()
     elif type(category) == str:
@@ -14,10 +14,7 @@ def get_paginated_files(request, category=None):
     else:
         files_list = UploadedFile.objects.filter(category)
 
-    paginator = Paginator(files_list, 6)  # Show 6 files per page
-    page = request.GET.get('page')
-    files = paginator.get_page(page)
-    return paginator, files
+    return files_list
 
 
 def assets_list(request, category=None):
@@ -25,18 +22,18 @@ def assets_list(request, category=None):
 
     if category == '3d-models':
         title = '3D Models'
-        paginator, files = get_paginated_files(request, category)
+        files = get_files(category)
     elif category == 'scripts':
         title = 'Scripts'
-        paginator, files = get_paginated_files(request, category)
+        files = get_files(category)
     elif category == 'unity':
         title = 'Unity'
-        paginator, files = get_paginated_files(request, category)
+        files = get_files(category)
     else:
         title = 'Others'
         category_filter = Q(category__in=['clouds', 'executable', 'folders', 'database',
-                                          'office', 'images', 'video', 'others'])
-        paginator, files = get_paginated_files(request, category_filter)
+                                          'office', 'images', 'video', 'other'])
+        files = get_files(category_filter)
 
     context = {
         'files_list': files,
@@ -51,7 +48,7 @@ def assets_list(request, category=None):
 def assets_hub(request):
     user_profile = Profile.objects.get(user=request.user)
 
-    other_categories = ['clouds', 'executable', 'folders', 'database', 'office', 'images', 'video', 'others']
+    other_categories = ['clouds', 'executable', 'folders', 'database', 'office', 'images', 'video', 'other']
 
     category_filter = Q(category__in=other_categories)
 
@@ -65,7 +62,7 @@ def assets_hub(request):
     values_unity = UploadedFile.objects.filter(category='unity').aggregate(Sum('value'))['value__sum']
     values_others = UploadedFile.objects.filter(category_filter).aggregate(Sum('value'))['value__sum']
 
-    paginator, all_files = get_paginated_files(request)
+    all_files = get_files()
 
     context = {
         'files_list': all_files,
@@ -79,7 +76,6 @@ def assets_hub(request):
         'others_value': values_others if values_others is not None else 0,
         'user_profile': user_profile,
         'segment': 'inventory',
-        # 'clients': Client.objects.all()
     }
 
     return render(request, "home/inventory/assets/details.html", context)
