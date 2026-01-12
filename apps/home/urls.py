@@ -204,10 +204,6 @@ collaborators_list_urls = [
 
     path('collaborators/change=<int:collab_id>', collaborators.change_status, name='collaborator_change_status'),
 
-    path('collaborators/order/', collaborators.sort_collaborators, name='sort_collaborators'),
-
-    path('collaborators/filter/', collaborators.filter_collaborators, name='filter_collaborators'),
-
     path('collaborators/order:<str:sorted_by>-<str:sort_type>', collaborators.page_list, name='sorted_collaborators'),
 
     path('collaborators/filters:<str:filters>', collaborators.page_list, name='filtered_collaborators'),

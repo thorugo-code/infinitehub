@@ -6,30 +6,15 @@ from apps.home.models import Meeting, Project, Task, Profile, SubTask
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
-def get_paginated_meetings(request, meetings_list):
-    page = request.GET.get('page', 1)
-    paginator = Paginator(meetings_list, 8)
-    try:
-        meetings = paginator.page(page)
-    except PageNotAnInteger:
-        meetings = paginator.page(1)
-    except EmptyPage:
-        meetings = paginator.page(paginator.num_pages)
-
-    return meetings, paginator
-
-
 ###########################################################
 
 
 def home(request):
     user = request.user
     meetings_list = Meeting.objects.all().order_by('-start')
-    meetings, paginator = get_paginated_meetings(request, meetings_list)
     context = {
         'user_profile': user.profile,
-        'meetings_list': meetings,
-        'paginator': paginator,
+        'meetings_list': meetings_list,
     }
 
     return render(request, 'home/meetings/home.html', context)

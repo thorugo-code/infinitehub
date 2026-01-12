@@ -15,7 +15,7 @@
                             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                                 <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
                                 <li class="breadcrumb-item"><a href="">Inventory</a></li>
-                                <li class="breadcrumb-item"><a href="/assets">Assets</a></li>
+                                <li class="breadcrumb-item"><a href="/inventory/assets/">Assets</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
                             </ol>
                         </nav>
@@ -40,8 +40,8 @@
                         </div>
                     </div>
                     <!-- Light table -->
-                    <div class="table-responsive" style="min-height: 531.61px">
-                        <table class="table align-items-center table-flush">
+                    <div class="table-responsive">
+                        <table class="table-responsive table align-items-center table-flush" id="assets-table">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col" class="px-4" style="width: 0"></th>
@@ -247,7 +247,13 @@
                                         {{ file.project.title|truncatechars:30 }}
                                     </td>
                                     <td>
-                                        {{ file.project.client.name|default:file.project.client_str|truncatechars:30 }}
+                                        {% if file.project.client %}
+                                            {{ file.project.client.name|truncatechars:30 }}
+                                        {% elif file.project.client_str %}
+                                            {{ file.project.client_str|truncatechars:30 }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {{ file.file.size|filesizeformat }}
@@ -276,67 +282,7 @@
                         </table>
                     </div>
                     <!-- Card footer -->
-                    <div class="card-footer py-4">
-                        <nav aria-label="...">
-
-                            <ul class="pagination justify-content-end mb-0">
-                                {% if files_list.has_previous %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ files_list.previous_page_number }}">
-                                            <i class="fas fa-angle-left"></i>
-                                            <span class="sr-only">Previous</span>
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#" tabindex="-1">
-                                            <i class="fas fa-angle-left"></i>
-                                            <span class="sr-only">Previous</span>
-                                        </a>
-                                    </li>
-                                {% endif %}
-
-                                {% for page_num in files_list.paginator.page_range %}
-                                    {% if files_list.number == page_num %}
-                                        <li class="page-item active">
-                                            <a class="page-link" href="#">{{ page_num }}</a>
-                                        </li>
-                                    {% elif page_num > files_list.number|add:"-2" and page_num < files_list.number|add:"2" %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                                        </li>
-                                    {% elif page_num == files_list.paginator.num_pages or page_num == 1 %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                                        </li>
-                                    {% else %}
-                                        {% if page_num == files_list.number|add:"-2" or page_num == files_list.number|add:"2" %}
-                                            <li class="page-item disabled">
-                                                <a class="page-link" href="#" tabindex="-1">...</a>
-                                            </li>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-
-                                {% if files_list.has_next %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ files_list.next_page_number }}">
-                                            <i class="fas fa-angle-right"></i>
-                                            <span class="sr-only">Next</span>
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#" tabindex="-1">
-                                            <i class="fas fa-angle-right"></i>
-                                            <span class="sr-only">Next</span>
-                                        </a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-
-                        </nav>
-                    </div>
+                    <div class="card-footer py-1 border-0"></div>
                 </div>
             </div>
         </div>
@@ -350,6 +296,24 @@
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
 
-    <script></script>
+    <script>
+        $(document).ready(function() {
+
+            $('#assets-table').DataTable({
+                pageLength: 10,
+                ordering: true,
+                searching: true,
+                columnDefs: [
+                    {
+                        targets: -1,
+                        orderable: false
+                    }
+                ]
+            });
+
+            $('.dt-search input.dt-input').attr('placeholder', 'Search');
+
+        });
+    </script>
 
 {% endblock javascripts %}

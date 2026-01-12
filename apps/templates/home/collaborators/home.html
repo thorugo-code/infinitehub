@@ -38,128 +38,34 @@
                             <div class="col"> <!-- Title Card -->
                                 <h3 class="mb-0">Collaborators</h3>
                             </div>
-                            <div class="col text-right"> <!-- Filters -->
-                                <a href="#" class="btn btn-sm {% if sorted_by is None %}btn-neutral{% else %}btn-primary{% endif %}" data-toggle="modal"
-                                   data-target="#sortCollaboratorsModal">
-                                    {% if sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down mr-0"></i>{% elif sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up mr-0"></i>{% endif %}
-                                    {% if sorted_by is not None %}
-                                        <span>{% if sorted_by != 'id' %}{{ sorted_by|capfirst }}{% else %}ID{% endif %}</span>{% else %}
-                                        <i class="fas fa-sort"></i>{% endif %}
-                                </a>
-                                <a href="#" class="btn btn-sm {% if filters is None %}btn-neutral{% else %}btn-primary{% endif %}" data-toggle="modal"
-                                   data-target="#filterCollaboratorsModal">
-                                    <i class="fas fa-filter {% if filters is None %}{% else %}mr-0{% endif %}"></i>
-                                    {% if filters is not None %}
-                                        {% load filters %}
-                                        {% with filters_list=filters|split:'&' %}
-                                            {% if filters|both_from_to %}
-                                                <span>Date</span>
-                                            {% endif %}
-                                            {% for filter_item in filters_list %}
-                                                {% if 'from=' in filter_item or 'to=' in filter_item %}
-                                                    {% if filters|xor_from_to %}
-                                                        <span>Date</span>
-                                                    {% endif %}
-                                                {% elif 'office=' in filter_item %}
-                                                    <span>{% if 'from=' in filters or 'to=' in filters %} | {% endif %}
-                                                        Office</span>
-                                                {% elif 'group=' in filter_item %}
-                                                    <span>{% if not filters|first_filter:'group' %} | {% endif %}
-                                                        Group</span>
-                                                {% elif 'disabled=' in filter_item %}
-                                                    <span>{% if not filters|first_filter:'disabled' %} | {% endif %}Disabled:Off</span>
-                                                {% elif 'active=' in filter_item %}
-                                                    <span>{% if not filters|first_filter:'active' %} | {% endif %}Active:Off</span>
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% endwith %}
-                                    {% endif %}
-                                </a>
-                            </div>
                         </div>
                     </div>
 
                     <!-- Table filter and options -->
-                    <table id="projectsListTable" class="table-responsive table align-items-center table-flush"
-                           style="height: 45rem">
+                    <table id="projectsListTable" class="table-responsive table align-items-center table-flush">
                         <thead class="thead-light"> 
                         <tr>
-                            <th scope="col" class="p-2" style="width: 0;{% if sorted_by == 'id' %}text-align: center{% endif %}">
-                                {% if sorted_by == 'id' and sort_type == 'desc' %}
-                                    <i class="fas fa-caret-down ml-1"></i>
-                                {% elif sorted_by == 'id' and sort_type == 'asc' %}
-                                    <i class="fas fa-caret-up ml-1"></i>
-                                {% endif %}
-                            </th>
-                            <th scope="col" class="py-2" style="width: 0"></th> <!-- Navbar Options -->
+                            {% if perms.home.view_document %}
+                                <th scope="col" class="p-2" style="width: 0;{% if sorted_by == 'id' %}text-align: center{% endif %}"></th>
+                            {% endif %}
 
-                            {% if perms.home.view_document %} <!-- Admins (with perm) -->
+                            <th scope="col" class="py-2" style="width: 0"></th>
+
+                            {% if perms.home.view_document %}
                             
-                                <th scope="col" class="py-2" style="width: 15%">Name
-                                    {% if sorted_by == 'name' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'name' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
-
+                                <th scope="col" class="py-2" style="width: 15%">Name</th>
                                 <th scope="col" class="py-2" style="width: 15%">Contact</th>
                                 <th scope="col" class="py-2" style="width: 15%">CNPJ</th>
                                 <th scope="col" class="py-2" style="width: 15%">CPF</th>
+                                <th scope="col" class="py-2" style="width: 10%">Position</th>
+                                <th scope="col" class="py-2" style="width: 10%">Admission</th>
+                                <th scope="col" class="py-2" style="width: 10%">ASO</th>
+                                <th scope="col" class="py-2" style="width: 10%">Birthday</th>
 
-                                <th scope="col" class="py-2" style="width: 10%">Position
-                                    {% if sorted_by == 'position' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'position' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
+                            {% else %}
 
-                                <th scope="col" class="py-2" style="width: 10%">Admission
-                                    {% if sorted_by == 'admission' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'admission' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
-
-                                <th scope="col" class="py-2" style="width: 10%">ASO
-                                    {% if sorted_by == 'aso' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'aso' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
-                                
-                                <th scope="col" class="py-2" style="width: 10%">Birthday
-                                    {% if sorted_by == 'birthday' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'birthday' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
-
-                            {% else %} <!-- Comum user (not perm) -->
-
-                                <th scope="col" class="py-2" style="width: 35%">Name
-                                    {% if sorted_by == 'name' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'name' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
-
-                                <th scope="col" class="py-2" style="width: 25%">Contact</th>
-
-                                <th scope="col" class="py-2" style="width: 25%">Position
-                                    {% if sorted_by == 'position' and sort_type == 'desc' %}
-                                        <i class="fas fa-caret-down ml-1"></i>
-                                    {% elif sorted_by == 'position' and sort_type == 'asc' %}
-                                        <i class="fas fa-caret-up ml-1"></i>
-                                    {% endif %}
-                                </th>
+                                <th scope="col" class="py-2" style="width: 50%">Name</th>
+                                <th scope="col" class="py-2" style="width: 35%">Contact</th>
 
                             {% endif %}
 
@@ -170,404 +76,390 @@
 
                         <tbody class="list"> <!-- Table Content with data -->
                         {% load filters %}
-                        {% for collab in collaborators %} 
-                            <tr>
-                                <td class="font-weight-300 {% if collab.identification is not None %}pl-3 pr-2{% else %}px-0{% endif %}"
-                                    style="font-size: 0.7rem; text-align: center"> <!-- ID -->
-                                    <span>{% if collab.identification is not None %}{{ collab.identification }}{% endif %}</span>
-                                </td>
-                                <td class="py-3 px-2"> <!-- profile photo -->
-                                    <a {% if collab == user_profile and not perms.home.view_document %}
-                                        href="{% url 'profile' %}"
-                                    {% elif perms.home.add_document %}
-                                        {% if collab.identification is None or not collab.admission %}
-                                            href="#" data-target="#collaboratorFillInfosModal{{ collab.id }}"
-                                            data-toggle="modal"
-                                        {% else %}
-                                            href="{% url 'collaborator_details' collab.slug %}"
-                                        {% endif %}
-                                    {% elif collab != user_profile %}
-                                        href="#" data-target="#collaboratorModal{{ collab.id }}" data-toggle="modal"
+                        {% for collab in collaborators %}
+                            {% if not perms.home.view_document and not collab.user.is_active %}
+                            {% else %}
+
+                                <tr>
+                                    {% if perms.home.view_document %}
+                                        <td class="font-weight-300 {% if collab.identification is not None %}pl-3 pr-2{% else %}px-0{% endif %}"
+                                            style="font-size: 0.7rem; text-align: center"> <!-- ID -->
+                                            <span>{% if collab.identification is not None %}{{ collab.identification }}{% endif %}</span>
+                                        </td>
                                     {% endif %}
-                                        class="media align-items-center">
-                                        <div class="avatar rounded-circle">
-                                            <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
-                                                 alt="Image placeholder"
-                                                 src="{{ collab.avatar.url }}">
-                                        </div>
-                                    </a>
-                                </td>
-                                <!-- Name and others -->
-                                <th scope="row" class="py-3">
-                                    <a {% if collab == user_profile and not perms.home.view_document %}
-                                        href="{% url 'profile' %}"
-                                    {% elif perms.home.add_document %}
-                                        {% if collab.identification is None or not collab.admission %}
-                                            href="#" data-target="#collaboratorFillInfosModal{{ collab.id }}"
-                                            data-toggle="modal"
-                                        {% else %}
-                                            href="{% url 'collaborator_details' collab.slug %}"
-                                        {% endif %}
-                                    {% elif collab != user_profile %}
-                                        href="#" data-target="#collaboratorModal{{ collab.id }}" data-toggle="modal"
-                                    {% endif %}
-                                        class="media align-items-center">
-                                        <span class="name mb-0 text-sm font-weight-400"
-                                              style="color: #525f7f">
-                                            {{ collab.user.get_full_name|truncatechars:30|default:'-' }}
-                                        </span>
-                                    </a>
-                                </th>
-                                <td>
-                                    {% if collab.qrcode %}
-                                        <a href="" data-toggle="modal" data-target="#qrcode{{ collab.id }}">
-                                            <i class="fas fa-qrcode pr-1"></i>
-                                        </a>
-                                    {% endif %}
-
-                                    <span class="h5 font-weight-normal">{{ collab.user.username|email_tag }}</span>
-                                    <span class="d-block font-weight-light" style="font-size: 90%">
-                                        {% if collab.phone %}
-                                        {{ collab.phone|default:'' }}
-                                        {% endif %}
-                                    </span>
-                                </td>
-
-                                {% if perms.home.view_document %}
-                                    <td>
-                                        <span>{{ collab.cnpj|default:'-' }}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{ collab.cpf|default:'-' }}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{ collab.position|default:'-' }}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{ collab.admission|date:'d/m/Y'|default:'-' }}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{ collab.aso|date:'d/m/Y'|default:'-' }}</span>
-                                        {% if collab.aso %}
-                                            <span class="d-block {% if collab.aso|time_to_date <= 0 %}text-danger{% elif collab.aso|time_to_date <= 30 %}text-warning{% else %}text-success{% endif %}">({{ collab.aso|time_to_date }} days)</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span>{{ collab.birthday|date:'d/m/Y'|default:'-' }}</span>
-                                    </td>
-
-                                {% else %}
-                                <td>
-                                    <span>{{ collab.position|default:'-' }}</span>
-                                </td>
-                                {% endif %}
-                                
-                                <td>
-                                    {% if collab.user.is_active %}
-                                    <span class="badge badge-dot">
-                                        <i class="bg-success"></i>
-                                        <span class="status mr-3">active</span>
-                                    </span>
-                                    {% else %}
-                                    <span class="badge badge-dot">
-                                        <i class="bg-danger"></i>
-                                        <span class="status">disabled</span>
-                                    </span>
-                                    {% endif %}
-
-                                </td>
-
-                                <!-- Dropdown -->
-                                <td class="text-right px-2">
-                                    <div class="dropdown">
-                                        <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
-                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                            <a {% if collab == user_profile and not perms.home.view_document %}
-                                                href="{% url 'profile' %}"
-                                            {% elif perms.home.add_document %}
-                                                {% if not collab.identification or not collab.cpf or not collab.admission %}
-                                                    href="#" data-target="#collaboratorFillInfosModal{{ collab.id }}"
-                                                    data-toggle="modal"
-                                                {% else %}
-                                                    href="{% url 'collaborator_details' collab.slug %}"
-                                                {% endif %}
-                                            {% elif collab != user_profile %}
-                                                href="#" data-target="#collaboratorModal{{ collab.id }}"
+                                    <td class="py-3 px-2 {% if not perms.home.view_document %}pl-4{% endif %}"> <!-- profile photo -->
+                                        <a {% if collab == user_profile and not perms.home.view_document %}
+                                            href="{% url 'profile' %}"
+                                        {% elif perms.home.add_document %}
+                                            {% if collab.identification is None or not collab.admission %}
+                                                href="#" data-target="#collaboratorFillInfosModal{{ collab.id }}"
                                                 data-toggle="modal"
+                                            {% else %}
+                                                href="{% url 'collaborator_details' collab.slug %}"
                                             {% endif %}
-                                                class="dropdown-item">Open
-                                            </a>
-                                            {% if perms.home.change_collaborator %}
-                                                <div class="dropdown-divider"></div>
-                                                {% if collab.user.is_active %}
-                                                    <a class="dropdown-item text-danger"
-                                                       href="{% url 'collaborator_change_status' collab.id %}">Disable</a>
+                                        {% elif collab != user_profile %}
+                                            href="#" data-target="#collaboratorModal{{ collab.id }}" data-toggle="modal"
+                                        {% endif %}
+                                            class="media align-items-center">
+                                            <div class="avatar rounded-circle">
+                                                <img style="max-width: 100%; height: 100%; object-fit: cover; background-color: #fff;"
+                                                     alt="Image placeholder"
+                                                     src="{{ collab.avatar.url }}">
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <!-- Name and others -->
+                                    <th scope="row" class="py-3">
+                                        <a {% if collab == user_profile and not perms.home.view_document %}
+                                            href="{% url 'profile' %}"
+                                        {% elif perms.home.add_document %}
+                                            {% if collab.identification is None or not collab.admission %}
+                                                href="#" data-target="#collaboratorFillInfosModal{{ collab.id }}"
+                                                data-toggle="modal"
+                                            {% else %}
+                                                href="{% url 'collaborator_details' collab.slug %}"
+                                            {% endif %}
+                                        {% elif collab != user_profile %}
+                                            href="#" data-target="#collaboratorModal{{ collab.id }}" data-toggle="modal"
+                                        {% endif %}
+                                            class="media align-items-center">
+                                            <span class="name mb-0 text-sm font-weight-400"
+                                                  style="color: #525f7f">
+                                                {% if perms.home.view_document %}
+                                                    {{ collab.user.get_full_name|truncatechars:30|default:'-' }}
                                                 {% else %}
-                                                    <a class="dropdown-item text-success"
-                                                       href="{% url 'collaborator_change_status' collab.id %}">Enable</a>
+                                                    {{ collab.user.get_full_name|truncatechars:50|default:'-' }}
                                                 {% endif %}
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                            </span>
+                                        </a>
+                                    </th>
+                                    <td>
+                                        {% if collab.qrcode %}
+                                            <a href="" data-toggle="modal" data-target="#qrcode{{ collab.id }}">
+                                                <i class="fas fa-qrcode pr-1"></i>
+                                            </a>
+                                        {% endif %}
 
-                            <!-- Collaborator Modal -->
-                            <div class="modal fade" id="collaboratorModal{{ collab.id }}" tabindex="-1" role="dialog"
-                                 aria-labelledby="filterModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
-                                    <div class="modal-content">
-                                        <div class="modal-header mt-2 align-items-center">
-                                            <button type="button" class="close mt--4 ml-auto"
-                                                    data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="row justify-content-center mt-6 pt-3">
-                                            <div class="col-lg-12">
-                                                <div class="card-profile-image"
-                                                     style="background-color: #adb5bd00">
-                                                    <a href="#" data-toggle="modal" data-target="#profilePictureModal">
-                                                        <img class="rounded-circle"
-                                                             style="min-width: 180px; height: 180px; object-fit: cover; background-color: #fff; z-index: 1"
-                                                             src="{{ collab.avatar.url }}"
-                                                             alt="{{ collab.user.first_name }}">
-                                                    </a>
-                                                </div>
+                                        <span class="h5 font-weight-normal">{{ collab.user.username|email_tag }}</span>
+                                        <span class="d-block font-weight-light" style="font-size: 90%">
+                                            {% if collab.phone %}
+                                            {{ collab.phone|default:'' }}
+                                            {% endif %}
+                                        </span>
+                                    </td>
+
+                                    {% if perms.home.view_document %}
+                                        <td>
+                                            <span>{{ collab.cnpj|default:'-' }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ collab.cpf|default:'-' }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ collab.position|default:'-' }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ collab.admission|date:'d/m/Y'|default:'-' }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ collab.aso|date:'d/m/Y'|default:'-' }}</span>
+                                            {% if collab.aso %}
+                                                <span class="d-block {% if collab.aso|time_to_date <= 0 %}text-danger{% elif collab.aso|time_to_date <= 30 %}text-warning{% else %}text-success{% endif %}">({{ collab.aso|time_to_date }} days)</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span>{{ collab.birthday|date:'d/m/Y'|default:'-' }}</span>
+                                        </td>
+                                    {% endif %}
+
+                                    <td>
+                                        {% if collab.user.is_active %}
+                                        <span class="badge badge-dot">
+                                            <i class="bg-success"></i>
+                                            <span class="status mr-3">active</span>
+                                        </span>
+                                        {% else %}
+                                        <span class="badge badge-dot">
+                                            <i class="bg-danger"></i>
+                                            <span class="status">disabled</span>
+                                        </span>
+                                        {% endif %}
+
+                                    </td>
+
+                                    <!-- Dropdown -->
+                                    <td class="text-right px-2">
+                                        <div class="dropdown">
+                                            <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
+                                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                <a {% if collab == user_profile and not perms.home.view_document %}
+                                                    href="{% url 'profile' %}"
+                                                {% elif perms.home.add_document %}
+                                                    {% if not collab.identification or not collab.cpf or not collab.admission %}
+                                                        href="#" data-target="#collaboratorFillInfosModal{{ collab.id }}"
+                                                        data-toggle="modal"
+                                                    {% else %}
+                                                        href="{% url 'collaborator_details' collab.slug %}"
+                                                    {% endif %}
+                                                {% elif collab != user_profile %}
+                                                    href="#" data-target="#collaboratorModal{{ collab.id }}"
+                                                    data-toggle="modal"
+                                                {% endif %}
+                                                    class="dropdown-item">Open
+                                                </a>
+                                                {% if perms.home.change_collaborator %}
+                                                    <div class="dropdown-divider"></div>
+                                                    {% if collab.user.is_active %}
+                                                        <a class="dropdown-item text-danger"
+                                                           href="{% url 'collaborator_change_status' collab.id %}">Disable</a>
+                                                    {% else %}
+                                                        <a class="dropdown-item text-success"
+                                                           href="{% url 'collaborator_change_status' collab.id %}">Enable</a>
+                                                    {% endif %}
+                                                {% endif %}
                                             </div>
                                         </div>
-                                        <div class="modal-body pt-3">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <div class="card-profile-stats d-flex justify-content-center mt-6 pb-2">
-                                                        <div class="py-3">
-                                                            <small class="badge badge-md {% if collab.user.is_active %}badge-success">
-                                                                Active{% else %}badge-danger">Disabled{% endif %}
-                                                            </small>
-                                                            {% if collab.user.username|check_group:'admin' %}
-                                                                <small class="badge badge-md badge-danger">Admin</small>
-                                                            {% endif %}
-                                                            {% if collab.user.username|check_group:'collaborator' %}
-                                                                <small class="badge badge-md badge-info">Collaborator</small>
-                                                            {% else %}
-                                                                <small class="badge badge-md badge-primary">External</small>
-                                                            {% endif %}
-                                                            {% if collab.user.username|check_group:'finance' %}
-                                                                <small class="badge badge-md badge-warning">Financial</small>
-                                                            {% endif %}
-                                                            {% if collab.qrcode %}
-                                                                <a href="" data-dismiss="modal" data-toggle="modal" 
-                                                                   data-target="#qrcode{{ collab.id }}" 
-                                                                   class="badge badge-md badge-secondary">
-                                                                    <i class="fas fa-qrcode"></i>
-                                                                </a>
-                                                            {% endif %}
+                                    </td>
+                                </tr>
+
+                                <!-- Collaborator Modal -->
+                                <div class="modal fade" id="collaboratorModal{{ collab.id }}" tabindex="-1" role="dialog"
+                                     aria-labelledby="filterModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
+                                        <div class="modal-content">
+                                            <div class="modal-header mt-2 align-items-center">
+                                                <button type="button" class="close mt--4 ml-auto"
+                                                        data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="row justify-content-center mt-6 pt-3">
+                                                <div class="col-lg-12">
+                                                    <div class="card-profile-image"
+                                                         style="background-color: #adb5bd00">
+                                                        <a href="#" data-toggle="modal" data-target="#profilePictureModal">
+                                                            <img class="rounded-circle"
+                                                                 style="min-width: 180px; height: 180px; object-fit: cover; background-color: #fff; z-index: 1"
+                                                                 src="{{ collab.avatar.url }}"
+                                                                 alt="{{ collab.user.first_name }}">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-body pt-3">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="card-profile-stats d-flex justify-content-center mt-6 pb-2">
+                                                            <div class="py-3">
+                                                                <small class="badge badge-md {% if collab.user.is_active %}badge-success">
+                                                                    Active{% else %}badge-danger">Disabled{% endif %}
+                                                                </small>
+                                                                {% if collab.user.username|check_group:'admin' %}
+                                                                    <small class="badge badge-md badge-danger">Admin</small>
+                                                                {% endif %}
+                                                                {% if collab.user.username|check_group:'collaborator' %}
+                                                                    <small class="badge badge-md badge-info">Collaborator</small>
+                                                                {% else %}
+                                                                    <small class="badge badge-md badge-primary">External</small>
+                                                                {% endif %}
+                                                                {% if collab.user.username|check_group:'finance' %}
+                                                                    <small class="badge badge-md badge-warning">Financial</small>
+                                                                {% endif %}
+                                                                {% if collab.qrcode %}
+                                                                    <a href="" data-dismiss="modal" data-toggle="modal"
+                                                                       data-target="#qrcode{{ collab.id }}"
+                                                                       class="badge badge-md badge-secondary">
+                                                                        <i class="fas fa-qrcode"></i>
+                                                                    </a>
+                                                                {% endif %}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="text-center">
-                                                <h5 class="h3 title py-1">
-                                                    {% if collab.identification and user_profile.user.username|check_group:'collaborator' %}
-                                                        <span class="h5 font-weight-light text-muted">({{ collab.identification }})</span>
+                                                <div class="text-center">
+                                                    <h5 class="h3 title py-1">
+                                                        <span>{{ collab.user.get_full_name }}</span>
+                                                    </h5>
+                                                    <div class="h5 mt-3">
+                                                        {{ collab.user.username }}
+                                                    </div>
+                                                    {% if collab.phone %}
+                                                        <div class="h5 font-weight-300 mt--2 {% if not collab.about %}pb-5{% else %}pb-2{% endif %}">
+                                                            {% if collab.phone %}
+                                                                {{ collab.phone }}
+                                                            {% endif %}
+                                                        </div>
                                                     {% endif %}
-                                                    <span>{{ collab.user.get_full_name }}</span>
-                                                    <small class="d-block h5 font-weight-light text-muted">{{ collab.position|default:'' }}</small>
-                                                </h5>
-                                                {% if collab.admission %}
-                                                    <div class="mt-3">
-                                                        Admission: {{ collab.admission|date:'d/m/Y' }}
-                                                    </div>
-                                                {% endif %}
-                                                <div class="h5 mt-3">
-                                                    {{ collab.user.username }}
-                                                </div>
-                                                {% if collab.phone %}
-                                                    <div class="h5 font-weight-300 mt--2 pb-2">
-                                                        {% if collab.phone %}
-                                                            {{ collab.phone }}
+                                                    {% if collab.about != '' %}
+                                                        <div class="h4 font-weight-500 mt-4 pt-2 pb-5">
+                                                            {% if collab.about %}
+                                                                <i>"{{ collab.about }}"</i>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <div class="row justify-content-center mt--4 mb-3" style="width: 108%;">
+                                                        {% if collab.website %}
+                                                            <div class="col-1 px-0 mx-1">
+                                                                <a href="{{ collab.website }}" target="_blank"
+                                                                   data-toggle="tooltip" data-original-title="Website">
+                                                                    <i class="fas fa-globe"></i>
+                                                                </a>
+                                                            </div>
                                                         {% endif %}
-                                                    </div>
-                                                {% endif %}
-                                                {% if user_profile.user.username|check_group:'collaborator' %}
-                                                    <div class="h5 font-weight-400 {% if not collab.about %}pb-5{% endif %}">
-                                                        {% if collab.street != '' and collab.city != '' and collab.state != '' and collab.country != '' %}
-                                                            <div><i class="fas fa-map-marker-alt mr-1 text-black-50"></i>
-                                                                {{ collab.street }}, {{ collab.street_number }}
-                                                                - {{ collab.city }}, {{ collab.state }}, {{ collab.country }}
+                                                        {% if collab.facebook %}
+                                                            <div class="col-1 px-0 mx-1">
+                                                                <a href="{{ collab.facebook }}" target="_blank"
+                                                                   data-toggle="tooltip" data-original-title="Facebook">
+                                                                    <i class="fab fa-facebook-square"></i>
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if collab.twitter %}
+                                                            <div class="col-1 px-0 mx-1">
+                                                                <a href="{{ collab.twitter }}" target="_blank"
+                                                                   data-toggle="tooltip" data-original-title="Twitter">
+                                                                    <i class="fab fa-twitter-square"></i>
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if collab.instagram %}
+                                                            <div class="col-1 px-0 mx-1">
+                                                                <a href="{{ collab.instagram }}" target="_blank"
+                                                                   data-toggle="tooltip" data-original-title="Instagram">
+                                                                    <i class="fab fa-instagram"></i>
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if collab.linkedin %}
+                                                            <div class="col-1 px-0 mx-1">
+                                                                <a href="{{ collab.linkedin }}" target="_blank"
+                                                                   data-toggle="tooltip" data-original-title="LinkedIn">
+                                                                    <i class="fab fa-linkedin"></i>
+                                                                </a>
                                                             </div>
                                                         {% endif %}
                                                     </div>
-                                                {% endif %}
-                                                {% if collab.about != '' %}
-                                                    <div class="h4 font-weight-500 mt-4 pt-2 pb-5">
-                                                        {% if collab.about %}
-                                                            <i>"{{ collab.about }}"</i>
-                                                        {% endif %}
-                                                    </div>
-                                                {% endif %}
 
-                                                <div class="row justify-content-center mt--4 mb-3" style="width: 108%;">
-                                                    {% if collab.website %}
-                                                        <div class="col-1 px-0 mx-1">
-                                                            <a href="{{ collab.website }}" target="_blank"
-                                                               data-toggle="tooltip" data-original-title="Website">
-                                                                <i class="fas fa-globe"></i>
-                                                            </a>
-                                                        </div>
-                                                    {% endif %}
-                                                    {% if collab.facebook %}
-                                                        <div class="col-1 px-0 mx-1">
-                                                            <a href="{{ collab.facebook }}" target="_blank"
-                                                               data-toggle="tooltip" data-original-title="Facebook">
-                                                                <i class="fab fa-facebook-square"></i>
-                                                            </a>
-                                                        </div>
-                                                    {% endif %}
-                                                    {% if collab.twitter %}
-                                                        <div class="col-1 px-0 mx-1">
-                                                            <a href="{{ collab.twitter }}" target="_blank"
-                                                               data-toggle="tooltip" data-original-title="Twitter">
-                                                                <i class="fab fa-twitter-square"></i>
-                                                            </a>
-                                                        </div>
-                                                    {% endif %}
-                                                    {% if collab.instagram %}
-                                                        <div class="col-1 px-0 mx-1">
-                                                            <a href="{{ collab.instagram }}" target="_blank"
-                                                               data-toggle="tooltip" data-original-title="Instagram">
-                                                                <i class="fab fa-instagram"></i>
-                                                            </a>
-                                                        </div>
-                                                    {% endif %}
-                                                    {% if collab.linkedin %}
-                                                        <div class="col-1 px-0 mx-1">
-                                                            <a href="{{ collab.linkedin }}" target="_blank"
-                                                               data-toggle="tooltip" data-original-title="LinkedIn">
-                                                                <i class="fab fa-linkedin"></i>
-                                                            </a>
-                                                        </div>
-                                                    {% endif %}
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Collaborator Fill Infos Modal -->
-                            <div class="modal fade" id="collaboratorFillInfosModal{{ collab.id }}" tabindex="-1" role="dialog"
-                                 aria-labelledby="filterModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
-                                    <div class="modal-content">
-                                        <div class="modal-header mt-2 align-items-center">
-                                            <h5 class="modal-title" style="margin-left: auto">
-                                                <i class="fas fa-user-friends text-blue" style="font-size: 1.4rem"></i>
-                                            </h5>
-                                            <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
-                                                  id="sortCollaboratorsModalLabel">{{ collab.user.get_full_name }}</span>
-                                            <button type="button" class="close mt--4" style="margin-left: -30px"
-                                                    data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body pt-3 pb-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                            <form id="collaboratorFillInfosForm{{ collab.id }}" method="post" 
-                                                  action="{% url 'fill_collaborator' collab.slug %}" 
-                                                  onsubmit="disableByID('collaboratorFillInfosButton{{ collab.id }}')">
-                                                {% csrf_token %}
-                                                <div class="row">
-                                                    <div class="col-8 form-group form-control-label">
-                                                        <label for="cpfInput{{ collab.id }}">CPF</label>
-                                                        <input class="form-control cpf-input"
-                                                            id="cpfInput{{ collab.id }}"
-                                                            name="cpf"
-                                                            type="text"
-                                                            value="{{ collab.cpf|default:'' }}">
-                                                    </div>
-                                                    <div class="col-4 form-group form-control-label">
-                                                        <label for="identificationInput">Registry</label>
-                                                        <input type="number" class="form-control" id="identificationInput" 
-                                                               name="identification" required="" autofocus="" 
-                                                               value="{% if collab.identification is not None %}{{ collab.identification }}{% endif %}">
-                                                    </div>
-                                                </div>
-                                                <div class="form-group form-control-label">
-                                                    <label for="cnpjInput{{ collab.id }}">CNPJ</label>
-                                                    <input class="form-control cnpj-input"
-                                                        id="cnpjInput{{ collab.id }}"
-                                                        name="cnpj"
-                                                        type="text"
-                                                        value="{{ collab.cnpj|default:'' }}">
-                                                </div>
-                                                <div class="form-group form-control-label">
-                                                    <label for="admissionInput">Admission</label>
-                                                    <input class="form-control" id="admissionInput" name="admission" autofocus="" type="date"
-                                                           value="{{ collab.admission|date:'Y-m-d'|default:'' }}">
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button class="btn btn-secondary" data-dismiss="modal" form="collaboratorFillInfosForm{{ collab.id }}"
-                                                    id="cancelButtonFile" type="button">
-                                                Cancel
-                                            </button>
-                                            <button class="btn btn-success" form="collaboratorFillInfosForm{{ collab.id }}" type="submit" 
-                                                    id="collaboratorFillInfosButton{{ collab.id }}">
-                                                Save
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- QRCode Modal -->
-                            {% if collab.qrcode %}
-                                <div class="modal fade" id="qrcode{{ collab.id }}" tabindex="-1" role="dialog"
-                                     aria-labelledby="qrcode{{ collab.id }}Label" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px"
-                                         role="document">
+
+                                <!-- Collaborator Fill Infos Modal -->
+                                <div class="modal fade" id="collaboratorFillInfosModal{{ collab.id }}" tabindex="-1" role="dialog"
+                                     aria-labelledby="filterModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
                                         <div class="modal-content">
-                                            <div class="modal-header align-items-center">
-                                                <h5 class="modal-title my-1" style="margin-left: auto">
-                                                    <i class="fas fa-qrcode text-blue" style="font-size: 1.5rem"></i>
+                                            <div class="modal-header mt-2 align-items-center">
+                                                <h5 class="modal-title" style="margin-left: auto">
+                                                    <i class="fas fa-user-friends text-blue" style="font-size: 1.4rem"></i>
                                                 </h5>
-                                                <h5 class="modal-title ml-3 my-1"
-                                                    style="margin-right: auto; font-size: 1.2rem"
-                                                    id="qrcode{{ collab.id }}Label">{{ collab.user.get_full_name }}</h5>
+                                                <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
+                                                      id="sortCollaboratorsModalLabel">{{ collab.user.get_full_name }}</span>
                                                 <button type="button" class="close mt--4" style="margin-left: -30px"
                                                         data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
-                                            <div class="modal-body py-0"
-                                                 style="padding-left: 2.5rem; padding-right: 2.5rem">
-                                                <div class="form-group mt-4 mb-0"
-                                                     style="display: flex; justify-content: center">
-                                                    <div style="z-index: 1; width: 250px; height: 250px; background-color: #adb5bd00">
-                                                        <img
-                                                                id="imagePreviewModal"
-                                                                class=""
-                                                                style="max-width: 100%; height: 100%; object-fit: cover;"
-                                                                alt="Image placeholder"
-                                                                src="{{ collab.qrcode.url }}">
+                                            <div class="modal-body pt-3 pb-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                <form id="collaboratorFillInfosForm{{ collab.id }}" method="post"
+                                                      action="{% url 'fill_collaborator' collab.slug %}"
+                                                      onsubmit="disableByID('collaboratorFillInfosButton{{ collab.id }}')">
+                                                    {% csrf_token %}
+                                                    <div class="row">
+                                                        <div class="col-8 form-group form-control-label">
+                                                            <label for="cpfInput{{ collab.id }}">CPF</label>
+                                                            <input class="form-control cpf-input"
+                                                                id="cpfInput{{ collab.id }}"
+                                                                name="cpf"
+                                                                type="text"
+                                                                value="{{ collab.cpf|default:'' }}">
+                                                        </div>
+                                                        <div class="col-4 form-group form-control-label">
+                                                            <label for="identificationInput">Registry</label>
+                                                            <input type="number" class="form-control" id="identificationInput"
+                                                                   name="identification" required="" autofocus=""
+                                                                   value="{% if collab.identification is not None %}{{ collab.identification }}{% endif %}">
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="cnpjInput{{ collab.id }}">CNPJ</label>
+                                                        <input class="form-control cnpj-input"
+                                                            id="cnpjInput{{ collab.id }}"
+                                                            name="cnpj"
+                                                            type="text"
+                                                            value="{{ collab.cnpj|default:'' }}">
+                                                    </div>
+                                                    <div class="form-group form-control-label">
+                                                        <label for="admissionInput">Admission</label>
+                                                        <input class="form-control" id="admissionInput" name="admission" autofocus="" type="date"
+                                                               value="{{ collab.admission|date:'Y-m-d'|default:'' }}">
+                                                    </div>
+                                                </form>
                                             </div>
                                             <div class="modal-footer">
-                                                <a href="{% url 'download_qrcode_collaborator' collab.slug %}" class="btn btn-success">
-                                                    <i class="fas fa-download text-white"></i>
-                                                </a>
+                                                <button class="btn btn-secondary" data-dismiss="modal" form="collaboratorFillInfosForm{{ collab.id }}"
+                                                        id="cancelButtonFile" type="button">
+                                                    Cancel
+                                                </button>
+                                                <button class="btn btn-success" form="collaboratorFillInfosForm{{ collab.id }}" type="submit"
+                                                        id="collaboratorFillInfosButton{{ collab.id }}">
+                                                    Save
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            {% endif %}
 
+                                <!-- QRCode Modal -->
+                                {% if collab.qrcode %}
+                                    <div class="modal fade" id="qrcode{{ collab.id }}" tabindex="-1" role="dialog"
+                                         aria-labelledby="qrcode{{ collab.id }}Label" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px"
+                                             role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header align-items-center">
+                                                    <h5 class="modal-title my-1" style="margin-left: auto">
+                                                        <i class="fas fa-qrcode text-blue" style="font-size: 1.5rem"></i>
+                                                    </h5>
+                                                    <h5 class="modal-title ml-3 my-1"
+                                                        style="margin-right: auto; font-size: 1.2rem"
+                                                        id="qrcode{{ collab.id }}Label">{{ collab.user.get_full_name }}</h5>
+                                                    <button type="button" class="close mt--4" style="margin-left: -30px"
+                                                            data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body py-0"
+                                                     style="padding-left: 2.5rem; padding-right: 2.5rem">
+                                                    <div class="form-group mt-4 mb-0"
+                                                         style="display: flex; justify-content: center">
+                                                        <div style="z-index: 1; width: 250px; height: 250px; background-color: #adb5bd00">
+                                                            <img
+                                                                    id="imagePreviewModal"
+                                                                    class=""
+                                                                    style="max-width: 100%; height: 100%; object-fit: cover;"
+                                                                    alt="Image placeholder"
+                                                                    src="{{ collab.qrcode.url }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="{% url 'download_qrcode_collaborator' collab.slug %}" class="btn btn-success">
+                                                        <i class="fas fa-download text-white"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                            {% endif %}
                         {% endfor %}
                         </tbody>
                     </table>
@@ -579,179 +471,6 @@
         </div>
     </div>
 
-    <!-- Filter Documents Modal -->
-    <div aria-hidden="true" aria-labelledby="filterCollaboratorsModalLabel" class="modal fade"
-         id="filterCollaboratorsModal"
-         role="dialog" tabindex="-1">
-        <div class="modal-dialog my-6" role="document">
-            <div class="modal-content">
-                <div class="modal-header mt-2 align-items-center">
-                    <h5 class="modal-title my-1" style="margin-left: auto">
-                        <i class="ni ni-ui-04 text-blue"
-                           style="font-size: 1.5rem; margin-top: 0.15rem !important"></i>
-                    </h5>
-                    <span class="ml-3 my-1"
-                          id="filterCollaboratorsModalLabel"
-                          style="margin-right: auto; font-size: 1.2rem">Filter</span>
-                    <button aria-label="Close" class="close mt--4" data-dismiss="modal"
-                            style="margin-left: -30px" type="button">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body py-0"
-                     style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form action="{% url 'filter_collaborators' %}" enctype="multipart/form-data" id="filterCollaborators" 
-                          method="post" onsubmit="disableByID('filterCollaborators')">
-                        {% csrf_token %}
-                        <input type="hidden" name="sort_by" value="{{ sorted_by }}">
-                        <input type="hidden" name="sort_type" value="{{ sort_type }}">
-                        <div class="row">
-                            <div class="col-sm form-group form-control-label">
-                                <label for="officeInput">Office</label>
-                                <select class="form-control" id="officeInput" name="office">
-                                    <option value="all"></option>
-                                    {% for office in offices %}
-                                        <option value="{{ office.id }}"
-                                                {% if 'office=' in filters and filters|extract_from_key:'office' == office.id %} selected {% endif %}>
-                                            {{ office.company_name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-sm form-group form-control-label">
-                                <label for="group">Group</label>
-                                <select class="form-control" id="group" name="group">
-                                    <option value="all"></option>
-                                    <option value="admin" {% if 'group' in filters and filters|extract_from_key:'group=' == 'admin' %}selected{% endif %}>Administrator</option>
-                                    <option value="financial" {% if 'group' in filters and filters|extract_from_key:'group=' == 'financial' %}selected{% endif %}>Financial</option>
-                                </select>
-                            </div>
-                        </div>
-                        <label class="form-control-label">Status</label>
-                        <div class="mt-2 form-group align-items-center" style="display: flex">
-                            <label class="mb-0 mr-2" style="font-size: 0.875rem">Disabled</label>
-                            <label class="custom-toggle custom-toggle-danger mr-4">
-                                <input type="checkbox" {% if filters|extract_from_key:'disabled' == 'off' %}{% else %}checked=""{% endif %} name="disabled_filter">
-                                <span class="custom-toggle-slider rounded-circle" data-label-off="No"
-                                      data-label-on="Yes"></span>
-                            </label>
-                            <label class="mb-0 mr-2" style="font-size: 0.875rem">Active</label>
-                            <label class="custom-toggle custom-toggle-success mr-4">
-                                <input type="checkbox" {% if filters|extract_from_key:'active' == 'off' %}{% else %}checked=""{% endif %} name="active_filter">
-                                <span class="custom-toggle-slider rounded-circle" data-label-off="No"
-                                      data-label-on="Yes"></span>
-                            </label>
-                        </div>
-                    </form>
-                    <form action="{% url 'sort_collaborators' %}" method="post" id="unfilterForm" 
-                          onsubmit="disableByID('unfilterButton')">
-                        {% csrf_token %}
-                        <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                        {% if sort_type == 'asc' %}
-                            <input type="hidden" value="True" name="asc">
-                        {% elif sort_type == 'desc' %}
-                            <input type="hidden" value="True" name="desc">
-                        {% endif %}
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-dismiss="modal" form="uploadDocument"
-                            id="cancelButtonFile" type="button">
-                        Cancel
-                    </button>
-                    {% if filters and sorted_by %}
-                        <button type="submit" class="btn btn-danger" id="unfilterButton" form="unfilterForm">
-                            Unfilter
-                        </button>
-                    {% elif filters %}
-                        <a href="{% url 'collaborators_list' %}" class="btn btn-danger">
-                            Unfilter
-                        </a>
-                    {% endif %}
-                    <button class="btn btn-primary" id="filterCollaboratorsButton" form="filterCollaborators" type="submit">
-                        Filter
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sort Documents Modal -->
-    <div class="modal fade" id="sortCollaboratorsModal" tabindex="-1" role="dialog"
-         aria-labelledby="sortCollaboratorsModalLabel" aria-hidden="true">
-        <div class="modal-dialog my-6" role="document">
-            <div class="modal-content">
-                <div class="modal-header mt-2 align-items-center">
-                    <h5 class="modal-title" style="margin-left: auto">
-                        <i class="ni ni-bullet-list-67 text-blue" style="font-size: 1.4rem"></i>
-                    </h5>
-                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
-                          id="sortCollaboratorsModalLabel">Sort</span>
-                    <button type="button" class="close mt--4" style="margin-left: -30px"
-                            data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="sortCollaboratorsForm" method="post" action="{% url 'sort_collaborators' %}" 
-                          onsubmit="disableByID('sortButton')">
-                        {% csrf_token %}
-                        <input type="hidden" name="filters" value="{{ filters }}">
-                        <label class="form-control-label" for="sortByModalInput">Data</label>
-                        <div class="row">
-                            <div class="col-8 form-group form-control-label">
-                                <select class="form-control" id="sortByModalInput" name="sort_by"
-                                        onchange="clearChks(this)">
-                                    <option value=""></option>
-                                    <option value="admission" {% if sorted_by == 'admission' %} selected {% endif %}>
-                                        Admission
-                                    </option>
-                                    {% if perms.home.view_document %}
-                                        <option value="aso" {% if sorted_by == 'aso' %} selected {% endif %}>
-                                            ASO
-                                        </option>
-                                    {% endif %}
-                                    <option value="birthday" {% if sorted_by == 'birthday' %} selected {% endif %}>
-                                        Birthday
-                                    </option>
-                                    <option value="identification" {% if sorted_by == 'id' %} selected {% endif %}>
-                                        ID
-                                    </option>
-                                    <option value="name" {% if sorted_by == 'name' %} selected {% endif %}>
-                                        Name
-                                    </option>
-                                    <option value="position" {% if sorted_by == 'position' %} selected {% endif %}>
-                                        Position
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-4 form-group align-items-center" style="display: flex">
-                                <div class="custom-control custom-checkbox custom-checkbox-primary mr-4">
-                                    <input class="custom-control-input" id="chk-asc" type="checkbox" name="asc"
-                                            {% if sort_type == 'asc' %} checked {% endif %}
-                                           onclick="changeAscDesc(event)">
-                                    <label class="custom-control-label" for="chk-asc">ASC</label>
-                                </div>
-                                <div class="custom-control custom-checkbox custom-checkbox-primary">
-                                    <input class="custom-control-input" id="chk-desc" type="checkbox" name="desc"
-                                            {% if sort_type == 'desc' %} checked {% endif %}
-                                           onclick="changeAscDesc(event)">
-                                    <label class="custom-control-label" for="chk-desc">DESC</label>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer  pt-1">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="sortButton" form="sortCollaboratorsForm">
-                        Sort
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Footer -->
     <div class="container-fluid">
         {% include "includes/footer.html" %}
@@ -760,6 +479,26 @@
 {% endblock content %}
 
 {% block javascripts %}
+
+    <script>
+        $(document).ready(function() {
+
+            $('#projectsListTable').DataTable({
+                pageLength: 10,
+                ordering: true,
+                searching: true,
+                columnDefs: [
+                    {
+                        targets: -1,
+                        orderable: false
+                    }
+                ]
+            });
+
+            $('.dt-search input.dt-input').attr('placeholder', 'Search');
+
+        });
+    </script>
     
     <script>
     
@@ -837,7 +576,6 @@
         });
     </script>
 
-    
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Get the task ID from the fragment identifier in the URL

@@ -29,7 +29,6 @@ def details(request):
 
     context = {
         'tasks_count': all_tasks.count(),
-        'user': Profile.objects.get(user=user),
         'user_profile': Profile.objects.get(user=user),
         'shared_documents': shared_documents,
         'tasks': sorted(tasks_to_do, key=lambda x: x.deadline if x.deadline else datetime.date.max),
@@ -67,6 +66,7 @@ def change_picture(request):
 
 def edit(request):
     if request.method == "POST":
+        print(request.POST)
         user_object = User.objects.get(username=request.user.username)
 
         user_object.first_name = request.POST['first_name'].title()
