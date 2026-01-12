@@ -20,7 +20,6 @@ projects_list_urls = [
     path('projects/change-status=<slug:slug>/redirect-to=<str:situation_page>', projects.change_project_status,
          name='change_project_status'),
 
-    path('projects/order', projects.sort_and_filter_projects, name='sort_projects'),
     path('projects/filter', projects.filter_projects, name='filter_projects'),
 
     path('projects/order:<str:sorted_by>-<str:sort_type>', projects.home, name='sorted_projects'),

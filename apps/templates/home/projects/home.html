@@ -51,16 +51,6 @@
                             </div>
                             <div class="col-auto text-right">
                                 {% if situation != "archive" %}
-                                    <a href="#" class="btn btn-sm {% if sorted_by is None %}btn-neutral{% else %}btn-primary{% endif %}" data-toggle="modal"
-                                       data-target="#sortModal">
-                                        {% if sort_type == 'desc' %}
-                                            <i class="fas fa-caret-down mr-0"></i>{% elif sort_type == 'asc' %}
-                                            <i class="fas fa-caret-up mr-0"></i>{% endif %}
-                                        {% if sorted_by is not None %}
-                                            <span>{% if sorted_by != 'id' %}{{ sorted_by|capfirst }}{% else %}ID{% endif %}</span>{% else %}
-                                            <i class="fas fa-sort"></i>
-                                        {% endif %}
-                                    </a>
                                     <a href="#" class="btn btn-sm {% if filters is None %}btn-neutral{% else %}btn-primary{% endif %}" data-toggle="modal"
                                    data-target="#filterModal">
                                         <i class="fas fa-filter {% if filters is None %}{% else %}mr-0{% endif %}"></i>
@@ -117,10 +107,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body p-0" style="height: 536px; overflow: auto">
+                    <div class="card-body p-0">
                         <!-- Light table -->
-                        <table id="projectsListTable" class="table-responsive table align-items-center table-flush"
-                               style="min-height: 531.61px">
+                        <table id="projectsListTable" class="table-responsive table align-items-center table-flush">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col" class="px-2 justify-content-center" style="width: 0"></th>
@@ -399,65 +388,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="card-footer py-4">
-                        <nav aria-label="...">
-                            <ul class="pagination justify-content-end mb-0">
-                                {% if projects_list.has_previous %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ projects_list.previous_page_number }}">
-                                            <i class="fas fa-angle-left"></i>
-                                            <span class="sr-only">Previous</span>
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#" tabindex="-1">
-                                            <i class="fas fa-angle-left"></i>
-                                            <span class="sr-only">Previous</span>
-                                        </a>
-                                    </li>
-                                {% endif %}
-
-                                {% for page_num in projects_list.paginator.page_range %}
-                                    {% if projects_list.number == page_num %}
-                                        <li class="page-item active">
-                                            <a class="page-link" href="#">{{ page_num }}</a>
-                                        </li>
-                                    {% elif page_num > projects_list.number|add:"-2" and page_num < projects_list.number|add:"2" %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                                        </li>
-                                    {% elif page_num == projects_list.paginator.num_pages or page_num == 1 %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                                        </li>
-                                    {% else %}
-                                        {% if page_num == projects_list.number|add:"-2" or page_num == projects_list.number|add:"2" %}
-                                            <li class="page-item disabled">
-                                                <a class="page-link" href="#" tabindex="-1">...</a>
-                                            </li>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-
-                                {% if projects_list.has_next %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ projects_list.next_page_number }}">
-                                            <i class="fas fa-angle-right"></i>
-                                            <span class="sr-only">Next</span>
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#" tabindex="-1">
-                                            <i class="fas fa-angle-right"></i>
-                                            <span class="sr-only">Next</span>
-                                        </a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    </div>
+                    <div class="card-footer py-1 border-0"></div>
                 </div>
             </div>
         </div>
@@ -678,23 +609,13 @@
                             </label>
                         </div>
                     </form>
-                    <form action="{% url 'sort_projects' %}" method="post" id="unfilterForm" 
-                          onsubmit="disableByID('unfilterButton')">
-                        {% csrf_token %}
-                        <input type="hidden" value="{{ sorted_by }}" name="sort_by">
-                        {% if sort_type == 'asc' %}
-                            <input type="hidden" value="True" name="asc">
-                        {% elif sort_type == 'desc' %}
-                            <input type="hidden" value="True" name="desc">
-                        {% endif %}
-                    </form>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss="modal" id="cancelButton" type="button">
                         Cancel
                     </button>
                     {% if filters and sorted_by %}
-                        <button type="submit" class="btn btn-danger" id="unfilterButton" form="unfilterForm">
+                        <button type="submit" class="btn btn-danger" href="{% url 'project_list' %}">
                             Unfilter
                         </button>
                     {% elif filters %}
@@ -710,76 +631,6 @@
         </div>
     </div>
 
-    <!-- Sort Modal -->
-    <div class="modal fade" id="sortModal" tabindex="-1" role="dialog"
-         aria-labelledby="sortModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header mt-2 align-items-center">
-                    <h5 class="modal-title" style="margin-left: auto">
-                        <i class="ni ni-bullet-list-67 text-blue" style="font-size: 1.4rem"></i>
-                    </h5>
-                    <span class="ml-3 my-1" style="margin-right: auto; font-size: 1.2rem"
-                          id="sortModalLabel">Sort</span>
-                    <button type="button" class="close mt--4" style="margin-left: -30px"
-                            data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body py-0" style="padding-left: 2.5rem; padding-right: 2.5rem">
-                    <form id="sortProjectsForm" method="post" action="{% url 'sort_projects' %}" 
-                          onsubmit="disableByID('sortButton')">
-                        {% csrf_token %}
-                        <input type="hidden" name="filters" value="{{ filters }}">
-                        <input type="hidden" name="page" value="{{ projects_list.number }}">
-                        <label class="form-control-label" for="sortByModalInput">Data</label>
-                        <div class="row">
-                            <div class="col-8 form-group form-control-label">
-                                <select class="form-control" id="sortByModalInput" name="sort_by"
-                                        onchange="clearChks(this)">
-                                    <option value=""></option>
-                                    <option value="client" {% if sorted_by == 'client' %} selected {% endif %}>
-                                        Client
-                                    </option>
-                                    <option value="deadline" {% if sorted_by == 'deadline' %} selected {% endif %}>
-                                        Deadline
-                                    </option>
-                                    <option value="id" {% if sorted_by == 'id' %} selected {% endif %}>
-                                        ID
-                                    </option>
-                                    <option value="performance" {% if sorted_by == 'performance' %} selected {% endif %}>
-                                        Performance
-                                    </option>
-                                    <option value="title" {% if sorted_by == 'title' %} selected {% endif %}>
-                                        Title
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-4 form-group align-items-center" style="display: flex">
-                                <div class="custom-control custom-checkbox custom-checkbox-primary mr-4">
-                                    <input class="custom-control-input" id="chk-asc" type="checkbox" name="asc"
-                                            {% if sort_type == 'asc' %} checked {% endif %}
-                                           onclick="changeAscDesc(event)">
-                                    <label class="custom-control-label" for="chk-asc">ASC</label>
-                                </div>
-                                <div class="custom-control custom-checkbox custom-checkbox-primary">
-                                    <input class="custom-control-input" id="chk-desc" type="checkbox" name="desc"
-                                            {% if sort_type == 'desc' %} checked {% endif %}
-                                           onclick="changeAscDesc(event)">
-                                    <label class="custom-control-label" for="chk-desc">DESC</label>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="sortButton" form="sortProjectsForm">Sort</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 {% endblock content %}
 
 <!-- Specific JS goes HERE -->
@@ -788,6 +639,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+
+            $('#projectsListTable').DataTable({
+                pageLength: 10,
+                ordering: true,
+                searching: true,
+                columnDefs: [
+                    {
+                        targets: -1,
+                        orderable: false
+                    }
+                ]
+            });
+
+            $('.dt-search input.dt-input').attr('placeholder', 'Search');
+
+        });
+    </script>
     
     <script>
     
